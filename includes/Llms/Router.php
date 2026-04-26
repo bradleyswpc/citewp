@@ -62,13 +62,11 @@ final class Router {
 			? $this->get_or_build_full()
 			: $this->get_or_build_short();
 
-		nocache_headers();
 		header( 'Content-Type: text/plain; charset=utf-8' );
 		header( 'X-Robots-Tag: noindex' );
 		header( 'X-Generated-By: CiteWP/' . CITEWP_VERSION );
-
-		// Make caches respect the conditional regeneration.
 		header( 'Cache-Control: public, max-age=3600' );
+		header( 'Pragma: public' );
 
 		echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- intentional plaintext
 		exit;

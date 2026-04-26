@@ -47,9 +47,6 @@ final class Menu {
 		}
 	}
 
-	/**
-	 * Placeholder dashboard. Replaced in week 5.
-	 */
 	public function render_dashboard(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;

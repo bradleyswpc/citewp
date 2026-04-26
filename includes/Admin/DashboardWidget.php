@@ -170,7 +170,7 @@ final class DashboardWidget {
 			)
 		);
 
-		return $result !== null ? (int) $result : null;
+		return $result !== null ? (int) $result : null; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Admin stat; real-time data, intentionally uncached.
 	}
 
 	/**
@@ -238,13 +238,7 @@ final class DashboardWidget {
 				'posts_per_page' => 5,
 				'orderby'        => 'meta_value_num',
 				'order'          => 'ASC',
-				'meta_key'       => Repository::META_KEY_TOTAL,
-				'meta_query'     => [
-					[
-						'key'     => Repository::META_KEY_TOTAL,
-						'compare' => 'EXISTS',
-					],
-				],
+				'meta_key'       => Repository::META_KEY_TOTAL, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Intentional; orderby meta_value_num requires meta_key.
 			]
 		);
 

@@ -59,6 +59,7 @@ final class LogsTable extends \WP_List_Table {
 		$table = Schema::table( Schema::TABLE_CRAWLER_LOGS );
 
 		// Load distinct bots before filter validation (validator checks against this list).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Filter dropdown; real-time, intentionally uncached.
 		$rows                = $wpdb->get_col( "SELECT DISTINCT bot_name FROM {$table} ORDER BY bot_name ASC" );
 		$this->distinct_bots = is_array( $rows ) ? $rows : [];
 
@@ -87,7 +88,8 @@ final class LogsTable extends \WP_List_Table {
 				$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE 1=1 {$where}", ...$filter_args )
 			);
 		} else {
-			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Real-time count; intentionally uncached.
+			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
 		}
 
 		$offset    = ( $current - 1 ) * $per_page;
