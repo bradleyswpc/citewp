@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+build/
+dist/
+*.min.js
+*.min.css
+
+# WP / IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.log
+
+# Env / secrets
+.env
+.env.local
+*.pem
+
+# Local WP testing
+wp-cli.local.yml
+
+# wp-env Docker state (config is tracked, runtime data is not)
+.wp-env.override.json
