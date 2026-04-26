@@ -45,6 +45,15 @@ final class Plugin {
 			$this->modules['llms_router']->register();
 		}
 
+		// Scoring: persists scores on save_post; runs on every request because
+		// the save_post hook needs to be registered.
+		$this->modules['scoring_repository'] = new Scoring\Repository();
+		$this->modules['scoring_repository']->register();
+
+		// REST API for score retrieval (Gutenberg sidebar + post list).
+		$this->modules['rest_score_controller'] = new Rest\ScoreController();
+		$this->modules['rest_score_controller']->register();
+
 		// Admin-only modules.
 		if ( is_admin() ) {
 			$this->modules['admin_menu'] = new Admin\Menu();
@@ -55,6 +64,12 @@ final class Plugin {
 
 			$this->modules['settings_page'] = new Settings\Page();
 			$this->modules['settings_page']->register();
+
+			$this->modules['post_list_column'] = new Admin\PostListColumn();
+			$this->modules['post_list_column']->register();
+
+			$this->modules['editor_assets'] = new Admin\EditorAssets();
+			$this->modules['editor_assets']->register();
 		}
 	}
 

@@ -4,7 +4,7 @@ Tags: ai, llm, geo, llms.txt, gptbot, claudebot, perplexity, generative engine o
 Requires at least: 6.5
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,14 @@ CiteWP is a Generative Engine Optimization (GEO) toolkit for WordPress. As AI se
 3. Navigate to **CiteWP > Crawler Logs** to start seeing AI bot activity
 
 == Changelog ==
+
+= 0.3.0 =
+* Added GEO Score: 100-point scoring across Structure (35), Citability (40), and Authority (25) categories.
+* 17 individual signals based on 2026 GEO research (statistics density, entity count, FAQ schema, E-E-A-T, etc.).
+* Gutenberg sidebar with expandable category breakdown and per-signal recommendations.
+* Sortable GEO Score column on All Posts and All Pages screens.
+* REST API at /citewp/v1/score/ for score retrieval and recalculation.
+* Auto-recalculation on every save_post.
 
 = 0.2.0 =
 * Added llms.txt and llms-full.txt dynamic generation per llmstxt.org spec.
