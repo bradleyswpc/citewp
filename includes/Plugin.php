@@ -70,6 +70,9 @@ final class Plugin {
 
 			$this->modules['editor_assets'] = new Admin\EditorAssets();
 			$this->modules['editor_assets']->register();
+
+			$this->modules['dashboard_widget'] = new Admin\DashboardWidget();
+			$this->modules['dashboard_widget']->register();
 		}
 	}
 
