@@ -6,6 +6,93 @@
 
 ---
 
+## Session 6 — Security Audit + Plugin Check Prep ✅
+
+**Date:** 2026-04-26
+
+**Deliverable:** Pre-WP.org submission security pass, hygiene cleanup, and version bump to 0.4.0.
+
+**Modified:**
+- `LICENSE` — added GPL v2 license file (WP.org submission requirement)
+- `citewp.php` — version bumped to 0.4.0
+- `readme.txt` — version bumped to 0.4.0; description rewritten to reflect actually-shipped features (crawler logs, llms.txt, GEO Score, dashboard widget, filters, CSV); 0.4.0 changelog entry added
+- `uninstall.php` — added missing `citewp_llms_settings` option to cleanup; added all `_citewp_*` post meta cleanup; added transient cleanup
+- `includes/Llms/Router.php` — removed `nocache_headers()` call that contradicted the explicit `Cache-Control` header set immediately after
+- `includes/Admin/LogsPage.php` — added `phpcs:ignore` annotations on direct DB stat queries (Plugin Check expects either a justification or a wpdb wrapper; annotations chosen since stats need raw aggregation)
+- `includes/Admin/LogsTable.php` — same `phpcs:ignore` treatment on count/filter queries
+- `includes/Admin/DashboardWidget.php` — removed redundant `meta_query EXISTS` (the `meta_key` filter already enforces existence; was a double-check that confused Plugin Check)
+- `includes/Admin/Menu.php` — removed stale placeholder comment
+
+**Decisions made:** None new. Standard pre-submission hygiene against existing Plugin Check expectations.
+
+**Verified:**
+- LICENSE file present and correct (GPL v2 — required for WP.org).
+- Uninstall genuinely removes everything: crawler_logs table, both options, all post meta, transients.
+- llms.txt cache headers no longer contradict each other.
+- Direct DB queries justified inline; Plugin Check annotations in place.
+- Committed and pushed: `f5e5699` — `feat: security audit + Plugin Check prep (v0.4.0)`.
+
+**Carryover into Session 7:**
+- None. Plugin should now pass WP.org Plugin Check tool. Next session is to actually run the tool and address anything it flags.
+
+**Next session focus:** Session 7 — run WP.org Plugin Check, fix any remaining warnings, prepare WP.org submission assets (banner, icon, screenshots).
+
+---
+
+## Session 5 — Settings Polish + Crawler Stats + CSV Export ✅
+
+**Date:** 2026-04-26
+
+**Deliverable:** Summary stats banner (24h/7d/30d), bot type filter, date range filter, and CSV export on the Crawler Logs page. Settings page inline-style cleanup.
+
+**Modified:**
+- `includes/Admin/LogsTable.php` — added `extra_tablenav()` with bot + date-range filter dropdowns; updated `prepare_items()` to apply both filters to COUNT and data queries; added `validated_bot_filter()`, `validated_range_filter()`, `range_to_since()` helpers
+- `includes/Admin/LogsPage.php` — replaced thin description text with 3-stat banner (24h/7d/30d); added "Export CSV" button; added `handle_csv_export()` (nonce + capability checked, streams UTF-8 BOM CSV with current filters applied); added `inline_styles()` scoped to logs screen
+- `includes/Settings/Page.php` — moved `style="display:block"` inline style to `.citewp-cpt-label` CSS class via `inline_styles()` / `admin_head` hook
+
+**Decisions made:** None new.
+
+**Verified:**
+- Stats banner renders correctly on Crawler Logs page.
+- Bot type and date range filters narrow the table and persist in pagination.
+- Export CSV downloads a valid file with headers and local timestamps; Chrome download prompt is expected browser behavior on localhost, not a plugin issue.
+- `npm run build` succeeded (3 pre-existing warnings only).
+- Committed and pushed: `28e91e8`.
+
+**Carryover into Session 6:**
+- None.
+
+**Next session focus:** Session 6 — Plugin Check + security audit.
+
+---
+
+## Session 4 — Dashboard Widget ✅
+
+**Date:** 2026-04-26
+
+**Deliverable:** WordPress Dashboard home widget showing avg GEO score, bot visit trend, top crawled pages, and lowest-scoring posts.
+
+**Shipped:**
+- `includes/Admin/DashboardWidget.php` — registers on `wp_dashboard_setup`; displays 4 sections: avg GEO score stat (grade-colored), bot visits last 7d vs prior 7d with trend arrow, top 5 crawled URIs (last 7 days), lowest 5 scored posts with edit links
+
+**Modified:**
+- `includes/Plugin.php` — wired `DashboardWidget` into `is_admin()` block
+
+**Decisions made:** None new. All decisions consistent with prior sessions.
+
+**Verified:**
+- Widget appears on WP Dashboard home (wp-admin/index.php).
+- Avg GEO score, bot visit trend, crawled pages, and lowest-scoring posts all render correctly.
+- `npm run build` succeeded (3 pre-existing warnings from sidebar `chartLine` icon — not introduced this session).
+- Committed and pushed: `12b993e`.
+
+**Carryover into Session 5:**
+- None.
+
+**Next session focus:** Session 5 — Settings page polish + crawler dashboard summary stats + CSV export.
+
+---
+
 ## Session 3 — GEO Score (Engine + REST + Sidebar + Post Column) ✅
 
 **Date:** 2026-04-26
