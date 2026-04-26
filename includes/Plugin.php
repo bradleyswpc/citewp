@@ -35,6 +35,16 @@ final class Plugin {
 		$this->modules['crawler_detector'] = new Crawler\Detector();
 		$this->modules['crawler_detector']->register();
 
+		// llms.txt: cache invalidation + request routing run on every request.
+		$llms_settings = get_option( 'citewp_llms_settings', [] );
+		if ( ! empty( $llms_settings['enabled'] ) || ! isset( $llms_settings['enabled'] ) ) {
+			$this->modules['llms_cache'] = new Llms\Cache();
+			$this->modules['llms_cache']->register();
+
+			$this->modules['llms_router'] = new Llms\Router();
+			$this->modules['llms_router']->register();
+		}
+
 		// Admin-only modules.
 		if ( is_admin() ) {
 			$this->modules['admin_menu'] = new Admin\Menu();
@@ -42,11 +52,14 @@ final class Plugin {
 
 			$this->modules['admin_logs_page'] = new Admin\LogsPage();
 			$this->modules['admin_logs_page']->register();
+
+			$this->modules['settings_page'] = new Settings\Page();
+			$this->modules['settings_page']->register();
 		}
 	}
 
 	/**
-	 * Activation hook. Creates DB tables, sets defaults.
+	 * Activation hook. Creates DB tables, sets defaults, registers rewrite rules.
 	 */
 	public static function activate(): void {
 		Database\Schema::install();
@@ -58,8 +71,18 @@ final class Plugin {
 				'log_retention_days'       => 7,
 			]
 		);
+		add_option(
+			'citewp_llms_settings',
+			[
+				'enabled'          => true,
+				'min_word_count'   => 500,
+				'recent_days'      => 90,
+				'extra_post_types' => [],
+			]
+		);
 
-		flush_rewrite_rules();
+		// Register llms.txt rewrite rules and flush so /llms.txt resolves immediately.
+		Llms\Router::flush_rewrite_rules_on_activation();
 	}
 
 	/**
