@@ -15,6 +15,9 @@ defined( 'ABSPATH' ) || exit;
 
 final class LogsTable extends \WP_List_Table {
 
+	/** Populated in prepare_items(); used by extra_tablenav() for the bot dropdown. */
+	private array $distinct_bots = [];
+
 	public function __construct() {
 		parent::__construct(
 			[
@@ -53,26 +56,58 @@ final class LogsTable extends \WP_List_Table {
 	public function prepare_items(): void {
 		global $wpdb;
 
-		$per_page = 25;
-		$current  = $this->get_pagenum();
-
-		$orderby = $this->validated_orderby();
-		$order   = $this->validated_order();
-
 		$table = Schema::table( Schema::TABLE_CRAWLER_LOGS );
 
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
+		// Load distinct bots before filter validation (validator checks against this list).
+		$rows                = $wpdb->get_col( "SELECT DISTINCT bot_name FROM {$table} ORDER BY bot_name ASC" );
+		$this->distinct_bots = is_array( $rows ) ? $rows : [];
 
-		$offset = ( $current - 1 ) * $per_page;
+		$per_page   = 25;
+		$current    = $this->get_pagenum();
+		$orderby    = $this->validated_orderby();
+		$order      = $this->validated_order();
+		$bot_filter = $this->validated_bot_filter();
+		$since      = $this->range_to_since( $this->validated_range_filter() );
 
-		// $orderby/$order are whitelisted by the validator methods, safe to interpolate.
-		$query = $wpdb->prepare(
-			"SELECT * FROM {$table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
-			$per_page,
-			$offset
-		);
+		$where       = '';
+		$filter_args = [];
 
-		$this->items = $wpdb->get_results( $query, ARRAY_A ) ?: [];
+		if ( $bot_filter !== '' ) {
+			$where        .= ' AND bot_name = %s';
+			$filter_args[] = $bot_filter;
+		}
+		if ( $since !== null ) {
+			$where        .= ' AND detected_at >= %s';
+			$filter_args[] = $since;
+		}
+
+		if ( ! empty( $filter_args ) ) {
+			$total = (int) $wpdb->get_var(
+				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $where built from whitelisted values.
+				$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE 1=1 {$where}", ...$filter_args )
+			);
+		} else {
+			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		}
+
+		$offset    = ( $current - 1 ) * $per_page;
+		$data_args = array_merge( $filter_args, [ $per_page, $offset ] );
+
+		if ( ! empty( $filter_args ) ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $where/$orderby/$order are whitelisted.
+			$query = $wpdb->prepare(
+				"SELECT * FROM {$table} WHERE 1=1 {$where} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
+				...$data_args
+			);
+		} else {
+			$query = $wpdb->prepare(
+				"SELECT * FROM {$table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$per_page,
+				$offset
+			);
+		}
+
+		$this->items = $wpdb->get_results( $query, ARRAY_A ) ?: []; // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		$this->set_pagination_args(
 			[
@@ -85,6 +120,42 @@ final class LogsTable extends \WP_List_Table {
 		$this->_column_headers = [ $this->get_columns(), [], $this->get_sortable_columns() ];
 	}
 
+	protected function extra_tablenav( $which ): void {
+		if ( $which !== 'top' ) {
+			return;
+		}
+
+		$current_bot   = $this->validated_bot_filter();
+		$current_range = $this->validated_range_filter();
+		?>
+		<div class="alignleft actions">
+			<label class="screen-reader-text" for="citewp_bot_filter">
+				<?php esc_html_e( 'Filter by bot', 'citewp' ); ?>
+			</label>
+			<select id="citewp_bot_filter" name="citewp_bot">
+				<option value=""><?php esc_html_e( 'All bots', 'citewp' ); ?></option>
+				<?php foreach ( $this->distinct_bots as $bot ) : ?>
+					<option value="<?php echo esc_attr( $bot ); ?>" <?php selected( $current_bot, $bot ); ?>>
+						<?php echo esc_html( $bot ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+
+			<label class="screen-reader-text" for="citewp_range_filter">
+				<?php esc_html_e( 'Filter by date range', 'citewp' ); ?>
+			</label>
+			<select id="citewp_range_filter" name="citewp_range">
+				<option value=""><?php esc_html_e( 'All time', 'citewp' ); ?></option>
+				<option value="24h" <?php selected( $current_range, '24h' ); ?>><?php esc_html_e( 'Last 24 hours', 'citewp' ); ?></option>
+				<option value="7d"  <?php selected( $current_range, '7d' );  ?>><?php esc_html_e( 'Last 7 days', 'citewp' ); ?></option>
+				<option value="30d" <?php selected( $current_range, '30d' ); ?>><?php esc_html_e( 'Last 30 days', 'citewp' ); ?></option>
+			</select>
+
+			<?php submit_button( __( 'Filter', 'citewp' ), '', 'filter_action', false ); ?>
+		</div>
+		<?php
+	}
+
 	private function validated_orderby(): string {
 		$allowed = [ 'detected_at', 'bot_name', 'bot_vendor' ];
 		$orderby = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'detected_at';
@@ -94,6 +165,25 @@ final class LogsTable extends \WP_List_Table {
 	private function validated_order(): string {
 		$order = isset( $_GET['order'] ) ? strtoupper( sanitize_key( wp_unslash( $_GET['order'] ) ) ) : 'DESC';
 		return in_array( $order, [ 'ASC', 'DESC' ], true ) ? $order : 'DESC';
+	}
+
+	private function validated_bot_filter(): string {
+		$bot = isset( $_GET['citewp_bot'] ) ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) ) : '';
+		return in_array( $bot, $this->distinct_bots, true ) ? $bot : '';
+	}
+
+	private function validated_range_filter(): string {
+		$range = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) ) : '';
+		return in_array( $range, [ '24h', '7d', '30d' ], true ) ? $range : '';
+	}
+
+	private function range_to_since( string $range ): ?string {
+		return match ( $range ) {
+			'24h'   => gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ),
+			'7d'    => gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) ),
+			'30d'   => gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) ),
+			default => null,
+		};
 	}
 
 	/**
@@ -124,8 +214,7 @@ final class LogsTable extends \WP_List_Table {
 	 * @param array<string, mixed> $item
 	 */
 	public function column_request_uri( $item ): string {
-		$uri = (string) ( $item['request_uri'] ?? '' );
-		// Truncate long paths in display, keep full value as title attribute.
+		$uri     = (string) ( $item['request_uri'] ?? '' );
 		$display = mb_strlen( $uri ) > 60 ? mb_substr( $uri, 0, 57 ) . '…' : $uri;
 		return sprintf(
 			'<code title="%s">%s</code>',
@@ -144,6 +233,6 @@ final class LogsTable extends \WP_List_Table {
 	}
 
 	public function no_items(): void {
-		esc_html_e( 'No crawler activity logged yet.', 'citewp' );
+		esc_html_e( 'No crawler activity matches your filters.', 'citewp' );
 	}
 }

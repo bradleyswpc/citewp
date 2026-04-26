@@ -24,6 +24,7 @@ final class Page {
 		add_action( 'admin_menu', [ $this, 'add_submenu' ], 20 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_post_citewp_regenerate_llms', [ $this, 'handle_regenerate' ] );
+		add_action( 'admin_head', [ $this, 'inline_styles' ] );
 	}
 
 	public function add_submenu(): void {
@@ -115,6 +116,18 @@ final class Page {
 			)
 		);
 		exit;
+	}
+
+	public function inline_styles(): void {
+		$screen = get_current_screen();
+		if ( ! $screen || $screen->id !== 'citewp_page_' . self::SLUG ) {
+			return;
+		}
+		?>
+		<style>
+			.citewp-cpt-label { display: block; margin-bottom: 4px; }
+		</style>
+		<?php
 	}
 
 	public function render(): void {
@@ -212,7 +225,7 @@ final class Page {
 						<th scope="row"><?php esc_html_e( 'Include custom post types', 'citewp' ); ?></th>
 						<td>
 							<?php foreach ( $public_types as $type ) : ?>
-								<label style="display:block;">
+								<label class="citewp-cpt-label">
 									<input type="checkbox" name="<?php echo esc_attr( self::OPTION_LLMS ); ?>[extra_post_types][]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, (array) ( $llms['extra_post_types'] ?? [] ), true ) ); ?> />
 									<?php echo esc_html( $type->labels->name ); ?>
 								</label>
