@@ -1,7 +1,7 @@
 {
-  "name": "citewp",
-  "version": "0.3.0",
-  "description": "Build pipeline for the CiteWP Gutenberg sidebar.",
+  "name": "ai-search-optimizer",
+  "version": "0.6.0",
+  "description": "Build pipeline for the AI Search Optimizer Gutenberg sidebar.",
   "private": true,
   "scripts": {
     "build": "wp-scripts build src/sidebar/index.js --output-path=build",
