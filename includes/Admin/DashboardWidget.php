@@ -183,7 +183,7 @@ final class DashboardWidget {
 		$table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 		$since = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table is esc_sql() of a hardcoded constant. Real-time widget data.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table is esc_sql() of a hardcoded constant. Real-time widget data.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT request_uri, COUNT(*) AS visit_count
@@ -195,6 +195,7 @@ final class DashboardWidget {
 				$since
 			)
 		);
+		// phpcs:enable
 
 		return is_array( $rows ) ? $rows : [];
 	}
@@ -210,7 +211,7 @@ final class DashboardWidget {
 		$seven_ago    = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
 		$fourteen_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-14 days' ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table is esc_sql() of a hardcoded constant. Real-time widget data.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table is esc_sql() of a hardcoded constant. Real-time widget data.
 		$this_week = (int) $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$table} WHERE detected_at >= %s AND detected_at < %s",
@@ -219,7 +220,6 @@ final class DashboardWidget {
 			)
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Same as above.
 		$last_week = (int) $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT COUNT(*) FROM {$table} WHERE detected_at >= %s AND detected_at < %s",
@@ -227,6 +227,7 @@ final class DashboardWidget {
 				$seven_ago
 			)
 		);
+		// phpcs:enable
 
 		return [ 'this_week' => $this_week, 'last_week' => $last_week ];
 	}

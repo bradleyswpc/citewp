@@ -100,26 +100,24 @@ final class Detector {
 	 * For now we just use REMOTE_ADDR — proxy support in a later session if needed.
 	 */
 	private function client_ip(): string {
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- filter_var( FILTER_VALIDATE_IP ) on the next line validates and sanitizes the value.
 		$ip = isset( $_SERVER['REMOTE_ADDR'] )
-			? (string) wp_unslash( $_SERVER['REMOTE_ADDR'] )
+			? (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- filter_var( FILTER_VALIDATE_IP ) on the return line validates and sanitizes.
 			: '';
 		return filter_var( $ip, FILTER_VALIDATE_IP ) ? $ip : '';
 	}
 
 	private function request_uri(): string {
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes on the next line.
 		$uri = isset( $_SERVER['REQUEST_URI'] )
-			? (string) wp_unslash( $_SERVER['REQUEST_URI'] )
+			? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes on the return line.
 			: '';
 		return mb_substr( esc_url_raw( $uri ), 0, 512 );
 	}
 
 	private function referer(): ?string {
-		if ( empty( $_SERVER['HTTP_REFERER'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes below.
+		if ( empty( $_SERVER['HTTP_REFERER'] ) ) {
 			return null;
 		}
-		$ref = (string) wp_unslash( $_SERVER['HTTP_REFERER'] );
+		$ref = (string) wp_unslash( $_SERVER['HTTP_REFERER'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes on the return line.
 		return mb_substr( esc_url_raw( $ref ), 0, 512 );
 	}
 
@@ -138,7 +136,7 @@ final class Detector {
 		$table  = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
 
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Pruning custom table; no WP API equivalent.
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Pruning custom table; DELETE does not benefit from caching; no WP API equivalent.
 			$wpdb->prepare( "DELETE FROM {$table} WHERE detected_at < %s", $cutoff ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $table is esc_sql() of a hardcoded prefix + constant string.
 		);
 	}

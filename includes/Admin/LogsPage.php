@@ -185,6 +185,7 @@ final class LogsPage {
 		header( 'Expires: 0' );
 
 		// UTF-8 BOM for Excel compatibility. Streaming directly to output — no filesystem API needed.
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- csv_line() double-quotes and escapes all fields per RFC 4180; WP escaping functions would corrupt binary CSV output.
 		echo "\xEF\xBB\xBF";
 		echo $this->csv_line( [ 'Detected At (Local)', 'Bot Name', 'Bot Vendor', 'Request URI', 'IP Address', 'User Agent' ] );
 
@@ -200,6 +201,7 @@ final class LogsPage {
 				]
 			);
 		}
+		// phpcs:enable
 		exit;
 	}
 
