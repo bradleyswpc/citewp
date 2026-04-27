@@ -6,6 +6,42 @@
 
 ---
 
+## Session 7 — WP.org Plugin Check + Submission Prep ✅
+
+**Date:** 2026-04-26
+
+**Deliverable:** Run WP.org Plugin Check, fix all errors/warnings, rename plugin to comply with WP.org trademark rules, bump to v0.5.0.
+
+**Shipped:**
+- `citewp.php` — Plugin Name header renamed to "Cite Score — AI Search Optimization"; version bumped to 0.5.0
+- `readme.txt` — display name, FAQ, installation section updated to "Cite Score"; Tested up to bumped to 6.9; Stable tag 0.5.0; 0.5.0 changelog entry added
+- `.distignore` — new file; excludes `.claude/`, `CLAUDE.md`, `SESSION-LOG.md`, `src/`, `package*.json`, `node_modules/` from WP.org SVN package
+- `includes/Admin/LogsPage.php` — CSV export replaced `fwrite`/`fclose` with direct `echo` streaming; `esc_sql()` on `$table`; phpcs annotations for nonce false-positives and custom-table queries
+- `includes/Admin/LogsTable.php` — `esc_sql()` on `$table`; unified phpcs:disable block for all custom-table query annotations; phpcs:ignore on 4 GET filter params
+- `includes/Admin/DashboardWidget.php` — `esc_sql()` on `$table`; moved DirectQuery phpcs:ignore to query lines
+- `includes/Crawler/Detector.php` — `sanitize_text_field()` on `HTTP_USER_AGENT`; phpcs:ignore on IP/URI/referer (sanitized by `filter_var`/`esc_url_raw`); `esc_sql()` on prune `$table`
+- `includes/Settings/Page.php` — phpcs:ignore on read-only GET display flags
+- `includes/Llms/Generator.php` — phpcs:ignore on `apply_filters('the_content')` core filter call
+- `includes/Scoring/ContentAnalysis.php` — same as above
+- `uninstall.php` — phpcs:ignore on global vars, SchemaChange, slow meta_key
+
+**Decisions made:** P8 amended — WP.org display name changed to "Cite Score — AI Search Optimization", WP.org slug to be requested as `cite-score`. Internal code (namespace, DB tables, REST routes, option keys, folder name, GitHub, domain) unchanged (see DECISION-LOG.md).
+
+**Verified:**
+- `npm run build` succeeded (3 pre-existing chartLine warnings only — not introduced this session).
+- Plugin Check re-run pending (user to verify after LocalWP cache clears).
+- Note: `.claude/` directory errors will still appear in LOCAL Plugin Check runs — this is expected. `.distignore` excludes them from the actual WP.org SVN submission package.
+- Committed `48bd190` and pushed.
+
+**Carryover into Session 8:**
+- WP.org submission image assets not yet created: `icon-128x128.png`, `icon-256x256.png`, `banner-772x250.png`, `banner-1544x500.png`, `screenshot-1.png` through `screenshot-N.png`. These require design work.
+- `readme.txt` is missing a `== Screenshots ==` section with descriptions — needs to be added before submission.
+- After assets are ready: add Screenshots section to readme.txt, do final smoke test, submit to WP.org.
+
+**Next session focus:** Session 8 — add Screenshots section to readme.txt, final smoke test (all features working), WP.org submission.
+
+---
+
 ## Session 6 — Security Audit + Plugin Check Prep ✅
 
 **Date:** 2026-04-26
