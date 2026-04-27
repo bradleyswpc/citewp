@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"/c/Users/KingpinBWP/Local Sites/citewp-dev/app/public/wp-content/plugins/ai-search-optimizer/.claude\")",
+      "Bash(touch \"/c/Users/KingpinBWP/Local Sites/citewp-dev/app/public/wp-content/plugins/ai-search-optimizer/.claude/.engine-edit-approved\")",
+      "Bash(grep -rn \"namespace CiteWP[^\\\\\\\\]\" --include=\"*.php\" --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)",
+      "Bash(grep -rn \"use CiteWP\\\\\\\\\\\\\\\\\" --include=\"*.php\" --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)",
+      "Bash(grep -v \"CiteWP\\\\\\\\\\\\\\\\Aiso\")",
+      "Bash(grep -rn \"\\\\\\\\\\\\\\\\CiteWP\\\\\\\\\\\\\\\\[A-Z]\" --include=\"*.php\" --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)",
+      "Bash(grep -rn \"@package CiteWP$\" --include=\"*.php\" --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)"
+    ]
+  }
+}

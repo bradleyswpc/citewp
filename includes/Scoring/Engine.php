@@ -29,12 +29,12 @@
  *   - meta_description_substantive .... 4
  *   - featured_image_with_alt ......... 4
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Scoring;
+namespace CiteWP\Aiso\Scoring;
 
 defined( 'ABSPATH' ) || exit;
 

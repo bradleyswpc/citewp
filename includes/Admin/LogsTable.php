@@ -2,14 +2,14 @@
 /**
  * Crawler logs list table.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Admin;
+namespace CiteWP\Aiso\Admin;
 
-use CiteWP\Database\Schema;
+use CiteWP\Aiso\Database\Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -33,12 +33,12 @@ final class LogsTable extends \WP_List_Table {
 	 */
 	public function get_columns(): array {
 		return [
-			'detected_at' => __( 'When', 'citewp' ),
-			'bot_name'    => __( 'Bot', 'citewp' ),
-			'bot_vendor'  => __( 'Vendor', 'citewp' ),
-			'request_uri' => __( 'URL', 'citewp' ),
-			'ip_address'  => __( 'IP', 'citewp' ),
-			'user_agent'  => __( 'User Agent', 'citewp' ),
+			'detected_at' => __( 'When', 'ai-search-optimizer' ),
+			'bot_name'    => __( 'Bot', 'ai-search-optimizer' ),
+			'bot_vendor'  => __( 'Vendor', 'ai-search-optimizer' ),
+			'request_uri' => __( 'URL', 'ai-search-optimizer' ),
+			'ip_address'  => __( 'IP', 'ai-search-optimizer' ),
+			'user_agent'  => __( 'User Agent', 'ai-search-optimizer' ),
 		];
 	}
 
@@ -130,11 +130,11 @@ final class LogsTable extends \WP_List_Table {
 		$current_range = $this->validated_range_filter();
 		?>
 		<div class="alignleft actions">
-			<label class="screen-reader-text" for="citewp_bot_filter">
-				<?php esc_html_e( 'Filter by bot', 'citewp' ); ?>
+			<label class="screen-reader-text" for="citewp_aiso_bot_filter">
+				<?php esc_html_e( 'Filter by bot', 'ai-search-optimizer' ); ?>
 			</label>
-			<select id="citewp_bot_filter" name="citewp_bot">
-				<option value=""><?php esc_html_e( 'All bots', 'citewp' ); ?></option>
+			<select id="citewp_aiso_bot_filter" name="citewp_aiso_bot">
+				<option value=""><?php esc_html_e( 'All bots', 'ai-search-optimizer' ); ?></option>
 				<?php foreach ( $this->distinct_bots as $bot ) : ?>
 					<option value="<?php echo esc_attr( $bot ); ?>" <?php selected( $current_bot, $bot ); ?>>
 						<?php echo esc_html( $bot ); ?>
@@ -142,17 +142,17 @@ final class LogsTable extends \WP_List_Table {
 				<?php endforeach; ?>
 			</select>
 
-			<label class="screen-reader-text" for="citewp_range_filter">
-				<?php esc_html_e( 'Filter by date range', 'citewp' ); ?>
+			<label class="screen-reader-text" for="citewp_aiso_range_filter">
+				<?php esc_html_e( 'Filter by date range', 'ai-search-optimizer' ); ?>
 			</label>
-			<select id="citewp_range_filter" name="citewp_range">
-				<option value=""><?php esc_html_e( 'All time', 'citewp' ); ?></option>
-				<option value="24h" <?php selected( $current_range, '24h' ); ?>><?php esc_html_e( 'Last 24 hours', 'citewp' ); ?></option>
-				<option value="7d"  <?php selected( $current_range, '7d' );  ?>><?php esc_html_e( 'Last 7 days', 'citewp' ); ?></option>
-				<option value="30d" <?php selected( $current_range, '30d' ); ?>><?php esc_html_e( 'Last 30 days', 'citewp' ); ?></option>
+			<select id="citewp_aiso_range_filter" name="citewp_aiso_range">
+				<option value=""><?php esc_html_e( 'All time', 'ai-search-optimizer' ); ?></option>
+				<option value="24h" <?php selected( $current_range, '24h' ); ?>><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></option>
+				<option value="7d"  <?php selected( $current_range, '7d' );  ?>><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></option>
+				<option value="30d" <?php selected( $current_range, '30d' ); ?>><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></option>
 			</select>
 
-			<?php submit_button( __( 'Filter', 'citewp' ), '', 'filter_action', false ); ?>
+			<?php submit_button( __( 'Filter', 'ai-search-optimizer' ), '', 'filter_action', false ); ?>
 		</div>
 		<?php
 	}
@@ -169,12 +169,12 @@ final class LogsTable extends \WP_List_Table {
 	}
 
 	private function validated_bot_filter(): string {
-		$bot = isset( $_GET['citewp_bot'] ) ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against DB values below.
+		$bot = isset( $_GET['citewp_aiso_bot'] ) ? sanitize_text_field( wp_unslash( $_GET['citewp_aiso_bot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against DB values below.
 		return in_array( $bot, $this->distinct_bots, true ) ? $bot : '';
 	}
 
 	private function validated_range_filter(): string {
-		$range = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against a whitelist below.
+		$range = isset( $_GET['citewp_aiso_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_aiso_range'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against a whitelist below.
 		return in_array( $range, [ '24h', '7d', '30d' ], true ) ? $range : '';
 	}
 
@@ -234,6 +234,6 @@ final class LogsTable extends \WP_List_Table {
 	}
 
 	public function no_items(): void {
-		esc_html_e( 'No crawler activity matches your filters.', 'citewp' );
+		esc_html_e( 'No crawler activity matches your filters.', 'ai-search-optimizer' );
 	}
 }

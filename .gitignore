@@ -29,3 +29,6 @@ wp-cli.local.yml
 
 # npm lockfile noise (we'll commit package-lock.json once we lock versions)
 .npm/
+
+# Claude Code local config (hooks, settings, sentinels — not project code)
+.claude/

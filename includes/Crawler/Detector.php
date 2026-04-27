@@ -3,21 +3,21 @@
  * AI crawler detection and logging.
  *
  * Hooks into `init` to inspect the User-Agent of every front-end request.
- * If matched against the bot registry, logs to citewp_crawler_logs.
+ * If matched against the bot registry, logs to citewp_aiso_crawler_logs.
  *
  * Skipped contexts (no logging):
  *   - WP-CLI, cron, AJAX, REST, admin, login pages
  *   - Empty user agents
  *   - Disabled in settings
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Crawler;
+namespace CiteWP\Aiso\Crawler;
 
-use CiteWP\Database\Schema;
+use CiteWP\Aiso\Database\Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,9 +29,9 @@ final class Detector {
 		add_action( 'init', [ $this, 'maybe_log_request' ], 1 );
 
 		// Daily cleanup of old logs.
-		add_action( 'citewp_daily_cleanup', [ $this, 'prune_old_logs' ] );
-		if ( ! wp_next_scheduled( 'citewp_daily_cleanup' ) ) {
-			wp_schedule_event( time() + DAY_IN_SECONDS, 'daily', 'citewp_daily_cleanup' );
+		add_action( 'citewp_aiso_daily_cleanup', [ $this, 'prune_old_logs' ] );
+		if ( ! wp_next_scheduled( 'citewp_aiso_daily_cleanup' ) ) {
+			wp_schedule_event( time() + DAY_IN_SECONDS, 'daily', 'citewp_aiso_daily_cleanup' );
 		}
 	}
 
@@ -69,7 +69,7 @@ final class Detector {
 			return false;
 		}
 
-		$settings = get_option( 'citewp_settings', [] );
+		$settings = get_option( 'citewp_aiso_settings', [] );
 		return ! empty( $settings['enable_crawler_detection'] );
 	}
 
@@ -127,7 +127,7 @@ final class Detector {
 	public function prune_old_logs(): void {
 		global $wpdb;
 
-		$settings = get_option( 'citewp_settings', [] );
+		$settings = get_option( 'citewp_aiso_settings', [] );
 		$days     = (int) ( $settings['log_retention_days'] ?? 7 );
 		if ( $days < 1 ) {
 			return;

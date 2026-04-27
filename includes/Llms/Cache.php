@@ -8,12 +8,12 @@
  *  - Theme/plugin activation
  *  - Manual "regenerate" button
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Llms;
+namespace CiteWP\Aiso\Llms;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -21,8 +21,8 @@ final class Cache {
 
 	public const TTL = HOUR_IN_SECONDS;
 
-	private const KEY_SHORT = 'citewp_llms_short';
-	private const KEY_FULL  = 'citewp_llms_full';
+	private const KEY_SHORT = 'citewp_aiso_llms_short';
+	private const KEY_FULL  = 'citewp_aiso_llms_full';
 
 	public function register(): void {
 		// Bust on any post status transition that affects publication state.
@@ -32,8 +32,8 @@ final class Cache {
 		add_action( 'save_post', [ $this, 'on_save_post' ], 10, 2 );
 
 		// Bust on settings save.
-		add_action( 'update_option_citewp_llms_settings', [ $this, 'flush' ] );
-		add_action( 'update_option_citewp_settings', [ $this, 'flush' ] );
+		add_action( 'update_option_citewp_aiso_llms_settings', [ $this, 'flush' ] );
+		add_action( 'update_option_citewp_aiso_settings', [ $this, 'flush' ] );
 
 		// Bust on plugin/theme changes (cornerstone meta could change availability).
 		add_action( 'activated_plugin', [ $this, 'flush' ] );

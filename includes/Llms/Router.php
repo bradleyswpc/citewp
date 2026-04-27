@@ -8,18 +8,18 @@
  *  - Cache invalidation is just a transient flush, not a file write
  *  - Identical pattern to how Yoast/RankMath serve sitemap.xml
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Llms;
+namespace CiteWP\Aiso\Llms;
 
 defined( 'ABSPATH' ) || exit;
 
 final class Router {
 
-	private const QUERY_VAR = 'citewp_llms';
+	private const QUERY_VAR = 'citewp_aiso_llms';
 
 	private Cache $cache;
 	private Generator $generator;
@@ -64,7 +64,7 @@ final class Router {
 
 		header( 'Content-Type: text/plain; charset=utf-8' );
 		header( 'X-Robots-Tag: noindex' );
-		header( 'X-Generated-By: CiteWP/' . CITEWP_VERSION );
+		header( 'X-Generated-By: CiteWP/' . CITEWP_AISO_VERSION );
 		header( 'Cache-Control: public, max-age=3600' );
 		header( 'Pragma: public' );
 

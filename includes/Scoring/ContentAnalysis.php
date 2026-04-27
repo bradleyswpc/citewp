@@ -5,12 +5,12 @@
  * Done once per analysis, then signals query the parsed result.
  * Cheaper than each signal re-parsing the HTML.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Scoring;
+namespace CiteWP\Aiso\Scoring;
 
 defined( 'ABSPATH' ) || exit;
 

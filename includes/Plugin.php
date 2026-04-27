@@ -2,12 +2,12 @@
 /**
  * Core plugin orchestrator.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP;
+namespace CiteWP\Aiso;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -36,7 +36,7 @@ final class Plugin {
 		$this->modules['crawler_detector']->register();
 
 		// llms.txt: cache invalidation + request routing run on every request.
-		$llms_settings = get_option( 'citewp_llms_settings', [] );
+		$llms_settings = get_option( 'citewp_aiso_llms_settings', [] );
 		if ( ! empty( $llms_settings['enabled'] ) || ! isset( $llms_settings['enabled'] ) ) {
 			$this->modules['llms_cache'] = new Llms\Cache();
 			$this->modules['llms_cache']->register();
@@ -81,16 +81,16 @@ final class Plugin {
 	 */
 	public static function activate(): void {
 		Database\Schema::install();
-		add_option( 'citewp_db_version', CITEWP_DB_VERSION );
+		add_option( 'citewp_aiso_db_version', CITEWP_AISO_DB_VERSION );
 		add_option(
-			'citewp_settings',
+			'citewp_aiso_settings',
 			[
 				'enable_crawler_detection' => true,
 				'log_retention_days'       => 7,
 			]
 		);
 		add_option(
-			'citewp_llms_settings',
+			'citewp_aiso_llms_settings',
 			[
 				'enabled'          => true,
 				'min_word_count'   => 500,

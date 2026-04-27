@@ -2,12 +2,12 @@
 /**
  * Result of a single scoring signal check.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Scoring;
+namespace CiteWP\Aiso\Scoring;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -13,12 +13,12 @@
  *
  * llms-full.txt extends with full content body for each entry.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Llms;
+namespace CiteWP\Aiso\Llms;
 
 defined( 'ABSPATH' ) || exit;
 

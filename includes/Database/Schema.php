@@ -2,18 +2,18 @@
 /**
  * Database schema management.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Database;
+namespace CiteWP\Aiso\Database;
 
 defined( 'ABSPATH' ) || exit;
 
 final class Schema {
 
-	public const TABLE_CRAWLER_LOGS = 'citewp_crawler_logs';
+	public const TABLE_CRAWLER_LOGS = 'citewp_aiso_crawler_logs';
 
 	/**
 	 * Full table name including WP prefix.
@@ -60,11 +60,11 @@ final class Schema {
 	 * and re-runs install() if they differ. Cheap when versions match.
 	 */
 	public static function maybe_upgrade(): void {
-		$installed = get_option( 'citewp_db_version' );
-		if ( $installed === CITEWP_DB_VERSION ) {
+		$installed = get_option( 'citewp_aiso_db_version' );
+		if ( $installed === CITEWP_AISO_DB_VERSION ) {
 			return;
 		}
 		self::install();
-		update_option( 'citewp_db_version', CITEWP_DB_VERSION );
+		update_option( 'citewp_aiso_db_version', CITEWP_AISO_DB_VERSION );
 	}
 }

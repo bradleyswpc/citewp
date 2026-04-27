@@ -3,24 +3,24 @@
  * REST endpoints for the GEO Score Gutenberg sidebar.
  *
  * Routes:
- *   GET  /citewp/v1/score/<post_id>           — get cached score
- *   POST /citewp/v1/score/<post_id>/recalculate — force recalc and return fresh score
+ *   GET  /citewp/aiso/v1/score/<post_id>           — get cached score
+ *   POST /citewp/aiso/v1/score/<post_id>/recalculate — force recalc and return fresh score
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Rest;
+namespace CiteWP\Aiso\Rest;
 
-use CiteWP\Scoring\Repository;
-use CiteWP\Scoring\Engine;
+use CiteWP\Aiso\Scoring\Repository;
+use CiteWP\Aiso\Scoring\Engine;
 
 defined( 'ABSPATH' ) || exit;
 
 final class ScoreController {
 
-	private const NAMESPACE = 'citewp/v1';
+	private const NAMESPACE = 'citewp/aiso/v1';
 
 	private Repository $repo;
 
@@ -70,8 +70,8 @@ final class ScoreController {
 		$post_id = (int) $request['post_id'];
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
-				'citewp_forbidden',
-				__( 'You do not have permission to view scores for this post.', 'citewp' ),
+				'citewp_aiso_forbidden',
+				__( 'You do not have permission to view scores for this post.', 'ai-search-optimizer' ),
 				[ 'status' => 403 ]
 			);
 		}

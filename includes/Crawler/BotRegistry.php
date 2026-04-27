@@ -12,12 +12,12 @@
  * - https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers
  * - https://darkvisitors.com (cross-reference)
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Crawler;
+namespace CiteWP\Aiso\Crawler;
 
 defined( 'ABSPATH' ) || exit;
 
