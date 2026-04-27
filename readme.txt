@@ -8,7 +8,7 @@ Stable tag: 0.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Optimize WordPress content for AI search engines. AI crawler tracking, llms.txt generation, and the Cite Score — a transparent 100-point AI citation score.
+Optimize WordPress content for AI search. AI crawler tracking, llms.txt generation, and a transparent 100-point Cite Score.
 
 == Description ==
 
