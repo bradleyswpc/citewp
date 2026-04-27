@@ -6,6 +6,78 @@
 
 ---
 
+## Session 7.5 — Multi-Product Architecture Refactor ✅
+
+**Date:** 2026-04-27
+
+**Deliverable:** Refactor codebase to multi-product architecture per A14. Plugin folder, slug, namespace, and ~110 identifiers renamed to align with WP.org distribution strategy (CiteWP parent brand + AI Search Optimizer plugin slug).
+
+**Final identifier contract (per A14):**
+- WP.org slug: `ai-search-optimizer`
+- Display name: "AI Search Optimizer – Optimize Content for AI Engines"
+- Author: CiteWP
+- PHP namespace: `CiteWP\Aiso\` (CiteWP\ stays as company-level root for future plugins)
+- DB tables: `wp_citewp_aiso_*`
+- Options/transients/cron/post meta: `citewp_aiso_*` / `_citewp_aiso_*`
+- REST namespace: `citewp/aiso/v1`
+- Constants: `CITEWP_AISO_*`
+- Text domain: `ai-search-optimizer`
+- Script handles: `citewp-aiso-*`
+- CSS classes: `citewp-aiso-*`
+
+**Shipped (10 commits on `refactor/multi-product-architecture` branch):**
+- `c1394bc` Step 2: rename main file, update header/constants/autoloader/hooks
+- `d1dab98` Step 3: namespace + @package across 22 PHP files (CiteWP\Aiso sub-namespacing); Engine.php math untouched
+- `d26a08c` Step 4: option keys, table names, post meta, transients, cron hooks, constants → citewp_aiso_*
+- `47a2c16` Step 5: REST namespace citewp/v1 → citewp/aiso/v1
+- `2a8aabe` Step 6: text domain 'citewp' → 'ai-search-optimizer' (63 i18n calls across 7 files)
+- `dbcd238` Step 7: JS sidebar slug citewp-geo-score → citewp-aiso-geo-score, header comment
+- `315feca` Step 8: script handle + CSS class prefix citewp- → citewp-aiso- (~100 occurrences across DashboardWidget, LogsPage, PostListColumn, EditorAssets, Settings/Page, Menu)
+- `9bc7651` + `01dcf94` Step 9: readme.txt replaced entirely with draft v0.6.0 (initial commit was a partial merge; fixed in follow-up)
+- `c1eca79` Step 11: CLAUDE.md updated to reflect AISO architecture
+- `cd21381` Step 12 fix: removed Domain Path header (no languages folder yet), shortened readme short description to <150 chars (Plugin Check fixes)
+
+**Smoke test (10/10 passed):**
+1. Plugin activates with new display name — PASS
+2. DB table `wp_citewp_aiso_crawler_logs` created on activation — PASS
+3. Three options created with `citewp_aiso_*` prefix — PASS
+4. Gutenberg sidebar loads, score displays, recalculate works — PASS
+5. `/llms.txt` and `/llms-full.txt` serve correctly — PASS
+6. `curl -A "GPTBot/1.0"` logs to new table with correct vendor mapping — PASS
+7. Dashboard widget renders with score data, bot counts, top crawled pages — PASS
+8. Crawler Logs admin page renders, filters work, CSV export works — PASS
+9. REST endpoint `/wp-json/citewp/aiso/v1/score/{id}` returns expected response (`citewp_aiso_forbidden` from address bar without nonce — confirms route registration AND error code rename) — PASS
+10. uninstall.php cleans all data — PASS (highest-risk step; verified zero `citewp%` options, zero `_citewp%` post meta, zero `wp_citewp%` tables after delete)
+
+**Plugin Check final state:** Same baseline as Session 7. All remaining warnings are local infrastructure files (`.claude/`, `.gitignore`, `CLAUDE.md`, `SESSION-LOG.md`) excluded from WP.org SVN package via `.distignore`. Zero real errors in shipped code.
+
+**Decisions made:** A14 (multi-product architecture, CiteWP\ as company root with per-plugin sub-namespaces); P17 amended (slug `ai-search-optimizer`, display name keyword-stuffed, internal architecture refactored, Cite Score remains as feature name).
+
+**Catastrophic loss + recovery (documented for posterity):**
+
+During the FIRST attempt at this refactor, the local `.git/` directory got corrupted at Step 1 — only `.git/objects/` survived, all other git metadata (HEAD, refs, config, index) and the entire working tree were destroyed. Cause not definitively identified but strong correlation with: (a) folder rename happening while Claude Code's terminal CWD was inside the renamed folder, (b) Windows Defender real-time scanning of `node_modules/`, (c) possible LocalWP file watcher activity. Steps 2-11 of the first attempt were never committed (original brief specified single-commit-at-Step-14) and were lost entirely.
+
+A SECOND corruption occurred during Step 13's smoke test: WordPress's plugin Delete action partially succeeded (uninstall.php ran cleanly, all DB cleanup verified) but the physical file deletion failed mid-operation due to a file lock on a deeply-nested `node_modules/` file. Same `.git/` corruption signature (only `objects/` remained).
+
+**Recovery:** Both incidents were recoverable because: (1) every step of the SECOND attempt was committed and pushed to `origin/refactor/multi-product-architecture` immediately (per-step commit cadence introduced as a process change), and (2) a robocopy backup excluding `node_modules/`, `build/`, and `.git/` was made to `Desktop/ai-search-optimizer-BACKUP/` before the uninstall test.
+
+**Process changes adopted:**
+1. **Per-step commits AND pushes** instead of single-commit-at-end. Cost: slightly messier history that can be squashed later via `git rebase -i`. Benefit: catastrophic loss = minutes lost, not hours.
+2. **Manual folder renames** via Windows Explorer with Claude Code session fully closed first. Never rename a folder while a tool has the folder as its CWD.
+3. **Defensive 4-grep policy** after every step: bare prefix (`citewp[_-]`), REST/path (`citewp/`), namespace (`(namespace|use)\s+CiteWP\\(?!Aiso)`), and `@package CiteWP$` patterns. Caught 100+ identifiers across multiple categories that the brief did not enumerate.
+4. **LocalWP plugins folder added to Windows Defender exclusion list** to reduce file-lock interference during dev work.
+
+**Known carryover into Session 8:**
+- WP.org submission image assets not yet created: icon-128x128.png, icon-256x256.png, banner-772x250.png, banner-1544x500.png, screenshot-1.png through screenshot-N.png. CiteWP company logo (blue/purple chat-bubble) becomes the WP.org plugin icon; banner uses CiteWP branding with "AI Search Optimizer" wordmark.
+- `readme.txt` is missing a `== Screenshots ==` section. Add when actual screenshots exist.
+- `.claude/` infrastructure rebuild deferred (was lost in corruption, was always gitignored, never on GitHub). Not blocking. Schedule as standalone session before Session 8 if needed.
+- The `ai-search-optimizer-WP-DELETION-BROKEN/` and `ai-search-optimizer-BROKEN-DO-NOT-USE/` folders sit in the plugins directory as recovery artifacts. Delete after a clean Windows reboot when file locks are released.
+- `Brain/14-REFACTOR-BRIEF-SESSION-7-5.md` should be archived (refactor complete) or kept as a reference for the architecture pattern.
+
+**Next session focus:** Session 8 — create WP.org submission image assets (icon, banner, screenshots), add Screenshots section to readme.txt, final pre-submission smoke test, submit to WP.org plugin directory.
+
+---
+
 ## Session 7 — WP.org Plugin Check + Submission Prep ✅
 
 **Date:** 2026-04-26
