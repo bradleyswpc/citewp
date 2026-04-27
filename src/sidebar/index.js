@@ -1,5 +1,5 @@
 /**
- * CiteWP — GEO Score sidebar for the Gutenberg block editor.
+ * AI Search Optimizer — GEO Score sidebar for the Gutenberg block editor.
  *
  * Registers a plugin sidebar that fetches and displays the score
  * for the current post via the citewp/aiso/v1/score REST endpoint.
@@ -86,11 +86,11 @@ function ScoreSidebar() {
 
 	return (
 		<>
-			<PluginSidebarMoreMenuItem target="citewp-geo-score" icon={ chartLine }>
+			<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ chartLine }>
 				CiteWP GEO Score
 			</PluginSidebarMoreMenuItem>
 			<PluginSidebar
-				name="citewp-geo-score"
+				name="citewp-aiso-geo-score"
 				title="CiteWP GEO Score"
 				icon={ chartLine }
 			>
@@ -278,7 +278,7 @@ function SignalRow( { signal } ) {
 	);
 }
 
-registerPlugin( 'citewp-geo-score', {
+registerPlugin( 'citewp-aiso-geo-score', {
 	render: ScoreSidebar,
 	icon: chartLine,
 } );
