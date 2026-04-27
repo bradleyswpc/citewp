@@ -30,7 +30,7 @@ final class LogsPage {
 		if ( ! is_admin() ) {
 			return;
 		}
-		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only GET param to identify admin page; no data modification.
 		if ( $page !== Menu::SLUG_LOGS ) {
 			return;
 		}
@@ -49,17 +49,17 @@ final class LogsPage {
 		}
 
 		global $wpdb;
-		$table_name = Schema::table( Schema::TABLE_CRAWLER_LOGS );
+		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Admin stats page; real-time data, intentionally uncached.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Admin stats page; $table_name is esc_sql() of a hardcoded constant. Real-time data, intentionally uncached.
 		$total     = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$count_24h = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE detected_at >= %s", gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ) ) );   // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$count_7d  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE detected_at >= %s", gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) ) ) );   // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$count_30d = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE detected_at >= %s", gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) ) ) );  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// phpcs:enable
 
-		$bot_filter   = isset( $_GET['citewp_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) )   : '';
-		$range_filter = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) )         : '';
+		$bot_filter   = isset( $_GET['citewp_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) )   : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
+		$range_filter = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) )         : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
 
 		$export_args = array_filter(
 			[
@@ -123,13 +123,16 @@ final class LogsPage {
 		check_admin_referer( 'citewp_export_logs' );
 
 		global $wpdb;
-		$table = Schema::table( Schema::TABLE_CRAWLER_LOGS );
+		$table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce already verified by check_admin_referer() above.
 		$bot_filter   = isset( $_GET['citewp_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) )   : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce already verified by check_admin_referer() above.
 		$range_filter = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) )         : '';
 
 		// Validate bot against actual DB values.
 		if ( $bot_filter !== '' ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Bot filter validation; $table is esc_sql() of a hardcoded constant.
 			$exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE bot_name = %s LIMIT 1", $bot_filter ) );
 			if ( ! $exists ) {
 				$bot_filter = '';
@@ -162,15 +165,16 @@ final class LogsPage {
 
 		$select = "SELECT detected_at, bot_name, bot_vendor, request_uri, ip_address, user_agent FROM {$table}";
 
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table export; $select/$where built from whitelisted values, $table is esc_sql(). Real-time admin data.
 		if ( ! empty( $filter_args ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $where built from whitelisted values.
 			$rows = $wpdb->get_results(
 				$wpdb->prepare( "{$select} WHERE 1=1 {$where} ORDER BY detected_at DESC", ...$filter_args ),
 				ARRAY_A
 			);
 		} else {
-			$rows = $wpdb->get_results( "{$select} ORDER BY detected_at DESC", ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			$rows = $wpdb->get_results( "{$select} ORDER BY detected_at DESC", ARRAY_A );
 		}
+		// phpcs:enable
 
 		$rows     = is_array( $rows ) ? $rows : [];
 		$filename = 'citewp-crawler-logs-' . gmdate( 'Y-m-d' ) . '.csv';
@@ -180,19 +184,12 @@ final class LogsPage {
 		header( 'Pragma: no-cache' );
 		header( 'Expires: 0' );
 
-		$output = fopen( 'php://output', 'w' );
-		if ( $output === false ) {
-			exit;
-		}
-
-		// UTF-8 BOM for Excel compatibility.
-		fwrite( $output, "\xEF\xBB\xBF" );
-
-		fputcsv( $output, [ 'Detected At (Local)', 'Bot Name', 'Bot Vendor', 'Request URI', 'IP Address', 'User Agent' ] );
+		// UTF-8 BOM for Excel compatibility. Streaming directly to output — no filesystem API needed.
+		echo "\xEF\xBB\xBF";
+		echo $this->csv_line( [ 'Detected At (Local)', 'Bot Name', 'Bot Vendor', 'Request URI', 'IP Address', 'User Agent' ] );
 
 		foreach ( $rows as $row ) {
-			fputcsv(
-				$output,
+			echo $this->csv_line(
 				[
 					get_date_from_gmt( $row['detected_at'], 'Y-m-d H:i:s' ),
 					$row['bot_name'],
@@ -203,9 +200,17 @@ final class LogsPage {
 				]
 			);
 		}
-
-		fclose( $output );
 		exit;
+	}
+
+	private function csv_line( array $fields ): string {
+		$escaped = array_map(
+			static function ( string $v ): string {
+				return '"' . str_replace( '"', '""', $v ) . '"';
+			},
+			array_map( 'strval', $fields )
+		);
+		return implode( ',', $escaped ) . "\r\n";
 	}
 
 	public function inline_styles(): void {

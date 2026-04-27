@@ -56,10 +56,10 @@ final class LogsTable extends \WP_List_Table {
 	public function prepare_items(): void {
 		global $wpdb;
 
-		$table = Schema::table( Schema::TABLE_CRAWLER_LOGS );
+		$table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 
 		// Load distinct bots before filter validation (validator checks against this list).
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Filter dropdown; real-time, intentionally uncached.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Filter dropdown; $table is esc_sql() of hardcoded constant. Real-time, intentionally uncached.
 		$rows                = $wpdb->get_col( "SELECT DISTINCT bot_name FROM {$table} ORDER BY bot_name ASC" );
 		$this->distinct_bots = is_array( $rows ) ? $rows : [];
 
@@ -82,13 +82,12 @@ final class LogsTable extends \WP_List_Table {
 			$filter_args[] = $since;
 		}
 
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table queries; $table is esc_sql() of a hardcoded constant, $where/$orderby/$order built from whitelisted values. Real-time admin data.
 		if ( ! empty( $filter_args ) ) {
 			$total = (int) $wpdb->get_var(
-				// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $where built from whitelisted values.
 				$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE 1=1 {$where}", ...$filter_args )
 			);
 		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Real-time count; intentionally uncached.
 			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
 		}
 
@@ -96,20 +95,20 @@ final class LogsTable extends \WP_List_Table {
 		$data_args = array_merge( $filter_args, [ $per_page, $offset ] );
 
 		if ( ! empty( $filter_args ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $where/$orderby/$order are whitelisted.
 			$query = $wpdb->prepare(
 				"SELECT * FROM {$table} WHERE 1=1 {$where} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
 				...$data_args
 			);
 		} else {
 			$query = $wpdb->prepare(
-				"SELECT * FROM {$table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT * FROM {$table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
 				$per_page,
 				$offset
 			);
 		}
 
-		$this->items = $wpdb->get_results( $query, ARRAY_A ) ?: []; // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$this->items = $wpdb->get_results( $query, ARRAY_A ) ?: [];
+		// phpcs:enable
 
 		$this->set_pagination_args(
 			[
@@ -160,22 +159,22 @@ final class LogsTable extends \WP_List_Table {
 
 	private function validated_orderby(): string {
 		$allowed = [ 'detected_at', 'bot_name', 'bot_vendor' ];
-		$orderby = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'detected_at';
+		$orderby = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : 'detected_at'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only WP_List_Table sort param; no data modification.
 		return in_array( $orderby, $allowed, true ) ? $orderby : 'detected_at';
 	}
 
 	private function validated_order(): string {
-		$order = isset( $_GET['order'] ) ? strtoupper( sanitize_key( wp_unslash( $_GET['order'] ) ) ) : 'DESC';
+		$order = isset( $_GET['order'] ) ? strtoupper( sanitize_key( wp_unslash( $_GET['order'] ) ) ) : 'DESC'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only WP_List_Table sort direction; no data modification.
 		return in_array( $order, [ 'ASC', 'DESC' ], true ) ? $order : 'DESC';
 	}
 
 	private function validated_bot_filter(): string {
-		$bot = isset( $_GET['citewp_bot'] ) ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) ) : '';
+		$bot = isset( $_GET['citewp_bot'] ) ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against DB values below.
 		return in_array( $bot, $this->distinct_bots, true ) ? $bot : '';
 	}
 
 	private function validated_range_filter(): string {
-		$range = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) ) : '';
+		$range = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against a whitelist below.
 		return in_array( $range, [ '24h', '7d', '30d' ], true ) ? $range : '';
 	}
 

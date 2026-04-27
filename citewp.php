@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name:       CiteWP
+ * Plugin Name:       Cite Score — AI Search Optimization
  * Plugin URI:        https://citewp.com
  * Description:       Generative Engine Optimization for WordPress. Detect AI crawlers, generate llms.txt, and score content for AI citability.
- * Version:           0.4.0
+ * Version:           0.5.0
  * Requires at least: 6.5
  * Requires PHP:      8.0
  * Author:            CiteWP
@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-define( 'CITEWP_VERSION', '0.4.0' );
+define( 'CITEWP_VERSION', '0.5.0' );
 define( 'CITEWP_PLUGIN_FILE', __FILE__ );
 define( 'CITEWP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CITEWP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

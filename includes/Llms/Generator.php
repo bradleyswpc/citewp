@@ -159,7 +159,7 @@ final class Generator {
 	 * Not a full HTML→MD converter; aims for readable, structured plaintext.
 	 */
 	private function markdown_body( \WP_Post $post ): string {
-		$html = apply_filters( 'the_content', $post->post_content );
+		$html = apply_filters( 'the_content', $post->post_content ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Calling WP core filter, not registering a plugin hook.
 		$html = strip_shortcodes( $html );
 
 		// Convert headings.

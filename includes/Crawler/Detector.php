@@ -41,7 +41,7 @@ final class Detector {
 		}
 
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] )
-			? (string) wp_unslash( $_SERVER['HTTP_USER_AGENT'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) )
 			: '';
 
 		if ( $user_agent === '' ) {
@@ -79,7 +79,7 @@ final class Detector {
 	private function insert_log( array $bot, string $user_agent ): void {
 		global $wpdb;
 
-		$wpdb->insert(
+		$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- High-frequency bot logging; no WP API equivalent for custom table inserts.
 			Schema::table( Schema::TABLE_CRAWLER_LOGS ),
 			[
 				'detected_at'  => current_time( 'mysql', true ), // GMT
@@ -100,6 +100,7 @@ final class Detector {
 	 * For now we just use REMOTE_ADDR — proxy support in a later session if needed.
 	 */
 	private function client_ip(): string {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- filter_var( FILTER_VALIDATE_IP ) on the next line validates and sanitizes the value.
 		$ip = isset( $_SERVER['REMOTE_ADDR'] )
 			? (string) wp_unslash( $_SERVER['REMOTE_ADDR'] )
 			: '';
@@ -107,6 +108,7 @@ final class Detector {
 	}
 
 	private function request_uri(): string {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes on the next line.
 		$uri = isset( $_SERVER['REQUEST_URI'] )
 			? (string) wp_unslash( $_SERVER['REQUEST_URI'] )
 			: '';
@@ -114,7 +116,7 @@ final class Detector {
 	}
 
 	private function referer(): ?string {
-		if ( empty( $_SERVER['HTTP_REFERER'] ) ) {
+		if ( empty( $_SERVER['HTTP_REFERER'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes below.
 			return null;
 		}
 		$ref = (string) wp_unslash( $_SERVER['HTTP_REFERER'] );
@@ -133,11 +135,11 @@ final class Detector {
 			return;
 		}
 
-		$table  = Schema::table( Schema::TABLE_CRAWLER_LOGS );
+		$table  = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( $days * DAY_IN_SECONDS ) );
 
-		$wpdb->query(
-			$wpdb->prepare( "DELETE FROM {$table} WHERE detected_at < %s", $cutoff )
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Pruning custom table; no WP API equivalent.
+			$wpdb->prepare( "DELETE FROM {$table} WHERE detected_at < %s", $cutoff ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $table is esc_sql() of a hardcoded prefix + constant string.
 		);
 	}
 }

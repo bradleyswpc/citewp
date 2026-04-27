@@ -149,13 +149,13 @@ final class Page {
 		<div class="wrap">
 			<h1><?php esc_html_e( 'CiteWP Settings', 'citewp' ); ?></h1>
 
-			<?php if ( isset( $_GET['regenerated'] ) ) : ?>
+			<?php if ( isset( $_GET['regenerated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
 				<div class="notice notice-success is-dismissible">
 					<p><?php esc_html_e( 'llms.txt cache cleared. The next request will regenerate from scratch.', 'citewp' ); ?></p>
 				</div>
 			<?php endif; ?>
 
-			<?php if ( isset( $_GET['settings-updated'] ) ) : ?>
+			<?php if ( isset( $_GET['settings-updated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Standard WP options-saved flag; no data modification. ?>
 				<div class="notice notice-success is-dismissible">
 					<p><?php esc_html_e( 'Settings saved.', 'citewp' ); ?></p>
 				</div>

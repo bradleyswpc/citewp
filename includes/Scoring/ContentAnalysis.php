@@ -53,7 +53,7 @@ final class ContentAnalysis {
 		$raw = $this->post->post_content;
 
 		// Render shortcodes/blocks the same way the front-end would.
-		$html = apply_filters( 'the_content', $raw );
+		$html = apply_filters( 'the_content', $raw ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Calling WP core filter, not registering a plugin hook.
 		$html = strip_shortcodes( $html );
 		$this->rendered_html = $html;
 

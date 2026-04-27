@@ -1,10 +1,10 @@
-=== CiteWP ===
+=== Cite Score — AI Search Optimization ===
 Contributors: citewp
 Tags: ai, seo, llms, gptbot, generative engine optimization
 Requires at least: 6.5
-Tested up to: 6.7
+Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.4.0
+Stable tag: 0.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Generative Engine Optimization for WordPress. Detect AI crawlers, generate llms.
 
 == Description ==
 
-CiteWP is a Generative Engine Optimization (GEO) toolkit for WordPress. As AI search engines like ChatGPT, Claude, and Perplexity reshape how people find information, CiteWP helps your content get cited — not just ranked.
+Cite Score is a Generative Engine Optimization (GEO) toolkit for WordPress. As AI search engines like ChatGPT, Claude, and Perplexity reshape how people find information, Cite Score helps your content get cited — not just ranked.
 
 = Features =
 
@@ -40,9 +40,9 @@ CiteWP is a Generative Engine Optimization (GEO) toolkit for WordPress. As AI se
 * Sortable GEO Score column on All Posts and All Pages screens
 * Auto-recalculates on every save
 
-= Why CiteWP? =
+= Why Cite Score? =
 
-SEO gets you ranked. CiteWP gets you cited.
+SEO gets you ranked. Cite Score gets you cited.
 
 Traditional SEO optimizes for keyword matching. GEO optimizes for AI citation — the signals that cause ChatGPT, Perplexity, and Google AI Overviews to quote your content as a source.
 
@@ -54,16 +54,16 @@ CiteWP logs AI crawler visits (user agent, IP address, URL) to your own WordPres
 
 1. Upload the `citewp` folder to `/wp-content/plugins/`
 2. Activate through the **Plugins** menu in WordPress
-3. Navigate to **CiteWP > Crawler Logs** to see AI bot activity
-4. Open any post in the block editor and find **CiteWP GEO Score** in the sidebar panels
+3. Navigate to **Cite Score > Crawler Logs** to see AI bot activity
+4. Open any post in the block editor and find **GEO Score** in the sidebar panels
 
 == Frequently Asked Questions ==
 
-= Does CiteWP send my content to external servers? =
+= Does Cite Score send my content to external servers? =
 
 No. All analysis and scoring happens locally on your WordPress installation. No content or personal data leaves your server.
 
-= Which AI bots does CiteWP detect? =
+= Which AI bots does Cite Score detect? =
 
 40+ bots including GPTBot (OpenAI), ClaudeBot (Anthropic), PerplexityBot, Google-Extended, Applebot-Extended, Meta-ExternalAgent, Bytespider, and more.
 
@@ -76,6 +76,13 @@ No tool can guarantee AI citations. The GEO Score reflects the structural and co
 No. Crawler detection adds zero latency to human visitors — AI bots are identified by user agent only, with no content scanning. The GEO Score is calculated on save, not on every page load.
 
 == Changelog ==
+
+= 0.5.0 =
+* Renamed plugin display name to "Cite Score — AI Search Optimization" (WP.org trademark compliance).
+* Raised "Tested up to" to WordPress 6.9.
+* CSV export: replaced direct filesystem calls with output streaming (WP.org Plugin Check compliance).
+* Crawler detector: hardened sanitization on all `$_SERVER` inputs.
+* Plugin Check compliance: phpcs annotations on all direct DB queries against custom tables.
 
 = 0.4.0 =
 * Added WordPress Dashboard widget (avg GEO score, bot visit trend, top crawled pages, lowest-scoring posts).

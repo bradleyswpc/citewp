@@ -1,0 +1,9 @@
+.claude/
+.git/
+.gitignore
+CLAUDE.md
+SESSION-LOG.md
+node_modules/
+package.json
+package-lock.json
+src/
