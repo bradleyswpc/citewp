@@ -3,8 +3,8 @@
  * REST endpoints for the GEO Score Gutenberg sidebar.
  *
  * Routes:
- *   GET  /citewp/v1/score/<post_id>           — get cached score
- *   POST /citewp/v1/score/<post_id>/recalculate — force recalc and return fresh score
+ *   GET  /citewp/aiso/v1/score/<post_id>           — get cached score
+ *   POST /citewp/aiso/v1/score/<post_id>/recalculate — force recalc and return fresh score
  *
  * @package CiteWP\Aiso
  */
@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class ScoreController {
 
-	private const NAMESPACE = 'citewp/v1';
+	private const NAMESPACE = 'citewp/aiso/v1';
 
 	private Repository $repo;
 
