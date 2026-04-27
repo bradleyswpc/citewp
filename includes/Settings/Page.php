@@ -16,14 +16,14 @@ defined( 'ABSPATH' ) || exit;
 
 final class Page {
 
-	public const SLUG          = 'citewp-settings';
-	public const OPTION_LLMS   = 'citewp_llms_settings';
-	public const OPTION_CORE   = 'citewp_settings';
+	public const SLUG          = 'citewp-aiso-settings';
+	public const OPTION_LLMS   = 'citewp_aiso_llms_settings';
+	public const OPTION_CORE   = 'citewp_aiso_settings';
 
 	public function register(): void {
 		add_action( 'admin_menu', [ $this, 'add_submenu' ], 20 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
-		add_action( 'admin_post_citewp_regenerate_llms', [ $this, 'handle_regenerate' ] );
+		add_action( 'admin_post_citewp_aiso_regenerate_llms', [ $this, 'handle_regenerate' ] );
 		add_action( 'admin_head', [ $this, 'inline_styles' ] );
 	}
 
@@ -40,7 +40,7 @@ final class Page {
 
 	public function register_settings(): void {
 		register_setting(
-			'citewp_settings_group',
+			'citewp_aiso_settings_group',
 			self::OPTION_CORE,
 			[
 				'type'              => 'array',
@@ -53,7 +53,7 @@ final class Page {
 		);
 
 		register_setting(
-			'citewp_settings_group',
+			'citewp_aiso_settings_group',
 			self::OPTION_LLMS,
 			[
 				'type'              => 'array',
@@ -105,7 +105,7 @@ final class Page {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Insufficient permissions.', 'citewp' ) );
 		}
-		check_admin_referer( 'citewp_regenerate_llms' );
+		check_admin_referer( 'citewp_aiso_regenerate_llms' );
 
 		( new Cache() )->flush();
 
@@ -162,7 +162,7 @@ final class Page {
 			<?php endif; ?>
 
 			<form method="post" action="options.php">
-				<?php settings_fields( 'citewp_settings_group' ); ?>
+				<?php settings_fields( 'citewp_aiso_settings_group' ); ?>
 
 				<h2><?php esc_html_e( 'Crawler Detection', 'citewp' ); ?></h2>
 				<table class="form-table" role="presentation">
@@ -176,9 +176,9 @@ final class Page {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="citewp_log_retention_days"><?php esc_html_e( 'Log retention (days)', 'citewp' ); ?></label></th>
+						<th scope="row"><label for="citewp_aiso_log_retention_days"><?php esc_html_e( 'Log retention (days)', 'citewp' ); ?></label></th>
 						<td>
-							<input type="number" id="citewp_log_retention_days" name="<?php echo esc_attr( self::OPTION_CORE ); ?>[log_retention_days]" value="<?php echo esc_attr( (string) ( $core['log_retention_days'] ?? 7 ) ); ?>" min="1" max="365" />
+							<input type="number" id="citewp_aiso_log_retention_days" name="<?php echo esc_attr( self::OPTION_CORE ); ?>[log_retention_days]" value="<?php echo esc_attr( (string) ( $core['log_retention_days'] ?? 7 ) ); ?>" min="1" max="365" />
 							<p class="description"><?php esc_html_e( 'Free tier: 7 days. Older logs are pruned daily.', 'citewp' ); ?></p>
 						</td>
 					</tr>
@@ -207,16 +207,16 @@ final class Page {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="citewp_min_word_count"><?php esc_html_e( 'Minimum word count for posts', 'citewp' ); ?></label></th>
+						<th scope="row"><label for="citewp_aiso_min_word_count"><?php esc_html_e( 'Minimum word count for posts', 'citewp' ); ?></label></th>
 						<td>
-							<input type="number" id="citewp_min_word_count" name="<?php echo esc_attr( self::OPTION_LLMS ); ?>[min_word_count]" value="<?php echo esc_attr( (string) ( $llms['min_word_count'] ?? 500 ) ); ?>" min="0" max="10000" step="50" />
+							<input type="number" id="citewp_aiso_min_word_count" name="<?php echo esc_attr( self::OPTION_LLMS ); ?>[min_word_count]" value="<?php echo esc_attr( (string) ( $llms['min_word_count'] ?? 500 ) ); ?>" min="0" max="10000" step="50" />
 							<p class="description"><?php esc_html_e( 'Posts shorter than this are skipped (Pages and cornerstone content are always included regardless).', 'citewp' ); ?></p>
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="citewp_recent_days"><?php esc_html_e( 'Include posts from last (days)', 'citewp' ); ?></label></th>
+						<th scope="row"><label for="citewp_aiso_recent_days"><?php esc_html_e( 'Include posts from last (days)', 'citewp' ); ?></label></th>
 						<td>
-							<input type="number" id="citewp_recent_days" name="<?php echo esc_attr( self::OPTION_LLMS ); ?>[recent_days]" value="<?php echo esc_attr( (string) ( $llms['recent_days'] ?? 90 ) ); ?>" min="1" max="3650" />
+							<input type="number" id="citewp_aiso_recent_days" name="<?php echo esc_attr( self::OPTION_LLMS ); ?>[recent_days]" value="<?php echo esc_attr( (string) ( $llms['recent_days'] ?? 90 ) ); ?>" min="1" max="3650" />
 						</td>
 					</tr>
 
@@ -242,8 +242,8 @@ final class Page {
 
 			<h2><?php esc_html_e( 'Maintenance', 'citewp' ); ?></h2>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-				<input type="hidden" name="action" value="citewp_regenerate_llms" />
-				<?php wp_nonce_field( 'citewp_regenerate_llms' ); ?>
+				<input type="hidden" name="action" value="citewp_aiso_regenerate_llms" />
+				<?php wp_nonce_field( 'citewp_aiso_regenerate_llms' ); ?>
 				<p>
 					<button type="submit" class="button">
 						<?php esc_html_e( 'Regenerate llms.txt now', 'citewp' ); ?>

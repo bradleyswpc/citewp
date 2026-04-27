@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class DashboardWidget {
 
-	private const WIDGET_ID = 'citewp_dashboard_widget';
+	private const WIDGET_ID = 'citewp_aiso_dashboard_widget';
 
 	public function register(): void {
 		add_action( 'wp_dashboard_setup', [ $this, 'add_widget' ] );
@@ -46,8 +46,8 @@ final class DashboardWidget {
 		$trend        = $this->get_visit_trend();
 		$top_crawled  = $this->get_top_crawled_pages();
 		$lowest_posts = $this->get_lowest_scoring_posts();
-		$logs_url     = admin_url( 'admin.php?page=citewp-logs' );
-		$all_posts_url = admin_url( 'edit.php?orderby=citewp_geo_score&order=asc' );
+		$logs_url     = admin_url( 'admin.php?page=citewp-aiso-crawler-logs' );
+		$all_posts_url = admin_url( 'edit.php?orderby=citewp_aiso_geo_score&order=asc' );
 
 		$avg_grade = 'red';
 		if ( $avg_score !== null ) {

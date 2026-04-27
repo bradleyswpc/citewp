@@ -18,7 +18,7 @@ final class EditorAssets {
 	}
 
 	public function enqueue(): void {
-		$asset_file = CITEWP_PLUGIN_DIR . 'build/index.asset.php';
+		$asset_file = CITEWP_AISO_PLUGIN_DIR . 'build/index.asset.php';
 
 		// If JS hasn't been built yet (e.g. fresh checkout), bail silently —
 		// the PHP scoring still works, the sidebar just won't load.
@@ -30,9 +30,9 @@ final class EditorAssets {
 
 		wp_enqueue_script(
 			'citewp-sidebar',
-			CITEWP_PLUGIN_URL . 'build/index.js',
+			CITEWP_AISO_PLUGIN_URL . 'build/index.js',
 			$asset['dependencies'] ?? [],
-			$asset['version']      ?? CITEWP_VERSION,
+			$asset['version']      ?? CITEWP_AISO_VERSION,
 			true
 		);
 	}

@@ -32,7 +32,7 @@ final class ContentSelector {
 	 * @return \WP_Post[]
 	 */
 	public function select(): array {
-		$settings = get_option( 'citewp_llms_settings', [] );
+		$settings = get_option( 'citewp_aiso_llms_settings', [] );
 
 		/** @var \WP_Post[] $bucket */
 		$bucket = [];
@@ -90,7 +90,7 @@ final class ContentSelector {
 		 *
 		 * @param \WP_Post[] $bucket
 		 */
-		return apply_filters( 'citewp_llms_selected_content', $bucket );
+		return apply_filters( 'citewp_aiso_llms_selected_content', $bucket );
 	}
 
 	/**
@@ -153,7 +153,7 @@ final class ContentSelector {
 		 *
 		 * @param \WP_Post[] $results
 		 */
-		return apply_filters( 'citewp_llms_cornerstone_posts', $results );
+		return apply_filters( 'citewp_aiso_llms_cornerstone_posts', $results );
 	}
 
 	/**
@@ -231,7 +231,7 @@ final class ContentSelector {
 		}
 
 		// Custom CiteWP per-post exclusion (settable via post meta box later).
-		if ( get_post_meta( $post->ID, '_citewp_exclude_from_llms', true ) === '1' ) {
+		if ( get_post_meta( $post->ID, '_citewp_aiso_exclude_from_llms', true ) === '1' ) {
 			return true;
 		}
 
@@ -241,6 +241,6 @@ final class ContentSelector {
 		 * @param bool     $excluded
 		 * @param \WP_Post $post
 		 */
-		return (bool) apply_filters( 'citewp_llms_post_excluded', false, $post );
+		return (bool) apply_filters( 'citewp_aiso_llms_post_excluded', false, $post );
 	}
 }

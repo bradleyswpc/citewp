@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 final class Menu {
 
 	public const SLUG_PARENT = 'citewp';
-	public const SLUG_LOGS   = 'citewp-crawler-logs';
+	public const SLUG_LOGS   = 'citewp-aiso-crawler-logs';
 
 	public function register(): void {
 		add_action( 'admin_menu', [ $this, 'add_menu' ] );

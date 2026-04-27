@@ -20,7 +20,7 @@ final class LogsPage {
 	public function register(): void {
 		add_action( 'admin_init',                    [ $this, 'maybe_init_table' ] );
 		add_action( 'admin_head',                    [ $this, 'inline_styles' ] );
-		add_action( 'admin_post_citewp_export_logs', [ $this, 'handle_csv_export' ] );
+		add_action( 'admin_post_citewp_aiso_export_logs', [ $this, 'handle_csv_export' ] );
 	}
 
 	/**
@@ -38,7 +38,7 @@ final class LogsPage {
 		if ( ! class_exists( '\WP_List_Table' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 		}
-		require_once CITEWP_PLUGIN_DIR . 'includes/Admin/LogsTable.php';
+		require_once CITEWP_AISO_PLUGIN_DIR . 'includes/Admin/LogsTable.php';
 
 		$this->table = new LogsTable();
 	}
@@ -58,19 +58,19 @@ final class LogsPage {
 		$count_30d = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE detected_at >= %s", gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) ) ) );  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		// phpcs:enable
 
-		$bot_filter   = isset( $_GET['citewp_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) )   : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
-		$range_filter = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) )         : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
+		$bot_filter   = isset( $_GET['citewp_aiso_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_aiso_bot'] ) )   : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
+		$range_filter = isset( $_GET['citewp_aiso_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_aiso_range'] ) )         : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
 
 		$export_args = array_filter(
 			[
-				'action'       => 'citewp_export_logs',
-				'citewp_bot'   => $bot_filter,
-				'citewp_range' => $range_filter,
+				'action'            => 'citewp_aiso_export_logs',
+				'citewp_aiso_bot'   => $bot_filter,
+				'citewp_aiso_range' => $range_filter,
 			]
 		);
 		$export_url = wp_nonce_url(
 			add_query_arg( $export_args, admin_url( 'admin-post.php' ) ),
-			'citewp_export_logs'
+			'citewp_aiso_export_logs'
 		);
 
 		if ( $this->table ) {
@@ -120,15 +120,15 @@ final class LogsPage {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Insufficient permissions.', 'citewp' ) );
 		}
-		check_admin_referer( 'citewp_export_logs' );
+		check_admin_referer( 'citewp_aiso_export_logs' );
 
 		global $wpdb;
 		$table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce already verified by check_admin_referer() above.
-		$bot_filter   = isset( $_GET['citewp_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) )   : '';
+		$bot_filter   = isset( $_GET['citewp_aiso_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_aiso_bot'] ) )   : '';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce already verified by check_admin_referer() above.
-		$range_filter = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) )         : '';
+		$range_filter = isset( $_GET['citewp_aiso_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_aiso_range'] ) )         : '';
 
 		// Validate bot against actual DB values.
 		if ( $bot_filter !== '' ) {
@@ -177,7 +177,7 @@ final class LogsPage {
 		// phpcs:enable
 
 		$rows     = is_array( $rows ) ? $rows : [];
-		$filename = 'citewp-crawler-logs-' . gmdate( 'Y-m-d' ) . '.csv';
+		$filename = 'citewp-aiso-crawler-logs-' . gmdate( 'Y-m-d' ) . '.csv';
 
 		header( 'Content-Type: text/csv; charset=utf-8' );
 		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );

@@ -70,7 +70,7 @@ final class ScoreController {
 		$post_id = (int) $request['post_id'];
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
-				'citewp_forbidden',
+				'citewp_aiso_forbidden',
 				__( 'You do not have permission to view scores for this post.', 'citewp' ),
 				[ 'status' => 403 ]
 			);

@@ -130,10 +130,10 @@ final class LogsTable extends \WP_List_Table {
 		$current_range = $this->validated_range_filter();
 		?>
 		<div class="alignleft actions">
-			<label class="screen-reader-text" for="citewp_bot_filter">
+			<label class="screen-reader-text" for="citewp_aiso_bot_filter">
 				<?php esc_html_e( 'Filter by bot', 'citewp' ); ?>
 			</label>
-			<select id="citewp_bot_filter" name="citewp_bot">
+			<select id="citewp_aiso_bot_filter" name="citewp_aiso_bot">
 				<option value=""><?php esc_html_e( 'All bots', 'citewp' ); ?></option>
 				<?php foreach ( $this->distinct_bots as $bot ) : ?>
 					<option value="<?php echo esc_attr( $bot ); ?>" <?php selected( $current_bot, $bot ); ?>>
@@ -142,10 +142,10 @@ final class LogsTable extends \WP_List_Table {
 				<?php endforeach; ?>
 			</select>
 
-			<label class="screen-reader-text" for="citewp_range_filter">
+			<label class="screen-reader-text" for="citewp_aiso_range_filter">
 				<?php esc_html_e( 'Filter by date range', 'citewp' ); ?>
 			</label>
-			<select id="citewp_range_filter" name="citewp_range">
+			<select id="citewp_aiso_range_filter" name="citewp_aiso_range">
 				<option value=""><?php esc_html_e( 'All time', 'citewp' ); ?></option>
 				<option value="24h" <?php selected( $current_range, '24h' ); ?>><?php esc_html_e( 'Last 24 hours', 'citewp' ); ?></option>
 				<option value="7d"  <?php selected( $current_range, '7d' );  ?>><?php esc_html_e( 'Last 7 days', 'citewp' ); ?></option>
@@ -169,12 +169,12 @@ final class LogsTable extends \WP_List_Table {
 	}
 
 	private function validated_bot_filter(): string {
-		$bot = isset( $_GET['citewp_bot'] ) ? sanitize_text_field( wp_unslash( $_GET['citewp_bot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against DB values below.
+		$bot = isset( $_GET['citewp_aiso_bot'] ) ? sanitize_text_field( wp_unslash( $_GET['citewp_aiso_bot'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against DB values below.
 		return in_array( $bot, $this->distinct_bots, true ) ? $bot : '';
 	}
 
 	private function validated_range_filter(): string {
-		$range = isset( $_GET['citewp_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_range'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against a whitelist below.
+		$range = isset( $_GET['citewp_aiso_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_aiso_range'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter param; validated against a whitelist below.
 		return in_array( $range, [ '24h', '7d', '30d' ], true ) ? $range : '';
 	}
 

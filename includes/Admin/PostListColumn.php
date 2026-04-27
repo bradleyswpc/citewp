@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class PostListColumn {
 
-	private const COLUMN_KEY = 'citewp_geo_score';
+	private const COLUMN_KEY = 'citewp_aiso_geo_score';
 
 	public function register(): void {
 		// Posts.
