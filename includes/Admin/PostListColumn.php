@@ -63,7 +63,7 @@ final class PostListColumn {
 		$grade = get_post_meta( $post_id, Repository::META_KEY_GRADE, true );
 
 		if ( $total === '' || $total === false ) {
-			echo '<span class="citewp-score citewp-score--none" title="' . esc_attr__( 'Not yet scored', 'ai-search-optimizer' ) . '">—</span>';
+			echo '<span class="citewp-aiso-score citewp-aiso-score--none" title="' . esc_attr__( 'Not yet scored', 'ai-search-optimizer' ) . '">—</span>';
 			return;
 		}
 
@@ -72,7 +72,7 @@ final class PostListColumn {
 			: 'red';
 
 		printf(
-			'<span class="citewp-score citewp-score--%1$s"><span class="citewp-score__dot"></span>%2$s</span>',
+			'<span class="citewp-aiso-score citewp-aiso-score--%1$s"><span class="citewp-aiso-score__dot"></span>%2$s</span>',
 			esc_attr( $grade ),
 			esc_html( (string) (int) $total )
 		);
@@ -105,14 +105,14 @@ final class PostListColumn {
 		}
 		?>
 		<style>
-			.column-citewp_geo_score { width: 110px; }
-			.citewp-score { display:inline-flex; align-items:center; gap:6px; font-weight:600; font-variant-numeric: tabular-nums; }
-			.citewp-score__dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-			.citewp-score--green  .citewp-score__dot { background:#16a34a; }
-			.citewp-score--yellow .citewp-score__dot { background:#ca8a04; }
-			.citewp-score--orange .citewp-score__dot { background:#ea580c; }
-			.citewp-score--red    .citewp-score__dot { background:#dc2626; }
-			.citewp-score--none   { color:#9ca3af; font-weight:400; }
+			.column-citewp_aiso_geo_score { width: 110px; }
+			.citewp-aiso-score { display:inline-flex; align-items:center; gap:6px; font-weight:600; font-variant-numeric: tabular-nums; }
+			.citewp-aiso-score__dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+			.citewp-aiso-score--green  .citewp-aiso-score__dot { background:#16a34a; }
+			.citewp-aiso-score--yellow .citewp-aiso-score__dot { background:#ca8a04; }
+			.citewp-aiso-score--orange .citewp-aiso-score__dot { background:#ea580c; }
+			.citewp-aiso-score--red    .citewp-aiso-score__dot { background:#dc2626; }
+			.citewp-aiso-score--none   { color:#9ca3af; font-weight:400; }
 		</style>
 		<?php
 	}

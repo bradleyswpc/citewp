@@ -80,20 +80,20 @@ final class LogsPage {
 		<div class="wrap">
 			<h1><?php esc_html_e( 'AI Crawler Logs', 'ai-search-optimizer' ); ?></h1>
 
-			<div class="citewp-logs-banner">
-				<div class="citewp-logs-stat">
-					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_24h ) ); ?></span>
+			<div class="citewp-aiso-logs-banner">
+				<div class="citewp-aiso-logs-stat">
+					<span class="citewp-aiso-logs-stat__label"><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_24h ) ); ?></span>
 				</div>
-				<div class="citewp-logs-stat">
-					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_7d ) ); ?></span>
+				<div class="citewp-aiso-logs-stat">
+					<span class="citewp-aiso-logs-stat__label"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_7d ) ); ?></span>
 				</div>
-				<div class="citewp-logs-stat">
-					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_30d ) ); ?></span>
+				<div class="citewp-aiso-logs-stat">
+					<span class="citewp-aiso-logs-stat__label"><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_30d ) ); ?></span>
 				</div>
-				<div class="citewp-logs-banner__export">
+				<div class="citewp-aiso-logs-banner__export">
 					<a href="<?php echo esc_url( $export_url ); ?>" class="button">
 						<?php esc_html_e( 'Export CSV', 'ai-search-optimizer' ); ?>
 					</a>
@@ -222,11 +222,11 @@ final class LogsPage {
 		}
 		?>
 		<style>
-			.citewp-logs-banner { display: flex; align-items: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
-			.citewp-logs-stat { background: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 16px; min-width: 110px; }
-			.citewp-logs-stat__label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 2px; }
-			.citewp-logs-stat__value { display: block; font-size: 22px; font-weight: 700; color: #111827; line-height: 1; }
-			.citewp-logs-banner__export { margin-left: auto; }
+			.citewp-aiso-logs-banner { display: flex; align-items: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
+			.citewp-aiso-logs-stat { background: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 16px; min-width: 110px; }
+			.citewp-aiso-logs-stat__label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 2px; }
+			.citewp-aiso-logs-stat__value { display: block; font-size: 22px; font-weight: 700; color: #111827; line-height: 1; }
+			.citewp-aiso-logs-banner__export { margin-left: auto; }
 		</style>
 		<?php
 	}

@@ -125,7 +125,7 @@ final class Page {
 		}
 		?>
 		<style>
-			.citewp-cpt-label { display: block; margin-bottom: 4px; }
+			.citewp-aiso-cpt-label { display: block; margin-bottom: 4px; }
 		</style>
 		<?php
 	}
@@ -225,7 +225,7 @@ final class Page {
 						<th scope="row"><?php esc_html_e( 'Include custom post types', 'ai-search-optimizer' ); ?></th>
 						<td>
 							<?php foreach ( $public_types as $type ) : ?>
-								<label class="citewp-cpt-label">
+								<label class="citewp-aiso-cpt-label">
 									<input type="checkbox" name="<?php echo esc_attr( self::OPTION_LLMS ); ?>[extra_post_types][]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, (array) ( $llms['extra_post_types'] ?? [] ), true ) ); ?> />
 									<?php echo esc_html( $type->labels->name ); ?>
 								</label>

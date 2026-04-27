@@ -29,7 +29,7 @@ final class EditorAssets {
 		$asset = require $asset_file;
 
 		wp_enqueue_script(
-			'citewp-sidebar',
+			'citewp-aiso-sidebar',
 			CITEWP_AISO_PLUGIN_URL . 'build/index.js',
 			$asset['dependencies'] ?? [],
 			$asset['version']      ?? CITEWP_AISO_VERSION,

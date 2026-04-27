@@ -69,36 +69,36 @@ final class DashboardWidget {
 			$pct = ( $diff / $last_week ) * 100;
 			if ( $pct >= 5 ) {
 				$trend_icon  = '▲';
-				$trend_class = 'citewp-trend--up';
+				$trend_class = 'citewp-aiso-trend--up';
 			} elseif ( $pct <= -5 ) {
 				$trend_icon  = '▼';
-				$trend_class = 'citewp-trend--down';
+				$trend_class = 'citewp-aiso-trend--down';
 			} else {
 				$trend_icon  = '—';
-				$trend_class = 'citewp-trend--flat';
+				$trend_class = 'citewp-aiso-trend--flat';
 			}
 		}
 		?>
-		<div class="citewp-widget">
+		<div class="citewp-aiso-widget">
 
-			<div class="citewp-widget__stats">
-				<div class="citewp-stat">
-					<span class="citewp-stat__label"><?php esc_html_e( 'Avg GEO Score', 'ai-search-optimizer' ); ?></span>
+			<div class="citewp-aiso-widget__stats">
+				<div class="citewp-aiso-stat">
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Avg GEO Score', 'ai-search-optimizer' ); ?></span>
 					<?php if ( $avg_score !== null ) : ?>
-						<span class="citewp-stat__value citewp-stat__value--<?php echo esc_attr( $avg_grade ); ?>"><?php echo esc_html( (string) $avg_score ); ?></span>
-						<span class="citewp-stat__sub"><?php esc_html_e( 'across scored posts', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-stat__value citewp-aiso-stat__value--<?php echo esc_attr( $avg_grade ); ?>"><?php echo esc_html( (string) $avg_score ); ?></span>
+						<span class="citewp-aiso-stat__sub"><?php esc_html_e( 'across scored posts', 'ai-search-optimizer' ); ?></span>
 					<?php else : ?>
-						<span class="citewp-stat__value citewp-stat__value--none">—</span>
-						<span class="citewp-stat__sub"><?php esc_html_e( 'No posts scored yet', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-stat__value citewp-aiso-stat__value--none">—</span>
+						<span class="citewp-aiso-stat__sub"><?php esc_html_e( 'No posts scored yet', 'ai-search-optimizer' ); ?></span>
 					<?php endif; ?>
 				</div>
 
-				<div class="citewp-stat">
-					<span class="citewp-stat__label"><?php esc_html_e( 'Bot Visits (7d)', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-stat__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></span>
-					<span class="citewp-stat__sub">
+				<div class="citewp-aiso-stat">
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Bot Visits (7d)', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></span>
+					<span class="citewp-aiso-stat__sub">
 						<?php if ( $trend_icon ) : ?>
-							<span class="citewp-trend <?php echo esc_attr( $trend_class ); ?>"><?php echo esc_html( $trend_icon . ' ' . number_format_i18n( abs( $diff ) ) ); ?></span>
+							<span class="citewp-aiso-trend <?php echo esc_attr( $trend_class ); ?>"><?php echo esc_html( $trend_icon . ' ' . number_format_i18n( abs( $diff ) ) ); ?></span>
 						<?php endif; ?>
 						<?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?>
 					</span>
@@ -106,29 +106,29 @@ final class DashboardWidget {
 			</div>
 
 			<?php if ( ! empty( $top_crawled ) ) : ?>
-			<div class="citewp-widget__section">
-				<h4 class="citewp-widget__heading"><?php esc_html_e( 'Most Crawled Pages (Last 7 Days)', 'ai-search-optimizer' ); ?></h4>
-				<ul class="citewp-list">
+			<div class="citewp-aiso-widget__section">
+				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Most Crawled Pages (Last 7 Days)', 'ai-search-optimizer' ); ?></h4>
+				<ul class="citewp-aiso-list">
 					<?php foreach ( $top_crawled as $row ) : ?>
-					<li class="citewp-list__item">
-						<span class="citewp-list__count"><?php echo esc_html( number_format_i18n( (int) $row->visit_count ) ); ?></span>
-						<span class="citewp-list__uri" title="<?php echo esc_attr( $row->request_uri ); ?>"><?php echo esc_html( $row->request_uri ); ?></span>
+					<li class="citewp-aiso-list__item">
+						<span class="citewp-aiso-list__count"><?php echo esc_html( number_format_i18n( (int) $row->visit_count ) ); ?></span>
+						<span class="citewp-aiso-list__uri" title="<?php echo esc_attr( $row->request_uri ); ?>"><?php echo esc_html( $row->request_uri ); ?></span>
 					</li>
 					<?php endforeach; ?>
 				</ul>
-				<a href="<?php echo esc_url( $logs_url ); ?>" class="citewp-widget__link"><?php esc_html_e( 'View all crawler logs →', 'ai-search-optimizer' ); ?></a>
+				<a href="<?php echo esc_url( $logs_url ); ?>" class="citewp-aiso-widget__link"><?php esc_html_e( 'View all crawler logs →', 'ai-search-optimizer' ); ?></a>
 			</div>
 			<?php else : ?>
-			<p class="citewp-widget__empty">
+			<p class="citewp-aiso-widget__empty">
 				<?php esc_html_e( 'No bot visits logged yet.', 'ai-search-optimizer' ); ?>
 				<a href="<?php echo esc_url( $logs_url ); ?>"><?php esc_html_e( 'View logs →', 'ai-search-optimizer' ); ?></a>
 			</p>
 			<?php endif; ?>
 
 			<?php if ( ! empty( $lowest_posts ) ) : ?>
-			<div class="citewp-widget__section">
-				<h4 class="citewp-widget__heading"><?php esc_html_e( 'Lowest GEO Scores — Needs Attention', 'ai-search-optimizer' ); ?></h4>
-				<ul class="citewp-list">
+			<div class="citewp-aiso-widget__section">
+				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Lowest GEO Scores — Needs Attention', 'ai-search-optimizer' ); ?></h4>
+				<ul class="citewp-aiso-list">
 					<?php foreach ( $lowest_posts as $post ) : ?>
 					<?php
 					$score    = (int) get_post_meta( $post->ID, Repository::META_KEY_TOTAL, true );
@@ -137,17 +137,17 @@ final class DashboardWidget {
 						? $grade : 'red';
 					$edit_url = get_edit_post_link( $post->ID );
 					?>
-					<li class="citewp-list__item">
-						<span class="citewp-score-badge citewp-score-badge--<?php echo esc_attr( $grade ); ?>"><?php echo esc_html( (string) $score ); ?></span>
+					<li class="citewp-aiso-list__item">
+						<span class="citewp-aiso-score-badge citewp-aiso-score-badge--<?php echo esc_attr( $grade ); ?>"><?php echo esc_html( (string) $score ); ?></span>
 						<?php if ( $edit_url ) : ?>
-							<a href="<?php echo esc_url( $edit_url ); ?>" class="citewp-list__title"><?php echo esc_html( get_the_title( $post ) ); ?></a>
+							<a href="<?php echo esc_url( $edit_url ); ?>" class="citewp-aiso-list__title"><?php echo esc_html( get_the_title( $post ) ); ?></a>
 						<?php else : ?>
-							<span class="citewp-list__title"><?php echo esc_html( get_the_title( $post ) ); ?></span>
+							<span class="citewp-aiso-list__title"><?php echo esc_html( get_the_title( $post ) ); ?></span>
 						<?php endif; ?>
 					</li>
 					<?php endforeach; ?>
 				</ul>
-				<a href="<?php echo esc_url( $all_posts_url ); ?>" class="citewp-widget__link"><?php esc_html_e( 'See all post scores →', 'ai-search-optimizer' ); ?></a>
+				<a href="<?php echo esc_url( $all_posts_url ); ?>" class="citewp-aiso-widget__link"><?php esc_html_e( 'See all post scores →', 'ai-search-optimizer' ); ?></a>
 			</div>
 			<?php endif; ?>
 
@@ -257,37 +257,37 @@ final class DashboardWidget {
 		}
 		?>
 		<style>
-			.citewp-widget { font-size: 13px; }
-			.citewp-widget__stats { display: flex; gap: 16px; margin-bottom: 16px; }
-			.citewp-stat { flex: 1; background: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; }
-			.citewp-stat__label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 4px; }
-			.citewp-stat__value { display: block; font-size: 28px; font-weight: 700; line-height: 1; color: #111827; }
-			.citewp-stat__value--green  { color: #16a34a; }
-			.citewp-stat__value--yellow { color: #ca8a04; }
-			.citewp-stat__value--orange { color: #ea580c; }
-			.citewp-stat__value--red    { color: #dc2626; }
-			.citewp-stat__value--none   { color: #9ca3af; }
-			.citewp-stat__sub { display: block; font-size: 11px; color: #6b7280; margin-top: 4px; }
-			.citewp-trend--up   { color: #16a34a; font-weight: 600; }
-			.citewp-trend--down { color: #dc2626; font-weight: 600; }
-			.citewp-trend--flat { color: #6b7280; }
-			.citewp-widget__section { margin-top: 14px; border-top: 1px solid #e5e7eb; padding-top: 12px; }
-			.citewp-widget__heading { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #374151; margin: 0 0 8px; font-weight: 600; }
-			.citewp-list { margin: 0 0 8px; padding: 0; list-style: none; }
-			.citewp-list__item { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
-			.citewp-list__item:last-child { border-bottom: none; }
-			.citewp-list__count { min-width: 32px; font-weight: 700; font-variant-numeric: tabular-nums; color: #111827; text-align: right; }
-			.citewp-list__uri { color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; font-family: monospace; font-size: 12px; }
-			.citewp-list__title { color: #2271b1; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 230px; }
-			.citewp-list__title:hover { text-decoration: underline; }
-			.citewp-score-badge { min-width: 30px; text-align: center; font-weight: 700; font-size: 12px; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
-			.citewp-score-badge--green  { background: #dcfce7; color: #16a34a; }
-			.citewp-score-badge--yellow { background: #fef9c3; color: #ca8a04; }
-			.citewp-score-badge--orange { background: #ffedd5; color: #ea580c; }
-			.citewp-score-badge--red    { background: #fee2e2; color: #dc2626; }
-			.citewp-widget__link { font-size: 12px; color: #2271b1; text-decoration: none; }
-			.citewp-widget__link:hover { text-decoration: underline; }
-			.citewp-widget__empty { color: #6b7280; font-size: 12px; margin: 0; }
+			.citewp-aiso-widget { font-size: 13px; }
+			.citewp-aiso-widget__stats { display: flex; gap: 16px; margin-bottom: 16px; }
+			.citewp-aiso-stat { flex: 1; background: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; }
+			.citewp-aiso-stat__label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 4px; }
+			.citewp-aiso-stat__value { display: block; font-size: 28px; font-weight: 700; line-height: 1; color: #111827; }
+			.citewp-aiso-stat__value--green  { color: #16a34a; }
+			.citewp-aiso-stat__value--yellow { color: #ca8a04; }
+			.citewp-aiso-stat__value--orange { color: #ea580c; }
+			.citewp-aiso-stat__value--red    { color: #dc2626; }
+			.citewp-aiso-stat__value--none   { color: #9ca3af; }
+			.citewp-aiso-stat__sub { display: block; font-size: 11px; color: #6b7280; margin-top: 4px; }
+			.citewp-aiso-trend--up   { color: #16a34a; font-weight: 600; }
+			.citewp-aiso-trend--down { color: #dc2626; font-weight: 600; }
+			.citewp-aiso-trend--flat { color: #6b7280; }
+			.citewp-aiso-widget__section { margin-top: 14px; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+			.citewp-aiso-widget__heading { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #374151; margin: 0 0 8px; font-weight: 600; }
+			.citewp-aiso-list { margin: 0 0 8px; padding: 0; list-style: none; }
+			.citewp-aiso-list__item { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+			.citewp-aiso-list__item:last-child { border-bottom: none; }
+			.citewp-aiso-list__count { min-width: 32px; font-weight: 700; font-variant-numeric: tabular-nums; color: #111827; text-align: right; }
+			.citewp-aiso-list__uri { color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; font-family: monospace; font-size: 12px; }
+			.citewp-aiso-list__title { color: #2271b1; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 230px; }
+			.citewp-aiso-list__title:hover { text-decoration: underline; }
+			.citewp-aiso-score-badge { min-width: 30px; text-align: center; font-weight: 700; font-size: 12px; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+			.citewp-aiso-score-badge--green  { background: #dcfce7; color: #16a34a; }
+			.citewp-aiso-score-badge--yellow { background: #fef9c3; color: #ca8a04; }
+			.citewp-aiso-score-badge--orange { background: #ffedd5; color: #ea580c; }
+			.citewp-aiso-score-badge--red    { background: #fee2e2; color: #dc2626; }
+			.citewp-aiso-widget__link { font-size: 12px; color: #2271b1; text-decoration: none; }
+			.citewp-aiso-widget__link:hover { text-decoration: underline; }
+			.citewp-aiso-widget__empty { color: #6b7280; font-size: 12px; margin: 0; }
 		</style>
 		<?php
 	}
