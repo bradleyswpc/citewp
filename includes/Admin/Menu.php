@@ -22,8 +22,8 @@ final class Menu {
 
 	public function add_menu(): void {
 		add_menu_page(
-			__( 'CiteWP', 'citewp' ),
-			__( 'CiteWP', 'citewp' ),
+			__( 'CiteWP', 'ai-search-optimizer' ),
+			__( 'CiteWP', 'ai-search-optimizer' ),
 			'manage_options',
 			self::SLUG_PARENT,
 			[ $this, 'render_dashboard' ],
@@ -33,8 +33,8 @@ final class Menu {
 
 		add_submenu_page(
 			self::SLUG_PARENT,
-			__( 'Crawler Logs', 'citewp' ),
-			__( 'Crawler Logs', 'citewp' ),
+			__( 'Crawler Logs', 'ai-search-optimizer' ),
+			__( 'Crawler Logs', 'ai-search-optimizer' ),
 			'manage_options',
 			self::SLUG_LOGS,
 			[ \CiteWP\Aiso\Plugin::instance()->module( 'admin_logs_page' ), 'render' ]
@@ -43,7 +43,7 @@ final class Menu {
 		// Rename the auto-added duplicate "CiteWP" submenu to "Dashboard".
 		global $submenu;
 		if ( isset( $submenu[ self::SLUG_PARENT ][0][0] ) ) {
-			$submenu[ self::SLUG_PARENT ][0][0] = __( 'Dashboard', 'citewp' );
+			$submenu[ self::SLUG_PARENT ][0][0] = __( 'Dashboard', 'ai-search-optimizer' );
 		}
 	}
 
@@ -53,11 +53,11 @@ final class Menu {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'CiteWP', 'citewp' ); ?></h1>
-			<p><?php esc_html_e( 'Generative Engine Optimization for WordPress.', 'citewp' ); ?></p>
+			<h1><?php esc_html_e( 'CiteWP', 'ai-search-optimizer' ); ?></h1>
+			<p><?php esc_html_e( 'Generative Engine Optimization for WordPress.', 'ai-search-optimizer' ); ?></p>
 			<p>
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . self::SLUG_LOGS ) ); ?>" class="button button-primary">
-					<?php esc_html_e( 'View Crawler Logs', 'citewp' ); ?>
+					<?php esc_html_e( 'View Crawler Logs', 'ai-search-optimizer' ); ?>
 				</a>
 			</p>
 		</div>

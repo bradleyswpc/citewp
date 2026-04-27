@@ -78,24 +78,24 @@ final class LogsPage {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'AI Crawler Logs', 'citewp' ); ?></h1>
+			<h1><?php esc_html_e( 'AI Crawler Logs', 'ai-search-optimizer' ); ?></h1>
 
 			<div class="citewp-logs-banner">
 				<div class="citewp-logs-stat">
-					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 24 hours', 'citewp' ); ?></span>
+					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_24h ) ); ?></span>
 				</div>
 				<div class="citewp-logs-stat">
-					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 7 days', 'citewp' ); ?></span>
+					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_7d ) ); ?></span>
 				</div>
 				<div class="citewp-logs-stat">
-					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 30 days', 'citewp' ); ?></span>
+					<span class="citewp-logs-stat__label"><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_30d ) ); ?></span>
 				</div>
 				<div class="citewp-logs-banner__export">
 					<a href="<?php echo esc_url( $export_url ); ?>" class="button">
-						<?php esc_html_e( 'Export CSV', 'citewp' ); ?>
+						<?php esc_html_e( 'Export CSV', 'ai-search-optimizer' ); ?>
 					</a>
 				</div>
 			</div>
@@ -103,7 +103,7 @@ final class LogsPage {
 			<?php if ( $total === 0 ) : ?>
 				<div class="notice notice-info inline">
 					<p>
-						<?php esc_html_e( 'No AI crawler activity yet. Once GPTBot, ClaudeBot, PerplexityBot, or another AI crawler visits your site, you\'ll see it here.', 'citewp' ); ?>
+						<?php esc_html_e( 'No AI crawler activity yet. Once GPTBot, ClaudeBot, PerplexityBot, or another AI crawler visits your site, you\'ll see it here.', 'ai-search-optimizer' ); ?>
 					</p>
 				</div>
 			<?php elseif ( $this->table ) : ?>
@@ -118,7 +118,7 @@ final class LogsPage {
 
 	public function handle_csv_export(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Insufficient permissions.', 'citewp' ) );
+			wp_die( esc_html__( 'Insufficient permissions.', 'ai-search-optimizer' ) );
 		}
 		check_admin_referer( 'citewp_aiso_export_logs' );
 
