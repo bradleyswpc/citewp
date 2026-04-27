@@ -1,6 +1,6 @@
-=== Cite Score — AI Search Optimization ===
-Contributors: citewp
-Tags: ai, seo, llms, gptbot, generative engine optimization
+=== AI Search Optimizer – Optimize Content for AI Engines ===
+Contributors: bradleyswpc
+Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
@@ -8,111 +8,73 @@ Stable tag: 0.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Generative Engine Optimization for WordPress. Detect AI crawlers, generate llms.txt, and score content for AI citability.
+Optimize WordPress content for AI search engines. AI crawler tracking, llms.txt generation, and the Cite Score — a transparent 100-point AI citation score.
 
 == Description ==
 
-Cite Score is a Generative Engine Optimization (GEO) toolkit for WordPress. As AI search engines like ChatGPT, Claude, and Perplexity reshape how people find information, Cite Score helps your content get cited — not just ranked.
+AI Search Optimizer helps your WordPress content get cited by AI search engines.
 
-= Features =
+Traditional SEO optimizes for ranking in search results. AI Search Optimizer focuses on a different goal: getting your content referenced inside AI-generated answers from ChatGPT, Claude, Perplexity, and other AI engines.
 
-**AI Crawler Detection**
+= What's included =
 
-* Detects 40+ AI bots by user agent (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, and more)
-* Logs every AI visit with user agent, IP, URL, and timestamp
-* Configurable log retention (7 days by default)
-* Filter logs by bot type or date range
-* Export logs to CSV
-* Dashboard widget showing visit trends
+**Cite Score** — a transparent 100-point score showing how likely your content is to be cited by AI engines. Calculated across 17 signals in three categories: Structure, Citability, and Authority. The full scoring rubric is published — no black box.
 
-**llms.txt Auto-Generator**
+**AI Crawler Tracking** — see which AI bots visit your site, when, and what they request. Filter by bot, export to CSV, and identify which content AI is paying attention to.
 
-* Dynamically serves `/llms.txt` and `/llms-full.txt` per the llmstxt.org spec
-* Tiered content selection: Pages → cornerstone content → recent quality posts → custom post types
-* Integrates with Yoast SEO, Rank Math, and AIOSEO for cornerstone detection and meta descriptions
-* 1-hour smart cache with automatic invalidation on publish/update
+**llms.txt Generation** — automatically generate llms.txt and llms-full.txt files using your most important content. Integrates with Yoast SEO, Rank Math, SEOPress, and AIOSEO to respect your existing settings.
 
-**GEO Score**
+**Gutenberg Sidebar** — see your Cite Score and signal-by-signal breakdown directly in the WordPress editor while you write. No context switching.
 
-* 100-point content scoring system across 3 categories: Structure (35pts), Citability (40pts), Authority (25pts)
-* 17 individual signals based on 2026 GEO research (statistics density, entity count, FAQ schema, E-E-A-T, and more)
-* Visible in the Gutenberg sidebar with expandable per-signal recommendations
-* Sortable GEO Score column on All Posts and All Pages screens
-* Auto-recalculates on every save
+**Post List Column** — sortable Cite Score column in All Posts and All Pages. Spot weak content at a glance.
 
-= Why Cite Score? =
+**Dashboard Widget** — average Cite Score across your site, top crawled pages, AI bot trends.
 
-SEO gets you ranked. Cite Score gets you cited.
+= Why this matters =
 
-Traditional SEO optimizes for keyword matching. GEO optimizes for AI citation — the signals that cause ChatGPT, Perplexity, and Google AI Overviews to quote your content as a source.
+AI engines now influence a meaningful share of search behavior. Your content can rank well on Google and still be invisible to AI assistants. AI Search Optimizer measures and improves your content's likelihood of being cited.
 
-= Privacy =
+= About the Cite Score =
 
-CiteWP logs AI crawler visits (user agent, IP address, URL) to your own WordPress database. No data is sent to external servers. All processing happens locally.
+The Cite Score is the heart of this plugin. Unlike competitors with proprietary "AI scoring" formulas, our rubric is fully public. The 17 signals are documented at https://citewp.com/cite-score, with research citations for every weight.
+
+= Built for the future =
+
+This plugin is built and maintained by **CiteWP**. Visit citewp.com for documentation, blog posts on AI search optimization, and product updates.
 
 == Installation ==
 
-1. Upload the `ai-search-optimizer` folder to `/wp-content/plugins/`
-2. Activate through the **Plugins** menu in WordPress
-3. Navigate to **Cite Score > Crawler Logs** to see AI bot activity
-4. Open any post in the block editor and find **GEO Score** in the sidebar panels
+1. Upload the plugin to /wp-content/plugins/, or install via Plugins → Add New.
+2. Activate.
+3. AI crawler tracking and llms.txt generation start automatically.
+4. Open any post or page to see the Cite Score in the editor sidebar.
 
 == Frequently Asked Questions ==
 
-= Does Cite Score send my content to external servers? =
+= Does this replace my SEO plugin? =
 
-No. All analysis and scoring happens locally on your WordPress installation. No content or personal data leaves your server.
+No. AI Search Optimizer complements Yoast SEO, Rank Math, SEOPress, and AIOSEO. Keep your SEO plugin for traditional search; add this for AI search.
 
-= Which AI bots does Cite Score detect? =
+= Is the Cite Score formula public? =
 
-40+ bots including GPTBot (OpenAI), ClaudeBot (Anthropic), PerplexityBot, Google-Extended, Applebot-Extended, Meta-ExternalAgent, Bytespider, and more.
+Yes. The full 100-point rubric is published at https://citewp.com/cite-score with research citations for every signal. Unlike competitor "AI scores," there's no black box.
 
-= Does the GEO Score guarantee my content will be cited by AI? =
+= Does this work with WooCommerce? =
 
-No tool can guarantee AI citations. The GEO Score reflects the structural and content signals that research shows correlate with AI citation frequency.
+Cite Score and llms.txt generation work with any post type, including WooCommerce products. Crawler tracking is site-wide.
 
-= Will CiteWP slow down my site? =
+= What's an llms.txt file? =
 
-No. Crawler detection adds zero latency to human visitors — AI bots are identified by user agent only, with no content scanning. The GEO Score is calculated on save, not on every page load.
+It's an emerging standard that helps AI engines understand your site's most important content. AI Search Optimizer generates it automatically, similar to how SEO plugins generate sitemap.xml.
 
 == Changelog ==
 
 = 0.6.0 =
-* Plugin folder and slug renamed to `ai-search-optimizer` (multi-product architecture).
-* PHP namespace updated to `CiteWP\Aiso\` throughout; company root `CiteWP\` reserved for future products.
-* All option keys, post meta keys, transients, and cron hooks updated to `citewp_aiso_*` prefix.
-* REST namespace updated to `citewp/aiso/v1`.
-* Text domain updated to `ai-search-optimizer`.
-
-= 0.5.0 =
-* Renamed plugin display name to "Cite Score — AI Search Optimization" (WP.org trademark compliance).
-* Raised "Tested up to" to WordPress 6.9.
-* CSV export: replaced direct filesystem calls with output streaming (WP.org Plugin Check compliance).
-* Crawler detector: hardened sanitization on all `$_SERVER` inputs.
-* Plugin Check compliance: phpcs annotations on all direct DB queries against custom tables.
-
-= 0.4.0 =
-* Added WordPress Dashboard widget (avg GEO score, bot visit trend, top crawled pages, lowest-scoring posts).
-* Crawler Logs: summary stats banner (24h / 7d / 30d visit counts).
-* Crawler Logs: bot type filter and date range filter.
-* Crawler Logs: CSV export with active filters applied.
-* Settings: minor UI polish.
-* Security: completed full security audit; all output escaped, all queries prepared.
-* Added LICENSE file (GPL v2).
-
-= 0.3.0 =
-* Added GEO Score: 100-point scoring across Structure (35), Citability (40), and Authority (25) categories.
-* 17 individual signals based on 2026 GEO research (statistics density, entity count, FAQ schema, E-E-A-T, etc.).
-* Gutenberg sidebar with expandable category breakdown and per-signal recommendations.
-* Sortable GEO Score column on All Posts and All Pages screens.
-* REST API at /citewp/aiso/v1/score/ for score retrieval and recalculation.
-* Auto-recalculation on every save_post.
-
-= 0.2.0 =
-* Added llms.txt and llms-full.txt dynamic generation per llmstxt.org spec.
-* Tiered content selection: pages, cornerstone content, recent quality posts.
-* Yoast / Rank Math / AIOSEO integration for cornerstone detection and meta descriptions.
-* Settings page with content selection controls and manual cache regeneration.
-
-= 0.1.0 =
-* Initial release: AI crawler detection and admin logs page.
+* Initial WordPress.org release.
+* Cite Score: transparent 100-point AI citation score with 17 signals across Structure, Citability, and Authority categories.
+* AI Crawler Tracking: log and filter visits from GPTBot, ClaudeBot, PerplexityBot, and 38+ other AI bots.
+* llms.txt and llms-full.txt generation with cornerstone content prioritization.
+* Gutenberg sidebar with category drilldown.
+* Sortable Cite Score column on Posts and Pages.
+* Dashboard widget with site-wide score, top crawled pages, and bot activity trends.
+* Integrations with Yoast SEO, Rank Math, SEOPress, and AIOSEO.
