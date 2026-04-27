@@ -4,7 +4,7 @@ Tags: ai, seo, llms, gptbot, generative engine optimization
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.5.0
+Stable tag: 0.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,7 +52,7 @@ CiteWP logs AI crawler visits (user agent, IP address, URL) to your own WordPres
 
 == Installation ==
 
-1. Upload the `citewp` folder to `/wp-content/plugins/`
+1. Upload the `ai-search-optimizer` folder to `/wp-content/plugins/`
 2. Activate through the **Plugins** menu in WordPress
 3. Navigate to **Cite Score > Crawler Logs** to see AI bot activity
 4. Open any post in the block editor and find **GEO Score** in the sidebar panels
@@ -77,6 +77,13 @@ No. Crawler detection adds zero latency to human visitors — AI bots are identi
 
 == Changelog ==
 
+= 0.6.0 =
+* Plugin folder and slug renamed to `ai-search-optimizer` (multi-product architecture).
+* PHP namespace updated to `CiteWP\Aiso\` throughout; company root `CiteWP\` reserved for future products.
+* All option keys, post meta keys, transients, and cron hooks updated to `citewp_aiso_*` prefix.
+* REST namespace updated to `citewp/aiso/v1`.
+* Text domain updated to `ai-search-optimizer`.
+
 = 0.5.0 =
 * Renamed plugin display name to "Cite Score — AI Search Optimization" (WP.org trademark compliance).
 * Raised "Tested up to" to WordPress 6.9.
@@ -98,7 +105,7 @@ No. Crawler detection adds zero latency to human visitors — AI bots are identi
 * 17 individual signals based on 2026 GEO research (statistics density, entity count, FAQ schema, E-E-A-T, etc.).
 * Gutenberg sidebar with expandable category breakdown and per-signal recommendations.
 * Sortable GEO Score column on All Posts and All Pages screens.
-* REST API at /citewp/v1/score/ for score retrieval and recalculation.
+* REST API at /citewp/aiso/v1/score/ for score retrieval and recalculation.
 * Auto-recalculation on every save_post.
 
 = 0.2.0 =
