@@ -1,19 +1,19 @@
 <?php
 /**
- * Plugin Name:       Cite Score — AI Search Optimization
- * Plugin URI:        https://citewp.com
- * Description:       Generative Engine Optimization for WordPress. Detect AI crawlers, generate llms.txt, and score content for AI citability.
- * Version:           0.5.0
+ * Plugin Name:       AI Search Optimizer – Optimize Content for AI Engines
+ * Plugin URI:        https://citewp.com/ai-search-optimizer
+ * Description:       Optimize WordPress content for AI search engines like ChatGPT, Claude, Perplexity, and Gemini. Includes AI crawler detection, llms.txt generation, and the Cite Score — a transparent 100-point GEO score for content citability.
+ * Version:           0.6.0
  * Requires at least: 6.5
  * Requires PHP:      8.0
  * Author:            CiteWP
  * Author URI:        https://citewp.com
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       citewp
+ * Text Domain:       ai-search-optimizer
  * Domain Path:       /languages
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
@@ -23,26 +23,26 @@ defined( 'ABSPATH' ) || exit;
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-define( 'CITEWP_VERSION', '0.5.0' );
-define( 'CITEWP_PLUGIN_FILE', __FILE__ );
-define( 'CITEWP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'CITEWP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'CITEWP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'CITEWP_DB_VERSION', '1' );
+define( 'CITEWP_AISO_VERSION', '0.6.0' );
+define( 'CITEWP_AISO_PLUGIN_FILE', __FILE__ );
+define( 'CITEWP_AISO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'CITEWP_AISO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'CITEWP_AISO_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'CITEWP_AISO_DB_VERSION', '1' );
 
 // ---------------------------------------------------------------------------
-// PSR-4 style autoloader (namespace: CiteWP\)
+// PSR-4 style autoloader (namespace: CiteWP\Aiso\)
 // ---------------------------------------------------------------------------
 spl_autoload_register(
 	static function ( string $class ): void {
-		$prefix = 'CiteWP\\';
+		$prefix = 'CiteWP\\Aiso\\';
 		if ( strncmp( $class, $prefix, strlen( $prefix ) ) !== 0 ) {
 			return;
 		}
 
 		$relative = substr( $class, strlen( $prefix ) );
-		// CiteWP\Crawler\Detector -> includes/Crawler/Detector.php
-		$path = CITEWP_PLUGIN_DIR . 'includes/' . str_replace( '\\', DIRECTORY_SEPARATOR, $relative ) . '.php';
+		// CiteWP\Aiso\Crawler\Detector -> includes/Crawler/Detector.php
+		$path = CITEWP_AISO_PLUGIN_DIR . 'includes/' . str_replace( '\\', DIRECTORY_SEPARATOR, $relative ) . '.php';
 
 		if ( is_readable( $path ) ) {
 			require_once $path;
@@ -53,8 +53,8 @@ spl_autoload_register(
 // ---------------------------------------------------------------------------
 // Activation / Deactivation / Uninstall
 // ---------------------------------------------------------------------------
-register_activation_hook( __FILE__, [ \CiteWP\Plugin::class, 'activate' ] );
-register_deactivation_hook( __FILE__, [ \CiteWP\Plugin::class, 'deactivate' ] );
+register_activation_hook( __FILE__, [ \CiteWP\Aiso\Plugin::class, 'activate' ] );
+register_deactivation_hook( __FILE__, [ \CiteWP\Aiso\Plugin::class, 'deactivate' ] );
 
 // ---------------------------------------------------------------------------
 // Boot
@@ -62,6 +62,6 @@ register_deactivation_hook( __FILE__, [ \CiteWP\Plugin::class, 'deactivate' ] );
 add_action(
 	'plugins_loaded',
 	static function (): void {
-		\CiteWP\Plugin::instance()->boot();
+		\CiteWP\Aiso\Plugin::instance()->boot();
 	}
 );
