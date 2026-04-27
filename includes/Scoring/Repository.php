@@ -5,12 +5,12 @@
  * Stored as a single serialized array under _citewp_geo_score for fast retrieval.
  * Also stores _citewp_geo_score_total as a top-level integer for orderby/list-table queries.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Scoring;
+namespace CiteWP\Aiso\Scoring;
 
 defined( 'ABSPATH' ) || exit;
 

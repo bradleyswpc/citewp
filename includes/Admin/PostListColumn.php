@@ -5,14 +5,14 @@
  * Adds a sortable column showing the score with a colored grade dot
  * to the All Posts and All Pages screens.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Admin;
+namespace CiteWP\Aiso\Admin;
 
-use CiteWP\Scoring\Repository;
+use CiteWP\Aiso\Scoring\Repository;
 
 defined( 'ABSPATH' ) || exit;
 

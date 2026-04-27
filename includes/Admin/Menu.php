@@ -2,12 +2,12 @@
 /**
  * Admin menu registration.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Admin;
+namespace CiteWP\Aiso\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,7 +37,7 @@ final class Menu {
 			__( 'Crawler Logs', 'citewp' ),
 			'manage_options',
 			self::SLUG_LOGS,
-			[ \CiteWP\Plugin::instance()->module( 'admin_logs_page' ), 'render' ]
+			[ \CiteWP\Aiso\Plugin::instance()->module( 'admin_logs_page' ), 'render' ]
 		);
 
 		// Rename the auto-added duplicate "CiteWP" submenu to "Dashboard".

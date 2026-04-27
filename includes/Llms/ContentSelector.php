@@ -11,12 +11,12 @@
  * Always excludes: drafts, password-protected, noindex'd, attachments,
  * revisions, content tagged with noai robots meta.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Llms;
+namespace CiteWP\Aiso\Llms;
 
 defined( 'ABSPATH' ) || exit;
 

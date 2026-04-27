@@ -10,14 +10,14 @@
  *   - Empty user agents
  *   - Disabled in settings
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Crawler;
+namespace CiteWP\Aiso\Crawler;
 
-use CiteWP\Database\Schema;
+use CiteWP\Aiso\Database\Schema;
 
 defined( 'ABSPATH' ) || exit;
 

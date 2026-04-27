@@ -3,7 +3,7 @@
  * Fires only when the plugin is deleted via the WordPress admin.
  * Removes all CiteWP data. Deactivation does NOT trigger this.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );

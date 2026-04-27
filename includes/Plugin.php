@@ -2,12 +2,12 @@
 /**
  * Core plugin orchestrator.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP;
+namespace CiteWP\Aiso;
 
 defined( 'ABSPATH' ) || exit;
 

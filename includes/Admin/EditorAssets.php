@@ -2,12 +2,12 @@
 /**
  * Enqueues the compiled Gutenberg sidebar in the block editor.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Admin;
+namespace CiteWP\Aiso\Admin;
 
 defined( 'ABSPATH' ) || exit;
 

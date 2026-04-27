@@ -2,15 +2,15 @@
 /**
  * Settings page (admin UI for plugin configuration).
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Settings;
+namespace CiteWP\Aiso\Settings;
 
-use CiteWP\Admin\Menu;
-use CiteWP\Llms\Cache;
+use CiteWP\Aiso\Admin\Menu;
+use CiteWP\Aiso\Llms\Cache;
 
 defined( 'ABSPATH' ) || exit;
 

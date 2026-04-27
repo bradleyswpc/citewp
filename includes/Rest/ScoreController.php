@@ -6,15 +6,15 @@
  *   GET  /citewp/v1/score/<post_id>           — get cached score
  *   POST /citewp/v1/score/<post_id>/recalculate — force recalc and return fresh score
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Rest;
+namespace CiteWP\Aiso\Rest;
 
-use CiteWP\Scoring\Repository;
-use CiteWP\Scoring\Engine;
+use CiteWP\Aiso\Scoring\Repository;
+use CiteWP\Aiso\Scoring\Engine;
 
 defined( 'ABSPATH' ) || exit;
 

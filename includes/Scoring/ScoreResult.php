@@ -2,12 +2,12 @@
 /**
  * Result of a GEO score analysis on a single post.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Scoring;
+namespace CiteWP\Aiso\Scoring;
 
 defined( 'ABSPATH' ) || exit;
 

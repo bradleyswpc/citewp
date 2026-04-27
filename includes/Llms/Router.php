@@ -8,12 +8,12 @@
  *  - Cache invalidation is just a transient flush, not a file write
  *  - Identical pattern to how Yoast/RankMath serve sitemap.xml
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Llms;
+namespace CiteWP\Aiso\Llms;
 
 defined( 'ABSPATH' ) || exit;
 

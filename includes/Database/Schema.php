@@ -2,12 +2,12 @@
 /**
  * Database schema management.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Database;
+namespace CiteWP\Aiso\Database;
 
 defined( 'ABSPATH' ) || exit;
 

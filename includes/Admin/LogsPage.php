@@ -2,14 +2,14 @@
 /**
  * Crawler Logs admin page.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Admin;
+namespace CiteWP\Aiso\Admin;
 
-use CiteWP\Database\Schema;
+use CiteWP\Aiso\Database\Schema;
 
 defined( 'ABSPATH' ) || exit;
 

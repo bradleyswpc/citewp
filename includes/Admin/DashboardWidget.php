@@ -5,15 +5,15 @@
  * Shows average GEO score, bot visit trend, top crawled pages,
  * and lowest-scoring posts to prompt action.
  *
- * @package CiteWP
+ * @package CiteWP\Aiso
  */
 
 declare( strict_types=1 );
 
-namespace CiteWP\Admin;
+namespace CiteWP\Aiso\Admin;
 
-use CiteWP\Database\Schema;
-use CiteWP\Scoring\Repository;
+use CiteWP\Aiso\Database\Schema;
+use CiteWP\Aiso\Scoring\Repository;
 
 defined( 'ABSPATH' ) || exit;
 
