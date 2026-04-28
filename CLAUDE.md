@@ -98,6 +98,12 @@ When in doubt, ask. The math is precious.
 - `@wordpress/data` selectors for editor state, never read DOM directly
 - No `localStorage` or `sessionStorage` (artifact rule applies — use React state)
 
+## File Creation Rule (per X9)
+
+All file writes and edits route through Claude Code (this terminal), the Filesystem MCP, or a downloadable artifact zip. Never paste file contents from a chat window into an editor for save — Markdown autolink processing in editors and clipboards corrupts filenames and content (e.g. `block-engine-edit.sh` becomes `[block-engine-edit.sh](http://block-engine-edit.sh)` on disk).
+
+See `Desktop\CiteWP\Brain\00-CITEWP-MASTER.md` rule 6 and `Desktop\CiteWP\Brain\DECISIONS.md` X9 for full context.
+
 ## UI Design Rules
 
 When modifying any admin page, React component, or CSS file, consult `Desktop\CiteWP\Brain\UI-DESIGN-SYSTEM.md` (per X7). Key rules:
