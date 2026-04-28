@@ -6,6 +6,58 @@
 
 ---
 
+## Session 7.5b — `.claude/` Infrastructure Rebuild ✅
+
+**Date:** 2026-04-27
+
+**Deliverable:** Rebuild the `.claude/` directory lost in the Session 7.5 git corruption. Resolves the last open carryover thread from Session 7.5. Parallel to Session 8 — does not touch plugin code.
+
+**Shipped (2 commits on `main`):**
+- `0fd0759` chore: rebuild .claude/ infrastructure (hooks, commands, settings)
+- `d51a569` docs: update CLAUDE.md and SESSION-LOG.md to current Brain file names + add UI Design Rules section
+
+**Files added (committed under `.claude/`):**
+- `settings.json` — registers four hooks (PreToolUse, PostToolUse x2, Stop)
+- `hooks/block-engine-edit.sh` — blocks edits to `includes/Scoring/Engine.php` unless `.claude/.engine-edit-approved` sentinel exists. Master file rule #4 / DECISIONS.md A11 enforced.
+- `hooks/php-syntax-check.sh` — runs `php -l` on edited `.php` files. Non-blocking. Searches LocalWP-bundled PHP path if `php` isn't on PATH.
+- `hooks/js-build-reminder.sh` — prints reminder to run `npm run build` when `src/**/*.js` or `*.jsx` is touched.
+- `hooks/stop-checklist.sh` — prints end-of-session checklist with most-skipped steps highlighted (SESSION-LOG, DECISIONS, master file, push).
+- `commands/session-start.md` — `/session-start` slash command.
+- `commands/session-end.md` — `/session-end` slash command.
+- `commands/smoke-test.md` — `/smoke-test` slash command (10-step Session 7.5 smoke test, X6-compliant).
+- `README.md` — documents polarity, hooks, commands, gitignore pattern.
+
+**Files updated (commit 2):**
+- `CLAUDE.md` (plugin) — replaced dead Brain references (`11-SESSION-PROTOCOL.md` → master file section; `08-DECISION-LOG.md` → `DECISIONS.md`; `12-SCORING-RUBRIC.md` → `SCORING-RUBRIC.md`). Added UI Design Rules section pointing at `Brain/UI-DESIGN-SYSTEM.md` per X7.
+- `SESSION-LOG.md` (this file) — same dead-name cleanup.
+
+**`.gitignore` patched:** `.claude/*` ignored by default with explicit un-ignores for `hooks/`, `commands/`, `settings.json`, `README.md`. `settings.local.json` and `.engine-edit-approved` remain gitignored (machine-local state).
+
+**Default state set:** `.engine-edit-approved` deleted post-rebuild, so Engine.php is locked by default. Sentinel must be manually created (`New-Item -ItemType File -Path .claude/.engine-edit-approved`) before any approved edit, deleted after.
+
+**Decisions made:** X8 (`.claude/` content split: hooks + commands + project `settings.json` committed; machine-local state gitignored).
+
+**Process lesson — chat→clipboard→editor autolink mangling:**
+
+When pasting code blocks containing filenames like `name.md` or `name.sh` from Claude.ai chat into a Markdown-aware editor (or via certain clipboards), the bare filename gets converted to a Markdown autolink: `[name.sh](http://name.sh)`. This affected both filenames-on-disk and file contents during the rebuild attempt.
+
+The chat renderer also displays clean text as autolinked when shown back in the chat window, which created confusion during diagnosis — eyes-on-terminal screenshots were the only reliable ground truth.
+
+**Resolution:** Built the rebuild as a downloadable zip (`citewp-claude-rebuild.zip`) generated from a sandbox where no autolink processing exists, then extracted into the plugin folder. Verified with a `verify.ps1` script that asserted (a) all 9 expected files present, (b) no filename contains brackets/URLs, (c) no file CONTENT contains the bracketed-URL pattern. All 19 checks PASS before commit.
+
+**Going-forward rule for AI-assisted file creation in this project:** if the file content references other filenames with extensions (`.md`, `.sh`, `.json`, etc.), do not paste from chat through any Markdown-aware editor. Use one of: (a) downloadable zip, (b) Filesystem MCP, (c) PowerShell `Set-Content` with literal here-strings typed (not pasted) directly into the terminal.
+
+**Verified:**
+- `git status` clean post-cleanup.
+- Hook executable bits set on first commit (mode `100755` for all four `.sh` files in commit `0fd0759`) — fresh clones inherit correctness.
+- Hooks not yet end-to-end tested in a live Claude Code session (will verify next time Session 8 work resumes from the plugin folder).
+
+**Carryover into next session:** None. The Session 7.5 carryover thread is closed.
+
+**Next session focus:** Resume Session 8 — WP.org submission prep (image assets, screenshots section in readme.txt, final smoke test, SVN package, submit).
+
+---
+
 ## Session 7.5 — Multi-Product Architecture Refactor ✅
 
 **Date:** 2026-04-27
