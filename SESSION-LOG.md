@@ -1,7 +1,7 @@
 # CiteWP — Session Log
 
 > Per-session record of what shipped, what broke, what carried over, and what's next.
-> Follow `Desktop\CiteWP\Brain\11-SESSION-PROTOCOL.md` for entry format.
+> Follow the "Session Protocol" section of `Desktop\CiteWP\Brain\00-CITEWP-MASTER.md` for entry format.
 > Most recent session at the top.
 
 ---

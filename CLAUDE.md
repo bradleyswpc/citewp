@@ -6,8 +6,8 @@
 
 ## Start of Every Session — REQUIRED
 
-1. Read `Desktop\CiteWP\Brain\11-SESSION-PROTOCOL.md` for full session checklist.
-2. Read `Desktop\CiteWP\Brain\08-DECISION-LOG.md` to confirm no settled decision is being relitigated.
+1. Read `Desktop\CiteWP\Brain\00-CITEWP-MASTER.md` completely — it is the single source of truth.
+2. Read `Desktop\CiteWP\Brain\DECISIONS.md` to confirm no settled decision is being relitigated.
 3. Read `SESSION-LOG.md` (this folder) to see last session's deliverable, carryover, and next session focus.
 4. State the current session number and today's deliverable in one sentence before any work begins.
 
@@ -56,7 +56,7 @@ This rule applies regardless of how the change is framed:
 - "Adjust" thresholds based on test results → REQUIRE CONFIRMATION
 - Adding entirely new signals → REQUIRE CONFIRMATION
 
-The canonical specification is `Desktop\CiteWP\Brain\12-SCORING-RUBRIC.md`. If `Engine.php` and the rubric ever disagree, the rubric is the source of truth — but neither changes without user approval.
+The canonical specification is `Desktop\CiteWP\Brain\SCORING-RUBRIC.md`. If `Engine.php` and the rubric ever disagree, the rubric is the source of truth — but neither changes without user approval.
 
 **What IS allowed without re-confirmation:**
 - Pure refactors that don't change scores (renaming private methods, extracting helpers)
@@ -97,6 +97,17 @@ When in doubt, ask. The math is precious.
 - `apiFetch` for all REST calls (handles nonces automatically)
 - `@wordpress/data` selectors for editor state, never read DOM directly
 - No `localStorage` or `sessionStorage` (artifact rule applies — use React state)
+
+## UI Design Rules
+
+When modifying any admin page, React component, or CSS file, consult `Desktop\CiteWP\Brain\UI-DESIGN-SYSTEM.md` (per X7). Key rules:
+- Use `var(--wp-admin-theme-color)` as accent, never custom brand colors
+- 4 font sizes only (20/14/13/12px), WP system font stack, weights 400/600
+- 8px spacing grid (4/8/16/24/32px tokens)
+- Native `@wordpress/components` in Gutenberg (ToggleControl, Button, PanelBody)
+- Toggles over checkboxes, one primary button per view, flat status badges
+- Empty state required for every data view
+- No custom fonts, no gradients, no full-width branded banners
 
 ## Commands — Run These
 
@@ -147,7 +158,7 @@ vendor/bin/phpcs --standard=WordPress includes/
 3. Check LocalWP `debug.log` for new PHP errors.
 4. `git add -A && git commit -m "feat: {description}" && git push`
 5. Update `SESSION-LOG.md` (this folder): what shipped, what carried over, next session focus.
-6. Update `Desktop\CiteWP\Brain\08-DECISION-LOG.md` if any new decisions were made.
+6. Update `Desktop\CiteWP\Brain\DECISIONS.md` if any new decisions were made.
 7. State carryover explicitly. No silent carryover.
 
 ## Quick Reference — Constants
