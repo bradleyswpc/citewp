@@ -6,6 +6,42 @@
 
 ---
 
+## Session 9 — WP.org Submission ✅
+
+**Date:** 2026-04-28
+
+**Deliverable:** Complete and submit the WP.org plugin package for `ai-search-optimizer` v0.6.0.
+
+**Shipped:**
+- `assets/` folder — all WP.org submission assets committed:
+  - `icon.svg` (copied from Desktop/CiteWP/logos/, `[A]` mark, Citrine bg, SMIL animated)
+  - `icon-128x128.png` + `icon-256x256.png` (from logo-export-kit.html, fixed `[C]`→`[A]` bug in `drawIcon()`)
+  - `banner-772x250.png` + `banner-1544x500.png` (designed in Canva: `[AISO]` wordmark, tagline, 3 feature callouts, Citrine divider)
+  - `screenshot-1.png` through `screenshot-5.png` (Gutenberg sidebar, post list column, dashboard widget, crawler logs, settings)
+- `readme.txt` — `== Screenshots ==` section added (5 descriptions matching screenshot order)
+- `.distignore` — `assets/` added to exclusion list
+- `.gitattributes` — `export-ignore` rules for all dev-only files; `git archive` now produces a clean distribution zip
+- `.gitignore` — `build/` removed from ignored files; compiled JS now tracked so distribution zip includes the Gutenberg sidebar
+- `src/sidebar/index.js` — two fixes:
+  - `chartLine` → `chartBar` (chartLine removed from @wordpress/icons; build now compiles with 0 warnings)
+  - Recalculate hint text moved below button (was clipping in narrow sidebar at `justifyContent: space-between`)
+- `logos/logo-export-kit.html` — fixed `[C]`→`[A]` in `drawIcon()` (icon PNGs now match plugin identity, not parent brand)
+- `ai-search-optimizer-v0.6.0.zip` — built via `git archive --format=zip`, submitted to WP.org plugin directory
+
+**Commits (4):**
+- `feat: WP.org submission assets, screenshots, sidebar icon + hint text fix (v0.6.0)`
+- `chore: add .gitattributes export-ignore rules for WP.org SVN package`
+- `chore: track build/ in git for WP.org distribution`
+- pushed to `origin/main` (`0431cfa..40c7e1f`)
+
+**Decisions made:** None new.
+
+**Carryover into Session 10:** None — Session 9 deliverable complete. WP.org review in progress (1–4 week wait). Phase 1.5 builds during the wait.
+
+**Next session focus:** Phase 1.5 — UI polish pass per `UI-DESIGN-SYSTEM.md` (P19/X7): tabbed top nav across CiteWP admin pages, card-based settings layout, toggle switches, score gauge in dashboard widget, empty states. OR Schema generator (P14) — user to choose priority.
+
+---
+
 ## Session 8 — Brand Kit & WP.org Asset Prep (Side Mission) ✅
 
 **Date:** 2026-04-28
