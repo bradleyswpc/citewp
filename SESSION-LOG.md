@@ -6,6 +6,38 @@
 
 ---
 
+## Session 8 — Brand Kit & WP.org Asset Prep (Side Mission) ✅
+
+**Date:** 2026-04-28
+
+**Deliverable:** Nail down brand architecture before creating WP.org submission assets. Resulted in complete brand kit, logo export toolkit, and animated SVG plugin icon. Main WP.org submission track carries into Session 9.
+
+**Shipped:**
+- `brand-kit-v2-yellow.html` — Obsidian & Citrine brand kit (active, canonical)
+- `logos/logo-export-kit.html` — browser-based export tool; downloads all WP.org PNGs (icon-128, icon-256, banner-772, banner-1544) + standalone wordmarks via Canvas API
+- `logos/icon.svg` — animated plugin icon; SMIL background pulse (#E8D400 → #F5EC30) + CSS scale breathe; runs as `<img>` on WP.org without JavaScript
+- `logos/color-comparison.html` — ecosystem color analysis page (reference, not a deliverable)
+- `Desktop/CiteWP/.agents/product-marketing-context.md` — full 12-section product marketing context document
+
+**Archived (not deleted):**
+- `brand-kit-v1-ink-ivy-ARCHIVED.html` — Ink & Ivy palette (green + gold)
+- `brand-kit-v2-ember-ARCHIVED.html` — Obsidian & Ember (orange — kept for future use)
+- `brand-kit-v2-teal-ARCHIVED.html` — Obsidian & Verdigris (teal — archived reference for future per-product color)
+
+**Decisions made:**
+- S8 (DECISIONS.md): Single Citrine accent across CiteWP parent and all current products. Per-product color differentiation deferred until a second product ships. Rationale: multi-neon-on-black reads as 80s synthwave, not expert AI SEO authority.
+- Logo convention confirmed: `[Name]` full wordmark / `[X]` icon. Plus Jakarta Sans 800. Bracket positioning (text in lower-center of bracket span) is typographically correct — not a mistake.
+- WP.org SVG icon strategy confirmed: `icon.svg` takes precedence over PNGs when placed in `assets/`. SMIL animations run even as `<img>`.
+- Ecosystem color exploration concluded: Citrine (53°) + Teal (168°) + Magenta (318°) triangle rejected — 80s aesthetic. Option A chosen: one color, ship the product.
+
+**Memory updated:** `project_brand_kit.md` — palette tokens, logo rules, ecosystem color policy, logo export kit path.
+
+**Carryover into Session 9:** Main Session 8 track — WP.org submission assets still need to be downloaded from export kit and packaged. readme.txt `== Screenshots ==` section not yet written. SVN package not yet built. Submission not yet made.
+
+**Next session focus:** Resume WP.org submission — download assets from logo-export-kit.html, write screenshots section in readme.txt, smoke test, build SVN package, submit.
+
+---
+
 ## Session 7.5b — `.claude/` Infrastructure Rebuild ✅
 
 **Date:** 2026-04-27
