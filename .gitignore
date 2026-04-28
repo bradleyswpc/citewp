@@ -2,8 +2,7 @@
 node_modules/
 vendor/
 
-# Build output (gitignored during dev, included in release zips)
-build/
+# Build output — build/ is committed so WP.org installs get the compiled JS
 dist/
 *.min.js
 *.min.css
