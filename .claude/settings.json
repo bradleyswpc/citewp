@@ -1,0 +1,41 @@
+{
+  "$comment": "Project-level Claude Code config for AI Search Optimizer (CiteWP). Committed to git. Machine-local permission grants live in settings.local.json (gitignored). Sentinel state .engine-edit-approved is also gitignored.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/block-engine-edit.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/php-syntax-check.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/js-build-reminder.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/stop-checklist.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
