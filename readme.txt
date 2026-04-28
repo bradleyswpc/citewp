@@ -67,6 +67,14 @@ Cite Score and llms.txt generation work with any post type, including WooCommerc
 
 It's an emerging standard that helps AI engines understand your site's most important content. AI Search Optimizer generates it automatically, similar to how SEO plugins generate sitemap.xml.
 
+== Screenshots ==
+
+1. Cite Score in the Gutenberg sidebar — 100-point score with category breakdown (Structure, Citability, Authority) and per-signal drilldown. Recalculate on demand.
+2. Sortable Cite Score column on the All Posts screen — color-coded red/orange/yellow/green so weak content stands out at a glance.
+3. WordPress Dashboard widget — site-wide average Cite Score, top crawled pages, and AI bot visit trends.
+4. Crawler Logs — AI bot visit log with bot type filter, date range filter, 24h/7d/30d summary stats, and CSV export.
+5. llms.txt Settings — configure which content appears in your llms.txt and llms-full.txt files.
+
 == Changelog ==
 
 = 0.6.0 =

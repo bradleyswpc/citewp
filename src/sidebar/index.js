@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Spinner, PanelBody } from '@wordpress/components';
-import { chartLine } from '@wordpress/icons';
+import { chartBar } from '@wordpress/icons';
 
 /**
  * Color tokens — kept in JS for now to avoid pulling in the full block editor styles.
@@ -86,13 +86,13 @@ function ScoreSidebar() {
 
 	return (
 		<>
-			<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ chartLine }>
+			<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ chartBar }>
 				CiteWP GEO Score
 			</PluginSidebarMoreMenuItem>
 			<PluginSidebar
 				name="citewp-aiso-geo-score"
 				title="CiteWP GEO Score"
-				icon={ chartLine }
+				icon={ chartBar }
 			>
 				<PanelBody>
 					{ loading && ! score && (
@@ -115,7 +115,7 @@ function ScoreSidebar() {
 								expanded={ expandedCategory }
 								onToggle={ setExpandedCategory }
 							/>
-							<div style={ { marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }>
+							<div style={ { marginTop: 16 } }>
 								<Button
 									variant="secondary"
 									onClick={ recalculate }
@@ -124,9 +124,9 @@ function ScoreSidebar() {
 								>
 									Recalculate
 								</Button>
-								<small style={ { color: '#6b7280' } }>
-									Saves trigger auto-recalc
-								</small>
+								<p style={ { margin: '6px 0 0', fontSize: 12, color: '#6b7280' } }>
+									Saves trigger auto-recalculation.
+								</p>
 							</div>
 						</>
 					) }
@@ -280,5 +280,5 @@ function SignalRow( { signal } ) {
 
 registerPlugin( 'citewp-aiso-geo-score', {
 	render: ScoreSidebar,
-	icon: chartLine,
+	icon: chartBar,
 } );

@@ -1,6 +1,7 @@
 .claude/
 .git/
 .gitignore
+assets/
 CLAUDE.md
 SESSION-LOG.md
 node_modules/
