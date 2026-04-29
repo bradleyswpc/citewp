@@ -153,11 +153,11 @@ final class Page {
 
 			<?php PageHeader::render_nav( self::SLUG ); ?>
 
-			<?php if ( isset( $_GET['regenerated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
+			<?php if ( sanitize_key( wp_unslash( $_GET['regenerated'] ?? '' ) ) === '1' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'llms.txt cache cleared. The next request will regenerate from scratch.', 'ai-search-optimizer' ); ?></p></div>
 			<?php endif; ?>
 
-			<?php if ( isset( $_GET['settings-updated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Standard WP options-saved flag; no data modification. ?>
+			<?php if ( sanitize_key( wp_unslash( $_GET['settings-updated'] ?? '' ) ) !== '' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Standard WP options-saved flag; no data modification. ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'ai-search-optimizer' ); ?></p></div>
 			<?php endif; ?>
 
@@ -410,7 +410,7 @@ final class Page {
 
 			// Restore from URL hash.
 			var hash    = location.hash.replace( '#', '' );
-			var initial = hash && document.getElementById( 'citewp-aiso-tab-' + hash ) ? hash : <?php echo wp_json_encode( $default_tab ); ?>;
+			var initial = hash && document.getElementById( 'citewp-aiso-tab-' + hash ) ? hash : <?php echo wp_json_encode( (string) $default_tab ); ?>;
 			activate( initial );
 
 			tabs.forEach( function ( btn ) {

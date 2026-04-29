@@ -51,6 +51,10 @@ final class Menu {
 	}
 
 	public function enqueue_assets( string $hook ): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		$is_citewp_screen = (
 			$hook === 'toplevel_page_' . self::SLUG_PARENT ||
 			strpos( $hook, 'citewp_page_' ) === 0
