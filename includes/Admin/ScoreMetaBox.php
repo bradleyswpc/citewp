@@ -54,6 +54,14 @@ final class ScoreMetaBox {
 			return;
 		}
 
+		/**
+		 * Filters the meta box tab definitions. Reserved for Pro tab registration.
+		 * Return an array of [ 'slug' => 'Label' ] pairs to register additional tabs.
+		 *
+		 * @param array<string, string> $tabs Empty by default; Pro registers tabs here.
+		 */
+		apply_filters( 'citewp_aiso/metabox/tabs', [] );
+
 		$repo       = new Repository();
 		$data       = $repo->get( $post->ID );
 		$total      = isset( $data['total'] ) ? (int) $data['total'] : null;
