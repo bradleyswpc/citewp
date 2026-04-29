@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace CiteWP\Aiso\Admin;
 
 use CiteWP\Aiso\Database\Schema;
+use CiteWP\Aiso\Admin\PageHeader;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -19,7 +20,6 @@ final class LogsPage {
 
 	public function register(): void {
 		add_action( 'admin_init',                    [ $this, 'maybe_init_table' ] );
-		add_action( 'admin_head',                    [ $this, 'inline_styles' ] );
 		add_action( 'admin_post_citewp_aiso_export_logs', [ $this, 'handle_csv_export' ] );
 	}
 
@@ -78,22 +78,25 @@ final class LogsPage {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'AI Crawler Logs', 'ai-search-optimizer' ); ?></h1>
 
-			<div class="citewp-aiso-logs-banner">
-				<div class="citewp-aiso-logs-stat">
-					<span class="citewp-aiso-logs-stat__label"><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_24h ) ); ?></span>
+			<?php PageHeader::render_nav( Menu::SLUG_LOGS ); ?>
+
+			<div class="citewp-aiso-page-body">
+
+			<div class="citewp-aiso-stats-banner">
+				<div class="citewp-aiso-stat">
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $count_24h ) ); ?></span>
 				</div>
-				<div class="citewp-aiso-logs-stat">
-					<span class="citewp-aiso-logs-stat__label"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_7d ) ); ?></span>
+				<div class="citewp-aiso-stat">
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $count_7d ) ); ?></span>
 				</div>
-				<div class="citewp-aiso-logs-stat">
-					<span class="citewp-aiso-logs-stat__label"><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-logs-stat__value"><?php echo esc_html( number_format_i18n( $count_30d ) ); ?></span>
+				<div class="citewp-aiso-stat">
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $count_30d ) ); ?></span>
 				</div>
-				<div class="citewp-aiso-logs-banner__export">
+				<div class="citewp-aiso-stats-banner__export">
 					<a href="<?php echo esc_url( $export_url ); ?>" class="button">
 						<?php esc_html_e( 'Export CSV', 'ai-search-optimizer' ); ?>
 					</a>
@@ -112,7 +115,8 @@ final class LogsPage {
 					<?php $this->table->display(); ?>
 				</form>
 			<?php endif; ?>
-		</div>
+			</div><!-- .citewp-aiso-page-body -->
+		</div><!-- .wrap -->
 		<?php
 	}
 
@@ -215,19 +219,4 @@ final class LogsPage {
 		return implode( ',', $escaped ) . "\r\n";
 	}
 
-	public function inline_styles(): void {
-		$screen = get_current_screen();
-		if ( ! $screen || strpos( $screen->id, Menu::SLUG_LOGS ) === false ) {
-			return;
-		}
-		?>
-		<style>
-			.citewp-aiso-logs-banner { display: flex; align-items: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
-			.citewp-aiso-logs-stat { background: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 16px; min-width: 110px; }
-			.citewp-aiso-logs-stat__label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 2px; }
-			.citewp-aiso-logs-stat__value { display: block; font-size: 22px; font-weight: 700; color: #111827; line-height: 1; }
-			.citewp-aiso-logs-banner__export { margin-left: auto; }
-		</style>
-		<?php
-	}
 }
