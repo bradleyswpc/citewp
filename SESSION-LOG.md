@@ -6,6 +6,31 @@
 
 ---
 
+## Session 11 close — Bookkeeping corrections ✅
+
+**Date:** 2026-04-29
+
+**Deliverable:** Correct Session 11 close bookkeeping. No code shipped.
+
+**Changes made:**
+- `Brain/DECISIONS.md` — P17 rewritten: plugin name locked as "CiteWP AI Search Optimizer – Optimize Content for AI Engines" in both `Plugin Name:` file header and readme.txt. The Session 11 amendment recommending shortening the file header was wrong and reverted. Added cross-reference to X14.
+- `Brain/DECISIONS.md` — X14 added (Process table): AI agents must cite 3+ comparable products before recommending changes to user-facing naming, branding, or copy fields. "Shorter / cleaner" instinct is often wrong when a category convention exists (e.g. Yoast SEO's 60+ character display name in WP admin is the convention, not an exception).
+- `memory/project_v070_checklist.md` — "Plugin Name: shortened to AI Search Optimizer" item removed. Note added: name stays as submitted per P17/X14.
+
+**Decisions made:** X14 (agent naming/copy change discipline — cite 3+ comparables first).
+
+**No code, no build, no debug.log check.**
+
+**Verified:** DECISIONS.md edits confirmed by read-back. Checklist confirmed by read-back.
+
+**Carryover into Session 12:**
+- Add P25 (plugin admin vs SaaS dashboard architectural separation) to DECISIONS.md Product table — text drafted in Session 11, deferred to Session 12 close
+- Manual browser verification: confirm meta boxes absent in Gutenberg, present in Classic/Elementor/Divi; TypeError resolved; Structure sub-score > 0 on post with H2/H3/list content
+
+**Next session focus:** UI polish pass per `Brain\UI-DESIGN-SYSTEM.md` (P19/X7).
+
+---
+
 ## Session 11 — Universal Score + Schema Meta Boxes ✅
 
 **Date:** 2026-04-29
