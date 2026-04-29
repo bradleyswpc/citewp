@@ -12,7 +12,6 @@ declare( strict_types=1 );
 
 namespace CiteWP\Aiso\Admin;
 
-use CiteWP\Aiso\Database\Schema;
 use CiteWP\Aiso\Scoring\Repository;
 use CiteWP\Aiso\Admin\DashboardData;
 
