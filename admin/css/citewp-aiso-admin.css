@@ -58,7 +58,7 @@
     line-height: 1;
 }
 
-.citewp-aiso-header__nav {
+.citewp-aiso-nav {
     display: flex;
     align-items: stretch;
     gap: 0;
@@ -154,7 +154,8 @@
     text-decoration: none;
 }
 
-.citewp-aiso-card__link:hover {
+.citewp-aiso-card__link:hover,
+.citewp-aiso-card__link:focus-visible {
     text-decoration: underline;
 }
 
@@ -188,7 +189,8 @@
     text-decoration: none;
 }
 
-.citewp-aiso-needs-attention__title:hover {
+.citewp-aiso-needs-attention__title:hover,
+.citewp-aiso-needs-attention__title:focus-visible {
     text-decoration: underline;
 }
 
@@ -238,6 +240,11 @@
 
 .citewp-aiso-tabs__btn:hover {
     color: var(--citewp-obsidian);
+}
+
+.citewp-aiso-tabs__btn:focus-visible {
+    outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+    outline-offset: 2px;
 }
 
 .citewp-aiso-tabs__btn--active {
@@ -483,7 +490,6 @@
     border-radius: 4px;
     padding: var(--citewp-space-3) var(--citewp-space-4);
     margin: var(--citewp-space-4) 0 var(--citewp-space-3);
-    flex-wrap: wrap;
 }
 
 .citewp-aiso-stat {
