@@ -6,52 +6,44 @@
 
 ---
 
-## Session 11 — Universal Meta Boxes (Phase 1.5) ✅
+## Session 11 — Universal Score + Schema Meta Boxes ✅
 
 **Date:** 2026-04-29
 
-**Deliverable:** Universal Cite Score + Schema Suggestions meta boxes (P22) — both features visible in Classic Editor, Elementor, Divi, Beaver Builder, and Gutenberg's meta box compatibility panel.
+**Deliverable:** Add native WP meta boxes for Cite Score and Schema Suggestions per P22, so both features are visible to non-Gutenberg users (Classic Editor, Elementor, Divi, Beaver Builder, Bricks). Brings ~95%+ editor coverage. Per P24 confirmed Session 11, meta boxes suppress when Gutenberg is active — sidebar and meta box surfaces are mutually exclusive per editor.
 
 **Shipped:**
-- `includes/Admin/ScoreMetaBox.php` — new `CiteWP\Aiso\Admin\ScoreMetaBox`:
-  - `register()` hooks `add_meta_boxes` at priority 20 (after Yoast/Rank Math at 10) + `admin_head`
-  - `render()`: 4 states — scored (badge + 3 category rows + timestamp + Recalculate), not-yet-scored (empty note + Recalculate), loading (button disabled, "Recalculating…"), error (re-enabled + message)
-  - Inline JS: `fetch()` POST to `/wp-json/citewp/aiso/v1/score/{id}/recalculate` with `X-WP-Nonce`, updates DOM in place without reload; `esc()` helper prevents XSS in innerHTML reconstruction
-  - 403 detected in `.catch()` and shown as "Session expired — please reload" vs generic retry message
-  - `inline_styles()` scoped to `#citewp_aiso_cite_score`, gated to `post`/`page` post types only
-- `includes/Admin/SchemaMetaBox.php` — new `CiteWP\Aiso\Admin\SchemaMetaBox`:
-  - Calls `Schema\Generator` directly in PHP (no REST round-trip) — `generate_article_schema`, `generate_faq_schema`, `detect_existing_types`
-  - Article + FAQPage sections with "Already detected" badges; other types read-only
-  - Clipboard-only insert (no TinyMCE injection): `navigator.clipboard` with `execCommand` fallback for HTTP/local environments
-  - Advisory paste note (X12-compliant): "Paste into a Custom HTML block…" fades after 8s; `clearTimeout` on repeated clicks prevents label flicker
-  - `wp_json_encode()` false guard on both `$article_json` and `$faq_json`
-  - `inline_styles()` scoped to `#citewp_aiso_schema`, gated to `post`/`page` post types only
+- `includes/Admin/ScoreMetaBox.php` — Cite Score display + recalculate button. Renders four states (scored / not yet scored / loading / error). Reads from post meta directly for display; calls existing REST recalculate endpoint via inline fetch.
+- `includes/Admin/SchemaMetaBox.php` — Schema Suggestions with Article + FAQPage detection. Calls `Schema\Generator` directly in PHP (no REST round-trip). Clipboard-only copy action with advisory note (X12 compliant). Fade timer cleared on repeated clicks.
+- `includes/Plugin.php` — wired both new modules into `boot()` under `is_admin()` block.
+- Gutenberg-suppression logic — both meta boxes check `use_block_editor_for_post_type()` at registration; only appear when Gutenberg is NOT active.
+- `src/sidebar/index.js` — `PluginDocumentSettingPanel` import moved from `@wordpress/edit-post` to `@wordpress/editor` per WP 6.6 deprecation. `npm run build` passes 0 warnings.
 
-**Modified:**
-- `includes/Plugin.php` — wired `Admin\ScoreMetaBox` + `Admin\SchemaMetaBox` into `boot()` inside `is_admin()` block, after `DashboardWidget`
+**Workflow validation:**
+- Full Superpowers + code-reviewer pipeline used end-to-end for the first time (X13 logged as a result).
+- Subagent dispatch: 2 parallel agents for ScoreMetaBox + SchemaMetaBox, sequential for Plugin.php wiring.
+- 9 bugs caught across 2 code-reviewer rounds before commit.
+- Manual browser verification caught 3 additional issues post-commit: duplicate Schema Suggestions panel in Gutenberg, PluginDocumentSettingPanel deprecation warning, unrelated TypeError on post-new.php.
+- Performance verified: 82ms recalculate on no-throttle, ~2s on Slow 3G.
 
-**Bugs caught and fixed during code review:**
-- ScoreMetaBox: XSS via unescaped REST values injected into `innerHTML` — fixed with `esc()` helper
-- ScoreMetaBox: JS success handler omitted "Scored just now" timestamp after recalculate — added
-- ScoreMetaBox: No null guard on `btn`/`errEl`/`contEl` DOM queries before `addEventListener` — added
-- ScoreMetaBox: `strtotime()` false return not guarded before `human_time_diff()` — fixed
-- ScoreMetaBox: `cats[k].label/score/max` undefined on partial REST response — added `?? ''` / `?? 0` fallbacks
-- ScoreMetaBox: `inline_styles()` loaded on all CPT edit screens, not just `post`/`page` — added post_type guard
-- SchemaMetaBox: `navigator.clipboard` unavailable on HTTP (LocalWP default) — added `execCommand` fallback
-- SchemaMetaBox: Button revert timer not stored — repeated clicks caused label flicker — stored as `revertTimer`
-- SchemaMetaBox: `wp_json_encode()` could return `false` on bad UTF-8 — guarded with early return + error note
-
-**Decisions made:** None new. X11, X12, P23 were committed at session start (pre-existing from prior brain session).
+**Decisions made:** P24 (meta box / Gutenberg mutual exclusion), X13 (Superpowers + code-reviewer pipeline as required for multi-file feature work).
 
 **Verified:**
-- `npm run build` — compiled clean, 913ms, 0 new warnings
-- No `debug.log` file present — no PHP errors generated during this session
-- Final code reviewer: **Ready to merge** — integration correct, data contracts match, security clean, CLAUDE.md compliant
-- Manual UI verification pending (open post edit screen in LocalWP, confirm both meta boxes appear in sidebar)
+- Cite Score meta box renders all four states correctly
+- Recalculate succeeds, updates badge + sub-scores + timestamp in place, no page reload
+- Schema Suggestions clipboard copy works, advisory note appears and fades
+- "Already detected" badge logic correct (root-level @type collection, no sub-node noise)
+- "No FAQ content detected" message appears for posts with < 2 Q&A pairs
+- Capability checks aligned with REST permission_callback
+- Hook priority 20 — no visual conflict with Yoast/Rank Math
+- Build passes, no PHP errors in debug.log
 
-**Carryover into Session 12:** Manual verification of both meta boxes in the browser (Classic Editor + Gutenberg meta box panel as minimum). No code carryover — both files are correct per review.
+**Carryover into Session 12:**
+- Manual browser verification of Gutenberg-suppression fix (confirm meta boxes do NOT appear in Gutenberg, sidebar surfaces do; confirm meta boxes DO appear in Classic/Elementor/Divi)
+- Manual verification of TypeError fix (confirm error gone after deprecation import update)
+- Score test post with deliberate H2 + H3 + bulleted list structure, verify Structure sub-score > 0 (flagged in Session 11 as possible silent scoring bug — low priority, low cost to test)
 
-**Next session focus:** Session 12 — UI polish pass per `Brain/UI-DESIGN-SYSTEM.md` (P19/X7): tabbed top nav, card-based settings layout, toggle switches, score gauge in dashboard widget, empty states. User has UI strategy sessions pending before this begins.
+**Next session focus:** UI polish pass per `Brain\UI-DESIGN-SYSTEM.md` (P19/X7). Tabbed top nav across CiteWP admin pages, card-based settings layout, toggle switches over checkboxes, score gauge in dashboard widget, empty states with explanatory copy. Pending UI strategy sessions before code begins.
 
 ---
 
