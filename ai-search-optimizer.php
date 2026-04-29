@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       AI Search Optimizer – Optimize Content for AI Engines
+ * Plugin Name:       CiteWP AI Search Optimizer – Optimize Content for AI Engines
  * Plugin URI:        https://citewp.com/ai-search-optimizer
  * Description:       Optimize WordPress content for AI search engines like ChatGPT, Claude, Perplexity, and Gemini. Includes AI crawler detection, llms.txt generation, and the Cite Score — a transparent 100-point GEO score for content citability.
  * Version:           0.6.0

@@ -1,4 +1,4 @@
-=== AI Search Optimizer – Optimize Content for AI Engines ===
+=== CiteWP AI Search Optimizer – Optimize Content for AI Engines ===
 Contributors: bradleyswpc
 Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
