@@ -116,6 +116,14 @@ final class ScoreMetaBox {
 		</div>
 		<script>
 		(function() {
+			function esc(s) {
+				return String(s)
+					.replace(/&/g, '&amp;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
+					.replace(/"/g, '&quot;');
+			}
+
 			var box    = document.getElementById( <?php echo wp_json_encode( $box_id ); ?> );
 			if ( ! box ) { return; }
 			var btn    = box.querySelector( '.citewp-aiso-recalc-btn' );
@@ -138,7 +146,7 @@ final class ScoreMetaBox {
 					var total = data.total || 0;
 					var cats  = data.categories || {};
 					var html  = '<div class="citewp-aiso-mb-score">'
-					          + '<span class="citewp-aiso-mb-badge citewp-aiso-mb-badge--' + grade + '">' + total + '</span>'
+					          + '<span class="citewp-aiso-mb-badge citewp-aiso-mb-badge--' + esc(grade) + '">' + esc(String(total)) + '</span>'
 					          + '<span class="citewp-aiso-mb-total-label"> / 100</span>'
 					          + '</div>';
 					if ( cats.structure ) {
@@ -146,13 +154,14 @@ final class ScoreMetaBox {
 						[ 'structure', 'citability', 'authority' ].forEach( function( k ) {
 							if ( cats[ k ] ) {
 								html += '<div class="citewp-aiso-mb-cat-row">'
-								      + '<span class="citewp-aiso-mb-cat-label">' + cats[ k ].label + '</span>'
-								      + '<span class="citewp-aiso-mb-cat-score">' + cats[ k ].score + ' / ' + cats[ k ].max + '</span>'
+								      + '<span class="citewp-aiso-mb-cat-label">' + esc(cats[ k ].label) + '</span>'
+								      + '<span class="citewp-aiso-mb-cat-score">' + esc(String(cats[ k ].score)) + ' / ' + esc(String(cats[ k ].max)) + '</span>'
 								      + '</div>';
 							}
 						} );
 						html += '</div>';
 					}
+					html += '<p class="citewp-aiso-mb-time">' + <?php echo wp_json_encode( __( 'Scored just now', 'ai-search-optimizer' ) ); ?> + '</p>';
 					contEl.innerHTML = html;
 					btn.disabled    = false;
 					btn.textContent = origText;
