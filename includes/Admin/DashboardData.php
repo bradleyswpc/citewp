@@ -22,7 +22,7 @@ final class DashboardData {
 	public function get_average_score(): ?int {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Admin stat; real-time data, intentionally uncached.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Admin stat; real-time data, intentionally uncached.
 		$result = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT ROUND( AVG( CAST( pm.meta_value AS UNSIGNED ) ) )

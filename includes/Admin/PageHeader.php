@@ -19,6 +19,7 @@ final class PageHeader {
 	 * Render the top nav bar. Pass the current page's menu slug as $current_page.
 	 */
 	public static function render_nav( string $current_page ): void {
+		$current_page = sanitize_key( $current_page );
 		$defaults = [
 			'dashboard' => [
 				'label' => __( 'Dashboard', 'ai-search-optimizer' ),
