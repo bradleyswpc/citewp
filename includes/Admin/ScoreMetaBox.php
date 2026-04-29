@@ -82,17 +82,20 @@ final class ScoreMetaBox {
 					</div>
 					<?php endif; ?>
 
-					<?php if ( $scored_at && is_string( $scored_at ) ) : ?>
+					<?php
+				$ts = $scored_at && is_string( $scored_at ) ? strtotime( $scored_at ) : false;
+				if ( false !== $ts ) :
+				?>
 					<p class="citewp-aiso-mb-time">
 						<?php
 						printf(
 							/* translators: %s: human-readable time difference, e.g. "5 minutes" */
 							esc_html__( 'Scored %s ago', 'ai-search-optimizer' ),
-							esc_html( human_time_diff( (int) strtotime( $scored_at ), time() ) )
+							esc_html( human_time_diff( $ts, time() ) )
 						);
 						?>
 					</p>
-					<?php endif; ?>
+				<?php endif; ?>
 
 				<?php else : ?>
 					<p class="citewp-aiso-mb-empty">
@@ -129,6 +132,7 @@ final class ScoreMetaBox {
 			var btn    = box.querySelector( '.citewp-aiso-recalc-btn' );
 			var errEl  = box.querySelector( '.citewp-aiso-recalc-error' );
 			var contEl = box.querySelector( '.citewp-aiso-mb-content' );
+			if ( ! btn || ! errEl || ! contEl ) { return; }
 
 			btn.addEventListener( 'click', function() {
 				var origText = btn.textContent;
@@ -154,8 +158,8 @@ final class ScoreMetaBox {
 						[ 'structure', 'citability', 'authority' ].forEach( function( k ) {
 							if ( cats[ k ] ) {
 								html += '<div class="citewp-aiso-mb-cat-row">'
-								      + '<span class="citewp-aiso-mb-cat-label">' + esc(cats[ k ].label) + '</span>'
-								      + '<span class="citewp-aiso-mb-cat-score">' + esc(String(cats[ k ].score)) + ' / ' + esc(String(cats[ k ].max)) + '</span>'
+								      + '<span class="citewp-aiso-mb-cat-label">' + esc(cats[ k ].label ?? '') + '</span>'
+								      + '<span class="citewp-aiso-mb-cat-score">' + esc(String(cats[ k ].score ?? 0)) + ' / ' + esc(String(cats[ k ].max ?? 0)) + '</span>'
 								      + '</div>';
 							}
 						} );
@@ -166,9 +170,12 @@ final class ScoreMetaBox {
 					btn.disabled    = false;
 					btn.textContent = origText;
 				} )
-				.catch( function() {
+				.catch( function( status ) {
 					btn.disabled    = false;
 					btn.textContent = origText;
+					if ( status === 403 ) {
+						errEl.textContent = <?php echo wp_json_encode( __( 'Session expired — please reload the page.', 'ai-search-optimizer' ) ); ?>;
+					}
 					errEl.style.display = 'block';
 				} );
 			} );
@@ -180,7 +187,7 @@ final class ScoreMetaBox {
 	/** Inline styles — scoped to the meta box, loaded on post edit screens only. */
 	public function inline_styles(): void {
 		$screen = get_current_screen();
-		if ( ! $screen || $screen->base !== 'post' ) {
+		if ( ! $screen || $screen->base !== 'post' || ! in_array( $screen->post_type, [ 'post', 'page' ], true ) ) {
 			return;
 		}
 		?>

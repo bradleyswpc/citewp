@@ -55,9 +55,14 @@ final class SchemaMetaBox {
 		$faqpage      = $generator->generate_faq_schema( $post );
 		$detected     = $generator->detect_existing_types( $post );
 		$article_json = wp_json_encode( $article, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		$faq_json     = ! empty( $faqpage )
+		if ( false === $article_json ) {
+			echo '<p class="citewp-aiso-mb-empty-note">' . esc_html__( 'Schema could not be generated (content encoding error).', 'ai-search-optimizer' ) . '</p>';
+			return;
+		}
+		$faq_encoded  = ! empty( $faqpage )
 			? wp_json_encode( $faqpage, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
 			: null;
+		$faq_json     = ( false !== $faq_encoded ) ? $faq_encoded : null;
 		$article_known = in_array( 'Article', $detected, true );
 		$faq_known     = in_array( 'FAQPage', $detected, true );
 		$box_id        = 'citewp-schema-box-' . $post->ID;
@@ -124,6 +129,7 @@ final class SchemaMetaBox {
 
 			box.querySelectorAll( '.citewp-aiso-copy-btn' ).forEach( function( btn ) {
 				var fadeTimer;
+				var revertTimer;
 				// Note element is always the next sibling of the button in our markup.
 				var note = btn.nextElementSibling;
 
@@ -131,17 +137,18 @@ final class SchemaMetaBox {
 					var schema    = btn.dataset.schema;
 					var origLabel = btn.dataset.label;
 
-					navigator.clipboard.writeText( schema ).then( function() {
+					function onSuccess() {
 						btn.textContent = <?php echo wp_json_encode( __( '✓ Copied to clipboard', 'ai-search-optimizer' ) ); ?>;
 
-						// Clear any existing fade so repeated clicks show a fresh note.
-						if ( fadeTimer ) { clearTimeout( fadeTimer ); }
+						// Clear any existing timers so repeated clicks show a fresh state.
+						if ( fadeTimer )   { clearTimeout( fadeTimer ); }
+						if ( revertTimer ) { clearTimeout( revertTimer ); }
 						note.style.transition = '';
 						note.style.opacity    = '1';
 						note.style.display    = 'block';
 
 						// Revert button label after 3 s.
-						setTimeout( function() { btn.textContent = origLabel; }, 3000 );
+						revertTimer = setTimeout( function() { btn.textContent = origLabel; }, 3000 );
 
 						// Begin fade at 8 s, finish in 0.6 s.
 						fadeTimer = setTimeout( function() {
@@ -153,11 +160,34 @@ final class SchemaMetaBox {
 								note.style.transition = '';
 							}, 650 );
 						}, 8000 );
+					}
 
-					} ).catch( function() {
+					function onFailure() {
 						btn.textContent = <?php echo wp_json_encode( __( 'Copy failed — try again', 'ai-search-optimizer' ) ); ?>;
-						setTimeout( function() { btn.textContent = origLabel; }, 3000 );
-					} );
+						if ( revertTimer ) { clearTimeout( revertTimer ); }
+						revertTimer = setTimeout( function() { btn.textContent = origLabel; }, 3000 );
+					}
+
+					// Use modern Clipboard API where available (requires HTTPS or localhost).
+					// Fall back to execCommand for HTTP staging/local environments.
+					if ( navigator.clipboard && navigator.clipboard.writeText ) {
+						navigator.clipboard.writeText( schema ).then( onSuccess ).catch( onFailure );
+					} else {
+						try {
+							var ta = document.createElement( 'textarea' );
+							ta.value          = schema;
+							ta.style.position = 'fixed';
+							ta.style.opacity  = '0';
+							document.body.appendChild( ta );
+							ta.focus();
+							ta.select();
+							document.execCommand( 'copy' );
+							document.body.removeChild( ta );
+							onSuccess();
+						} catch ( e ) {
+							onFailure();
+						}
+					}
 				} );
 			} );
 		})();
@@ -168,7 +198,7 @@ final class SchemaMetaBox {
 	/** Inline styles — scoped to the meta box, loaded on post edit screens only. */
 	public function inline_styles(): void {
 		$screen = get_current_screen();
-		if ( ! $screen || $screen->base !== 'post' ) {
+		if ( ! $screen || $screen->base !== 'post' || ! in_array( $screen->post_type, [ 'post', 'page' ], true ) ) {
 			return;
 		}
 		?>
