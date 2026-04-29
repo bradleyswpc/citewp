@@ -32,8 +32,15 @@ final class SchemaMetaBox {
 		add_action( 'admin_head',     [ $this, 'inline_styles' ] );
 	}
 
-	/** Callback for add_meta_boxes hook. */
-	public function register_meta_box(): void {
+	/**
+	 * Callback for add_meta_boxes hook.
+	 * Suppressed when Gutenberg is active — PluginDocumentSettingPanel handles it there.
+	 * Honors Classic Editor plugin overrides and per-post-type filters.
+	 */
+	public function register_meta_box( string $post_type = '' ): void {
+		if ( $post_type && use_block_editor_for_post_type( $post_type ) ) {
+			return;
+		}
 		add_meta_box(
 			'citewp_aiso_schema',
 			__( 'Schema Suggestions', 'ai-search-optimizer' ),

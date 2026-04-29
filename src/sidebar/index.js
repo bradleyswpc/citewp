@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Spinner, PanelBody } from '@wordpress/components';
 import { chartBar } from '@wordpress/icons';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
 
 /**
