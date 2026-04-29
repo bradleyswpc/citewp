@@ -6,6 +6,48 @@
 
 ---
 
+## Session 12 close — Admin UI polish pass (WP Rocket IA) ✅
+
+**Date:** 2026-04-29
+
+**Deliverable:** Full admin UI polish across all three CiteWP admin pages (Dashboard, Settings, Crawler Logs) and the WP Dashboard widget. WP Rocket-inspired IA with wordmark top nav, card-based sections, toggles, and X15 filter hooks on all four surfaces.
+
+**Shipped / Modified:**
+- `admin/css/citewp-aiso-admin.css` — new file (571 lines). Two `@font-face` rules (Plus Jakarta Sans 800, JetBrains Mono 400). `:root` design tokens (citrine `#E8D400`, obsidian, spacing/radius/shadow scale). All admin UI components: nav, cards, gauge, badges, stats banner, tabs, toggles, form sections, empty states. Toggle ON state uses `var(--wp-admin-theme-color)`, not citrine. BEM naming: `.citewp-aiso-nav` block.
+- `admin/fonts/plus-jakarta-sans-800.woff2` — self-hosted font (12 KB, jsDelivr).
+- `admin/fonts/jetbrains-mono-400.woff2` — self-hosted font (21 KB, jsDelivr).
+- `includes/Admin/PageHeader.php` — new file. `render_nav(string $current_page)` static method. Four nav items. `apply_filters('citewp_aiso/admin/nav', $defaults)` (X15 hook #1).
+- `includes/Admin/DashboardData.php` — new file. Service extracted from `DashboardWidget`. Four public methods: `get_average_score()`, `get_visit_trend()`, `get_top_crawled_pages()`, `get_lowest_scoring_posts()`. Shared by both `Menu.php` and `DashboardWidget.php`.
+- `includes/Admin/Menu.php` — fully rebuilt. Added `enqueue_assets()` for CSS-only load on CiteWP screens. `render_dashboard()`: DashboardData queries, SVG semicircle gauge, 3-col card grid, `apply_filters('citewp_aiso/dashboard/cards', [])` (X15 hook #4), PageHeader nav.
+- `includes/Settings/Page.php` — fully rebuilt. PageHeader nav, tabbed layout (general / crawler-detection / llms-txt), `apply_filters('citewp_aiso/settings/tabs', $default_tabs)` (X15 hook #2), toggle switches, card sections, inline JS tab switcher with URL hash persistence. Removed `inline_styles()` and its `admin_head` hook.
+- `includes/Admin/LogsPage.php` — updated. PageHeader nav added. Stats banner migrated from inline styles to CSS classes. `inline_styles()` method deleted.
+- `includes/Admin/DashboardWidget.php` — updated. Delegated four data methods to `DashboardData`. Added `apply_filters('citewp_aiso/dashboard/cards', [])` stub. Removed stale `Schema` import.
+- `includes/Admin/ScoreMetaBox.php` — updated. Added `apply_filters('citewp_aiso/metabox/tabs', [])` stub (X15 hook #3).
+- `includes/Admin/SchemaMetaBox.php` — updated. Same `apply_filters('citewp_aiso/metabox/tabs', [])` stub added.
+
+**Commits:** `d0d736d`, `e212729`, `624811b`, `1d8eaf7`, `f72750d`, `8517e11`, `d6fa62b`, `06e2134`, `de44713`, `7771613`, `10a994e`, `9370db3`, `bc0e881`, `ad47bc4`. Pushed to `origin/main`.
+
+**X15 extensibility hooks added:**
+1. `citewp_aiso/admin/nav` — admin top nav items
+2. `citewp_aiso/settings/tabs` — settings page tabs
+3. `citewp_aiso/metabox/tabs` — score + schema meta box tabs
+4. `citewp_aiso/dashboard/cards` — dashboard summary cards
+
+**Decisions made:** None new. Existing P19/P26/X15 drove all choices.
+
+**Forward design note (pre-Pro):** `citewp_aiso/metabox/tabs` fires from both `ScoreMetaBox` and `SchemaMetaBox` with the same key and no context argument. Before Pro ships, add a `$context` string argument (`'score'` / `'schema'`) so Pro can target each independently.
+
+**npm build:** ✅ clean. **PHP lint:** ✅ all 8 new/modified files clean. **Browser verification:** ✅ all three admin pages, WP Dashboard widget, tab switching + hash URLs, toggles, CSV export, gauge rendering.
+
+**Carryover into Session 13:**
+- P25 (plugin admin vs SaaS dashboard architectural separation) still needs a DECISIONS.md Product table entry — carried from Sessions 11–12.
+- UI-DESIGN-SYSTEM.md Color System section needs a "Surface-by-surface palette" subsection documenting which tokens apply where (handle in Desktop, Brain file edit).
+- `citewp_aiso/metabox/tabs` shared filter key: add `$context` argument before Pro ships (tracked as forward design note above).
+
+**Next session focus:** Session 13 — Per P24/v0.7.0 checklist: `readme.txt` polish (feature bullets, FAQ, changelog) + WP.org asset preparation (screenshots, banner, icon). Or next backlog item per user direction.
+
+---
+
 ## Session 11 close (final) — Audit follow-up, FEATURE-BACKLOG.md, X15 ✅
 
 **Date:** 2026-04-29
@@ -176,7 +218,7 @@
 
 **Decisions made:** None new.
 
-**WP.org outcome:** Approved. Slug confirmed as `ai-search-optimizer`. Plugin live in the WordPress.org directory.
+**WP.org outcome:** Submitted 2026-04-29 (corrected 2026-04-29 — earlier "approved/live" entry was incorrect; the WP.org submission confirmation page was misread as approval). Slug assigned: `ai-search-optimizer`. Awaiting review email from `plugins@wordpress.org` to hello@citewp.com. Typical queue 2-14 days. Plugin NOT yet committed to WP.org SVN — that step happens only after approval email arrives.
 
 **Carryover into Session 10:** None — Session 9 deliverable complete.
 
