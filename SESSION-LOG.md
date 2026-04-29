@@ -6,6 +6,54 @@
 
 ---
 
+## Session 10 — Schema Generator (Phase 1.5) ✅
+
+**Date:** 2026-04-28
+
+**Deliverable:** Build the JSON-LD schema generator (P14) — auto-suggest Article and FAQPage schema markup from post content, surfaced as a "Schema Suggestions" panel in the Gutenberg Document Settings sidebar.
+
+**Shipped:**
+- `includes/Schema/Generator.php` — new `CiteWP\Aiso\Schema\Generator` service:
+  - `generate_article_schema(WP_Post)`: complete Article JSON-LD (headline, dates, description, author, featured image, publisher with site icon → custom logo fallback, mainEntityOfPage)
+  - `generate_faq_schema(WP_Post)`: FAQPage JSON-LD when ≥ 2 question/answer pairs found; H2/H3 detection by question-word prefix OR trailing `?`; first `<p>` before next heading as answer; returns `[]` if < 2 pairs
+  - `detect_existing_types(WP_Post)`: top-level `@type` values from JSON-LD blocks in post_content only (not recursive — prevents nested sub-nodes like Person/Organization/WebPage from appearing as independent detected types)
+  - Internal `ContentAnalysis` caching: one `apply_filters('the_content')` call per request
+- `includes/Rest/SchemaController.php` — `GET /citewp/aiso/v1/schema/{post_id}` → `{article, faqpage|null, detected[]}`, permission `current_user_can('edit_post')`
+- `src/sidebar/index.js` — `SchemaSuggestions` component via `PluginDocumentSettingPanel` (`@wordpress/edit-post`) in Document Settings sidebar (always visible; separate from the Cite Score `PluginSidebar`):
+  - Article + FAQPage rows: Insert button, "Already detected" badge, "✓ Added" badge
+  - FAQPage empty state: "No FAQ content detected (need ≥ 2 Q&A pairs)"
+  - Other detected types: read-only "X schema detected — more types coming soon"
+  - Re-fetches after post save (mirrors ScoreSidebar `wasSaving` pattern)
+  - Block inserted via `insertBlock(block)` with no index (safe append, avoids root-count-only error with nested blocks)
+
+**Modified:**
+- `includes/Plugin.php` — wired `Rest\SchemaController` into `boot()` outside `is_admin()` block
+- `build/index.js` + `build/index.asset.php` — recompiled; new dependencies: `wp-blocks`, `wp-edit-post`
+
+**Bugs caught and fixed during code review:**
+- FAQ `<p>` extraction now scoped to content before next heading (prevents block-injected markup capturing wrong answer)
+- `insertBlock(block)` without index (was `insertBlock(block, getBlockCount())` — root-count broken for nested blocks)
+- `setInserted({})` moved before try block in `fetchSchema` (prevents stale badge on failed re-fetch)
+- `detect_existing_types()` changed from recursive to root-level-only collection (fixes Person/Organization/WebPage noise)
+
+**Decisions made:** P20 (DECISIONS.md) — schema generator implementation choices.
+
+**Verified:**
+- "Schema Suggestions" panel appears in Document Settings sidebar
+- Article Insert → Custom HTML block at end of post with valid Article JSON-LD
+- "Already detected" badge shown after autosave + re-fetch
+- "No FAQ content detected" shown for posts with no FAQ structure
+- Person/Organization/WebPage sub-type noise removed
+- REST endpoint returns 403 (not 404) without auth — route registered, permission_callback active
+- No debug.log PHP errors
+- `npm run build` 0 warnings
+
+**Carryover into Session 11:** None — Session 10 deliverable complete.
+
+**Next session focus:** Phase 1.5 — UI polish pass per `UI-DESIGN-SYSTEM.md` (P19/X7): tabbed top nav, card-based settings layout, toggle switches, score gauge in dashboard widget, empty states. User has strategy sessions on UI design pending before this session begins.
+
+---
+
 ## Session 9 — WP.org Submission ✅
 
 **Date:** 2026-04-28

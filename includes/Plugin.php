@@ -54,6 +54,10 @@ final class Plugin {
 		$this->modules['rest_score_controller'] = new Rest\ScoreController();
 		$this->modules['rest_score_controller']->register();
 
+		// REST API for schema suggestions (Document Settings panel).
+		$this->modules['rest_schema_controller'] = new Rest\SchemaController();
+		$this->modules['rest_schema_controller']->register();
+
 		// Admin-only modules.
 		if ( is_admin() ) {
 			$this->modules['admin_menu'] = new Admin\Menu();
