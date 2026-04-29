@@ -6,6 +6,55 @@
 
 ---
 
+## Session 11 — Universal Meta Boxes (Phase 1.5) ✅
+
+**Date:** 2026-04-29
+
+**Deliverable:** Universal Cite Score + Schema Suggestions meta boxes (P22) — both features visible in Classic Editor, Elementor, Divi, Beaver Builder, and Gutenberg's meta box compatibility panel.
+
+**Shipped:**
+- `includes/Admin/ScoreMetaBox.php` — new `CiteWP\Aiso\Admin\ScoreMetaBox`:
+  - `register()` hooks `add_meta_boxes` at priority 20 (after Yoast/Rank Math at 10) + `admin_head`
+  - `render()`: 4 states — scored (badge + 3 category rows + timestamp + Recalculate), not-yet-scored (empty note + Recalculate), loading (button disabled, "Recalculating…"), error (re-enabled + message)
+  - Inline JS: `fetch()` POST to `/wp-json/citewp/aiso/v1/score/{id}/recalculate` with `X-WP-Nonce`, updates DOM in place without reload; `esc()` helper prevents XSS in innerHTML reconstruction
+  - 403 detected in `.catch()` and shown as "Session expired — please reload" vs generic retry message
+  - `inline_styles()` scoped to `#citewp_aiso_cite_score`, gated to `post`/`page` post types only
+- `includes/Admin/SchemaMetaBox.php` — new `CiteWP\Aiso\Admin\SchemaMetaBox`:
+  - Calls `Schema\Generator` directly in PHP (no REST round-trip) — `generate_article_schema`, `generate_faq_schema`, `detect_existing_types`
+  - Article + FAQPage sections with "Already detected" badges; other types read-only
+  - Clipboard-only insert (no TinyMCE injection): `navigator.clipboard` with `execCommand` fallback for HTTP/local environments
+  - Advisory paste note (X12-compliant): "Paste into a Custom HTML block…" fades after 8s; `clearTimeout` on repeated clicks prevents label flicker
+  - `wp_json_encode()` false guard on both `$article_json` and `$faq_json`
+  - `inline_styles()` scoped to `#citewp_aiso_schema`, gated to `post`/`page` post types only
+
+**Modified:**
+- `includes/Plugin.php` — wired `Admin\ScoreMetaBox` + `Admin\SchemaMetaBox` into `boot()` inside `is_admin()` block, after `DashboardWidget`
+
+**Bugs caught and fixed during code review:**
+- ScoreMetaBox: XSS via unescaped REST values injected into `innerHTML` — fixed with `esc()` helper
+- ScoreMetaBox: JS success handler omitted "Scored just now" timestamp after recalculate — added
+- ScoreMetaBox: No null guard on `btn`/`errEl`/`contEl` DOM queries before `addEventListener` — added
+- ScoreMetaBox: `strtotime()` false return not guarded before `human_time_diff()` — fixed
+- ScoreMetaBox: `cats[k].label/score/max` undefined on partial REST response — added `?? ''` / `?? 0` fallbacks
+- ScoreMetaBox: `inline_styles()` loaded on all CPT edit screens, not just `post`/`page` — added post_type guard
+- SchemaMetaBox: `navigator.clipboard` unavailable on HTTP (LocalWP default) — added `execCommand` fallback
+- SchemaMetaBox: Button revert timer not stored — repeated clicks caused label flicker — stored as `revertTimer`
+- SchemaMetaBox: `wp_json_encode()` could return `false` on bad UTF-8 — guarded with early return + error note
+
+**Decisions made:** None new. X11, X12, P23 were committed at session start (pre-existing from prior brain session).
+
+**Verified:**
+- `npm run build` — compiled clean, 913ms, 0 new warnings
+- No `debug.log` file present — no PHP errors generated during this session
+- Final code reviewer: **Ready to merge** — integration correct, data contracts match, security clean, CLAUDE.md compliant
+- Manual UI verification pending (open post edit screen in LocalWP, confirm both meta boxes appear in sidebar)
+
+**Carryover into Session 12:** Manual verification of both meta boxes in the browser (Classic Editor + Gutenberg meta box panel as minimum). No code carryover — both files are correct per review.
+
+**Next session focus:** Session 12 — UI polish pass per `Brain/UI-DESIGN-SYSTEM.md` (P19/X7): tabbed top nav, card-based settings layout, toggle switches, score gauge in dashboard widget, empty states. User has UI strategy sessions pending before this begins.
+
+---
+
 ## Session 10 — Schema Generator (Phase 1.5) ✅
 
 **Date:** 2026-04-28
