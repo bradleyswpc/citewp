@@ -362,7 +362,7 @@
 }
 
 .citewp-aiso-toggle input[type="checkbox"]:checked + .citewp-aiso-toggle__track {
-    background: var(--citewp-citrine);
+    background: var(--wp-admin-theme-color, #2271b1);
 }
 
 .citewp-aiso-toggle input[type="checkbox"]:checked + .citewp-aiso-toggle__track::after {
