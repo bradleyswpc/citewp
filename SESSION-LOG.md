@@ -6,6 +6,32 @@
 
 ---
 
+## Session 11 close (final) — Audit follow-up, FEATURE-BACKLOG.md, X15 ✅
+
+**Date:** 2026-04-29
+
+**Deliverable:** Log Rank Math audit findings as backlog candidates; add filter-extensibility rule (X15); wire backlog scan into `/session-start` protocol; add 6th Brain file. Pure documentation session — no code shipped.
+
+**Shipped / Modified:**
+- `Brain/FEATURE-BACKLOG.md` — new file. P28 (Cite Audit), P29 (Schema expansion), P30 (Cite Bridges), P31 (Role Manager), P32 (migration tools), P33 (email reports), P34 (Global Meta defaults), P35 (AI Citation Competitor Analyzer), Cite Tracker architecture reference, Rank Math pattern observations. Reference material only — not a roadmap.
+- `Brain/00-CITEWP-MASTER.md` — rule 2 updated to "6 active files: master, decisions, scoring-rubric, competitors, ui-design-system, feature-backlog"; rule 7 added (backlog scan requirement per X15); Active Brain files table expanded to 6 rows; Horizon FEATURE-BACKLOG.md cross-reference added with X15 note; last-updated bumped.
+- `Brain/DECISIONS.md` — X15 appended (filter-extensibility: settings tabs, meta box tabs, admin nav rail, dashboard widget cards all use `apply_filters` from first build); last-updated bumped.
+- `.claude/commands/session-start.md` — Hard rules updated to "6 active files" list; Backlog Scan section appended (6-step protocol, surface taxonomy, format template, skip-is-a-violation enforcement). Committed `fad4f68`, pushed to `origin/main`.
+
+**Decisions made:** X15 (filter-extensibility requirement for all UI surfaces hosting FEATURE-BACKLOG.md candidates).
+
+**No code, no JS build, no debug.log errors.**
+
+**Verified:** All file edits confirmed by read-back. Plugin commit pushed to GitHub (`fad4f68`). Brain files protected by robocopy backup.
+
+**Carryover into Session 12:**
+- Add P25 (plugin admin vs SaaS dashboard architectural separation) to DECISIONS.md Product table — text drafted in Session 11, deferred twice
+- Manual browser verification: confirm meta boxes absent in Gutenberg, present in Classic/Elementor/Divi; TypeError resolved; Structure sub-score > 0 on post with H2/H3/list content
+
+**Next session focus:** Session 12 — UI polish pass per `Brain\UI-DESIGN-SYSTEM.md` (P19/X7). **Before writing the plan, run the backlog scan per X15**: Session 12 touches admin nav, settings tabs, dashboard widget cards, and meta box layout — P28, P30, P34 all overlap these surfaces and must be confirmed reserved (via filter hooks) or explicitly deferred.
+
+---
+
 ## Session 11 close — Bookkeeping corrections ✅
 
 **Date:** 2026-04-29
