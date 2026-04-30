@@ -66,25 +66,29 @@ final class Menu {
 		$defaults = [
 			'dashboard' => [
 				'label'  => __( 'Dashboard', 'ai-search-optimizer' ),
+				'desc'   => __( 'Overview and metrics', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-chart-line',
 				'slug'   => 'dashboard',
 				'render' => [ $this, 'render_dashboard_panel' ],
 			],
 			'crawler-logs' => [
 				'label'  => __( 'Crawler Logs', 'ai-search-optimizer' ),
+				'desc'   => __( 'AI bot visit history', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-list-view',
 				'slug'   => 'crawler-logs',
 				'render' => $logs_module ? [ $logs_module, 'render' ] : null,
 			],
 			'settings' => [
 				'label'  => __( 'Settings', 'ai-search-optimizer' ),
+				'desc'   => __( 'Configure detection and llms.txt', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-admin-settings',
 				'slug'   => 'settings',
 				'render' => $settings_module ? [ $settings_module, 'render' ] : null,
 			],
 			'pro' => [
-				'label'    => __( 'Pro ↗', 'ai-search-optimizer' ),
-				'icon'     => '',
+				'label'    => __( 'Pro', 'ai-search-optimizer' ),
+				'desc'     => __( 'Citation tracking and analytics', 'ai-search-optimizer' ),
+				'icon'     => 'dashicons-external',
 				'slug'     => 'pro',
 				'external' => true,
 				'href'     => 'https://citewp.com',
@@ -153,7 +157,17 @@ final class Menu {
 							target="_blank"
 							rel="noopener noreferrer"
 						<?php endif; ?>
-					><?php if ( ! empty( $item['icon'] ) ) : ?><span class="dashicons <?php echo esc_attr( $item['icon'] ); ?>" aria-hidden="true"></span><?php endif; ?><?php echo esc_html( $item['label'] ); ?></a>
+					>
+						<?php if ( ! empty( $item['icon'] ) ) : ?>
+							<span class="dashicons <?php echo esc_attr( $item['icon'] ); ?>" aria-hidden="true"></span>
+						<?php endif; ?>
+						<span class="citewp-aiso-rail__item-text">
+							<span class="citewp-aiso-rail__item-label"><?php echo esc_html( $item['label'] ); ?></span>
+							<?php if ( ! empty( $item['desc'] ) ) : ?>
+								<span class="citewp-aiso-rail__item-desc"><?php echo esc_html( $item['desc'] ); ?></span>
+							<?php endif; ?>
+						</span>
+					</a>
 					<?php endforeach; ?>
 				</nav>
 
@@ -355,9 +369,10 @@ final class Menu {
 			</div>
 
 			<!-- Quick Actions -->
-			<p class="citewp-aiso-quick-actions">
+			<div class="citewp-aiso-quick-actions">
 				<a href="<?php echo esc_url( $logs_url ); ?>" class="button"><?php esc_html_e( 'View Crawler Logs', 'ai-search-optimizer' ); ?></a>
-			</p>
+				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=citewp_aiso_regenerate_llms&_wpnonce=' . wp_create_nonce( 'citewp_aiso_regenerate_llms' ) ) ); ?>" class="button"><?php esc_html_e( 'Regenerate llms.txt', 'ai-search-optimizer' ); ?></a>
+			</div>
 
 			<!-- Extra cards from filter (Pro / extensions) -->
 			<?php if ( ! empty( $extra_cards ) ) : ?>
