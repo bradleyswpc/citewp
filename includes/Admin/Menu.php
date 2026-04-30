@@ -130,11 +130,14 @@ final class Menu {
 		<div class="wrap">
 
 			<div class="citewp-aiso-header">
-				<div class="citewp-aiso-header__lockup">
-					<span class="citewp-aiso-header__wordmark">
-						<span class="citewp-aiso-header__bracket">[</span>CiteWP<span class="citewp-aiso-header__bracket">]</span>
-					</span>
-					<span class="citewp-aiso-header__tagline"><?php esc_html_e( 'AI Search Optimizer', 'ai-search-optimizer' ); ?></span>
+				<div class="citewp-aiso-header__brand">
+					<div class="citewp-aiso-header__lockup">
+						<span class="citewp-aiso-header__wordmark">
+							<span class="citewp-aiso-header__bracket">[</span>CiteWP<span class="citewp-aiso-header__bracket">]</span>
+						</span>
+						<span class="citewp-aiso-header__plugin-name"><?php esc_html_e( 'AI Search Optimizer', 'ai-search-optimizer' ); ?></span>
+					</div>
+					<p class="citewp-aiso-header__tagline"><?php esc_html_e( 'SEO gets you ranked. CiteWP gets you cited.', 'ai-search-optimizer' ); ?></p>
 				</div>
 			</div>
 
