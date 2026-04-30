@@ -6,6 +6,43 @@
 
 ---
 
+## Session 13 close — Admin layout refactor + brand identity (P27 + P28 + P29) ✅
+
+**Date:** 2026-04-29
+
+**Deliverable:** Full admin layout refactor replacing the Session 12 hybrid (WP submenus + horizontal top tabs) with a single `add_menu_page`, left vertical rail, URL hash dispatch, and shared card surface. Visual polish pass brought the register in line with WP Rocket's reference. Brand identity locked: `[CiteWP]` wordmark with Citrine brackets, "AI Search Optimizer" plugin name inline, and canonical tagline "SEO gets you ranked. CiteWP gets you cited." below in Fraunces 800 italic (Georgia fallback until woff2 loaded).
+
+**Shipped / Modified:**
+- `includes/Admin/Menu.php` — fully rewritten. Single `add_menu_page` (no `add_submenu_page`). `render_page()`: left rail loop, panel loop, inline JS with 5-priority `resolveSlug()` (hash → `citewp_section` param → `settings-updated` flag → sessionStorage → default), `hashchange` listener, click handlers with `history.pushState`. `citewp_aiso/admin/nav` filter extended with render-callback schema (X15 — FB28/FB30/FB34 register panels via this filter). `render_dashboard_panel()`: P27 single-column layout, SVG gauge, Needs Attention list, quick-action buttons. Header: `__brand` wrapper → `__lockup` (wordmark with Citrine `__bracket` spans + `__plugin-name`) + `__tagline` paragraph (canonical brand tagline). Null-guards on `module()` callables; `wp_nonce_url()` for regenerate button.
+- `includes/Settings/Page.php` — stripped to pure panel renderer. Removed submenu registration, `.wrap` wrapper, `PageHeader` nav. Settings inner-tab state moved to `localStorage` (avoids hash conflict with outer `#settings`). Redirect uses `Menu::SLUG_PARENT` + `citewp_section=settings`.
+- `includes/Admin/LogsPage.php` — stripped to pure panel renderer. `maybe_init_table()` now guards on `SLUG_PARENT`. List table form submits `page=citewp` + hidden `citewp_section=crawler-logs` field.
+- `includes/Admin/PageHeader.php` — **deleted**. Wordmark inlined in `Menu::render_page()`.
+- `admin/css/citewp-aiso-admin.css` — appended ~175 lines. Shared card surface (`.citewp-aiso-page` = outer card, `.citewp-aiso-rail` = 220px `#fafafa` strip with right divider, `.citewp-aiso-main` = padded content area). Left rail BEM block. Panel visibility (`display:none` / `display:block` toggle). Stat-row Dashboard styles. Primary button brand override (`.toplevel_page_citewp .button-primary` → Obsidian fill, Citrine border on hover). Header card chrome with lockup + tagline CSS (`__brand`, `__lockup`, `__plugin-name`, `__tagline`, `__bracket`). Rail two-line items (`__item-label` uppercase + `__item-desc`). Rail active state: Citrine left accent only, no flood-fill. Responsive stack at ≤782px. `--citewp-citrine-text: #8A7800` confirmed already in `:root`.
+
+**Commits:** `3863b1f` (Settings strip), `f2b9fe4` (LogsPage strip), `00d359a` (Menu rewrite), `8d6164d` (null-guard + admin_url hash fix), `5d47f52` (CSS Phase 2), `6104dce` (delete PageHeader + docs), `40f1937` (6-fix polish pass), `0352b9f` (wp_nonce_url fix), `78a7a1c` (rail descs + no flood-fill + Citrine brackets), `2914762` (header lockup container), `ff969db` (tagline font → Plus Jakarta Sans), `ef59ab4` (canonical tagline below lockup), `9adcb7a` (shared card surface).
+
+**Decisions made:**
+- P30 logged: canonical brand tagline "SEO gets you ranked. CiteWP gets you cited." — locked wording for all brand surfaces. Fraunces 800 italic. `--citewp-citrine-text` color. P21 verbal-identity amendment.
+
+**Post-session Brain updates:**
+- `DECISIONS.md` — P30 added. Header datestamp updated.
+- `UI-DESIGN-SYSTEM.md` — left rail spec, shared card surface, lockup/tagline component rules should be updated in Session 14 to reflect final implementation (deferred — visual pass confirmed in browser first).
+
+**Font carryover:** `admin/fonts/fraunces-800-italic.woff2` not yet loaded. Tagline renders in Georgia/serif fallback for v0.7.0. To activate Fraunces: drop woff2 into `admin/fonts/`, add `@font-face` (weight 800, italic) near top of `citewp-aiso-admin.css`. `plus-jakarta-sans-500.woff2` also not loaded — `__plugin-name` renders at weight 800 fallback (12px, `#787c82`) until added.
+
+**npm build:** ✅ clean (no JS changes). **PHP lint:** ✅. **Browser verification:** pending user confirmation.
+
+**Carryover into Session 14:**
+- Load `fraunces-800-italic.woff2` to `admin/fonts/` + add `@font-face` block — tagline then renders in Fraunces as designed.
+- Load `plus-jakarta-sans-500.woff2` + `@font-face` — `__plugin-name` renders at correct weight.
+- Update `UI-DESIGN-SYSTEM.md` to document left rail layout, shared card surface, lockup/tagline component, and P30 tagline spec.
+- `citewp_aiso/metabox/tabs` filter needs `$context` arg (`'score'`/`'schema'`) before Pro ships (carried from Session 12).
+- Session 14 primary: readme.txt + WP.org assets (per P28 deferral).
+
+**Next session focus:** Session 14 — readme.txt + WP.org assets (screenshots, banner, icon). Font loading (Fraunces + Jakarta 500). UI-DESIGN-SYSTEM.md update. Anti-cloaking content (Session 15+).
+
+---
+
 ## Session 12 close — Admin UI polish pass (WP Rocket IA) ✅
 
 **Date:** 2026-04-29
