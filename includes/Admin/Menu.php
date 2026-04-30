@@ -60,6 +60,9 @@ final class Menu {
 			return;
 		}
 
+		$logs_module     = \CiteWP\Aiso\Plugin::instance()->module( 'admin_logs_page' );
+		$settings_module = \CiteWP\Aiso\Plugin::instance()->module( 'settings_page' );
+
 		$defaults = [
 			'dashboard' => [
 				'label'  => __( 'Dashboard', 'ai-search-optimizer' ),
@@ -71,13 +74,13 @@ final class Menu {
 				'label'  => __( 'Crawler Logs', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-list-view',
 				'slug'   => 'crawler-logs',
-				'render' => [ \CiteWP\Aiso\Plugin::instance()->module( 'admin_logs_page' ), 'render' ],
+				'render' => $logs_module ? [ $logs_module, 'render' ] : null,
 			],
 			'settings' => [
 				'label'  => __( 'Settings', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-admin-settings',
 				'slug'   => 'settings',
-				'render' => [ \CiteWP\Aiso\Plugin::instance()->module( 'settings_page' ), 'render' ],
+				'render' => $settings_module ? [ $settings_module, 'render' ] : null,
 			],
 			'pro' => [
 				'label'    => __( 'Pro ↗', 'ai-search-optimizer' ),
@@ -263,7 +266,7 @@ final class Menu {
 		$fill_pct      = $avg_score !== null ? max( 0, min( 100, $avg_score ) ) : 0;
 		$offset        = $circumference - ( $fill_pct / 100 ) * $circumference;
 
-		$logs_url = admin_url( 'admin.php?page=' . self::SLUG_PARENT . '#crawler-logs' );
+		$logs_url = admin_url( 'admin.php?page=' . self::SLUG_PARENT ) . '#crawler-logs';
 
 		/**
 		 * Filters extra dashboard cards rendered after the built-in summary.
