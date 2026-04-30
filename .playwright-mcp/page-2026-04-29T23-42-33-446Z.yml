@@ -1,0 +1,267 @@
+- generic [ref=e2]:
+  - navigation "Main menu":
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#wpbody-content"
+    - link "Skip to toolbar" [ref=e4] [cursor=pointer]:
+      - /url: "#wp-toolbar"
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: index.php
+          - generic [ref=e10]: 
+          - generic [ref=e11]: Dashboard
+        - list [ref=e12]:
+          - listitem [ref=e13]:
+            - link "Home" [ref=e14] [cursor=pointer]:
+              - /url: index.php
+          - listitem [ref=e15]:
+            - link "Updates" [ref=e16] [cursor=pointer]:
+              - /url: update-core.php
+      - listitem [ref=e17]:
+        - link "Elementor" [ref=e18] [cursor=pointer]:
+          - /url: admin.php?page=elementor-home
+          - generic [ref=e20]: Elementor
+        - list [ref=e21]:
+          - listitem [ref=e22]:
+            - link "Home" [ref=e23] [cursor=pointer]:
+              - /url: admin.php?page=elementor-home
+          - listitem [ref=e24]:
+            - link "Editor" [ref=e25] [cursor=pointer]:
+              - /url: admin.php?page=elementor
+          - listitem [ref=e26]:
+            - link "Upgrade" [ref=e27] [cursor=pointer]:
+              - /url: admin.php?page=elementor-one-upgrade
+      - listitem [ref=e28]
+      - listitem [ref=e30]:
+        - link "Posts" [ref=e31] [cursor=pointer]:
+          - /url: edit.php
+          - generic [ref=e32]: 
+          - generic [ref=e33]: Posts
+        - list [ref=e34]:
+          - listitem [ref=e35]:
+            - link "All Posts" [ref=e36] [cursor=pointer]:
+              - /url: edit.php
+          - listitem [ref=e37]:
+            - link "Add Post" [ref=e38] [cursor=pointer]:
+              - /url: post-new.php
+          - listitem [ref=e39]:
+            - link "Categories" [ref=e40] [cursor=pointer]:
+              - /url: edit-tags.php?taxonomy=category
+          - listitem [ref=e41]:
+            - link "Tags" [ref=e42] [cursor=pointer]:
+              - /url: edit-tags.php?taxonomy=post_tag
+      - listitem [ref=e43]:
+        - link "Media" [ref=e44] [cursor=pointer]:
+          - /url: upload.php
+          - generic [ref=e45]: 
+          - generic [ref=e46]: Media
+        - list [ref=e47]:
+          - listitem [ref=e48]:
+            - link "Library" [ref=e49] [cursor=pointer]:
+              - /url: upload.php
+          - listitem [ref=e50]:
+            - link "Add Media File" [ref=e51] [cursor=pointer]:
+              - /url: media-new.php
+      - listitem [ref=e52]:
+        - link "Pages" [ref=e53] [cursor=pointer]:
+          - /url: edit.php?post_type=page
+          - generic [ref=e54]: 
+          - generic [ref=e55]: Pages
+        - list [ref=e56]:
+          - listitem [ref=e57]:
+            - link "All Pages" [ref=e58] [cursor=pointer]:
+              - /url: edit.php?post_type=page
+          - listitem [ref=e59]:
+            - link "Add Page" [ref=e60] [cursor=pointer]:
+              - /url: post-new.php?post_type=page
+      - listitem [ref=e61]:
+        - link "Comments" [ref=e62] [cursor=pointer]:
+          - /url: edit-comments.php
+          - generic [ref=e63]: 
+          - generic [ref=e64]: Comments
+      - text:  
+      - listitem [ref=e65]
+      - listitem [ref=e67]:
+        - link "Appearance" [ref=e68] [cursor=pointer]:
+          - /url: themes.php
+          - generic [ref=e69]: 
+          - generic [ref=e70]: Appearance
+        - list [ref=e71]:
+          - listitem [ref=e72]:
+            - link "Themes" [ref=e73] [cursor=pointer]:
+              - /url: themes.php
+          - listitem [ref=e74]:
+            - link "Editor" [ref=e75] [cursor=pointer]:
+              - /url: site-editor.php
+      - listitem [ref=e76]:
+        - link "Plugins" [ref=e77] [cursor=pointer]:
+          - /url: plugins.php
+          - generic [ref=e78]: 
+          - generic [ref=e79]: Plugins
+        - list [ref=e80]:
+          - listitem [ref=e81]:
+            - link "Installed Plugins" [ref=e82] [cursor=pointer]:
+              - /url: plugins.php
+          - listitem [ref=e83]:
+            - link "Add Plugin" [ref=e84] [cursor=pointer]:
+              - /url: plugin-install.php
+      - listitem [ref=e85]:
+        - link "Users" [ref=e86] [cursor=pointer]:
+          - /url: users.php
+          - generic [ref=e87]: 
+          - generic [ref=e88]: Users
+        - list [ref=e89]:
+          - listitem [ref=e90]:
+            - link "All Users" [ref=e91] [cursor=pointer]:
+              - /url: users.php
+          - listitem [ref=e92]:
+            - link "Add User" [ref=e93] [cursor=pointer]:
+              - /url: user-new.php
+          - listitem [ref=e94]:
+            - link "Profile" [ref=e95] [cursor=pointer]:
+              - /url: profile.php
+      - listitem [ref=e96]:
+        - link "Tools" [ref=e97] [cursor=pointer]:
+          - /url: tools.php
+          - generic [ref=e98]: 
+          - generic [ref=e99]: Tools
+        - list [ref=e100]:
+          - listitem [ref=e101]:
+            - link "Available Tools" [ref=e102] [cursor=pointer]:
+              - /url: tools.php
+          - listitem [ref=e103]:
+            - link "Import" [ref=e104] [cursor=pointer]:
+              - /url: import.php
+          - listitem [ref=e105]:
+            - link "Export" [ref=e106] [cursor=pointer]:
+              - /url: export.php
+          - listitem [ref=e107]:
+            - link "Site Health" [ref=e108] [cursor=pointer]:
+              - /url: site-health.php
+          - listitem [ref=e109]:
+            - link "Export Personal Data" [ref=e110] [cursor=pointer]:
+              - /url: export-personal-data.php
+          - listitem [ref=e111]:
+            - link "Erase Personal Data" [ref=e112] [cursor=pointer]:
+              - /url: erase-personal-data.php
+          - listitem [ref=e113]:
+            - link "Plugin Check" [ref=e114] [cursor=pointer]:
+              - /url: tools.php?page=plugin-check
+          - listitem [ref=e115]:
+            - link "Plugin Check Namer" [ref=e116] [cursor=pointer]:
+              - /url: tools.php?page=plugin-check-namer
+          - listitem [ref=e117]:
+            - link "Theme File Editor" [ref=e118] [cursor=pointer]:
+              - /url: theme-editor.php
+          - listitem [ref=e119]:
+            - link "Plugin File Editor" [ref=e120] [cursor=pointer]:
+              - /url: plugin-editor.php
+      - listitem [ref=e121]:
+        - link "Settings" [ref=e122] [cursor=pointer]:
+          - /url: options-general.php
+          - generic [ref=e123]: 
+          - generic [ref=e124]: Settings
+        - list [ref=e125]:
+          - listitem [ref=e126]:
+            - link "General" [ref=e127] [cursor=pointer]:
+              - /url: options-general.php
+          - listitem [ref=e128]:
+            - link "Writing" [ref=e129] [cursor=pointer]:
+              - /url: options-writing.php
+          - listitem [ref=e130]:
+            - link "Reading" [ref=e131] [cursor=pointer]:
+              - /url: options-reading.php
+          - listitem [ref=e132]:
+            - link "Discussion" [ref=e133] [cursor=pointer]:
+              - /url: options-discussion.php
+          - listitem [ref=e134]:
+            - link "Media" [ref=e135] [cursor=pointer]:
+              - /url: options-media.php
+          - listitem [ref=e136]:
+            - link "Permalinks" [ref=e137] [cursor=pointer]:
+              - /url: options-permalink.php
+          - listitem [ref=e138]:
+            - link "Privacy" [ref=e139] [cursor=pointer]:
+              - /url: options-privacy.php
+      - listitem [ref=e140]:
+        - link "CiteWP" [ref=e141] [cursor=pointer]:
+          - /url: admin.php?page=citewp
+          - generic [ref=e142]: 
+          - generic [ref=e143]: CiteWP
+        - list [ref=e144]:
+          - listitem [ref=e145]:
+            - link "Dashboard" [ref=e146] [cursor=pointer]:
+              - /url: admin.php?page=citewp
+          - listitem [ref=e147]:
+            - link "Crawler Logs" [ref=e148] [cursor=pointer]:
+              - /url: admin.php?page=citewp-aiso-crawler-logs
+          - listitem [ref=e149]:
+            - link "Settings" [ref=e150] [cursor=pointer]:
+              - /url: admin.php?page=citewp-aiso-settings
+      - listitem [ref=e151]:
+        - button "Collapse Main menu" [expanded] [ref=e152] [cursor=pointer]:
+          - generic [ref=e154]: Collapse Menu
+  - generic [ref=e155]:
+    - generic [ref=e156]:
+      - navigation "Toolbar":
+        - menu:
+          - group [ref=e157]:
+            - menuitem "About WordPress" [ref=e158] [cursor=pointer]:
+              - generic [ref=e160]: About WordPress
+          - group [ref=e161]:
+            - menuitem "CiteWP-dev" [ref=e162] [cursor=pointer]
+          - group [ref=e163]:
+            - menuitem "0 Comments in moderation" [ref=e164] [cursor=pointer]:
+              - generic [ref=e166]: "0"
+              - generic [ref=e167]: 0 Comments in moderation
+          - group [ref=e168]:
+            - menuitem "New" [ref=e169] [cursor=pointer]:
+              - generic [ref=e171]: New
+        - menu [ref=e172]:
+          - group [ref=e173]:
+            - menuitem "Howdy, Bradleyswpc" [ref=e174] [cursor=pointer]
+    - main [ref=e175]:
+      - generic [ref=e177]:
+        - generic [ref=e178]:
+          - generic [ref=e179]: "[CiteWP]"
+          - navigation "CiteWP navigation" [ref=e180]:
+            - link "Dashboard" [ref=e181] [cursor=pointer]:
+              - /url: http://citewp-dev.local/wp-admin/admin.php?page=citewp
+            - link "Settings" [ref=e182] [cursor=pointer]:
+              - /url: http://citewp-dev.local/wp-admin/admin.php?page=citewp-aiso-settings
+            - link "Crawler Logs" [ref=e183] [cursor=pointer]:
+              - /url: http://citewp-dev.local/wp-admin/admin.php?page=citewp-aiso-crawler-logs
+            - link "Pro ↗" [ref=e184] [cursor=pointer]:
+              - /url: https://citewp.com
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - generic [ref=e187]:
+              - paragraph [ref=e188]: Avg GEO Score
+              - generic [ref=e189]:
+                - img [ref=e190]:
+                  - generic [ref=e193]: "16"
+                - generic [ref=e194]: across all scored posts
+            - generic [ref=e195]:
+              - paragraph [ref=e196]: Bot Visits (7d)
+              - paragraph [ref=e197]: "3"
+              - paragraph [ref=e198]: vs. prior 7 days
+            - generic [ref=e199]:
+              - paragraph [ref=e200]: Needs Attention
+              - list [ref=e201]:
+                - listitem [ref=e202]:
+                  - generic [ref=e203]: "16"
+                  - link "Hello world!" [ref=e204] [cursor=pointer]:
+                    - /url: http://citewp-dev.local/wp-admin/post.php?post=1&action=edit
+          - paragraph [ref=e205]:
+            - link "Settings" [ref=e206] [cursor=pointer]:
+              - /url: http://citewp-dev.local/wp-admin/admin.php?page=citewp-aiso-settings
+            - link "Crawler Logs" [ref=e207] [cursor=pointer]:
+              - /url: http://citewp-dev.local/wp-admin/admin.php?page=citewp-aiso-crawler-logs
+  - contentinfo [ref=e208]:
+    - paragraph [ref=e209]:
+      - generic [ref=e210]:
+        - text: Thank you for creating with
+        - link "WordPress" [ref=e211] [cursor=pointer]:
+          - /url: https://wordpress.org/
+        - text: .
+    - paragraph [ref=e212]: Version 6.9.4

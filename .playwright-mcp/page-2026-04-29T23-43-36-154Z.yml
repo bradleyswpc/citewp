@@ -1,0 +1,633 @@
+- generic [ref=e2]:
+  - navigation "Main menu":
+    - link "Skip to main content" [ref=e3] [cursor=pointer]:
+      - /url: "#wpbody-content"
+    - link "Skip to toolbar" [ref=e4] [cursor=pointer]:
+      - /url: "#wp-toolbar"
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: index.php
+          - generic [ref=e10]: 
+          - generic [ref=e11]: Dashboard
+        - list [ref=e12]:
+          - listitem [ref=e13]:
+            - link "Home" [ref=e14] [cursor=pointer]:
+              - /url: index.php
+          - listitem [ref=e15]:
+            - link "Updates" [ref=e16] [cursor=pointer]:
+              - /url: update-core.php
+      - listitem [ref=e17]:
+        - link "Elementor" [ref=e18] [cursor=pointer]:
+          - /url: admin.php?page=elementor-home
+          - generic [ref=e20]: Elementor
+        - list [ref=e21]:
+          - listitem [ref=e22]:
+            - link "Home" [ref=e23] [cursor=pointer]:
+              - /url: admin.php?page=elementor-home
+          - listitem [ref=e24]:
+            - link "Editor" [ref=e25] [cursor=pointer]:
+              - /url: admin.php?page=elementor
+          - listitem [ref=e26]:
+            - link "Upgrade" [ref=e27] [cursor=pointer]:
+              - /url: admin.php?page=elementor-one-upgrade
+      - listitem [ref=e28]
+      - listitem [ref=e30]:
+        - link "Posts" [ref=e31] [cursor=pointer]:
+          - /url: edit.php
+          - generic [ref=e32]: 
+          - generic [ref=e33]: Posts
+        - list [ref=e34]:
+          - listitem [ref=e35]:
+            - link "All Posts" [ref=e36] [cursor=pointer]:
+              - /url: edit.php
+          - listitem [ref=e37]:
+            - link "Add Post" [ref=e38] [cursor=pointer]:
+              - /url: post-new.php
+          - listitem [ref=e39]:
+            - link "Categories" [ref=e40] [cursor=pointer]:
+              - /url: edit-tags.php?taxonomy=category
+          - listitem [ref=e41]:
+            - link "Tags" [ref=e42] [cursor=pointer]:
+              - /url: edit-tags.php?taxonomy=post_tag
+      - listitem [ref=e43]:
+        - link "Media" [ref=e44] [cursor=pointer]:
+          - /url: upload.php
+          - generic [ref=e45]: 
+          - generic [ref=e46]: Media
+        - list [ref=e47]:
+          - listitem [ref=e48]:
+            - link "Library" [ref=e49] [cursor=pointer]:
+              - /url: upload.php
+          - listitem [ref=e50]:
+            - link "Add Media File" [ref=e51] [cursor=pointer]:
+              - /url: media-new.php
+      - listitem [ref=e52]:
+        - link "Pages" [ref=e53] [cursor=pointer]:
+          - /url: edit.php?post_type=page
+          - generic [ref=e54]: 
+          - generic [ref=e55]: Pages
+        - list [ref=e56]:
+          - listitem [ref=e57]:
+            - link "All Pages" [ref=e58] [cursor=pointer]:
+              - /url: edit.php?post_type=page
+          - listitem [ref=e59]:
+            - link "Add Page" [ref=e60] [cursor=pointer]:
+              - /url: post-new.php?post_type=page
+      - listitem [ref=e61]:
+        - link "Comments" [ref=e62] [cursor=pointer]:
+          - /url: edit-comments.php
+          - generic [ref=e63]: 
+          - generic [ref=e64]: Comments
+      - text:  
+      - listitem [ref=e65]
+      - listitem [ref=e67]:
+        - link "Appearance" [ref=e68] [cursor=pointer]:
+          - /url: themes.php
+          - generic [ref=e69]: 
+          - generic [ref=e70]: Appearance
+        - list [ref=e71]:
+          - listitem [ref=e72]:
+            - link "Themes" [ref=e73] [cursor=pointer]:
+              - /url: themes.php
+          - listitem [ref=e74]:
+            - link "Editor" [ref=e75] [cursor=pointer]:
+              - /url: site-editor.php
+      - listitem [ref=e76]:
+        - link "Plugins" [ref=e77] [cursor=pointer]:
+          - /url: plugins.php
+          - generic [ref=e78]: 
+          - generic [ref=e79]: Plugins
+        - list [ref=e80]:
+          - listitem [ref=e81]:
+            - link "Installed Plugins" [ref=e82] [cursor=pointer]:
+              - /url: plugins.php
+          - listitem [ref=e83]:
+            - link "Add Plugin" [ref=e84] [cursor=pointer]:
+              - /url: plugin-install.php
+      - listitem [ref=e85]:
+        - link "Users" [ref=e86] [cursor=pointer]:
+          - /url: users.php
+          - generic [ref=e87]: 
+          - generic [ref=e88]: Users
+        - list [ref=e89]:
+          - listitem [ref=e90]:
+            - link "All Users" [ref=e91] [cursor=pointer]:
+              - /url: users.php
+          - listitem [ref=e92]:
+            - link "Add User" [ref=e93] [cursor=pointer]:
+              - /url: user-new.php
+          - listitem [ref=e94]:
+            - link "Profile" [ref=e95] [cursor=pointer]:
+              - /url: profile.php
+      - listitem [ref=e96]:
+        - link "Tools" [ref=e97] [cursor=pointer]:
+          - /url: tools.php
+          - generic [ref=e98]: 
+          - generic [ref=e99]: Tools
+        - list [ref=e100]:
+          - listitem [ref=e101]:
+            - link "Available Tools" [ref=e102] [cursor=pointer]:
+              - /url: tools.php
+          - listitem [ref=e103]:
+            - link "Import" [ref=e104] [cursor=pointer]:
+              - /url: import.php
+          - listitem [ref=e105]:
+            - link "Export" [ref=e106] [cursor=pointer]:
+              - /url: export.php
+          - listitem [ref=e107]:
+            - link "Site Health" [ref=e108] [cursor=pointer]:
+              - /url: site-health.php
+          - listitem [ref=e109]:
+            - link "Export Personal Data" [ref=e110] [cursor=pointer]:
+              - /url: export-personal-data.php
+          - listitem [ref=e111]:
+            - link "Erase Personal Data" [ref=e112] [cursor=pointer]:
+              - /url: erase-personal-data.php
+          - listitem [ref=e113]:
+            - link "Plugin Check" [ref=e114] [cursor=pointer]:
+              - /url: tools.php?page=plugin-check
+          - listitem [ref=e115]:
+            - link "Plugin Check Namer" [ref=e116] [cursor=pointer]:
+              - /url: tools.php?page=plugin-check-namer
+          - listitem [ref=e117]:
+            - link "Theme File Editor" [ref=e118] [cursor=pointer]:
+              - /url: theme-editor.php
+          - listitem [ref=e119]:
+            - link "Plugin File Editor" [ref=e120] [cursor=pointer]:
+              - /url: plugin-editor.php
+      - listitem [ref=e121]:
+        - link "Settings" [ref=e122] [cursor=pointer]:
+          - /url: options-general.php
+          - generic [ref=e123]: 
+          - generic [ref=e124]: Settings
+        - list [ref=e125]:
+          - listitem [ref=e126]:
+            - link "General" [ref=e127] [cursor=pointer]:
+              - /url: options-general.php
+          - listitem [ref=e128]:
+            - link "Writing" [ref=e129] [cursor=pointer]:
+              - /url: options-writing.php
+          - listitem [ref=e130]:
+            - link "Reading" [ref=e131] [cursor=pointer]:
+              - /url: options-reading.php
+          - listitem [ref=e132]:
+            - link "Discussion" [ref=e133] [cursor=pointer]:
+              - /url: options-discussion.php
+          - listitem [ref=e134]:
+            - link "Media" [ref=e135] [cursor=pointer]:
+              - /url: options-media.php
+          - listitem [ref=e136]:
+            - link "Permalinks" [ref=e137] [cursor=pointer]:
+              - /url: options-permalink.php
+          - listitem [ref=e138]:
+            - link "Privacy" [ref=e139] [cursor=pointer]:
+              - /url: options-privacy.php
+      - listitem [ref=e140]:
+        - link "CiteWP" [ref=e141] [cursor=pointer]:
+          - /url: admin.php?page=citewp
+          - generic [ref=e142]: 
+          - generic [ref=e143]: CiteWP
+        - list [ref=e144]:
+          - listitem [ref=e145]:
+            - link "Dashboard" [ref=e146] [cursor=pointer]:
+              - /url: admin.php?page=citewp
+          - listitem [ref=e147]:
+            - link "Crawler Logs" [ref=e148] [cursor=pointer]:
+              - /url: admin.php?page=citewp-aiso-crawler-logs
+          - listitem [ref=e149]:
+            - link "Settings" [ref=e150] [cursor=pointer]:
+              - /url: admin.php?page=citewp-aiso-settings
+      - listitem [ref=e151]:
+        - button "Collapse Main menu" [expanded] [ref=e152] [cursor=pointer]:
+          - generic [ref=e154]: Collapse Menu
+  - generic [ref=e155]:
+    - generic [ref=e156]:
+      - navigation "Toolbar":
+        - menu:
+          - group [ref=e157]:
+            - menuitem "About WordPress" [ref=e158] [cursor=pointer]:
+              - generic [ref=e160]: About WordPress
+          - group [ref=e161]:
+            - menuitem "CiteWP-dev" [ref=e162] [cursor=pointer]
+          - group [ref=e163]:
+            - menuitem "0 Comments in moderation" [ref=e164] [cursor=pointer]:
+              - generic [ref=e166]: "0"
+              - generic [ref=e167]: 0 Comments in moderation
+          - group [ref=e168]:
+            - menuitem "New" [ref=e169] [cursor=pointer]:
+              - generic [ref=e171]: New
+        - menu [ref=e172]:
+          - group [ref=e173]:
+            - menuitem "Howdy, Bradleyswpc" [ref=e174] [cursor=pointer]
+    - main [ref=e175]:
+      - generic [ref=e176]:
+        - generic [ref=e177]:
+          - button "Screen Options" [ref=e179] [cursor=pointer]
+          - button "Help" [ref=e181] [cursor=pointer]
+        - generic [ref=e182]:
+          - heading "Dashboard" [level=1] [ref=e183]
+          - generic [ref=e184]:
+            - link "Dismiss the welcome panel" [ref=e185] [cursor=pointer]:
+              - /url: http://citewp-dev.local/wp-admin/?welcome=0
+              - text:  Dismiss
+            - generic [ref=e186]:
+              - generic [ref=e187]:
+                - img [ref=e189]
+                - heading "Welcome to WordPress!" [level=2] [ref=e194]
+                - paragraph [ref=e195]:
+                  - link "Learn more about the 6.9.4 version." [ref=e196] [cursor=pointer]:
+                    - /url: http://citewp-dev.local/wp-admin/about.php
+              - generic [ref=e197]:
+                - generic [ref=e198]:
+                  - img [ref=e199]
+                  - generic [ref=e202]:
+                    - heading "Author rich content with blocks and patterns" [level=3] [ref=e203]
+                    - paragraph [ref=e204]: Block patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.
+                    - link "Add a new page" [ref=e205] [cursor=pointer]:
+                      - /url: http://citewp-dev.local/wp-admin/post-new.php?post_type=page
+                - generic [ref=e206]:
+                  - img [ref=e207]
+                  - generic [ref=e210]:
+                    - heading "Customize your entire site with block themes" [level=3] [ref=e211]
+                    - paragraph [ref=e212]: Design everything on your site — from the header down to the footer, all using blocks and patterns.
+                    - link "Open site editor" [ref=e213] [cursor=pointer]:
+                      - /url: http://citewp-dev.local/wp-admin/site-editor.php
+                - generic [ref=e214]:
+                  - img [ref=e215]
+                  - generic [ref=e218]:
+                    - heading "Switch up your site’s look & feel with Styles" [level=3] [ref=e219]
+                    - paragraph [ref=e220]: Tweak your site, or give it a whole new look! Get creative — how about a new color palette or font?
+                    - link "Edit styles" [ref=e221] [cursor=pointer]:
+                      - /url: http://citewp-dev.local/wp-admin/site-editor.php?path=%2Fwp_global_styles
+          - generic [ref=e223]:
+            - generic [ref=e225]:
+              - generic [ref=e226]:
+                - generic [ref=e227]:
+                  - heading "Elementor Overview" [level=2] [ref=e228]
+                  - generic [ref=e229]:
+                    - button "Move up" [disabled] [ref=e230]:
+                      - generic [ref=e231]: Move up
+                    - button "Move down" [ref=e233] [cursor=pointer]:
+                      - generic [ref=e234]: Move down
+                    - 'button "Toggle panel: Elementor Overview" [expanded] [ref=e236] [cursor=pointer]':
+                      - generic [ref=e237]: "Toggle panel: Elementor Overview"
+                - generic [ref=e240]:
+                  - generic [ref=e241]:
+                    - generic [ref=e244]: 
+                    - generic [ref=e246]: Elementor v4.0.4
+                    - link "Create New Page" [ref=e248] [cursor=pointer]:
+                      - /url: http://citewp-dev.local/wp-admin/edit.php?action=elementor_new_post&post_type=page&_wpnonce=60191a7dad
+                      - generic [ref=e249]: 
+                      - text: Create New Page
+                  - generic [ref=e250]:
+                    - heading "Recently Edited" [level=3] [ref=e251]
+                    - list [ref=e252]:
+                      - listitem [ref=e253]:
+                        - link "Test Post2 " [ref=e254] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/post.php?post=11&action=elementor
+                          - text: Test Post2
+                          - generic [ref=e255]: 
+                        - text: Apr 29th, 6:06 pm
+                      - listitem [ref=e256]:
+                        - 'link "Elementor #13 " [ref=e257] [cursor=pointer]':
+                          - /url: http://citewp-dev.local/wp-admin/post.php?post=13&action=elementor
+                          - text: "Elementor #13"
+                          - generic [ref=e258]: 
+                        - text: Apr 29th, 5:52 pm
+                  - generic [ref=e259]:
+                    - heading "News & Updates" [level=3] [ref=e260]
+                    - list [ref=e261]:
+                      - listitem [ref=e262]:
+                        - 'link "NEW Introducing Angie: Agentic AI for WordPress" [ref=e263] [cursor=pointer]':
+                          - /url: https://elementor.com/blog/introducing-angie-agentic-ai-for-wordpress/?utm_source=wp-overview-widget&utm_medium=wp-dash&utm_campaign=news-feed
+                        - paragraph [ref=e264]: Meet Angie, agentic AI purpose-built for WordPress. Angie understands your site, connects to your tools, and takes real actions on your behalf. Its first capability, Angie Code, lets you describe any WordPress feature you can imagine and have it built for you in minutes. Production-ready, fully integrated with your site, and safe to test before it ever goes live.
+                      - listitem [ref=e265]:
+                        - link "NEW The atomic foundation of version 4 is ready for real sites!" [ref=e266] [cursor=pointer]:
+                          - /url: https://elementor.com/blog/editor-4-beta/?utm_source=wp-overview-widget&utm_medium=wp-dash&utm_campaign=news-feed
+                        - paragraph [ref=e267]: The alpha phase is complete. Version 4 is now in beta, and the atomic foundation is ready to be used on real sites! This is the final step before the official release of version 4.0, activating the new features automatically on new sites, and becoming the default editing experience in Elementor.
+                      - listitem [ref=e268]:
+                        - 'link "NEW Introducing Elementor 3.33: Variables Manager, Custom CSS, Blend Modes, & more!" [ref=e269] [cursor=pointer]':
+                          - /url: https://elementor.com/blog/elementor-333-v4-variables-manager-custom-css/?utm_source=wp-overview-widget&utm_medium=wp-dash&utm_campaign=news-feed
+                        - paragraph [ref=e270]: Elementor 3.33 builds on the foundation of Editor V4, continuing our mission to create a faster, more scalable, and more intuitive design experience for Web Creators. With the addition of the Variables Manager, element-level Custom CSS, Background Clipping, and Blend Modes, designers have more creative precision and consistency than ever.
+                  - list [ref=e272]:
+                    - listitem [ref=e273]:
+                      - link "Blog (opens in a new window)" [ref=e274] [cursor=pointer]:
+                        - /url: https://go.elementor.com/overview-widget-blog/
+                        - text: Blog
+                        - generic [ref=e275]: (opens in a new window)
+                        - generic [ref=e276]: 
+                    - listitem [ref=e277]:
+                      - link "Help (opens in a new window)" [ref=e278] [cursor=pointer]:
+                        - /url: https://go.elementor.com/overview-widget-docs/
+                        - text: Help
+                        - generic [ref=e279]: (opens in a new window)
+                        - generic [ref=e280]: 
+                    - listitem [ref=e281]:
+                      - link "Build Smart with AI (opens in a new window)" [ref=e282] [cursor=pointer]:
+                        - /url: https://go.elementor.com/overview-widget-ai/
+                        - text: Build Smart with AI
+                        - generic [ref=e283]: (opens in a new window)
+                        - generic [ref=e284]: 
+                    - listitem [ref=e285]:
+                      - link "Upgrade (opens in a new window)" [ref=e286] [cursor=pointer]:
+                        - /url: https://go.elementor.com/go-pro-wp-overview-widget/
+                        - text: Upgrade
+                        - generic [ref=e287]: (opens in a new window)
+                        - generic [ref=e288]: 
+              - generic [ref=e289]:
+                - generic [ref=e290]:
+                  - heading "Site Health Status" [level=2] [ref=e291]
+                  - generic [ref=e292]:
+                    - button "Move up" [ref=e293] [cursor=pointer]:
+                      - generic [ref=e294]: Move up
+                    - button "Move down" [ref=e296] [cursor=pointer]:
+                      - generic [ref=e297]: Move down
+                    - 'button "Toggle panel: Site Health Status" [expanded] [ref=e299] [cursor=pointer]':
+                      - generic [ref=e300]: "Toggle panel: Site Health Status"
+                - generic [ref=e303]:
+                  - generic [ref=e304]:
+                    - img [ref=e306]
+                    - generic [ref=e309]: Good
+                  - generic [ref=e310]:
+                    - paragraph [ref=e311]: Your site’s health is looking good, but there are still some things you can do to improve its performance and security.
+                    - paragraph [ref=e312]:
+                      - text: Take a look at the
+                      - strong [ref=e313]: 3 items
+                      - text: on the
+                      - link "Site Health screen" [ref=e314] [cursor=pointer]:
+                        - /url: http://citewp-dev.local/wp-admin/site-health.php
+                      - text: .
+              - generic [ref=e315]:
+                - generic [ref=e316]:
+                  - heading "At a Glance" [level=2] [ref=e317]
+                  - generic [ref=e318]:
+                    - button "Move up" [ref=e319] [cursor=pointer]:
+                      - generic [ref=e320]: Move up
+                    - button "Move down" [ref=e322] [cursor=pointer]:
+                      - generic [ref=e323]: Move down
+                    - 'button "Toggle panel: At a Glance" [expanded] [ref=e325] [cursor=pointer]':
+                      - generic [ref=e326]: "Toggle panel: At a Glance"
+                - generic [ref=e329]:
+                  - list [ref=e330]:
+                    - listitem [ref=e331]:
+                      - link "1 Post" [ref=e332] [cursor=pointer]:
+                        - /url: edit.php?post_type=post
+                    - listitem [ref=e333]:
+                      - link "1 Page" [ref=e334] [cursor=pointer]:
+                        - /url: edit.php?post_type=page
+                    - listitem [ref=e335]:
+                      - link "1 Comment" [ref=e336] [cursor=pointer]:
+                        - /url: edit-comments.php
+                  - paragraph [ref=e337]:
+                    - generic [ref=e338]:
+                      - text: WordPress 6.9.4 running
+                      - link "Twenty Twenty-Five" [ref=e339] [cursor=pointer]:
+                        - /url: themes.php
+                      - text: theme.
+              - generic [ref=e340]:
+                - generic [ref=e341]:
+                  - heading "Activity" [level=2] [ref=e342]
+                  - generic [ref=e343]:
+                    - button "Move up" [ref=e344] [cursor=pointer]:
+                      - generic [ref=e345]: Move up
+                    - button "Move down" [ref=e347] [cursor=pointer]:
+                      - generic [ref=e348]: Move down
+                    - 'button "Toggle panel: Activity" [expanded] [ref=e350] [cursor=pointer]':
+                      - generic [ref=e351]: "Toggle panel: Activity"
+                - generic [ref=e354]:
+                  - generic [ref=e355]:
+                    - heading "Recently Published" [level=3] [ref=e356]
+                    - list [ref=e357]:
+                      - listitem [ref=e358]:
+                        - generic [ref=e359]: Apr 26th, 7:04 pm
+                        - link "Edit “Hello world!”" [ref=e360] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/post.php?post=1&action=edit
+                          - text: Hello world!
+                  - generic [ref=e361]:
+                    - heading "Recent Comments" [level=3] [ref=e362]
+                    - list [ref=e363]:
+                      - listitem [ref=e364]:
+                        - generic [ref=e365]:
+                          - paragraph [ref=e366]:
+                            - text: From
+                            - link "A WordPress Commenter" [ref=e368] [cursor=pointer]:
+                              - /url: https://wordpress.org/
+                            - text: "on"
+                            - link "Hello world!" [ref=e369] [cursor=pointer]:
+                              - /url: http://citewp-dev.local/hello-world/
+                          - blockquote [ref=e370]:
+                            - paragraph [ref=e371]: Hi, this is a comment. To get started with moderating, editing, and deleting comments, please visit the Comments screen in…
+                          - paragraph [ref=e372]:
+                            - button "Unapprove this comment" [ref=e374] [cursor=pointer]: Unapprove
+                            - generic [ref=e375]:
+                              - text: "|"
+                              - button "Reply to this comment" [ref=e376] [cursor=pointer]: Reply
+                            - generic [ref=e377]:
+                              - text: "|"
+                              - link "Edit this comment" [ref=e378] [cursor=pointer]:
+                                - /url: comment.php?action=editcomment&c=1
+                                - text: Edit
+                            - generic [ref=e379]:
+                              - text: "|"
+                              - button "Mark this comment as spam" [ref=e380] [cursor=pointer]: Spam
+                            - generic [ref=e381]:
+                              - text: "|"
+                              - button "Move this comment to the Trash" [ref=e382] [cursor=pointer]: Trash
+                            - generic [ref=e383]:
+                              - text: "|"
+                              - link "View this comment" [ref=e384] [cursor=pointer]:
+                                - /url: http://citewp-dev.local/hello-world/#comment-1
+                                - text: View
+                    - heading "View more comments" [level=3] [ref=e385]
+                    - list [ref=e386]:
+                      - listitem [ref=e387]:
+                        - link "All (1)" [ref=e388] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/edit-comments.php?comment_status=all
+                          - text: All
+                          - generic [ref=e389]: (1)
+                        - text: "|"
+                      - listitem [ref=e390]:
+                        - link "Mine (0)" [ref=e391] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/edit-comments.php?comment_status=mine&user_id=1
+                          - text: Mine
+                          - generic [ref=e392]: (0)
+                        - text: "|"
+                      - listitem [ref=e393]:
+                        - link "Pending (0)" [ref=e394] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/edit-comments.php?comment_status=moderated
+                          - text: Pending
+                          - generic [ref=e395]: (0)
+                        - text: "|"
+                      - listitem [ref=e396]:
+                        - link "Approved (1)" [ref=e397] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/edit-comments.php?comment_status=approved
+                          - text: Approved
+                          - generic [ref=e398]: (1)
+                        - text: "|"
+                      - listitem [ref=e399]:
+                        - link "Spam (0)" [ref=e400] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/edit-comments.php?comment_status=spam
+                          - text: Spam
+                          - generic [ref=e401]: (0)
+                        - text: "|"
+                      - listitem [ref=e402]:
+                        - link "Trash (0)" [ref=e403] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/edit-comments.php?comment_status=trash
+                          - text: Trash
+                          - generic [ref=e404]: (0)
+              - generic [ref=e405]:
+                - generic [ref=e406]:
+                  - heading "CiteWP — GEO Overview" [level=2] [ref=e407]
+                  - generic [ref=e408]:
+                    - button "Move up" [ref=e409] [cursor=pointer]:
+                      - generic [ref=e410]: Move up
+                    - button "Move down" [ref=e412] [cursor=pointer]:
+                      - generic [ref=e413]: Move down
+                    - 'button "Toggle panel: CiteWP — GEO Overview" [expanded] [ref=e415] [cursor=pointer]':
+                      - generic [ref=e416]: "Toggle panel: CiteWP — GEO Overview"
+                - generic [ref=e419]:
+                  - generic [ref=e420]:
+                    - generic [ref=e421]:
+                      - generic [ref=e422]: Avg GEO Score
+                      - generic [ref=e423]: "16"
+                      - generic [ref=e424]: across scored posts
+                    - generic [ref=e425]:
+                      - generic [ref=e426]: Bot Visits (7d)
+                      - generic [ref=e427]: "3"
+                      - generic [ref=e428]: vs. prior 7 days
+                  - generic [ref=e429]:
+                    - heading "Most Crawled Pages (Last 7 Days)" [level=4] [ref=e430]
+                    - list [ref=e431]:
+                      - listitem [ref=e432]:
+                        - generic [ref=e433]: "3"
+                        - generic / [ref=e434]
+                    - link "View all crawler logs →" [ref=e435] [cursor=pointer]:
+                      - /url: http://citewp-dev.local/wp-admin/admin.php?page=citewp-aiso-crawler-logs
+                  - generic [ref=e436]:
+                    - heading "Lowest GEO Scores — Needs Attention" [level=4] [ref=e437]
+                    - list [ref=e438]:
+                      - listitem [ref=e439]:
+                        - generic [ref=e440]: "16"
+                        - link "Hello world!" [ref=e441] [cursor=pointer]:
+                          - /url: http://citewp-dev.local/wp-admin/post.php?post=1&action=edit
+                    - link "See all post scores →" [ref=e442] [cursor=pointer]:
+                      - /url: http://citewp-dev.local/wp-admin/edit.php?orderby=citewp_aiso_geo_score&order=asc
+            - generic [ref=e444]:
+              - generic [ref=e445]:
+                - generic [ref=e446]:
+                  - heading "Quick Draft" [level=2] [ref=e447]:
+                    - generic [ref=e448]: Quick Draft
+                  - generic [ref=e449]:
+                    - button "Move up" [ref=e450] [cursor=pointer]:
+                      - generic [ref=e451]: Move up
+                    - button "Move down" [ref=e453] [cursor=pointer]:
+                      - generic [ref=e454]: Move down
+                    - 'button "Toggle panel: Quick Draft" [expanded] [ref=e456] [cursor=pointer]':
+                      - generic [ref=e457]:
+                        - text: "Toggle panel:"
+                        - generic [ref=e458]: Quick Draft
+                - generic [ref=e460]:
+                  - generic [ref=e461]:
+                    - generic [ref=e462]:
+                      - generic [ref=e463]: Title
+                      - textbox "Title" [ref=e464]
+                    - generic [ref=e465]:
+                      - generic [ref=e466]: Content
+                      - textbox "Content" [ref=e467]:
+                        - /placeholder: What’s on your mind?
+                    - paragraph [ref=e468]:
+                      - button "Save Draft" [ref=e469] [cursor=pointer]
+                  - generic [ref=e470]:
+                    - heading "Your Recent Drafts" [level=2] [ref=e471]
+                    - list [ref=e472]:
+                      - listitem [ref=e473]:
+                        - generic [ref=e474]:
+                          - link "Edit “Test Post2”" [ref=e475] [cursor=pointer]:
+                            - /url: http://citewp-dev.local/wp-admin/post.php?post=11&action=edit
+                            - text: Test Post2
+                          - time [ref=e476]: April 29, 2026
+                      - listitem [ref=e477]:
+                        - generic [ref=e478]:
+                          - link "Edit “Test Post”" [ref=e479] [cursor=pointer]:
+                            - /url: http://citewp-dev.local/wp-admin/post.php?post=9&action=edit
+                            - text: Test Post
+                          - time [ref=e480]: April 29, 2026
+              - generic [ref=e481]:
+                - generic [ref=e482]:
+                  - heading "WordPress Events and News" [level=2] [ref=e483]
+                  - generic [ref=e484]:
+                    - button "Move up" [ref=e485] [cursor=pointer]:
+                      - generic [ref=e486]: Move up
+                    - button "Move down" [ref=e488] [cursor=pointer]:
+                      - generic [ref=e489]: Move down
+                    - 'button "Toggle panel: WordPress Events and News" [expanded] [ref=e491] [cursor=pointer]':
+                      - generic [ref=e492]: "Toggle panel: WordPress Events and News"
+                - generic [ref=e494]:
+                  - text: 
+                  - generic [ref=e495]:
+                    - list [ref=e497]:
+                      - listitem [ref=e498]:
+                        - link "WordPress Student Clubs Build Momentum" [ref=e499] [cursor=pointer]:
+                          - /url: https://wordpress.org/news/2026/04/student-clubs-build-momentum/
+                      - listitem [ref=e500]:
+                        - link "Celebrating Community at WordCamp Asia 2026" [ref=e501] [cursor=pointer]:
+                          - /url: https://wordpress.org/news/2026/04/celebrating-wcasia-2026/
+                    - list [ref=e503]:
+                      - listitem [ref=e504]:
+                        - 'link "WPTavern: #214 – Robby McCullough on Beaver Builder, AI Hype, and Evolving WordPress Workflows" [ref=e505] [cursor=pointer]':
+                          - /url: https://wptavern.com/podcast/214-robby-mccullough-on-beaver-builder-ai-hype-and-evolving-wordpress-workflows
+                      - listitem [ref=e506]:
+                        - 'link "WordPress.org blog: WordPress Student Clubs Build Momentum" [ref=e507] [cursor=pointer]':
+                          - /url: https://wordpress.org/news/2026/04/student-clubs-build-momentum/
+                      - listitem [ref=e508]:
+                        - 'link "HeroPress: The Hero of HeroPress and quiet art of walking with people" [ref=e509] [cursor=pointer]':
+                          - /url: https://heropress.com/essays/the-hero-of-heropress-and-quiet-art-of-walking-with-people/#utm_source=rss&utm_medium=rss&utm_campaign=the-hero-of-heropress-and-quiet-art-of-walking-with-people
+                  - paragraph [ref=e510]:
+                    - link "Meetups (opens in a new tab)" [ref=e511] [cursor=pointer]:
+                      - /url: https://make.wordpress.org/community/meetups-landing-page
+                      - text: Meetups
+                      - generic [ref=e512]: (opens in a new tab)
+                      - generic [ref=e513]: 
+                    - text: "|"
+                    - link "WordCamps (opens in a new tab)" [ref=e514] [cursor=pointer]:
+                      - /url: https://central.wordcamp.org/schedule/
+                      - text: WordCamps
+                      - generic [ref=e515]: (opens in a new tab)
+                      - generic [ref=e516]: 
+                    - text: "|"
+                    - link "News (opens in a new tab)" [ref=e517] [cursor=pointer]:
+                      - /url: https://wordpress.org/news/
+                      - text: News
+                      - generic [ref=e518]: (opens in a new tab)
+                      - generic [ref=e519]: 
+            - generic [ref=e522]:
+              - generic [ref=e523]:
+                - heading "Accessibility" [level=2] [ref=e524]:
+                  - img [ref=e525]
+                  - text: Accessibility
+                - generic [ref=e527]:
+                  - button "Move up" [ref=e528] [cursor=pointer]:
+                    - generic [ref=e529]: Move up
+                  - button "Move down" [ref=e531] [cursor=pointer]:
+                    - generic [ref=e532]: Move down
+                  - 'button "Toggle panel: Accessibility" [expanded] [ref=e534] [cursor=pointer]':
+                    - generic [ref=e535]:
+                      - text: "Toggle panel:"
+                      - img [ref=e536]
+                      - text: Accessibility
+              - generic [ref=e540]:
+                - img [ref=e542]
+                - generic [ref=e545]:
+                  - heading "Accessibility check recommended" [level=4] [ref=e546]
+                  - paragraph [ref=e547]: Most sites have accessibility gaps. Run a free scan to see how yours performs.
+                  - link "Run free scan" [ref=e548] [cursor=pointer]:
+                    - /url: https://go.elementor.com/acc-checker-dashboard-plg?url=http://citewp-dev.local
+  - contentinfo [ref=e549]:
+    - paragraph [ref=e550]:
+      - generic [ref=e551]:
+        - text: Thank you for creating with
+        - link "WordPress" [ref=e552] [cursor=pointer]:
+          - /url: https://wordpress.org/
+        - text: .
+    - paragraph [ref=e553]: Version 6.9.4

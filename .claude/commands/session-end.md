@@ -64,7 +64,44 @@ Two updates:
 
 Do not rewrite sections that didn't change.
 
-## Step 7 - Commit and push
+## Step 7 - Verify cross-reference integrity AND outcome accuracy (X16)
+
+Before committing, run two checks. This is mandatory per X16 — it catches phantom decision references and outcome drift before they propagate into future sessions.
+
+### 7a - Cross-reference integrity check
+
+For every P-number, X-number, A-number, R-number, S-number you ADDED or REFERENCED in this session's edits to DECISIONS.md, FEATURE-BACKLOG.md, master file, or SESSION-LOG.md, verify the actual decision row exists in DECISIONS.md.
+
+Quick grep pattern (run from `Desktop\CiteWP\Brain\`):
+
+```
+PowerShell open at:
+  C:\Users\KingpinBWP\Desktop\CiteWP\Brain
+
+# List every P/X/A/R/S reference across canonical files
+Select-String -Path "*.md","..\Local Sites\citewp-dev\app\public\wp-content\plugins\ai-search-optimizer\SESSION-LOG.md" -Pattern "\b[PXARS]\d+\b" | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value | Sort-Object -Unique
+```
+
+For each reference:
+- If the row exists in DECISIONS.md → pass
+- If the row does NOT exist → either (a) write the row now, or (b) remove the reference from the file that contains it
+
+Phantom references — where future-tense decision drafts ("rejected separately as P25") get committed to other files before the actual row is written — are forbidden. Either the row exists or the reference doesn't.
+
+### 7b - Outcome accuracy check
+
+Review every outcome statement added to master file `Current state` line and SESSION-LOG.md outcomes during this session. For each:
+
+- "Approved" / "Live" / "Shipped" / "Deployed" / "Submitted" claims — verify external evidence:
+  - "Approved" only if you have the approval email in hand
+  - "Live on WP.org" only if SVN commit verified (not just GitHub push)
+  - "Shipped" only if the deliverable is actually merged to `main` and pushed
+  - "Submitted" only if the WP.org submission page or equivalent confirms it
+- If the claim was anticipatory ("about to submit", "will be live"), correct it to reflect actual state at session close
+
+Two real failures motivated this rule (see X16 in DECISIONS.md). Skipping this check is the failure mode.
+
+## Step 8 - Commit and push
 
 From the plugin folder. Use a `feat:` / `fix:` / `refactor:` / `docs:` / `chore:` prefix.
 
@@ -79,6 +116,6 @@ git push
 
 Per X4 - push after every meaningful step in multi-step work, not just at session end.
 
-## Step 8 - State carryover explicitly
+## Step 9 - State carryover explicitly
 
 End your final message with a "Carryover into next session" block. No silent carryover. If there is none, say "No carryover."

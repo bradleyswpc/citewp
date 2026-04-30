@@ -8,7 +8,26 @@
       "Bash(grep -v \"CiteWP\\\\\\\\\\\\\\\\Aiso\")",
       "Bash(grep -rn \"\\\\\\\\\\\\\\\\CiteWP\\\\\\\\\\\\\\\\[A-Z]\" --include=\"*.php\" --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)",
       "Bash(grep -rn \"@package CiteWP$\" --include=\"*.php\" --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "Bash(curl -s \"http://citewp-dev.local/wp-json/citewp/aiso/v1/schema/1\" -H \"Accept: application/json\")",
+      "Bash(npm run *)",
+      "PowerShell(robocopy \"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\app\\\\public\\\\wp-content\\\\plugins\\\\ai-search-optimizer\" \"C:\\\\Users\\\\KingpinBWP\\\\Desktop\\\\ai-search-optimizer-BACKUP\" /MIR /XD node_modules build .git /NFL /NDL /NJH /NJS; Write-Host \"Robocopy exit code: $LASTEXITCODE\")",
+      "Bash(\"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\components\\\\php\\\\8.2.30\\\\php.exe\" -l includes/Admin/ScoreMetaBox.php)",
+      "PowerShell(& \"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\components\\\\php\\\\8.2.30\\\\php.exe\" -l \"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\app\\\\public\\\\wp-content\\\\plugins\\\\ai-search-optimizer\\\\includes\\\\Admin\\\\ScoreMetaBox.php\")",
+      "PowerShell(& \"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\components\\\\php\\\\8.2.30\\\\php.exe\" -l \"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\app\\\\public\\\\wp-content\\\\plugins\\\\ai-search-optimizer\\\\includes\\\\Admin\\\\SchemaMetaBox.php\")",
+      "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+      "PowerShell(robocopy \"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\app\\\\public\\\\wp-content\\\\plugins\\\\ai-search-optimizer\" \"C:\\\\Users\\\\KingpinBWP\\\\Desktop\\\\ai-search-optimizer-BACKUP\" /MIR /XD node_modules build .git /NFL /NDL /NJH /NJS)",
+      "PowerShell(robocopy \"C:\\\\Users\\\\KingpinBWP\\\\Local Sites\\\\citewp-dev\\\\app\\\\public\\\\wp-content\\\\plugins\\\\ai-search-optimizer\" \"C:\\\\Users\\\\KingpinBWP\\\\Desktop\\\\ai-search-optimizer-BACKUP\" /MIR /XD node_modules build .git /NFL /NDL /NJH /NJS; exit 0)",
+      "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri 'https://citewp.com' -UseBasicParsing -TimeoutSec 10 -MaximumRedirection 5; \"Status: $\\($r.StatusCode\\) $\\($r.StatusDescription\\)\" } catch { \"FAILED: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(New-Item *)",
+      "Bash(php *)",
+      "mcp__plugin_playwright_playwright__browser_fill_form",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "Bash(grep -E \"^\\(P1[0-9]|P2[0-9]|X1[0-9]|X[0-9]$\\)\")"
     ]
   }
 }
