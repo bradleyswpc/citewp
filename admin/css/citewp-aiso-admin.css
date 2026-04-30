@@ -574,3 +574,148 @@
     padding-top: var(--citewp-space-3);
     border-top: 1px solid #c3c4c7;
 }
+
+/* =========================================================================
+   Left Rail Page Layout — Session 13 (P27 / P28 / P29)
+   ========================================================================= */
+
+/* Outer flex container: left rail + main content */
+.citewp-aiso-page {
+    display: flex;
+    gap: var(--citewp-space-4);
+    margin-top: var(--citewp-space-4);
+    align-items: flex-start;
+}
+
+/* Left navigation rail */
+.citewp-aiso-rail {
+    flex: 0 0 192px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.citewp-aiso-rail__item {
+    display: flex;
+    align-items: center;
+    gap: var(--citewp-space-2);
+    padding: 10px var(--citewp-space-3);
+    font-size: var(--citewp-font-sm);
+    font-weight: 400;
+    color: #50575e;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid #f0f0f1;
+    transition: color 0.1s ease, background 0.1s ease;
+}
+
+.citewp-aiso-rail__item:last-child {
+    border-bottom: none;
+}
+
+.citewp-aiso-rail__item:hover,
+.citewp-aiso-rail__item:focus {
+    color: #1d2327;
+    background: #f6f7f7;
+    text-decoration: none;
+}
+
+.citewp-aiso-rail__item--active {
+    border-left-color: var(--citewp-citrine);
+    background: #fffde6;
+    color: var(--citewp-obsidian);
+    font-weight: 600;
+}
+
+.citewp-aiso-rail__item--external {
+    color: #787c82;
+    font-size: var(--citewp-font-xs);
+    margin-top: var(--citewp-space-2);
+}
+
+.citewp-aiso-rail__item .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: inherit;
+}
+
+/* Main content area */
+.citewp-aiso-main {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Section panels — hidden by default, shown when --active */
+.citewp-aiso-panel {
+    display: none;
+}
+
+.citewp-aiso-panel--active {
+    display: block;
+}
+
+/* Panel title (h2 inside each panel) */
+.citewp-aiso-panel__title {
+    font-size: var(--citewp-font-xl);
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0 0 var(--citewp-space-4);
+    padding: 0;
+}
+
+/* =========================================================================
+   Single-Column Dashboard Stat Row — P27
+   ========================================================================= */
+
+.citewp-aiso-stat-row {
+    display: flex;
+    gap: var(--citewp-space-5);
+    align-items: center;
+    padding-bottom: var(--citewp-space-4);
+    margin-bottom: var(--citewp-space-4);
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.citewp-aiso-stat-row__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--citewp-space-1);
+}
+
+.citewp-aiso-stat-row__value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 400;
+    color: #1d2327;
+    line-height: 1;
+}
+
+.citewp-aiso-stat-row__value--empty {
+    color: #c3c4c7;
+}
+
+.citewp-aiso-stat-row__label {
+    font-size: var(--citewp-font-xs);
+    color: #787c82;
+}
+
+/* Gauge when used inside stat row (smaller viewBox, no extra margin) */
+.citewp-aiso-stat-row__item .citewp-aiso-gauge {
+    display: block;
+    margin: 0;
+}
+
+/* Responsive: stack rail below content at narrow widths */
+@media screen and (max-width: 782px) {
+    .citewp-aiso-page {
+        flex-direction: column;
+    }
+    .citewp-aiso-rail {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+}
