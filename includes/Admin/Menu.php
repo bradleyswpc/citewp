@@ -66,28 +66,28 @@ final class Menu {
 		$defaults = [
 			'dashboard' => [
 				'label'  => __( 'Dashboard', 'ai-search-optimizer' ),
-				'desc'   => __( 'Overview and metrics', 'ai-search-optimizer' ),
+				'desc'   => __( 'Cite Score, bot visits, what to fix', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-chart-line',
 				'slug'   => 'dashboard',
 				'render' => [ $this, 'render_dashboard_panel' ],
 			],
 			'crawler-logs' => [
 				'label'  => __( 'Crawler Logs', 'ai-search-optimizer' ),
-				'desc'   => __( 'AI bot visit history', 'ai-search-optimizer' ),
+				'desc'   => __( 'Who crawled, when, from where', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-list-view',
 				'slug'   => 'crawler-logs',
 				'render' => $logs_module ? [ $logs_module, 'render' ] : null,
 			],
 			'settings' => [
 				'label'  => __( 'Settings', 'ai-search-optimizer' ),
-				'desc'   => __( 'Configure detection and llms.txt', 'ai-search-optimizer' ),
+				'desc'   => __( 'Detection, llms.txt, defaults', 'ai-search-optimizer' ),
 				'icon'   => 'dashicons-admin-settings',
 				'slug'   => 'settings',
 				'render' => $settings_module ? [ $settings_module, 'render' ] : null,
 			],
 			'pro' => [
 				'label'    => __( 'Pro', 'ai-search-optimizer' ),
-				'desc'     => __( 'Citation tracking and analytics', 'ai-search-optimizer' ),
+				'desc'     => __( 'Track citations across AI engines', 'ai-search-optimizer' ),
 				'icon'     => 'dashicons-external',
 				'slug'     => 'pro',
 				'external' => true,
@@ -130,7 +130,10 @@ final class Menu {
 		<div class="wrap">
 
 			<div class="citewp-aiso-header">
-				<span class="citewp-aiso-header__wordmark">[CiteWP]</span>
+				<div class="citewp-aiso-header__brand">
+					<span class="citewp-aiso-header__wordmark"><span class="citewp-aiso-header__bracket">[</span>CiteWP<span class="citewp-aiso-header__bracket">]</span></span>
+					<span class="citewp-aiso-header__tagline"><?php esc_html_e( 'AI Search Optimizer', 'ai-search-optimizer' ); ?></span>
+				</div>
 			</div>
 
 			<div class="citewp-aiso-page">

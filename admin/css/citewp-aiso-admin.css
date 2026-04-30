@@ -42,7 +42,7 @@
 
 .citewp-aiso-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     background: #fff;
     border: 1px solid #c3c4c7;
@@ -51,12 +51,31 @@
     margin-bottom: var(--citewp-space-3);
 }
 
+.citewp-aiso-header__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .citewp-aiso-header__wordmark {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: var(--citewp-font-xl);
     font-weight: 800;
     color: var(--citewp-obsidian);
     letter-spacing: -0.5px;
+    line-height: 1;
+}
+
+.citewp-aiso-header__bracket {
+    color: var(--citewp-citrine);
+}
+
+.citewp-aiso-header__tagline {
+    font-family: 'Fraunces', 'Plus Jakarta Sans', sans-serif;
+    font-size: var(--citewp-font-sm);
+    font-weight: 800;
+    font-style: italic;
+    color: #787c82;
     line-height: 1;
 }
 
@@ -622,7 +641,6 @@
 
 .citewp-aiso-rail__item--active {
     border-left-color: var(--citewp-citrine);
-    background: #fffde6;
     color: var(--citewp-obsidian);
     font-weight: 600;
 }
