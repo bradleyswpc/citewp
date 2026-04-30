@@ -603,18 +603,21 @@
 /* Outer flex container: left rail + main content */
 .citewp-aiso-page {
     display: flex;
-    gap: var(--citewp-space-4);
-    margin-top: var(--citewp-space-4);
-    align-items: flex-start;
-}
-
-/* Left navigation rail */
-.citewp-aiso-rail {
-    flex: 0 0 192px;
+    gap: 0;
+    margin-top: var(--citewp-space-3);
+    align-items: stretch;
     background: #fff;
     border: 1px solid #c3c4c7;
     border-radius: 4px;
     overflow: hidden;
+}
+
+/* Left navigation rail */
+.citewp-aiso-rail {
+    flex: 0 0 220px;
+    background: #fafafa;
+    border-right: 1px solid #c3c4c7;
+    padding: var(--citewp-space-3) 0;
 }
 
 .citewp-aiso-rail__item {
@@ -693,6 +696,7 @@
 .citewp-aiso-main {
     flex: 1;
     min-width: 0;
+    padding: var(--citewp-space-3) var(--citewp-space-4);
 }
 
 /* Section panels — hidden by default, shown when --active */
@@ -781,5 +785,8 @@
     .citewp-aiso-rail {
         flex: 0 0 auto;
         width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #c3c4c7;
+        padding: var(--citewp-space-2) 0;
     }
 }
