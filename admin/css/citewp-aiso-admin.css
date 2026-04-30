@@ -42,7 +42,7 @@
 
 .citewp-aiso-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     background: #fff;
     border: 1px solid #c3c4c7;
@@ -51,10 +51,10 @@
     margin-bottom: var(--citewp-space-3);
 }
 
-.citewp-aiso-header__brand {
+.citewp-aiso-header__lockup {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: baseline;
+    gap: var(--citewp-space-3);
 }
 
 .citewp-aiso-header__wordmark {
@@ -71,12 +71,13 @@
 }
 
 .citewp-aiso-header__tagline {
-    font-family: 'Fraunces', 'Plus Jakarta Sans', sans-serif;
-    font-size: var(--citewp-font-sm);
+    font-family: 'Fraunces', 'Plus Jakarta Sans', Georgia, serif;
     font-weight: 800;
     font-style: italic;
-    color: #787c82;
+    font-size: 14px;
+    color: #50575e;
     line-height: 1;
+    letter-spacing: 0;
 }
 
 .citewp-aiso-nav {
