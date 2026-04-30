@@ -371,7 +371,7 @@ final class Menu {
 			<!-- Quick Actions -->
 			<div class="citewp-aiso-quick-actions">
 				<a href="<?php echo esc_url( $logs_url ); ?>" class="button"><?php esc_html_e( 'View Crawler Logs', 'ai-search-optimizer' ); ?></a>
-				<a href="<?php echo esc_url( admin_url( 'admin-post.php?action=citewp_aiso_regenerate_llms&_wpnonce=' . wp_create_nonce( 'citewp_aiso_regenerate_llms' ) ) ); ?>" class="button"><?php esc_html_e( 'Regenerate llms.txt', 'ai-search-optimizer' ); ?></a>
+				<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-post.php?action=citewp_aiso_regenerate_llms' ), 'citewp_aiso_regenerate_llms' ) ); ?>" class="button"><?php esc_html_e( 'Regenerate llms.txt', 'ai-search-optimizer' ); ?></a>
 			</div>
 
 			<!-- Extra cards from filter (Pro / extensions) -->
