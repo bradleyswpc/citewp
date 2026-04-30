@@ -10,7 +10,6 @@ declare( strict_types=1 );
 namespace CiteWP\Aiso\Admin;
 
 use CiteWP\Aiso\Database\Schema;
-use CiteWP\Aiso\Admin\PageHeader;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -31,7 +30,7 @@ final class LogsPage {
 			return;
 		}
 		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only GET param to identify admin page; no data modification.
-		if ( $page !== Menu::SLUG_LOGS ) {
+		if ( $page !== Menu::SLUG_PARENT ) {
 			return;
 		}
 
@@ -77,11 +76,7 @@ final class LogsPage {
 			$this->table->prepare_items();
 		}
 		?>
-		<div class="wrap">
-
-			<?php PageHeader::render_nav( Menu::SLUG_LOGS ); ?>
-
-			<div class="citewp-aiso-page-body">
+		<div class="citewp-aiso-page-body">
 
 			<div class="citewp-aiso-stats-banner">
 				<div class="citewp-aiso-stat">
@@ -111,12 +106,12 @@ final class LogsPage {
 				</div>
 			<?php elseif ( $this->table ) : ?>
 				<form method="get">
-					<input type="hidden" name="page" value="<?php echo esc_attr( Menu::SLUG_LOGS ); ?>" />
+					<input type="hidden" name="page" value="<?php echo esc_attr( Menu::SLUG_PARENT ); ?>" />
+					<input type="hidden" name="citewp_section" value="crawler-logs" />
 					<?php $this->table->display(); ?>
 				</form>
 			<?php endif; ?>
-			</div><!-- .citewp-aiso-page-body -->
-		</div><!-- .wrap -->
+		</div><!-- .citewp-aiso-page-body -->
 		<?php
 	}
 
