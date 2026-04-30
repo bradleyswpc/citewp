@@ -10,7 +10,6 @@ declare( strict_types=1 );
 namespace CiteWP\Aiso\Settings;
 
 use CiteWP\Aiso\Admin\Menu;
-use CiteWP\Aiso\Admin\PageHeader;
 use CiteWP\Aiso\Llms\Cache;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,20 +21,8 @@ final class Page {
 	public const OPTION_CORE = 'citewp_aiso_settings';
 
 	public function register(): void {
-		add_action( 'admin_menu', [ $this, 'add_submenu' ], 20 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_post_citewp_aiso_regenerate_llms', [ $this, 'handle_regenerate' ] );
-	}
-
-	public function add_submenu(): void {
-		add_submenu_page(
-			Menu::SLUG_PARENT,
-			__( 'CiteWP Settings', 'ai-search-optimizer' ),
-			__( 'Settings', 'ai-search-optimizer' ),
-			'manage_options',
-			self::SLUG,
-			[ $this, 'render' ]
-		);
 	}
 
 	public function register_settings(): void {
@@ -111,7 +98,7 @@ final class Page {
 
 		wp_safe_redirect(
 			add_query_arg(
-				[ 'page' => self::SLUG, 'regenerated' => '1' ],
+				[ 'page' => Menu::SLUG_PARENT, 'regenerated' => '1', 'citewp_section' => 'settings' ],
 				admin_url( 'admin.php' )
 			)
 		);
@@ -149,11 +136,7 @@ final class Page {
 
 		$default_tab = array_key_first( $tabs ) ?? 'general';
 		?>
-		<div class="wrap">
-
-			<?php PageHeader::render_nav( self::SLUG ); ?>
-
-			<?php if ( sanitize_key( wp_unslash( $_GET['regenerated'] ?? '' ) ) === '1' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
+		<?php if ( sanitize_key( wp_unslash( $_GET['regenerated'] ?? '' ) ) === '1' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'llms.txt cache cleared. The next request will regenerate from scratch.', 'ai-search-optimizer' ); ?></p></div>
 			<?php endif; ?>
 
@@ -389,12 +372,11 @@ final class Page {
 
 			</div><!-- .citewp-aiso-tabs -->
 
-		</div><!-- .wrap -->
-
 		<script>
 		(function () {
 			var tabs   = document.querySelectorAll( '.citewp-aiso-tabs__btn' );
 			var panels = document.querySelectorAll( '.citewp-aiso-tabs__panel' );
+			var LS_KEY = 'citewp_aiso_settings_tab';
 
 			function activate( slug ) {
 				tabs.forEach( function ( btn ) {
@@ -408,19 +390,21 @@ final class Page {
 				} );
 			}
 
-			// Restore from URL hash.
-			var hash    = location.hash.replace( '#', '' );
-			var initial = hash && document.getElementById( 'citewp-aiso-tab-' + hash ) ? hash : <?php echo wp_json_encode( (string) $default_tab ); ?>;
+			// Restore from localStorage, fall back to first tab.
+			var stored  = localStorage.getItem( LS_KEY );
+			var initial = stored && document.getElementById( 'citewp-aiso-tab-' + stored )
+				? stored
+				: <?php echo wp_json_encode( (string) $default_tab ); ?>;
 			activate( initial );
 
 			tabs.forEach( function ( btn ) {
 				btn.addEventListener( 'click', function () {
 					var slug = btn.dataset.tab;
-					history.replaceState( null, '', '#' + slug );
+					localStorage.setItem( LS_KEY, slug );
 					activate( slug );
 				} );
 			} );
-		}());
+		}() );
 		</script>
 		<?php
 	}
