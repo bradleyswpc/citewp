@@ -33,18 +33,32 @@
 3. `citewp_aiso/metabox/tabs` — score + schema meta box tabs
 4. `citewp_aiso/dashboard/cards` — dashboard summary cards
 
-**Decisions made:** None new. Existing P19/P26/X15 drove all choices.
+**Decisions made (code session):** None new. Existing P19/P26/X15 drove all choices.
+
+**Post-session Brain updates (Desktop, 2026-04-29):**
+- P25 logged: plugin admin vs SaaS dashboard architectural separation (was phantom reference — resolved).
+- P26 logged: P16 amended to polish-by-surface; UI-DESIGN-SYSTEM.md is the per-surface spec authority.
+- P27 logged: single-column content areas for Phase 1.5 admin pages; card grid on Dashboard dropped.
+- P28 logged: left rail nav inside the plugin page; WP submenus removed; Session 13 scoped as layout refactor.
+- P29 logged: Session 13 implementation specifics — single `add_menu_page` (no submenus), URL hash dispatch (`admin.php?page=citewp#dashboard`), JS `hashchange` handler, all sections in DOM with `display:none` toggled client-side. Server-side separate slug dispatch (Rank Math pattern) explicitly rejected.
+- X16 logged: end-of-session cross-reference + outcome accuracy verification rule.
+- X17 logged: FEATURE-BACKLOG.md candidates use `FB` prefix (FB28–FB35); DECISIONS.md keeps `P/X/A/R/S` — distinct namespaces enforced permanently.
+- UI-DESIGN-SYSTEM.md updated: surface-by-surface palette + left rail layout pattern. Spec current.
+- Phase 1.5 sequence updated in master file: Session 13 = layout refactor, Session 14 = readme.txt + WP.org assets, Session 15+ = anti-cloaking.
+
+**Note on cross-references:** Any entry above this that says "P28–P35 candidates" refers to what are now FB28–FB35. Per X17, preserved as-written historical artifacts — not retroactively edited.
 
 **Forward design note (pre-Pro):** `citewp_aiso/metabox/tabs` fires from both `ScoreMetaBox` and `SchemaMetaBox` with the same key and no context argument. Before Pro ships, add a `$context` string argument (`'score'` / `'schema'`) so Pro can target each independently.
 
 **npm build:** ✅ clean. **PHP lint:** ✅ all 8 new/modified files clean. **Browser verification:** ✅ all three admin pages, WP Dashboard widget, tab switching + hash URLs, toggles, CSV export, gauge rendering.
 
 **Carryover into Session 13:**
-- P25 (plugin admin vs SaaS dashboard architectural separation) still needs a DECISIONS.md Product table entry — carried from Sessions 11–12.
-- UI-DESIGN-SYSTEM.md Color System section needs a "Surface-by-surface palette" subsection documenting which tokens apply where (handle in Desktop, Brain file edit).
-- `citewp_aiso/metabox/tabs` shared filter key: add `$context` argument before Pro ships (tracked as forward design note above).
+- Layout refactor per P28 + P29: single `add_menu_page` (remove `add_submenu_page` for Logs + Settings), URL hash dispatch (`admin.php?page=citewp#dashboard` / `#settings` / `#crawler-logs`), JS `hashchange` handler, all section panels in DOM. `citewp_aiso/admin/nav` filter is the registration point for left rail items.
+- Layout refactor per P27: drop 3-col Dashboard card grid; rebuild as single-column content area.
+- UI-DESIGN-SYSTEM.md left rail spec is current — read it before writing the plan.
+- `citewp_aiso/metabox/tabs` filter needs a `$context` arg before Pro ships.
 
-**Next session focus:** Session 13 — Per P24/v0.7.0 checklist: `readme.txt` polish (feature bullets, FAQ, changelog) + WP.org asset preparation (screenshots, banner, icon). Or next backlog item per user direction.
+**Next session focus:** Session 13 — Layout refactor per P27 + P28 + P29. Single `add_menu_page`, URL hash dispatch, JS hashchange handler, single-column content areas. Readme.txt + WP.org assets deferred to Session 14 per P28.
 
 ---
 
