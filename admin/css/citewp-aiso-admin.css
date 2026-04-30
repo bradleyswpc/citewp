@@ -38,6 +38,15 @@
     --citewp-font-xs:      12px;
 }
 
+/* Session 14 — P34 Teal accent + P35 rail surface tokens */
+:root {
+    --citewp-teal:        #006D70;
+    --citewp-teal-tint:   rgba(0,109,112,0.12);
+    --citewp-gray-50:     #F1EFE8;
+    --citewp-gray-600:    #5F5E5A;
+    --citewp-rail-edge:   rgba(0,0,0,0.08);
+}
+
 /* Page Header + Top Nav ----------------------------------------------------- */
 
 .citewp-aiso-header {
