@@ -1,807 +1,1042 @@
-/* ==========================================================================
-   CiteWP AI Search Optimizer — Admin UI
-   Loaded only on toplevel_page_citewp and citewp_page_* screens.
-   ========================================================================== */
+/* ============================================================
+   CiteWP AI Search Optimizer — Admin CSS v3
+   P38 brand system: Citrine on Navy
+   ============================================================ */
 
-/* @font-face — self-hosted from admin/fonts/ -------------------------------- */
-
-@font-face {
-    font-family: 'Plus Jakarta Sans';
-    src: url('../fonts/plus-jakarta-sans-800.woff2') format('woff2');
-    font-weight: 800;
-    font-style: normal;
-    font-display: swap;
-}
+/* === SECTION 1: @font-face === */
 
 @font-face {
-    font-family: 'JetBrains Mono';
-    src: url('../fonts/jetbrains-mono-400.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/inter-400.woff2') format('woff2');
 }
 
-/* Design Tokens ------------------------------------------------------------- */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/inter-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/inter-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/inter-800.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/jetbrains-mono-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/jetbrains-mono-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/jetbrains-mono-700.woff2') format('woff2');
+}
+
+/* === SECTION 2: :root tokens (P38) === */
 
 :root {
-    --citewp-citrine:      #E8D400;
-    --citewp-citrine-text: #8A7800;
-    --citewp-obsidian:     #0C0C0D;
-    --citewp-space-1:      4px;
-    --citewp-space-2:      8px;
-    --citewp-space-3:      16px;
-    --citewp-space-4:      24px;
-    --citewp-space-5:      32px;
-    --citewp-font-xl:      20px;
-    --citewp-font-base:    14px;
-    --citewp-font-sm:      13px;
-    --citewp-font-xs:      12px;
+  /* Brand identity */
+  --citewp-citrine:       #E8D400;
+  --citewp-obsidian:      #1A1A1A;
+  --citewp-white:         #FFFFFF;
+  /* Navy */
+  --citewp-navy:          #1E2A3B;
+  --citewp-navy-deep:     #141F2E;
+  /* Paper */
+  --citewp-paper:         #F8F9FA;
+  --citewp-paper-mid:     #F1F3F5;
+  --citewp-paper-border:  #E2E6EA;
+  /* Decorative tints */
+  --citewp-blue-tint:     rgba(59, 130, 246, 0.12);
+  --citewp-teal-tint:     rgba(20, 184, 166, 0.12);
+  --citewp-purple-tint:   rgba(139, 92, 246, 0.12);
+  --citewp-orange-tint:   rgba(249, 115, 22, 0.12);
+  --citewp-green-tint:    rgba(34, 197, 94, 0.12);
+  --citewp-red-tint:      rgba(239, 68, 68, 0.12);
+  /* Score colors (P38) */
+  --citewp-score-green:   #00A32A;
+  --citewp-score-yellow:  #DBA617;
+  --citewp-score-orange:  #D63638;
+  --citewp-score-red:     #8C1B1B;
+  /* Text */
+  --citewp-text-primary:    #1A1A1A;
+  --citewp-text-secondary:  #5A6270;
+  --citewp-text-muted:      #8A9099;
+  --citewp-text-on-navy:    #FFFFFF;
+  --citewp-text-on-citrine: #1A1A1A;
+  /* Border */
+  --citewp-border: #E2E6EA;
+  /* Spacing — 8px grid */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  /* Type scale */
+  --fs-xl:   20px;
+  --fs-base: 14px;
+  --fs-sm:   13px;
+  --fs-xs:   12px;
+  /* Icon sizes */
+  --icon-sm: 14px;
+  --icon-md: 18px;
+  --icon-lg: 24px;
+  /* Rail */
+  --rail-width: 240px;
 }
 
-/* Session 14 — P34 Teal accent + P35 rail surface tokens */
-:root {
-    --citewp-teal:        #006D70;
-    --citewp-teal-tint:   rgba(0,109,112,0.12);
-    --citewp-gray-50:     #F1EFE8;
-    --citewp-gray-600:    #5F5E5A;
-    --citewp-rail-edge:   rgba(0,0,0,0.08);
+/* === SECTION 3: Reset / global page chrome === */
+
+.toplevel_page_citewp #wpcontent,
+.toplevel_page_citewp #wpbody-content {
+  padding: 0;
 }
 
-/* Page Header + Top Nav ----------------------------------------------------- */
-
-.citewp-aiso-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: var(--citewp-space-3) var(--citewp-space-4);
-    margin-bottom: var(--citewp-space-3);
+.toplevel_page_citewp .wrap {
+  margin: 0;
+  max-width: none;
 }
 
-.citewp-aiso-header__brand {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: var(--citewp-space-3);
+.citewp-aiso-page h1,
+.citewp-aiso-page h2,
+.citewp-aiso-page h3,
+.citewp-aiso-page h4,
+.citewp-aiso-page p {
+  padding: 0;
+  margin: 0;
 }
 
-.citewp-aiso-header__lockup {
-    display: flex;
-    align-items: baseline;
-    gap: var(--citewp-space-3);
+/* === SECTION 4: Layout shell === */
+
+.citewp-aiso-page {
+  display: flex;
+  min-height: calc(100vh - 32px);
+  background: var(--citewp-paper);
 }
 
-.citewp-aiso-header__wordmark {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: var(--citewp-font-xl);
-    font-weight: 800;
-    color: var(--citewp-obsidian);
-    letter-spacing: -0.5px;
-    line-height: 1;
+.citewp-aiso-rail {
+  width: var(--rail-width);
+  background: var(--citewp-navy);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 32px;
+  height: calc(100vh - 32px);
+  overflow-y: auto;
 }
 
-.citewp-aiso-header__bracket {
-    color: var(--citewp-citrine);
+.citewp-aiso-rail__nav {
+  flex: 1;
+  padding: var(--sp-2) 0;
 }
 
-.citewp-aiso-header__plugin-name {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 500;
-    font-style: normal;
-    font-size: 14px;
-    color: #50575e;
-    line-height: 1;
-    letter-spacing: 0;
+.citewp-aiso-main {
+  flex: 1;
+  background: var(--citewp-paper);
+  overflow-y: auto;
+  min-width: 0;
 }
 
-.citewp-aiso-header__tagline {
-    font-family: 'Fraunces', Georgia, serif;
-    font-weight: 800;
-    font-style: normal;
-    font-size: 16px;
-    color: var(--citewp-citrine-text);
-    line-height: 1.3;
-    letter-spacing: 0;
-    margin: 0;
+.citewp-aiso-panel {
+  display: none;
+  padding: var(--sp-6);
 }
 
-.citewp-aiso-nav {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
+.citewp-aiso-panel.is-active {
+  display: block;
 }
 
-.citewp-aiso-nav__item {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--citewp-space-2) var(--citewp-space-3);
-    font-size: var(--citewp-font-sm);
-    font-weight: 600;
-    color: #50575e;
-    text-decoration: none;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -1px;
-    transition: color 0.15s, border-color 0.15s;
+/* === SECTION 5: Rail brand area === */
+
+.citewp-aiso-rail__brand {
+  padding: var(--sp-6) var(--sp-5) var(--sp-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.citewp-aiso-nav__item:hover,
-.citewp-aiso-nav__item:focus {
-    color: var(--citewp-obsidian);
-    text-decoration: none;
+.citewp-aiso-rail__wordmark {
+  display: block;
+  font: 800 18px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-citrine);
+  letter-spacing: -0.02em;
 }
 
-.citewp-aiso-nav__item--active {
-    color: var(--citewp-obsidian);
-    border-bottom-color: var(--citewp-citrine);
+.citewp-aiso-rail__plugin-name {
+  display: block;
+  font: 500 11px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: var(--sp-1);
 }
 
-/* Page Body ----------------------------------------------------------------- */
-
-.citewp-aiso-page-body {
-    margin-top: var(--citewp-space-4);
+.citewp-aiso-rail__tagline {
+  display: block;
+  font: 400 11px/1.4 'Inter', system-ui, -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: var(--sp-1);
 }
 
-.citewp-aiso-page-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: var(--citewp-font-xl);
-    font-weight: 800;
-    color: var(--citewp-obsidian);
-    margin: var(--citewp-space-4) 0 var(--citewp-space-3);
-    line-height: 1.2;
+/* === SECTION 6: Rail nav items === */
+
+.citewp-aiso-rail__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px var(--sp-5);
+  color: rgba(255, 255, 255, 0.65);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  font: 500 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background 0.12s, color 0.12s;
 }
 
-/* Dashboard Card Grid ------------------------------------------------------- */
-
-.citewp-aiso-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--citewp-space-3);
-    margin-bottom: var(--citewp-space-4);
+.citewp-aiso-rail__item:hover {
+  color: var(--citewp-white);
+  background: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
 }
 
-.citewp-aiso-card-grid--3col {
-    grid-template-columns: repeat(3, 1fr);
+.citewp-aiso-rail__item.is-active {
+  color: var(--citewp-white);
+  border-left-color: var(--citewp-citrine);
+  background: rgba(255, 255, 255, 0.07);
 }
 
-.citewp-aiso-card {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: var(--citewp-space-4);
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+.citewp-aiso-rail__item .citewp-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
-.citewp-aiso-card__title {
-    font-size: var(--citewp-font-xs);
-    font-weight: 600;
-    color: #50575e;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0 0 var(--citewp-space-1);
+.citewp-aiso-rail__item.is-active .citewp-icon,
+.citewp-aiso-rail__item:hover .citewp-icon {
+  opacity: 1;
 }
 
-.citewp-aiso-card__value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 32px;
-    font-weight: 400;
-    color: var(--citewp-obsidian);
-    line-height: 1.1;
-    margin: var(--citewp-space-1) 0;
+/* === SECTION 7: Rail Pro card === */
+
+.citewp-aiso-rail__pro-card {
+  margin: var(--sp-4);
+  padding: var(--sp-4);
+  background: rgba(232, 212, 0, 0.08);
+  border: 1px solid rgba(232, 212, 0, 0.2);
+  border-radius: var(--radius-md);
 }
 
-.citewp-aiso-card__desc {
-    font-size: var(--citewp-font-xs);
-    color: #787c82;
-    margin: 0;
+.citewp-aiso-pro__heading {
+  font: 700 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-citrine);
+  margin-bottom: var(--sp-1);
 }
 
-.citewp-aiso-card__link {
-    font-size: var(--citewp-font-xs);
-    color: #2271b1;
-    text-decoration: none;
+.citewp-aiso-pro__copy {
+  font: 400 11px/1.5 'Inter', system-ui, -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: var(--sp-3);
 }
 
-.citewp-aiso-card__link:hover,
-.citewp-aiso-card__link:focus-visible {
-    text-decoration: underline;
+/* === SECTION 8: Panel title row (Settings + Logs minimal header) === */
+
+.citewp-aiso-panel__title-row {
+  margin-bottom: var(--sp-6);
 }
 
-/* Dashboard — Needs Attention card ----------------------------------------- */
-
-.citewp-aiso-needs-attention__list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+.citewp-aiso-panel__title-row h2 {
+  font: 700 20px/1.2 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+  margin-bottom: var(--sp-1);
 }
 
-.citewp-aiso-needs-attention__item {
-    display: flex;
-    align-items: center;
-    gap: var(--citewp-space-2);
-    padding: 4px 0;
-    border-bottom: 1px solid #f0f0f1;
+.citewp-aiso-panel__subtitle {
+  font: 400 14px/1.4 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
 }
 
-.citewp-aiso-needs-attention__item:last-child {
-    border-bottom: none;
+/* === SECTION 9: Hero card === */
+
+.citewp-aiso-hero {
+  background: linear-gradient(135deg, var(--citewp-navy) 0%, var(--citewp-navy-deep) 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-8);
+  margin-bottom: var(--sp-6);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: var(--sp-8);
+  align-items: center;
 }
 
-.citewp-aiso-needs-attention__title {
-    font-size: var(--citewp-font-xs);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 140px;
-    color: #2271b1;
-    text-decoration: none;
+.citewp-aiso-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(255,255,255,0.025) 24px, rgba(255,255,255,0.025) 25px),
+    repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(255,255,255,0.025) 24px, rgba(255,255,255,0.025) 25px);
+  pointer-events: none;
 }
 
-.citewp-aiso-needs-attention__title:hover,
-.citewp-aiso-needs-attention__title:focus-visible {
-    text-decoration: underline;
+.citewp-aiso-hero__left {
+  flex: 1;
+  position: relative;
 }
 
-.citewp-aiso-needs-attention__nodata {
-    font-size: var(--citewp-font-xs);
-    color: #787c82;
-    margin: var(--citewp-space-2) 0 0;
+.citewp-aiso-hero__title {
+  font: 700 20px/1.2 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-white);
+  margin-bottom: var(--sp-1);
 }
 
-/* Dashboard — Quick actions ------------------------------------------------- */
-
-.citewp-aiso-quick-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--citewp-space-2);
-    margin-top: var(--citewp-space-4);
+.citewp-aiso-hero__sub {
+  font: 400 13px/1.4 'Inter', system-ui, -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: var(--sp-5);
 }
 
-/* Settings Inner Tabs ------------------------------------------------------- */
-
-.citewp-aiso-tabs {
-    margin-top: var(--citewp-space-4);
+.citewp-aiso-hero__filters {
+  display: flex;
+  gap: var(--sp-2);
 }
+
+.citewp-aiso-hero__filter {
+  font: 500 12px/1 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.65);
+  border: none;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.citewp-aiso-hero__filter:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--citewp-white);
+}
+
+.citewp-aiso-hero__filter.is-active {
+  background: var(--citewp-citrine);
+  color: var(--citewp-obsidian);
+}
+
+.citewp-aiso-hero__stats {
+  display: flex;
+  gap: var(--sp-8);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.citewp-aiso-hero__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.citewp-aiso-hero__stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.citewp-aiso-hero__stat-value {
+  font: 800 28px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-white);
+}
+
+.citewp-aiso-hero__stat-label {
+  font: 400 11px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* === SECTION 10: KPI card row === */
+
+.citewp-aiso-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: var(--sp-6);
+}
+
+.citewp-aiso-kpi-row--3col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.citewp-aiso-kpi-card {
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.citewp-aiso-kpi-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--sp-1);
+}
+
+.citewp-aiso-kpi-card__orb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.citewp-aiso-kpi-card__title {
+  font: 500 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+}
+
+.citewp-aiso-kpi-card__value {
+  font: 800 32px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+}
+
+.citewp-aiso-kpi-card__caption {
+  font: 400 12px/1.3 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+}
+
+.citewp-aiso-kpi-card__trend {
+  font: 500 12px/1 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.citewp-aiso-kpi-card__trend--up {
+  color: var(--citewp-score-green);
+}
+
+.citewp-aiso-kpi-card__trend--down {
+  color: var(--citewp-score-orange);
+}
+
+.citewp-aiso-kpi-card__actions {
+  margin-top: var(--sp-2);
+}
+
+/* === SECTION 11: KPI button === */
+
+.citewp-aiso-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--citewp-navy);
+  color: var(--citewp-citrine);
+  font: 500 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.citewp-aiso-btn:hover {
+  opacity: 0.85;
+  color: var(--citewp-citrine);
+  text-decoration: none;
+}
+
+.citewp-aiso-btn:focus {
+  outline: 2px solid var(--citewp-citrine);
+  outline-offset: 2px;
+}
+
+.citewp-aiso-btn--outline {
+  background: transparent;
+  color: var(--citewp-navy);
+  border: 1px solid var(--citewp-navy);
+}
+
+.citewp-aiso-btn--outline:hover {
+  color: var(--citewp-navy);
+  opacity: 0.75;
+}
+
+.citewp-aiso-btn--citrine {
+  background: var(--citewp-citrine);
+  color: var(--citewp-obsidian);
+}
+
+.citewp-aiso-btn--citrine:hover {
+  color: var(--citewp-obsidian);
+}
+
+/* === SECTION 12: Two-column lower layout === */
+
+.citewp-aiso-lower {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--sp-6);
+}
+
+.citewp-aiso-col-a,
+.citewp-aiso-col-b {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* === SECTION 13: AI Insights two-tone === */
+
+.citewp-aiso-insights {
+  background: var(--citewp-purple-tint);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+}
+
+.citewp-aiso-insights__inner {
+  background: var(--citewp-teal-tint);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+
+.citewp-aiso-insights__header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.citewp-aiso-insights__title {
+  font: 600 14px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+  flex: 1;
+}
+
+.citewp-aiso-insights__badge {
+  font: 600 10px/1 'Inter', system-ui, -apple-system, sans-serif;
+  background: rgba(139, 92, 246, 0.15);
+  color: rgb(139, 92, 246);
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.citewp-aiso-insights__item {
+  font: 400 13px/1.5 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+  padding: var(--sp-1) 0;
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.citewp-aiso-insights__item::before {
+  content: '→';
+  color: rgba(20, 184, 166, 0.8);
+  flex-shrink: 0;
+}
+
+/* === SECTION 14: Top Crawlers === */
+
+.citewp-aiso-crawlers {
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+}
+
+.citewp-aiso-crawlers__heading {
+  font: 600 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+  margin-bottom: var(--sp-4);
+}
+
+.citewp-aiso-crawlers__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--citewp-border);
+}
+
+.citewp-aiso-crawlers__row:last-child {
+  border-bottom: none;
+}
+
+.citewp-aiso-crawlers__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-white);
+  flex-shrink: 0;
+}
+
+.citewp-bot--gpt    { background: #10A37F; }
+.citewp-bot--claude { background: #CC785C; }
+.citewp-bot--perp   { background: #20808D; }
+.citewp-bot--google { background: #4285F4; }
+.citewp-bot--default { background: var(--citewp-text-muted); }
+
+.citewp-aiso-crawlers__name {
+  flex: 1;
+  font: 500 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+}
+
+.citewp-aiso-crawlers__count {
+  font: 600 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+}
+
+/* === SECTION 15: Needs Attention === */
+
+.citewp-aiso-needs {
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+}
+
+.citewp-aiso-needs__heading {
+  font: 600 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+  margin-bottom: var(--sp-4);
+}
+
+.citewp-aiso-needs__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--citewp-border);
+  gap: 12px;
+}
+
+.citewp-aiso-needs__item:last-child {
+  border-bottom: none;
+}
+
+.citewp-aiso-needs__title {
+  flex: 1;
+  font: 400 13px/1.3 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+}
+
+.citewp-aiso-needs__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.citewp-aiso-needs__title a:hover {
+  color: var(--citewp-navy);
+  text-decoration: underline;
+}
+
+.citewp-aiso-needs__badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 12px/1 'JetBrains Mono', 'Courier New', monospace;
+  color: var(--citewp-white);
+  flex-shrink: 0;
+}
+
+.citewp-aiso-needs__badge--green  { background: var(--citewp-score-green); }
+.citewp-aiso-needs__badge--yellow { background: var(--citewp-score-yellow); }
+.citewp-aiso-needs__badge--orange { background: var(--citewp-score-orange); }
+.citewp-aiso-needs__badge--red    { background: var(--citewp-score-red); }
+
+/* === SECTION 16: Quick Actions === */
+
+.citewp-aiso-actions-heading {
+  font: 600 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+  margin-bottom: var(--sp-3);
+}
+
+.citewp-aiso-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.citewp-aiso-action-card {
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+
+.citewp-aiso-action-card:hover {
+  border-color: var(--citewp-navy);
+  box-shadow: 0 1px 6px rgba(30, 42, 59, 0.08);
+  text-decoration: none;
+}
+
+.citewp-aiso-action-card__orb {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--citewp-blue-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--citewp-navy);
+}
+
+.citewp-aiso-action-card__label {
+  flex: 1;
+  font: 500 13px/1.3 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+}
+
+.citewp-aiso-action-card__arrow {
+  color: var(--citewp-text-muted);
+}
+
+/* === SECTION 17: Pro Tip footer === */
+
+.citewp-aiso-protip {
+  background: rgba(232, 212, 0, 0.06);
+  border-left: 3px solid var(--citewp-citrine);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: var(--sp-4) var(--sp-5);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: var(--sp-6);
+}
+
+.citewp-aiso-protip__icon {
+  color: var(--citewp-citrine);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.citewp-aiso-protip__content {
+  font: 400 13px/1.5 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+}
+
+.citewp-aiso-protip__label {
+  font-weight: 700;
+  color: var(--citewp-text-primary);
+}
+
+.citewp-aiso-protip__link {
+  color: var(--citewp-navy);
+  text-decoration: underline;
+}
+
+/* === SECTION 18: Score badges (legacy inline use) === */
+
+.citewp-aiso-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font: 600 12px/1 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.citewp-aiso-badge--green  { background: rgba(0, 163, 42, 0.1);    color: var(--citewp-score-green); }
+.citewp-aiso-badge--yellow { background: rgba(219, 166, 23, 0.12); color: var(--citewp-score-yellow); }
+.citewp-aiso-badge--orange { background: rgba(214, 54, 56, 0.1);   color: var(--citewp-score-orange); }
+.citewp-aiso-badge--red    { background: rgba(140, 27, 27, 0.1);   color: var(--citewp-score-red); }
+
+/* === SECTION 19: Score gauge / JetBrains Mono value display === */
+
+.citewp-aiso-gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-5) 0;
+}
+
+.citewp-aiso-gauge__value {
+  font: 800 48px/1 'JetBrains Mono', 'Courier New', monospace;
+}
+
+.citewp-aiso-gauge__value--green  { color: var(--citewp-score-green); }
+.citewp-aiso-gauge__value--yellow { color: var(--citewp-score-yellow); }
+.citewp-aiso-gauge__value--orange { color: var(--citewp-score-orange); }
+.citewp-aiso-gauge__value--red    { color: var(--citewp-score-red); }
+.citewp-aiso-gauge__value--empty  { color: var(--citewp-text-muted); }
+
+.citewp-aiso-gauge__label {
+  font: 400 11px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* === SECTION 20: Tabs / Settings sections === */
 
 .citewp-aiso-tabs__nav {
-    display: flex;
-    border-bottom: 1px solid #c3c4c7;
-    margin-bottom: var(--citewp-space-4);
-    gap: 0;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--citewp-border);
+  margin-bottom: var(--sp-5);
 }
 
-.citewp-aiso-tabs__btn {
-    padding: var(--citewp-space-2) var(--citewp-space-3);
-    font-size: var(--citewp-font-sm);
-    font-weight: 400;
-    color: #50575e;
-    background: none;
-    border: none;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -1px;
-    cursor: pointer;
-    transition: color 0.15s, border-color 0.15s;
-    line-height: 1.5;
+.citewp-aiso-tabs__tab {
+  padding: 10px var(--sp-4);
+  font: 500 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  margin-bottom: -1px;
 }
 
-.citewp-aiso-tabs__btn:hover {
-    color: var(--citewp-obsidian);
+.citewp-aiso-tabs__tab:hover {
+  color: var(--citewp-text-primary);
 }
 
-.citewp-aiso-tabs__btn:focus-visible {
-    outline: 2px solid var(--wp-admin-theme-color, #2271b1);
-    outline-offset: 2px;
+.citewp-aiso-tabs__tab.is-active {
+  color: var(--citewp-text-primary);
+  border-bottom-color: var(--citewp-citrine);
 }
 
-.citewp-aiso-tabs__btn--active {
-    font-weight: 600;
-    color: var(--citewp-obsidian);
-    border-bottom-color: var(--citewp-citrine);
+.citewp-aiso-tabs__content-panel {
+  display: none;
 }
 
-.citewp-aiso-tabs__panel {
-    display: none;
+.citewp-aiso-tabs__content-panel.is-active {
+  display: block;
 }
-
-.citewp-aiso-tabs__panel--active {
-    display: block;
-}
-
-/* Settings Section Cards ---------------------------------------------------- */
 
 .citewp-aiso-section {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    margin-bottom: var(--citewp-space-3);
-}
-
-.citewp-aiso-section__header {
-    padding: var(--citewp-space-3) var(--citewp-space-4);
-    border-bottom: 1px solid #f0f0f1;
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-4);
 }
 
 .citewp-aiso-section__title {
-    font-size: var(--citewp-font-base);
-    font-weight: 600;
-    color: var(--citewp-obsidian);
-    margin: 0;
+  font: 600 14px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
+  margin-bottom: var(--sp-4);
 }
 
-.citewp-aiso-section__desc {
-    font-size: var(--citewp-font-sm);
-    color: #787c82;
-    margin: var(--citewp-space-1) 0 0;
+/* === SECTION 21: Tables === */
+
+.citewp-aiso-table-wrap {
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
-.citewp-aiso-section__body {
-    padding: var(--citewp-space-3) var(--citewp-space-4);
+.citewp-aiso-table-wrap .wp-list-table {
+  border: none;
 }
 
-/* Field Row (toggle + label) ------------------------------------------------ */
-
-.citewp-aiso-field {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--citewp-space-4);
-    padding: var(--citewp-space-2) 0;
-    border-bottom: 1px solid #f0f0f1;
+.citewp-aiso-table-wrap .tablenav.top {
+  padding: 12px var(--sp-4) 0;
 }
 
-.citewp-aiso-field:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+.citewp-aiso-table-wrap .tablenav.bottom {
+  padding: 0 var(--sp-4) 12px;
 }
 
-.citewp-aiso-field__label {
-    flex: 1;
+.citewp-aiso-table-wrap thead th,
+.citewp-aiso-table-wrap thead td {
+  border-bottom: 1px solid var(--citewp-border);
 }
 
-.citewp-aiso-field__label-text {
-    font-size: var(--citewp-font-sm);
-    font-weight: 600;
-    color: var(--citewp-obsidian);
-    display: block;
+/* === SECTION 22: Forms === */
+
+.citewp-aiso-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--citewp-border);
 }
 
-.citewp-aiso-field__label-desc {
-    font-size: var(--citewp-font-xs);
-    color: #787c82;
-    display: block;
-    margin-top: 2px;
+.citewp-aiso-toggle-row:last-child {
+  border-bottom: none;
 }
 
-/* Toggle Switch ------------------------------------------------------------- */
-
-.citewp-aiso-toggle {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
+.citewp-aiso-toggle-row__label {
+  font: 500 14px/1.4 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
 }
 
-.citewp-aiso-toggle input[type="checkbox"] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
+.citewp-aiso-toggle-row__desc {
+  font: 400 13px/1.4 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  margin-top: 2px;
 }
 
-.citewp-aiso-toggle__track {
-    width: 40px;
-    height: 22px;
-    background: #c3c4c7;
-    border-radius: 11px;
-    transition: background 0.2s;
-    cursor: pointer;
-    position: relative;
-    display: block;
+.citewp-aiso-save-bar {
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--citewp-border);
+  margin-top: var(--sp-4);
 }
 
-.citewp-aiso-toggle__track::after {
-    content: '';
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 16px;
-    height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 2px rgba(0,0,0,.2);
-}
-
-.citewp-aiso-toggle input[type="checkbox"]:checked + .citewp-aiso-toggle__track {
-    background: var(--wp-admin-theme-color, #2271b1);
-}
-
-.citewp-aiso-toggle input[type="checkbox"]:checked + .citewp-aiso-toggle__track::after {
-    transform: translateX(18px);
-}
-
-.citewp-aiso-toggle input[type="checkbox"]:focus-visible + .citewp-aiso-toggle__track {
-    outline: 2px solid var(--wp-admin-theme-color, #2271b1);
-    outline-offset: 2px;
-}
-
-/* Number Input -------------------------------------------------------------- */
-
-.citewp-aiso-input-row {
-    display: flex;
-    align-items: center;
-    gap: var(--citewp-space-2);
-    padding: var(--citewp-space-2) 0;
-    border-bottom: 1px solid #f0f0f1;
-}
-
-.citewp-aiso-input-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.citewp-aiso-input-row__label {
-    font-size: var(--citewp-font-sm);
-    font-weight: 600;
-    color: var(--citewp-obsidian);
-    flex: 1;
-}
-
-.citewp-aiso-input-row__field {
-    display: flex;
-    align-items: center;
-    gap: var(--citewp-space-2);
-}
-
-.citewp-aiso-input--number {
-    width: 80px;
-    text-align: right;
-}
-
-/* Score Gauge (SVG semicircle) ---------------------------------------------- */
-
-.citewp-aiso-gauge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: var(--citewp-space-3) 0;
-}
-
-.citewp-aiso-gauge svg {
-    overflow: visible;
-}
-
-.citewp-aiso-gauge__track {
-    fill: none;
-    stroke: #e5e7eb;
-    stroke-width: 10;
-    stroke-linecap: round;
-}
-
-.citewp-aiso-gauge__fill {
-    fill: none;
-    stroke-width: 10;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1);
-}
-
-.citewp-aiso-gauge__fill--green  { stroke: #46b450; }
-.citewp-aiso-gauge__fill--yellow { stroke: var(--citewp-citrine); }
-.citewp-aiso-gauge__fill--orange { stroke: #f56e28; }
-.citewp-aiso-gauge__fill--red    { stroke: #dc3232; }
-
-.citewp-aiso-gauge__score-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 32px;
-    fill: var(--citewp-obsidian);
-    text-anchor: middle;
-    dominant-baseline: middle;
-}
-
-.citewp-aiso-gauge__label {
-    font-size: var(--citewp-font-xs);
-    color: #787c82;
-    text-align: center;
-    margin-top: var(--citewp-space-1);
-}
-
-/* Score Badges -------------------------------------------------------------- */
-
-.citewp-aiso-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 3px;
-    font-size: var(--citewp-font-xs);
-    font-weight: 600;
-    line-height: 1.6;
-    white-space: nowrap;
-}
-
-.citewp-aiso-badge--green  { background: #d7f0d7; color: #1a6b1a; }
-.citewp-aiso-badge--yellow { background: #fef9c3; color: var(--citewp-citrine-text); }
-.citewp-aiso-badge--orange { background: #fde8d3; color: #9a3412; }
-.citewp-aiso-badge--red    { background: #fce8e8; color: #9b1c1c; }
-
-/* Stats Banner (Logs page) -------------------------------------------------- */
-
-.citewp-aiso-stats-banner {
-    display: grid;
-    grid-template-columns: repeat(3, auto) 1fr;
-    align-items: center;
-    gap: var(--citewp-space-3);
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: var(--citewp-space-3) var(--citewp-space-4);
-    margin: var(--citewp-space-4) 0 var(--citewp-space-3);
-}
-
-.citewp-aiso-stat {
-    min-width: 100px;
-}
-
-.citewp-aiso-stat__label {
-    display: block;
-    font-size: var(--citewp-font-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #787c82;
-    margin-bottom: 2px;
-}
-
-.citewp-aiso-stat__value {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 22px;
-    font-weight: 400;
-    color: var(--citewp-obsidian);
-    line-height: 1;
-}
-
-.citewp-aiso-stats-banner__export {
-    text-align: right;
-}
-
-/* Empty State --------------------------------------------------------------- */
+/* === SECTION 23: Empty states === */
 
 .citewp-aiso-empty {
-    text-align: center;
-    padding: var(--citewp-space-5) var(--citewp-space-4);
-    color: #787c82;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-12);
+  text-align: center;
+}
+
+.citewp-aiso-empty__icon {
+  color: var(--citewp-text-muted);
+  margin-bottom: var(--sp-4);
+  opacity: 0.5;
 }
 
 .citewp-aiso-empty__title {
-    font-size: var(--citewp-font-base);
-    font-weight: 600;
-    color: #50575e;
-    margin: 0 0 var(--citewp-space-2);
+  font: 600 16px/1.3 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+  margin-bottom: var(--sp-2);
 }
 
-.citewp-aiso-empty__desc {
-    font-size: var(--citewp-font-sm);
-    margin: 0;
+.citewp-aiso-empty__text {
+  font: 400 13px/1.5 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  max-width: 320px;
 }
 
-/* CPT checkboxes (llms.txt tab) --------------------------------------------- */
+/* === SECTION 24: Loading / skeleton states === */
 
-.citewp-aiso-cpt-label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: var(--citewp-font-sm);
+.citewp-aiso-skeleton {
+  background: linear-gradient(90deg, var(--citewp-paper-mid) 25%, var(--citewp-paper-border) 50%, var(--citewp-paper-mid) 75%);
+  background-size: 200% 100%;
+  animation: citewp-shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
 }
 
-/* Stacked field and input-row modifiers ------------------------------------- */
-
-.citewp-aiso-field--stacked {
-    flex-direction: column;
-    align-items: flex-start;
+@keyframes citewp-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-.citewp-aiso-field--stacked .button {
-    margin-top: var(--citewp-space-2);
-}
+/* === SECTION 25: Responsive breakpoints === */
 
-.citewp-aiso-input-row--stacked {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--citewp-space-2);
-}
+@media (max-width: 1280px) {
+  :root { --rail-width: 56px; }
 
-/* Save bar ------------------------------------------------------------------ */
-
-.citewp-aiso-save-bar {
-    display: flex;
-    align-items: center;
-    gap: var(--citewp-space-3);
-    margin-top: var(--citewp-space-4);
-    padding-top: var(--citewp-space-3);
-    border-top: 1px solid #c3c4c7;
-}
-
-/* =========================================================================
-   Left Rail Page Layout — Session 13 (P27 / P28 / P29)
-   ========================================================================= */
-
-/* Outer flex container: left rail + main content */
-.citewp-aiso-page {
-    display: flex;
-    gap: 0;
-    margin-top: var(--citewp-space-3);
-    align-items: stretch;
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-/* Left navigation rail */
-.citewp-aiso-rail {
-    flex: 0 0 220px;
-    background: var(--citewp-gray-50);
-    border: none;
-    border-right: 0.5px solid var(--citewp-rail-edge);
-    padding: var(--citewp-space-3) 0;
-}
-
-.citewp-aiso-rail__item {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--citewp-space-2);
-    padding: 10px var(--citewp-space-3);
-    color: var(--citewp-obsidian);
-    text-decoration: none;
-    border-left: 3px solid transparent;
-    border-bottom: 1px solid var(--citewp-rail-edge);
-}
-
-.citewp-aiso-rail__item:last-child {
-    border-bottom: none;
-}
-
-.citewp-aiso-rail__item--active {
-    border-left-color: var(--citewp-citrine);
-    color: var(--citewp-obsidian);
-}
-
-.citewp-aiso-rail__item--external {
-    border-top: 1px solid var(--citewp-rail-edge);
-    margin-top: var(--citewp-space-2);
-}
-
-.citewp-aiso-rail__item .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    color: inherit;
-    margin-top: 1px;
-}
-
-.citewp-aiso-rail__item-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.citewp-aiso-rail__item-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: inherit;
-    line-height: 1.2;
-}
-
-.citewp-aiso-rail__item-desc {
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--citewp-gray-600);
-    text-transform: none;
-    letter-spacing: 0;
-    line-height: 1.3;
-}
-
-/* Main content area */
-.citewp-aiso-main {
-    flex: 1;
-    min-width: 0;
-    padding: var(--citewp-space-3) var(--citewp-space-4);
-}
-
-/* Section panels — hidden by default, shown when --active */
-.citewp-aiso-panel {
+  .citewp-aiso-rail__brand,
+  .citewp-aiso-rail__pro-card {
     display: none;
+  }
+
+  .citewp-aiso-rail__item {
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .citewp-aiso-rail__item span:not(.citewp-icon) {
+    display: none;
+  }
+
+  .citewp-aiso-rail__item .citewp-icon {
+    opacity: 1;
+  }
 }
 
-.citewp-aiso-panel--active {
-    display: block;
+@media (max-width: 1024px) {
+  .citewp-aiso-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .citewp-aiso-lower {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* Panel title (h2 inside each panel) */
-.citewp-aiso-panel__title {
-    font-size: var(--citewp-font-xl);
-    font-weight: 600;
-    color: #1d2327;
-    margin: 0 0 var(--citewp-space-4);
-    padding: 0;
-}
+@media (max-width: 782px) {
+  .citewp-aiso-panel {
+    padding: var(--sp-4);
+  }
 
-/* =========================================================================
-   Single-Column Dashboard Stat Row — P27
-   ========================================================================= */
-
-.citewp-aiso-stat-row {
-    display: flex;
-    gap: var(--citewp-space-5);
-    align-items: center;
-    flex-wrap: wrap;
-    padding-bottom: var(--citewp-space-4);
-    margin-bottom: var(--citewp-space-4);
-    border-bottom: 1px solid #f0f0f1;
-}
-
-.citewp-aiso-stat-row__item {
-    display: flex;
+  .citewp-aiso-hero {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--citewp-space-1);
-}
+    padding: var(--sp-5);
+  }
 
-.citewp-aiso-stat-row__value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 28px;
-    font-weight: 400;
-    color: #1d2327;
-    line-height: 1;
-}
+  .citewp-aiso-hero__stats {
+    width: 100%;
+    justify-content: space-between;
+  }
 
-.citewp-aiso-stat-row__value--empty {
-    color: #c3c4c7;
-}
+  .citewp-aiso-kpi-row {
+    grid-template-columns: 1fr;
+  }
 
-.citewp-aiso-stat-row__label {
-    font-size: var(--citewp-font-xs);
-    color: #787c82;
-}
-
-/* Gauge when used inside stat row (smaller viewBox, no extra margin) */
-.citewp-aiso-stat-row__item .citewp-aiso-gauge {
-    display: block;
-    margin: 0;
-}
-
-/* Primary button brand override — CiteWP admin pages only */
-.toplevel_page_citewp .button-primary {
-    background: var(--citewp-obsidian);
-    border-color: var(--citewp-obsidian);
-    color: #fff;
-}
-
-.toplevel_page_citewp .button-primary:hover,
-.toplevel_page_citewp .button-primary:focus {
-    background: var(--citewp-obsidian);
-    border-color: var(--citewp-citrine);
-    color: #fff;
-    outline: 2px solid var(--citewp-citrine);
-    outline-offset: 1px;
-}
-
-/* Responsive: stack rail below content at narrow widths */
-@media screen and (max-width: 782px) {
-    .citewp-aiso-page {
-        flex-direction: column;
-    }
-    .citewp-aiso-rail {
-        flex: 0 0 auto;
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        padding: var(--citewp-space-2) 0;
-    }
+  .citewp-aiso-actions-grid {
+    grid-template-columns: 1fr;
+  }
 }
