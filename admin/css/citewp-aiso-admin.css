@@ -75,13 +75,20 @@
   --citewp-paper:         #F8F9FA;
   --citewp-paper-mid:     #F1F3F5;
   --citewp-paper-border:  #E2E6EA;
-  /* Decorative tints */
+  /* Decorative tints — rgba (orb backgrounds, badge backgrounds) */
   --citewp-blue-tint:     rgba(59, 130, 246, 0.12);
   --citewp-teal-tint:     rgba(20, 184, 166, 0.12);
   --citewp-purple-tint:   rgba(139, 92, 246, 0.12);
   --citewp-orange-tint:   rgba(249, 115, 22, 0.12);
   --citewp-green-tint:    rgba(34, 197, 94, 0.12);
   --citewp-red-tint:      rgba(239, 68, 68, 0.12);
+  /* Decorative tints — solid (text, avatars, icon strokes, KPI button) */
+  --citewp-tint-blue:     #2563EB;
+  --citewp-tint-teal:     #14B8A6;
+  --citewp-tint-green:    #16A34A;
+  --citewp-tint-orange:   #F97316;
+  --citewp-tint-red:      #EF4444;
+  --citewp-tint-purple:   #7C3AED;
   /* Score colors (P38) */
   --citewp-score-green:   #00A32A;
   --citewp-score-yellow:  #DBA617;
@@ -620,11 +627,11 @@
   flex-shrink: 0;
 }
 
-.citewp-bot--gpt    { background: #10A37F; }
-.citewp-bot--claude { background: #CC785C; }
-.citewp-bot--perp   { background: #20808D; }
-.citewp-bot--google { background: #4285F4; }
-.citewp-bot--default { background: var(--citewp-text-muted); }
+.citewp-bot--gpt    { background: #ec4899; } /* av-pink — GPTBot; custom, documented P38 exception */
+.citewp-bot--claude { background: var(--citewp-tint-orange); } /* av-orange */
+.citewp-bot--perp   { background: var(--citewp-tint-purple); } /* av-purple */
+.citewp-bot--google { background: var(--citewp-tint-blue); }   /* av-blue */
+.citewp-bot--default { background: var(--citewp-tint-teal); }  /* av-teal — unrecognised engines */
 
 .citewp-aiso-crawlers__name {
   flex: 1;
