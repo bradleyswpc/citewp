@@ -6,6 +6,66 @@
 
 ---
 
+## Session 16 — Plugin admin v3 migration ✅
+
+**Date:** 2026-05-01
+
+**Deliverable:** Full plugin admin v3 migration shipped. `admin/css/citewp-aiso-admin.css` rewritten (~1,042 lines, 21 sections, all 18 P38 tokens active). `Menu.php` `render_dashboard_panel()` fully rebuilt to v3 composition per P39 Verdict 3: hero card with personalized greeting + 3 stat cards, 4-card KPI row, two-column lower section (AI Insights two-tone nested + Top Crawlers table / Needs Attention list + Quick Actions 4-wide grid), Pro Tip footer. P31 meta box consolidated into `EditorPanel.php` (replaces `ScoreMetaBox.php` + `SchemaMetaBox.php`). `IconLibrary.php` added (20 Lucide SVG icons). Settings + LogsPage light v3 styling. GEO Score → Cite Score rename throughout all PHP and CSS. `DashboardData.php` extended with `get_issue_count()` and `get_top_crawlers()` bot_type + prior_visits fields. X20 logged (component spec compliance audit before manual verification — derived from Session 16 multi-pass cleanup analysis). **P36 plugin code freeze lifted — v3 admin migration condition met.**
+
+**Commits (plugin repo, Session 16):**
+- `495f9b8` — chore: remove plus-jakarta-sans-800.woff2 (replaced by Inter v3)
+- `6377390` — fix: swap bot avatar colors to P38 tint tokens; add solid tint token set to :root
+- `a9c27b5` — feat: subagent C — Menu.php v3 rewrite, rail brand area, dashboard composition
+- `b90094a` — feat: subagent E — EditorPanel P31 metabox, retire ScoreMetaBox + SchemaMetaBox
+- `33e76b5` — feat: subagent F — swap Tailwind hex to P38 colors, rename GEO Score → Cite Score
+- `6b8ba7e` — feat: subagent G — Settings + LogsPage light v3 (title rows, KPI cards, table wrap)
+- `7402ea5` — fix: code-review blockers + warnings
+- `402c638` — feat: Session 16 cleanup pass (KPI trends, hero stat cards, Needs Attention, AI Insights two-tone, rail descriptions, footer spacing)
+- `095a2da` — feat: Session 16 tightening pass (brand area, KPI anatomy, hero chrome, AI Insights contrast, column swap + 45/55 ratio, 4-wide Quick Actions, Top Crawlers full table, Pro Tip orb)
+- `38a054e` — feat: Session 16 closeout pass (wordmark color, Citrine brackets, Pro card copy, hero greeting, icon contrast, KPI score-band, AI Insights spacing, Quick Actions orb colors, Top Crawlers cap 3 + View Full Report, Pro Tip gradient, logo audit)
+
+**Brain edits (Session 16 close, direct file edits — Brain folder has no accessible git shell):**
+- `DECISIONS.md` — X20 logged: component spec compliance audit before manual browser verification. Derived from Session 16 multi-pass cleanup analysis — all deviations caught in three cleanup passes were enumerated in the UI-DESIGN-SYSTEM.md Component Library and required no judgment, just deterministic spec comparison.
+- `UI-DESIGN-SYSTEM.md` — wordmark spec amended (28-30px, "CiteWP" in `--citewp-text-on-navy`), plugin name spec (16px), Pro card copy updated to match shipped implementation.
+- `00-CITEWP-MASTER.md` — Last updated, Session 16 appended to Shipped list, Current status updated (P36 freeze lifted, last commit `38a054e`), Next Session updated to Session 17 scope, Phase 1.5 sequence Session 16 marked ✅ shipped.
+
+**Files modified (plugin):**
+- `admin/css/citewp-aiso-admin.css` — full v3 rewrite
+- `includes/Admin/Menu.php` — Dashboard panel renderer, rail brand area
+- `includes/Admin/EditorPanel.php` — P31 consolidated meta box (new file)
+- `includes/Admin/IconLibrary.php` — 20 Lucide SVG icons (new file)
+- `includes/Admin/DashboardData.php` — `get_issue_count()` added, `get_top_crawlers()` extended
+- `includes/Admin/ScoreMetaBox.php` — retired (logic absorbed into EditorPanel)
+- `includes/Admin/SchemaMetaBox.php` — retired (logic absorbed into EditorPanel)
+- `includes/Admin/Settings/Page.php` — light v3 styling
+- `includes/Admin/LogsPage.php` — light v3 styling
+- `includes/Plugin.php` — register EditorPanel, deregister old meta boxes
+
+**Decisions made:**
+- X20 — component spec compliance audit before manual browser verification (2026-05-01)
+
+**Smoke test:** Manual browser verification passed across three review passes. Stats data flowing (108 visits this week, Top Crawlers rendered, KPI cards displayed, hero greeting personalized). No dedicated `/smoke-test` slash command found in `.claude/commands/` — slash command rebuild deferred per CLAUDE.md note (Session 7.5 carryover).
+
+**npm build:** N/A — no JavaScript changes this session. CSS and PHP only.
+
+**PHP lint:** Not run — PHP CLI not configured in LocalWP shell (per CLAUDE.md). No new PHP errors observed in debug.log during browser verification.
+
+**WP.org status:** In review (submitted 2026-04-29). Awaiting approval email at hello@citewp.com. SVN commit held until approval confirmed per X16.
+
+**Carryover into Session 17:**
+- **WP.org SVN commit** — first task if approval email has arrived before Session 17 starts.
+- **readme.txt + WP.org assets** — v0.7.0 changelog, screenshot updates, banner/icon review.
+- **Anti-cloaking content** (S7) — landing page section + first blog post.
+- **"Suggest a Feature" link** in admin — GitHub Discussions lean.
+- **Page-builder canvas-mode awareness surface** — admin notice on Elementor/Divi/Bricks screens.
+- **P33 (Posts/Pages stat split)** — Dashboard data layer. Still deferred.
+- **Engine.php entities detector bug** — A11-gated. Still requires explicit user approval.
+- **`citewp_aiso/metabox/tabs` filter `$context` arg** — Session 12 carryover, ships with EditorPanel follow-up if needed.
+
+**Next session focus:** Session 17 — Phase 1.5 remaining: readme.txt + WP.org assets, anti-cloaking content (S7), "Suggest a Feature" link, page-builder canvas-mode awareness. Check WP.org approval status first — if approval email arrived, SVN commit is Task 1.
+
+---
+
 ## Session 15 — v3 brand system reset, Citrine on Navy ✅
 
 **Date:** 2026-04-30
