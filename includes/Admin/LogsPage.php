@@ -76,40 +76,54 @@ final class LogsPage {
 			$this->table->prepare_items();
 		}
 		?>
+		<div class="citewp-aiso-panel__title-row">
+			<div>
+				<h2><?php esc_html_e( 'Crawler Logs', 'ai-search-optimizer' ); ?></h2>
+				<p class="citewp-aiso-panel__subtitle"><?php esc_html_e( 'AI crawler activity on your site.', 'ai-search-optimizer' ); ?></p>
+			</div>
+			<a href="<?php echo esc_url( $export_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--secondary">
+				<?php esc_html_e( 'Export CSV', 'ai-search-optimizer' ); ?>
+			</a>
+		</div>
 		<div class="citewp-aiso-page-body">
 
-			<div class="citewp-aiso-stats-banner">
-				<div class="citewp-aiso-stat">
-					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $count_24h ) ); ?></span>
+			<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--3col">
+				<div class="citewp-aiso-kpi-card">
+					<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--blue"><?php echo IconLibrary::icon( 'search', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
+					<div class="citewp-aiso-kpi-card__body">
+						<p class="citewp-aiso-kpi-card__title"><?php esc_html_e( '24h Visits', 'ai-search-optimizer' ); ?></p>
+						<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $count_24h ) ); ?></p>
+					</div>
 				</div>
-				<div class="citewp-aiso-stat">
-					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $count_7d ) ); ?></span>
+				<div class="citewp-aiso-kpi-card">
+					<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--blue"><?php echo IconLibrary::icon( 'search', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
+					<div class="citewp-aiso-kpi-card__body">
+						<p class="citewp-aiso-kpi-card__title"><?php esc_html_e( '7d Visits', 'ai-search-optimizer' ); ?></p>
+						<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $count_7d ) ); ?></p>
+					</div>
 				</div>
-				<div class="citewp-aiso-stat">
-					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $count_30d ) ); ?></span>
-				</div>
-				<div class="citewp-aiso-stats-banner__export">
-					<a href="<?php echo esc_url( $export_url ); ?>" class="button">
-						<?php esc_html_e( 'Export CSV', 'ai-search-optimizer' ); ?>
-					</a>
+				<div class="citewp-aiso-kpi-card">
+					<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--blue"><?php echo IconLibrary::icon( 'search', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
+					<div class="citewp-aiso-kpi-card__body">
+						<p class="citewp-aiso-kpi-card__title"><?php esc_html_e( '30d Visits', 'ai-search-optimizer' ); ?></p>
+						<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $count_30d ) ); ?></p>
+					</div>
 				</div>
 			</div>
 
 			<?php if ( $total === 0 ) : ?>
-				<div class="notice notice-info inline">
-					<p>
-						<?php esc_html_e( 'No AI crawler activity yet. Once GPTBot, ClaudeBot, PerplexityBot, or another AI crawler visits your site, you\'ll see it here.', 'ai-search-optimizer' ); ?>
-					</p>
+				<div class="citewp-aiso-empty">
+					<?php echo IconLibrary::icon( 'calendar', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
+					<p><?php esc_html_e( 'No AI crawler activity yet. Once GPTBot, ClaudeBot, PerplexityBot, or another AI crawler visits your site, you\'ll see it here.', 'ai-search-optimizer' ); ?></p>
 				</div>
 			<?php elseif ( $this->table ) : ?>
-				<form method="get">
-					<input type="hidden" name="page" value="<?php echo esc_attr( Menu::SLUG_PARENT ); ?>" />
-					<input type="hidden" name="citewp_section" value="crawler-logs" />
-					<?php $this->table->display(); ?>
-				</form>
+				<div class="citewp-aiso-table-wrap">
+					<form method="get">
+						<input type="hidden" name="page" value="<?php echo esc_attr( Menu::SLUG_PARENT ); ?>" />
+						<input type="hidden" name="citewp_section" value="crawler-logs" />
+						<?php $this->table->display(); ?>
+					</form>
+				</div>
 			<?php endif; ?>
 		</div><!-- .citewp-aiso-page-body -->
 		<?php

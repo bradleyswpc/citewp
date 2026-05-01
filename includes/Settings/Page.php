@@ -136,6 +136,13 @@ final class Page {
 
 		$default_tab = array_key_first( $tabs ) ?? 'general';
 		?>
+		<div class="citewp-aiso-panel__title-row">
+			<div>
+				<h2><?php esc_html_e( 'Settings', 'ai-search-optimizer' ); ?></h2>
+				<p class="citewp-aiso-panel__subtitle"><?php esc_html_e( 'Configure your AI search optimization preferences.', 'ai-search-optimizer' ); ?></p>
+			</div>
+		</div>
+
 		<?php if ( sanitize_key( wp_unslash( $_GET['regenerated'] ?? '' ) ) === '1' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'llms.txt cache cleared. The next request will regenerate from scratch.', 'ai-search-optimizer' ); ?></p></div>
 			<?php endif; ?>
