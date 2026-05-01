@@ -92,7 +92,7 @@ final class DashboardWidget {
 
 			<div class="citewp-aiso-widget__stats">
 				<div class="citewp-aiso-stat">
-					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Avg GEO Score', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Avg Cite Score', 'ai-search-optimizer' ); ?></span>
 					<?php if ( $avg_score !== null ) : ?>
 						<span class="citewp-aiso-stat__value citewp-aiso-stat__value--<?php echo esc_attr( $avg_grade ); ?>"><?php echo esc_html( (string) $avg_score ); ?></span>
 						<span class="citewp-aiso-stat__sub"><?php esc_html_e( 'across scored posts', 'ai-search-optimizer' ); ?></span>
@@ -136,7 +136,7 @@ final class DashboardWidget {
 
 			<?php if ( ! empty( $lowest_posts ) ) : ?>
 			<div class="citewp-aiso-widget__section">
-				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Lowest GEO Scores — Needs Attention', 'ai-search-optimizer' ); ?></h4>
+				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Lowest Cite Scores — Needs Attention', 'ai-search-optimizer' ); ?></h4>
 				<ul class="citewp-aiso-list">
 					<?php foreach ( $lowest_posts as $post ) : ?>
 					<?php
@@ -201,14 +201,14 @@ final class DashboardWidget {
 			.citewp-aiso-stat { flex: 1; background: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px 14px; }
 			.citewp-aiso-stat__label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 4px; }
 			.citewp-aiso-stat__value { display: block; font-size: 28px; font-weight: 700; line-height: 1; color: #111827; }
-			.citewp-aiso-stat__value--green  { color: #16a34a; }
-			.citewp-aiso-stat__value--yellow { color: #ca8a04; }
-			.citewp-aiso-stat__value--orange { color: #ea580c; }
-			.citewp-aiso-stat__value--red    { color: #dc2626; }
+			.citewp-aiso-stat__value--green  { color: #00A32A; }
+			.citewp-aiso-stat__value--yellow { color: #DBA617; }
+			.citewp-aiso-stat__value--orange { color: #D63638; }
+			.citewp-aiso-stat__value--red    { color: #8C1B1B; }
 			.citewp-aiso-stat__value--none   { color: #9ca3af; }
 			.citewp-aiso-stat__sub { display: block; font-size: 11px; color: #6b7280; margin-top: 4px; }
-			.citewp-aiso-trend--up   { color: #16a34a; font-weight: 600; }
-			.citewp-aiso-trend--down { color: #dc2626; font-weight: 600; }
+			.citewp-aiso-trend--up   { color: #00A32A; font-weight: 600; }
+			.citewp-aiso-trend--down { color: #8C1B1B; font-weight: 600; }
 			.citewp-aiso-trend--flat { color: #6b7280; }
 			.citewp-aiso-widget__section { margin-top: 14px; border-top: 1px solid #e5e7eb; padding-top: 12px; }
 			.citewp-aiso-widget__heading { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #374151; margin: 0 0 8px; font-weight: 600; }
@@ -220,10 +220,10 @@ final class DashboardWidget {
 			.citewp-aiso-list__title { color: #2271b1; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 230px; }
 			.citewp-aiso-list__title:hover { text-decoration: underline; }
 			.citewp-aiso-score-badge { min-width: 30px; text-align: center; font-weight: 700; font-size: 12px; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
-			.citewp-aiso-score-badge--green  { background: #dcfce7; color: #16a34a; }
-			.citewp-aiso-score-badge--yellow { background: #fef9c3; color: #ca8a04; }
-			.citewp-aiso-score-badge--orange { background: #ffedd5; color: #ea580c; }
-			.citewp-aiso-score-badge--red    { background: #fee2e2; color: #dc2626; }
+			.citewp-aiso-score-badge--green  { background: #dcfce7; color: #00A32A; }
+			.citewp-aiso-score-badge--yellow { background: #fef9c3; color: #DBA617; }
+			.citewp-aiso-score-badge--orange { background: #ffedd5; color: #D63638; }
+			.citewp-aiso-score-badge--red    { background: #fee2e2; color: #8C1B1B; }
 			.citewp-aiso-widget__link { font-size: 12px; color: #2271b1; text-decoration: none; }
 			.citewp-aiso-widget__link:hover { text-decoration: underline; }
 			.citewp-aiso-widget__empty { color: #6b7280; font-size: 12px; margin: 0; }

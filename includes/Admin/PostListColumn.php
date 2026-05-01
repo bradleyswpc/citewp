@@ -45,11 +45,11 @@ final class PostListColumn {
 		foreach ( $cols as $key => $label ) {
 			$new[ $key ] = $label;
 			if ( $key === 'title' ) {
-				$new[ self::COLUMN_KEY ] = __( 'GEO Score', 'ai-search-optimizer' );
+				$new[ self::COLUMN_KEY ] = __( 'Cite Score', 'ai-search-optimizer' );
 			}
 		}
 		if ( ! isset( $new[ self::COLUMN_KEY ] ) ) {
-			$new[ self::COLUMN_KEY ] = __( 'GEO Score', 'ai-search-optimizer' );
+			$new[ self::COLUMN_KEY ] = __( 'Cite Score', 'ai-search-optimizer' );
 		}
 		return $new;
 	}
@@ -108,10 +108,10 @@ final class PostListColumn {
 			.column-citewp_aiso_geo_score { width: 110px; }
 			.citewp-aiso-score { display:inline-flex; align-items:center; gap:6px; font-weight:600; font-variant-numeric: tabular-nums; }
 			.citewp-aiso-score__dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-			.citewp-aiso-score--green  .citewp-aiso-score__dot { background:#16a34a; }
-			.citewp-aiso-score--yellow .citewp-aiso-score__dot { background:#ca8a04; }
-			.citewp-aiso-score--orange .citewp-aiso-score__dot { background:#ea580c; }
-			.citewp-aiso-score--red    .citewp-aiso-score__dot { background:#dc2626; }
+			.citewp-aiso-score--green  .citewp-aiso-score__dot { background:#00A32A; }
+			.citewp-aiso-score--yellow .citewp-aiso-score__dot { background:#DBA617; }
+			.citewp-aiso-score--orange .citewp-aiso-score__dot { background:#D63638; }
+			.citewp-aiso-score--red    .citewp-aiso-score__dot { background:#8C1B1B; }
 			.citewp-aiso-score--none   { color:#9ca3af; font-weight:400; }
 		</style>
 		<?php
