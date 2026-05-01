@@ -67,28 +67,32 @@ final class Menu {
 
 		$defaults = [
 			'dashboard' => [
-				'label'  => __( 'Dashboard', 'ai-search-optimizer' ),
-				'icon'   => fn() => IconLibrary::icon( 'dashboard', 18 ),
-				'slug'   => 'dashboard',
-				'render' => [ $this, 'render_dashboard_panel' ],
+				'label'       => __( 'Dashboard', 'ai-search-optimizer' ),
+				'description' => __( 'Cite Score, bot visits, what to fix', 'ai-search-optimizer' ),
+				'icon'        => fn() => IconLibrary::icon( 'dashboard', 18 ),
+				'slug'        => 'dashboard',
+				'render'      => [ $this, 'render_dashboard_panel' ],
 			],
 			'crawler-logs' => [
-				'label'  => __( 'Crawler Logs', 'ai-search-optimizer' ),
-				'icon'   => fn() => IconLibrary::icon( 'crawler-logs', 18 ),
-				'slug'   => 'crawler-logs',
-				'render' => $logs_module ? [ $logs_module, 'render' ] : null,
+				'label'       => __( 'Crawler Logs', 'ai-search-optimizer' ),
+				'description' => __( 'Who crawled, when, from where', 'ai-search-optimizer' ),
+				'icon'        => fn() => IconLibrary::icon( 'crawler-logs', 18 ),
+				'slug'        => 'crawler-logs',
+				'render'      => $logs_module ? [ $logs_module, 'render' ] : null,
 			],
 			'cite-score' => [
-				'label'  => __( 'Cite Score', 'ai-search-optimizer' ),
-				'icon'   => fn() => IconLibrary::icon( 'cite-score', 18 ),
-				'slug'   => 'cite-score',
-				'render' => [ $this, 'render_cite_score_panel' ],
+				'label'       => __( 'Cite Score', 'ai-search-optimizer' ),
+				'description' => __( 'Per-post scores and improvements', 'ai-search-optimizer' ),
+				'icon'        => fn() => IconLibrary::icon( 'cite-score', 18 ),
+				'slug'        => 'cite-score',
+				'render'      => [ $this, 'render_cite_score_panel' ],
 			],
 			'settings' => [
-				'label'  => __( 'Settings', 'ai-search-optimizer' ),
-				'icon'   => fn() => IconLibrary::icon( 'settings', 18 ),
-				'slug'   => 'settings',
-				'render' => $settings_module ? [ $settings_module, 'render' ] : null,
+				'label'       => __( 'Settings', 'ai-search-optimizer' ),
+				'description' => __( 'Configure your preferences', 'ai-search-optimizer' ),
+				'icon'        => fn() => IconLibrary::icon( 'settings', 18 ),
+				'slug'        => 'settings',
+				'render'      => $settings_module ? [ $settings_module, 'render' ] : null,
 			],
 		];
 
@@ -167,6 +171,9 @@ final class Menu {
 						<?php endif; ?>
 						<span class="citewp-aiso-rail__item-text">
 							<span class="citewp-aiso-rail__item-label"><?php echo esc_html( $item['label'] ); ?></span>
+							<?php if ( ! empty( $item['description'] ) ) : ?>
+								<span class="citewp-aiso-rail__item-desc"><?php echo esc_html( $item['description'] ); ?></span>
+							<?php endif; ?>
 						</span>
 					</a>
 					<?php endforeach; ?>
@@ -277,9 +284,9 @@ final class Menu {
 
 		$avg_grade = 'empty';
 		if ( $avg_score !== null ) {
-			if ( $avg_score >= 80 )      { $avg_grade = 'green'; }
-			elseif ( $avg_score >= 60 )  { $avg_grade = 'yellow'; }
-			elseif ( $avg_score >= 40 )  { $avg_grade = 'orange'; }
+			if ( $avg_score >= 90 )      { $avg_grade = 'green'; }
+			elseif ( $avg_score >= 70 )  { $avg_grade = 'yellow'; }
+			elseif ( $avg_score >= 50 )  { $avg_grade = 'orange'; }
 			else                         { $avg_grade = 'red'; }
 		}
 
@@ -290,6 +297,10 @@ final class Menu {
 		$this_week  = (int) ( $trend['this_week'] ?? 0 );
 		$last_week  = (int) ( $trend['last_week']  ?? 0 );
 		$trend_diff = $this_week - $last_week;
+		$trend_pct  = $last_week > 0 ? (int) round( ( $trend_diff / $last_week ) * 100 ) : 0;
+
+		$llms_settings = get_option( 'citewp_aiso_llms_settings', [] );
+		$llms_enabled  = ! empty( $llms_settings['enabled'] );
 
 		/**
 		 * Filters the Quick Actions grid items on the Dashboard.
@@ -346,6 +357,7 @@ final class Menu {
 		<!-- KPI card row -->
 		<div class="citewp-aiso-kpi-row">
 
+			<!-- Card 1: Avg Cite Score -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<div class="citewp-aiso-kpi-card__orb" style="background:var(--citewp-purple-tint);color:var(--citewp-tint-purple)">
@@ -355,11 +367,13 @@ final class Menu {
 				</div>
 				<div class="citewp-aiso-kpi-card__value"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></div>
 				<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Across all scored posts', 'ai-search-optimizer' ); ?></div>
+				<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
 				<div class="citewp-aiso-kpi-card__actions">
-					<a href="#cite-score" class="citewp-aiso-btn"><?php esc_html_e( 'View Scores', 'ai-search-optimizer' ); ?></a>
+					<a href="#cite-score" class="citewp-aiso-btn"><?php esc_html_e( 'View Scores →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
+			<!-- Card 2: Bot Visits -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<div class="citewp-aiso-kpi-card__orb" style="background:var(--citewp-teal-tint);color:var(--citewp-tint-teal)">
@@ -368,30 +382,20 @@ final class Menu {
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Bot Visits (7d)', 'ai-search-optimizer' ); ?></span>
 				</div>
 				<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></div>
-				<?php if ( $last_week > 0 && $trend_diff !== 0 ) : ?>
-					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--<?php echo $trend_diff > 0 ? 'up' : 'down'; ?>">
-						<?php echo $trend_diff > 0 ? '↑ ' : '↓ '; echo esc_html( number_format_i18n( abs( $trend_diff ) ) ); ?> <?php esc_html_e( 'vs last week', 'ai-search-optimizer' ); ?>
-					</div>
+				<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'AI crawler visits this week', 'ai-search-optimizer' ); ?></div>
+				<?php if ( $trend_pct > 5 ) : ?>
+					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--up">↑ <?php echo esc_html( absint( $trend_pct ) ); ?>% <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs last week', 'ai-search-optimizer' ); ?></span></div>
+				<?php elseif ( $trend_pct < -5 ) : ?>
+					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--down">↓ <?php echo esc_html( absint( $trend_pct ) ); ?>% <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs last week', 'ai-search-optimizer' ); ?></span></div>
+				<?php else : ?>
+					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
 				<?php endif; ?>
 				<div class="citewp-aiso-kpi-card__actions">
-					<a href="#crawler-logs" class="citewp-aiso-btn"><?php esc_html_e( 'View Logs', 'ai-search-optimizer' ); ?></a>
+					<a href="#crawler-logs" class="citewp-aiso-btn"><?php esc_html_e( 'View Logs →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
-			<div class="citewp-aiso-kpi-card">
-				<div class="citewp-aiso-kpi-card__head">
-					<div class="citewp-aiso-kpi-card__orb" style="background:var(--citewp-orange-tint);color:var(--citewp-tint-orange)">
-						<?php echo IconLibrary::icon( 'alert-triangle', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-					</div>
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Issues Found', 'ai-search-optimizer' ); ?></span>
-				</div>
-				<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $issue_count ) ); ?></div>
-				<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Red or orange-graded posts', 'ai-search-optimizer' ); ?></div>
-				<div class="citewp-aiso-kpi-card__actions">
-					<a href="#cite-score" class="citewp-aiso-btn"><?php esc_html_e( 'Review', 'ai-search-optimizer' ); ?></a>
-				</div>
-			</div>
-
+			<!-- Card 3: Indexed Pages -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<div class="citewp-aiso-kpi-card__orb" style="background:var(--citewp-green-tint);color:var(--citewp-tint-green)">
@@ -401,8 +405,27 @@ final class Menu {
 				</div>
 				<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $indexed_total ) ); ?></div>
 				<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Published posts &amp; pages', 'ai-search-optimizer' ); ?></div>
+				<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
 				<div class="citewp-aiso-kpi-card__actions">
-					<a href="<?php echo esc_url( admin_url( 'edit.php' ) ); ?>" class="citewp-aiso-btn"><?php esc_html_e( 'View All', 'ai-search-optimizer' ); ?></a>
+					<a href="<?php echo esc_url( admin_url( 'edit.php' ) ); ?>" class="citewp-aiso-btn"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
+				</div>
+			</div>
+
+			<!-- Card 4: llms.txt Status -->
+			<div class="citewp-aiso-kpi-card">
+				<div class="citewp-aiso-kpi-card__head">
+					<div class="citewp-aiso-kpi-card__orb" style="background:var(--citewp-blue-tint);color:var(--citewp-tint-blue)">
+						<?php echo IconLibrary::icon( 'llms-txt', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+					</div>
+					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'llms.txt', 'ai-search-optimizer' ); ?></span>
+				</div>
+				<div class="citewp-aiso-kpi-card__value" style="color:<?php echo $llms_enabled ? 'var(--citewp-tint-green)' : 'var(--citewp-text-muted)'; ?>">
+					<?php echo $llms_enabled ? esc_html__( 'Active', 'ai-search-optimizer' ) : esc_html__( 'Off', 'ai-search-optimizer' ); ?>
+				</div>
+				<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'AI-readable content index', 'ai-search-optimizer' ); ?></div>
+				<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
+				<div class="citewp-aiso-kpi-card__actions">
+					<a href="#settings" class="citewp-aiso-btn"><?php esc_html_e( 'Configure →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
@@ -420,10 +443,26 @@ final class Menu {
 						<span class="citewp-aiso-insights__title"><?php esc_html_e( 'AI Insights', 'ai-search-optimizer' ); ?></span>
 						<span class="citewp-aiso-insights__badge">BETA</span>
 					</div>
-					<div class="citewp-aiso-insights__inner">
-						<div class="citewp-aiso-insights__item"><?php esc_html_e( 'Your site receives AI crawler visits — good for citation potential.', 'ai-search-optimizer' ); ?></div>
-						<div class="citewp-aiso-insights__item"><?php esc_html_e( 'Add schema markup to increase structured data coverage.', 'ai-search-optimizer' ); ?></div>
-						<div class="citewp-aiso-insights__item"><?php esc_html_e( 'Publish consistently to maintain crawler interest.', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-insights__body">
+						<div class="citewp-aiso-insights__nested">
+							<div class="citewp-aiso-insights__nested-top">
+								<div class="citewp-aiso-insights__orb">
+									<?php echo IconLibrary::icon( 'bot', 28 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+								</div>
+								<div class="citewp-aiso-insights__headline-wrap">
+									<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content is being discovered', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-insights__sub"><?php esc_html_e( 'AI crawlers are visiting your site. Optimise to increase citation likelihood.', 'ai-search-optimizer' ); ?></p>
+								</div>
+							</div>
+							<div class="citewp-aiso-insights__nested-bottom">
+								<p class="citewp-aiso-insights__opp-label"><?php esc_html_e( 'Top opportunity', 'ai-search-optimizer' ); ?></p>
+								<p class="citewp-aiso-insights__opp-body"><?php esc_html_e( 'Add structured schema markup to your highest-traffic posts to improve citation potential.', 'ai-search-optimizer' ); ?></p>
+								<p class="citewp-aiso-insights__opp-muted"><?php esc_html_e( 'Posts with schema are 3× more likely to be cited in AI responses.', 'ai-search-optimizer' ); ?></p>
+								<div class="citewp-aiso-insights__opp-actions">
+									<a href="#cite-score" class="citewp-aiso-btn"><?php esc_html_e( 'View Recommendations →', 'ai-search-optimizer' ); ?></a>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -432,20 +471,32 @@ final class Menu {
 					<h3 class="citewp-aiso-needs__heading"><?php esc_html_e( 'Needs Attention', 'ai-search-optimizer' ); ?></h3>
 					<?php if ( ! empty( $lowest_posts ) ) : ?>
 						<?php foreach ( $lowest_posts as $post ) :
-							$score    = (int) get_post_meta( $post->ID, Repository::META_KEY_TOTAL, true );
-							$grade    = get_post_meta( $post->ID, Repository::META_KEY_GRADE, true );
-							$grade    = is_string( $grade ) && in_array( $grade, [ 'red', 'orange', 'yellow', 'green' ], true ) ? $grade : 'red';
-							$edit_url = get_edit_post_link( $post->ID );
+							$score     = (int) get_post_meta( $post->ID, Repository::META_KEY_TOTAL, true );
+							$grade     = get_post_meta( $post->ID, Repository::META_KEY_GRADE, true );
+							$grade     = is_string( $grade ) && in_array( $grade, [ 'red', 'orange', 'yellow', 'green' ], true ) ? $grade : 'red';
+							$edit_url  = get_edit_post_link( $post->ID );
+							$post_type = get_post_type_object( $post->post_type );
+							$type_name = $post_type ? $post_type->labels->singular_name : $post->post_type;
+							$time_ago  = human_time_diff( (int) get_post_modified_time( 'U', true, $post ), time() );
 						?>
 						<div class="citewp-aiso-needs__item">
-							<div class="citewp-aiso-needs__title">
-								<?php if ( $edit_url ) : ?>
-									<a href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html( get_the_title( $post ) ); ?></a>
-								<?php else : ?>
-									<?php echo esc_html( get_the_title( $post ) ); ?>
-								<?php endif; ?>
+							<div class="citewp-aiso-needs__score citewp-aiso-needs__score--<?php echo esc_attr( $grade ); ?>">
+								<span class="citewp-aiso-needs__score-val"><?php echo esc_html( (string) $score ); ?></span>
+								<span class="citewp-aiso-needs__score-lbl"><?php esc_html_e( 'score', 'ai-search-optimizer' ); ?></span>
 							</div>
-							<div class="citewp-aiso-needs__badge citewp-aiso-needs__badge--<?php echo esc_attr( $grade ); ?>"><?php echo esc_html( (string) $score ); ?></div>
+							<div class="citewp-aiso-needs__info">
+								<div class="citewp-aiso-needs__title">
+									<?php if ( $edit_url ) : ?>
+										<a href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html( get_the_title( $post ) ); ?></a>
+									<?php else : ?>
+										<?php echo esc_html( get_the_title( $post ) ); ?>
+									<?php endif; ?>
+								</div>
+								<div class="citewp-aiso-needs__meta"><?php echo esc_html( $type_name . ' · ' . $time_ago . ' ' . __( 'ago', 'ai-search-optimizer' ) ); ?></div>
+							</div>
+							<?php if ( $edit_url ) : ?>
+								<a href="<?php echo esc_url( $edit_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'Improve', 'ai-search-optimizer' ); ?></a>
+							<?php endif; ?>
 						</div>
 						<?php endforeach; ?>
 					<?php else : ?>
