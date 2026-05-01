@@ -53,7 +53,7 @@
 - **WP Dashboard widget review** — verify it stays WP-native per P39 Verdict 2 (Surface 2). Score colors allowed for emphasis, no Citrine, no decorative tints, no Inter, WP system font stack only. Likely already correct from Session 12 implementation; needs verification.
 - **Post list score column review** — verify minimal styling per P39 Verdict 2 (Surface 3). Score colors only. Already correct from prior sessions; needs verification.
 - **P31 metabox consolidation styled to v3** — universal meta box position `'normal'` + tabbed structure from Session 13/14 carryover. Light v3 styling per UI-DESIGN-SYSTEM.md (sits between Surface 1 and WP-native).
-- **P33 Posts/Pages stat split** — deferred from Session 13/14. Still relevant for Session 16 Dashboard data layer.
+- **Posts/Pages stat split** (number pre-allocated as P33, no DECISIONS.md row yet — log before Session 16 Dashboard build per SESSION-15-BRIEF.md guidance) — deferred from Session 13/14. Still relevant for Session 16 Dashboard data layer.
 - **Engine.php entities detector bug** (A11-gated, dedicated session) — `ContentAnalysis.php` line ~165 `count_entities()` regex bug. Requires explicit user approval before any Engine.php touch.
 - **DashboardData draft-exclusion comment** — `WHERE p.post_status = 'publish'` inline comment.
 - **`citewp_aiso/metabox/tabs` filter `$context` arg** — Session 12 carryover, should ship with P31 build.
