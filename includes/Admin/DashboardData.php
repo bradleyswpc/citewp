@@ -126,7 +126,7 @@ final class DashboardData {
 				   AND pm.meta_value IN ('red','orange')
 				   AND p.post_status = 'publish'
 				   AND p.post_type IN ('post','page')",
-				'_citewp_aiso_geo_score_grade'
+				Repository::META_KEY_GRADE
 			)
 		);
 		return (int) ( $result ?? 0 );

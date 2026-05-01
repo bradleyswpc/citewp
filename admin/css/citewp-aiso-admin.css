@@ -845,7 +845,7 @@
   margin-bottom: var(--sp-5);
 }
 
-.citewp-aiso-tabs__tab {
+.citewp-aiso-tabs__btn {
   padding: 10px var(--sp-4);
   font: 500 13px/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-secondary);
@@ -858,20 +858,20 @@
   margin-bottom: -1px;
 }
 
-.citewp-aiso-tabs__tab:hover {
+.citewp-aiso-tabs__btn:hover {
   color: var(--citewp-text-primary);
 }
 
-.citewp-aiso-tabs__tab.is-active {
+.citewp-aiso-tabs__btn--active {
   color: var(--citewp-text-primary);
   border-bottom-color: var(--citewp-citrine);
 }
 
-.citewp-aiso-tabs__content-panel {
+.citewp-aiso-tabs__panel {
   display: none;
 }
 
-.citewp-aiso-tabs__content-panel.is-active {
+.citewp-aiso-tabs__panel--active {
   display: block;
 }
 

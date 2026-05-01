@@ -32,7 +32,7 @@ final class DashboardWidget {
 		}
 		wp_add_dashboard_widget(
 			self::WIDGET_ID,
-			__( 'CiteWP — GEO Overview', 'ai-search-optimizer' ),
+			__( 'CiteWP — Cite Score', 'ai-search-optimizer' ),
 			[ $this, 'render' ]
 		);
 	}
@@ -44,7 +44,7 @@ final class DashboardWidget {
 
 		$avg_score    = $this->get_average_score();
 		$trend        = $this->get_visit_trend();
-		$top_crawled  = $this->get_top_crawled_pages();
+		$top_crawlers = $this->get_top_crawlers_data();
 		$lowest_posts = $this->get_lowest_scoring_posts();
 
 		/**
@@ -55,7 +55,7 @@ final class DashboardWidget {
 		 */
 		apply_filters( 'citewp_aiso/dashboard/cards', [] );
 
-		$logs_url     = admin_url( 'admin.php?page=citewp-aiso-crawler-logs' );
+		$logs_url     = admin_url( 'admin.php?page=' . Menu::SLUG_PARENT );
 		$all_posts_url = admin_url( 'edit.php?orderby=citewp_aiso_geo_score&order=asc' );
 
 		$avg_grade = 'red';
@@ -114,14 +114,15 @@ final class DashboardWidget {
 				</div>
 			</div>
 
-			<?php if ( ! empty( $top_crawled ) ) : ?>
+			<?php if ( ! empty( $top_crawlers ) ) : ?>
 			<div class="citewp-aiso-widget__section">
-				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Most Crawled Pages (Last 7 Days)', 'ai-search-optimizer' ); ?></h4>
+				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Top AI Crawlers (Last 7 Days)', 'ai-search-optimizer' ); ?></h4>
 				<ul class="citewp-aiso-list">
-					<?php foreach ( $top_crawled as $row ) : ?>
+					<?php foreach ( $top_crawlers as $crawler ) : ?>
 					<li class="citewp-aiso-list__item">
-						<span class="citewp-aiso-list__count"><?php echo esc_html( number_format_i18n( (int) $row->visit_count ) ); ?></span>
-						<span class="citewp-aiso-list__uri" title="<?php echo esc_attr( $row->request_uri ); ?>"><?php echo esc_html( $row->request_uri ); ?></span>
+						<span class="citewp-aiso-widget__bot-avatar citewp-aiso-bot--<?php echo esc_attr( $crawler['color_class'] ); ?>"><?php echo esc_html( $crawler['initial'] ); ?></span>
+						<span class="citewp-aiso-list__title"><?php echo esc_html( $crawler['display_name'] ); ?></span>
+						<span class="citewp-aiso-list__count"><?php echo esc_html( number_format_i18n( (int) $crawler['visits'] ) ); ?></span>
 					</li>
 					<?php endforeach; ?>
 				</ul>
@@ -169,10 +170,10 @@ final class DashboardWidget {
 	}
 
 	/**
-	 * @return array<int, object>
+	 * @return array<int, array<string, mixed>>
 	 */
-	private function get_top_crawled_pages(): array {
-		return ( new DashboardData() )->get_top_crawled_pages();
+	private function get_top_crawlers_data(): array {
+		return ( new DashboardData() )->get_top_crawlers();
 	}
 
 	/**
@@ -227,6 +228,12 @@ final class DashboardWidget {
 			.citewp-aiso-widget__link { font-size: 12px; color: #2271b1; text-decoration: none; }
 			.citewp-aiso-widget__link:hover { text-decoration: underline; }
 			.citewp-aiso-widget__empty { color: #6b7280; font-size: 12px; margin: 0; }
+			.citewp-aiso-widget__bot-avatar { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
+			.citewp-aiso-bot--gpt    { background: #ec4899; }
+			.citewp-aiso-bot--claude { background: #F97316; }
+			.citewp-aiso-bot--perp   { background: #7C3AED; }
+			.citewp-aiso-bot--google { background: #2563EB; }
+			.citewp-aiso-bot--default { background: #14B8A6; }
 		</style>
 		<?php
 	}
