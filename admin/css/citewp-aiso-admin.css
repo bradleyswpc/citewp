@@ -201,8 +201,8 @@
 .citewp-aiso-rail__wordmark {
   display: block;
   font: 800 28px/1 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--citewp-citrine);
-  letter-spacing: -0.02em;
+  color: var(--citewp-text-on-navy);
+  letter-spacing: -0.04em;
 }
 
 .citewp-aiso-rail__bracket {
@@ -211,7 +211,7 @@
 
 .citewp-aiso-rail__plugin-name {
   display: block;
-  font: 700 15px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 700 16px/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-citrine);
   margin-top: 8px;
 }
@@ -292,15 +292,20 @@
   border-radius: var(--radius-md);
 }
 
+.citewp-aiso-pro__icon {
+  color: var(--citewp-citrine);
+  margin-bottom: var(--sp-2);
+}
+
 .citewp-aiso-pro__heading {
-  font: 700 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 800 13px/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-citrine);
   margin-bottom: var(--sp-1);
 }
 
 .citewp-aiso-pro__copy {
   font: 400 11px/1.5 'Inter', system-ui, -apple-system, sans-serif;
-  color: rgba(255, 255, 255, 0.5);
+  color: #e2e8f0;
   margin-bottom: var(--sp-3);
 }
 
@@ -351,13 +356,13 @@
 }
 
 .citewp-aiso-hero__title {
-  font: 700 20px/1.2 'Inter', system-ui, -apple-system, sans-serif;
+  font: 800 22px/1.2 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-white);
-  margin-bottom: var(--sp-1);
+  margin-bottom: 6px;
 }
 
 .citewp-aiso-hero__sub {
-  font: 400 13px/1.4 'Inter', system-ui, -apple-system, sans-serif;
+  font: 500 13px/1.4 'Inter', system-ui, -apple-system, sans-serif;
   color: rgba(255, 255, 255, 0.6);
   margin-bottom: var(--sp-5);
 }
@@ -533,6 +538,12 @@
   margin-top: var(--sp-1);
 }
 
+.citewp-aiso-kpi-score--green  { color: var(--citewp-score-green); }
+.citewp-aiso-kpi-score--yellow { color: var(--citewp-score-yellow); }
+.citewp-aiso-kpi-score--orange { color: var(--citewp-score-orange); }
+.citewp-aiso-kpi-score--red    { color: var(--citewp-score-red); }
+.citewp-aiso-kpi-score--empty  { color: var(--citewp-text-muted); }
+
 /* === SECTION 11: KPI button === */
 
 .citewp-aiso-btn {
@@ -700,7 +711,7 @@
 .citewp-aiso-insights__opp-muted {
   font: 400 12px/1.4 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-muted);
-  margin-bottom: var(--sp-3);
+  margin-bottom: 24px;
 }
 
 .citewp-aiso-insights__opp-actions {
@@ -717,10 +728,27 @@
   padding: var(--sp-5);
 }
 
+.citewp-aiso-crawlers__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
 .citewp-aiso-crawlers__heading {
-  font: 600 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 800 14px/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-primary);
-  margin-bottom: var(--sp-4);
+}
+
+.citewp-aiso-crawlers__view-all {
+  font: 700 12px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-tint-blue);
+  text-decoration: none;
+}
+
+.citewp-aiso-crawlers__view-all:hover {
+  text-decoration: underline;
+  color: var(--citewp-tint-blue);
 }
 
 .citewp-aiso-crawlers__table {
@@ -927,11 +955,12 @@
   background: var(--citewp-white);
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-md);
-  padding: var(--sp-4);
+  padding: 14px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--sp-2);
+  min-height: 100px;
   text-decoration: none;
   transition: border-color 0.15s, box-shadow 0.15s;
   cursor: pointer;
@@ -946,7 +975,7 @@
 .citewp-aiso-action-card__orb {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 10px;
   background: var(--citewp-blue-tint);
   display: flex;
   align-items: center;
@@ -954,6 +983,11 @@
   flex-shrink: 0;
   color: var(--citewp-tint-blue);
 }
+
+.citewp-aiso-action-card__orb--green  { background: rgba(22, 163, 74, 0.12);  color: var(--citewp-tint-green); }
+.citewp-aiso-action-card__orb--purple { background: rgba(124, 58, 237, 0.12); color: var(--citewp-tint-purple); }
+.citewp-aiso-action-card__orb--blue   { background: rgba(37, 99, 235, 0.12);  color: var(--citewp-tint-blue); }
+.citewp-aiso-action-card__orb--orange { background: rgba(249, 115, 22, 0.12); color: var(--citewp-tint-orange); }
 
 .citewp-aiso-action-card__label {
   font: 600 13px/1.3 'Inter', system-ui, -apple-system, sans-serif;
@@ -968,8 +1002,8 @@
 /* === SECTION 17: Pro Tip footer === */
 
 .citewp-aiso-protip {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(139, 92, 246, 0.06) 100%);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.18) 0%, rgba(20, 184, 166, 0.10) 100%);
+  border: 1px solid rgba(124, 58, 237, 0.45);
   border-radius: var(--radius-lg);
   padding: var(--sp-5) var(--sp-6);
   display: flex;
