@@ -138,8 +138,10 @@ final class DashboardData {
 	public function get_top_crawlers( int $limit = 5 ): array {
 		global $wpdb;
 
-		$table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
-		$since = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+		$table        = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
+		$since        = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+		$prior_start  = gmdate( 'Y-m-d H:i:s', strtotime( '-14 days' ) );
+		$prior_end    = $since;
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table is esc_sql() of a hardcoded constant. Real-time widget data.
 		$rows = $wpdb->get_results(
@@ -155,13 +157,33 @@ final class DashboardData {
 			),
 			ARRAY_A
 		);
+
+		$prior_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT bot_name, COUNT(*) AS visits
+				 FROM {$table}
+				 WHERE detected_at >= %s AND detected_at < %s
+				 GROUP BY bot_name",
+				$prior_start,
+				$prior_end
+			),
+			ARRAY_A
+		);
 		// phpcs:enable
 
 		if ( empty( $rows ) ) {
 			return [];
 		}
 
-		$map = [
+		// Index prior-period counts by bot_name for O(1) lookup.
+		$prior_map = [];
+		if ( is_array( $prior_rows ) ) {
+			foreach ( $prior_rows as $prior_row ) {
+				$prior_map[ $prior_row['bot_name'] ] = (int) $prior_row['visits'];
+			}
+		}
+
+		$display_map = [
 			'GPTBot'        => [ 'label' => 'GPTBot',      'class' => 'citewp-bot--gpt' ],
 			'ClaudeBot'     => [ 'label' => 'Claude',      'class' => 'citewp-bot--claude' ],
 			'Claude-Web'    => [ 'label' => 'Claude',      'class' => 'citewp-bot--claude' ],
@@ -170,16 +192,29 @@ final class DashboardData {
 			'Bingbot'       => [ 'label' => 'Bing',        'class' => 'citewp-bot--default' ],
 		];
 
+		$bot_type_map = [
+			'GPTBot'          => 'Search Engine',
+			'ChatGPT-User'    => 'AI Assistant',
+			'ClaudeBot'       => 'AI Assistant',
+			'Claude-Web'      => 'AI Assistant',
+			'PerplexityBot'   => 'AI Assistant',
+			'Googlebot'       => 'Search Engine',
+			'Google-Extended' => 'Search Engine',
+			'Bingbot'         => 'AI Assistant',
+		];
+
 		$out = [];
 		foreach ( $rows as $row ) {
 			$bot_name = $row['bot_name'] ?? '';
-			$meta     = $map[ $bot_name ] ?? [ 'label' => $bot_name, 'class' => 'citewp-bot--default' ];
+			$meta     = $display_map[ $bot_name ] ?? [ 'label' => $bot_name, 'class' => 'citewp-bot--default' ];
 			$out[] = [
 				'bot_name'     => $bot_name,
 				'display_name' => $meta['label'],
 				'visits'       => (int) $row['visits'],
 				'initial'      => strtoupper( substr( $meta['label'], 0, 1 ) ),
 				'color_class'  => $meta['class'],
+				'bot_type'     => $bot_type_map[ $bot_name ] ?? 'AI Crawler',
+				'prior_visits' => $prior_map[ $bot_name ] ?? 0,
 			];
 		}
 		return $out;
