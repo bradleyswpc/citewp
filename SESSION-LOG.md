@@ -6,6 +6,121 @@
 
 ---
 
+## Session 15 — v3 brand system reset, Citrine on Navy ✅
+
+**Date:** 2026-04-30
+
+**Deliverable:** Full v3 brand system shipped across Brain folder. P38 palette locked (18 tokens), P39 surface + layout verdicts, brand-kit-v3-citrine-on-navy.html canonical reference built, UI-DESIGN-SYSTEM.md fully rewritten under v3 with new Component Library section, X19 logged covering coherence audit + carry-over verdict discipline. **No plugin code shipped this session — P36 plugin code freeze remains in effect through Session 15.** Plugin admin migration to v3 is Session 16+ work via X13 pipeline.
+
+**Brain edits (per X10 per-edit commit cadence):**
+- `DECISIONS.md` — P38 logged (v3 palette: 18 tokens organized as 3 brand identity + 2 navy + 3 paper + 6 decorative tints + 4 score colors + 3 text + 1 border). Citrine `#E8D400` retained (user explicit: "I like poppy color"); reference CSS's softer `#F7D84A` rejected. Blue + Teal demoted to decorative tints only — re-skinned in reference: blue links/buttons → Citrine on navy / Obsidian on paper. P34 (Teal semantic citation/data role) and P35 (soft gray rail) explicitly superseded. SHA `16053c2`.
+- `DECISIONS.md` — P39 logged covering three Step 2 verdicts: (Verdict 1) tagline placement amends P30 — moves from page header to rail, stacked under wordmark + plugin name lockup; (Verdict 2) surface-by-surface palette amends P26 with v3 specifics — admin pages full v3, WP Dashboard widget WP-native + score colors, post list column score colors only; (Verdict 3) Dashboard layout target amends P32 — hero card + 4-card stat row + 2-column lower section + Pro Tip footer composition. SHA `4a26bc7`.
+- `DECISIONS.md` — X19 logged covering two paired rules: (1) coherence audit at session-start when amendment density crosses threshold (3+ amendments across 2+ consecutive sessions to same cluster); (2) carry-over verdict discipline when amending a P-row with dependents — each dependent gets explicit verdict, even when "principle survives." SHA `8a3cde9`.
+- `Brain/brand/brand-kit-v3-citrine-on-navy.html` — 7-section brand kit demonstrating v3 design system: Hero / Architecture (three-name system) / Color (full P38 palette swatches) / Typography (Inter + JetBrains Mono on paper and navy) / Components (Dashboard composition: rail + hero card + 4-card stat row + AI Insights nested two-tone + Top Crawlers + Needs Attention + Quick Actions + Pro Tip footer) / Voice / Specs. Iterated through 4 review passes addressing user feedback (squared rail items, Lucide icons, two-tone AI Insights, score-band Cite Score color, KPI button styling). SHA `2f41530`.
+- `Brain/design-reference/v3-reference-{dashboard,crawler-logs,cite-score}.png` — three ChatGPT-generated reference mockups committed (retroactive — Session 14 commit missed them). SHA `9535386`.
+- `Brain/SESSION-15-BRIEF.md` — Step 5 stale line corrected (typography review marked RESOLVED by P37). SHA `800bda7`.
+- `Brain/UI-DESIGN-SYSTEM.md` — full v3 rewrite (~800 lines, replaces v2 system). Major sections: Design Philosophy (v3 SaaS register, deliberate inversion of v2), Color System (full P38 + Surface 1/2/3 application), Typography (P37 stack), Spacing (8px grid survives), Layout Patterns (rail spec from P28 + P39 V1, Dashboard composition from P39 V3), **Component Library (NEW)** — 12 components catalogued with structural specs (Wordmark, Rail brand area, Hero Card, KPI Card, KPI Button, AI Insights two-tone nested, Top Crawlers Table, Needs Attention List, Quick Actions, Pro Tip Footer, Score Badge, Score Gauge, Panel Link), What NOT to Do (rewritten — 12 new v3 rules + 3 surviving from v2), Cross-References. SHA `4050c47`.
+
+**Decisions made:**
+- P38 — v3 palette locked (Citrine retained, Navy adopted, Blue/Teal demoted to decorative tints)
+- P39 — three Step 2 verdicts (tagline placement, surface palette, Dashboard layout) under v3
+- X19 — coherence audit + carry-over verdict discipline (paired rules)
+
+**Decisions superseded this session:**
+- P34 — Teal semantic citation/data role (superseded by P38; Teal now decorative tint)
+- P35 — Soft gray rail (superseded by P38; rail is now navy)
+- P26 — surface-by-surface palette principle survives but specifics replaced (P39 V2 amends)
+- P30 — tagline wording survives but placement moves rail (P39 V1 amends)
+- P32 — three-column principle survives but layout target updated (P39 V3 amends)
+
+**v2 vs v3 register difference:** v2 chased "look like the best WordPress plugin" (WP-native styling, no custom fonts, system color scheme). v3 deliberately inverts: "look like a modern SaaS product" (navy shell + Citrine accents + Inter typography + Lucide icons + decorative tint orbs). Buyer signal: mortgage industry + regulated industry buyers (S2) read WP-native as "free WordPress thing"; SaaS register reads as "professional software worth paying for." Plus: v3 register works across plugin admin + citewp.com website + Pro SaaS app — single visual language for three surfaces. v2 only worked on plugin and forced website + Pro to invent their own.
+
+**Brand kit iteration history (Session 15, in-conversation):**
+- Pass 1 (medium fidelity, ~630 lines) — structural skeleton with placeholder square icons. User feedback: rail brackets need to be squared not rounded, icons needed, cards should be same height, Cite Score 44 needs threshold color, AI Insights needs panel title.
+- Pass 2 (~715 lines) — Lucide-style SVG icons, squared rail items + 3px Citrine left edge, paper-bg main column (not navy), trend percentages on KPI cards, hero stat icons added, AI Insights header strip with BETA badge, score-band-red on Cite Score 44, half-Citrine half-Blue button test.
+- Pass 3 — all buttons unified to Blue text + paper-tinted background (Blue won the side-by-side); AI Insights wrapped in nested two-tone teal/purple-tinted card; hero card Cite Score back to white (red on navy looked bad); KPI cards restructured to icon-orb-left-of-title.
+- Pass 4 (final, ~775 lines) — Improve buttons → Blue, panel-link → Blue, Top Crawlers reduced from 4 to 3 rows, KPI orbs reduced from 36×36 to 28×28 (icons 14px — ~25% larger than 13px title text), hero stat icons colorized purple/teal/orange.
+
+**Final user assessment of v3:** "Serious upgrade." (Verbatim transcript not rendered here — full discussion in conversation history.)
+
+**Plugin code status:** No plugin code shipped Session 15. P36 freeze remains active through end-of-session. Last plugin commits remain Session 14's three CSS commits (`6ae59cf` single-row header, `5633a69` soft gray rail, `d09b8a6` Teal tokens) — all stay in dev-branch history as artifact, will be superseded by Session 16 v3 migration before any user sees them. v0.6.0 stays in WP.org review hold pending coordinated launch with citewp.com website + Pro app.
+
+**npm build:** N/A (no plugin code touched). **PHP lint:** N/A. **Browser verification:** brand kit visually verified by user in browser across 4 iteration passes.
+
+**Carryover into Session 16:**
+- **Plugin admin migration to v3 brand system** (X13 pipeline — multi-file CSS + PHP). Implements UI-DESIGN-SYSTEM.md v3 spec across `admin/css/citewp-aiso-admin.css`, `Menu.php` panel renderers, `PageHeader.php` (recreate — was deleted Session 13, needs to come back for the new rail + hero structure), Settings page, Logs page. All 18 P38 tokens active. Replaces Session 14's superseded CSS commits.
+- **Inter + JetBrains Mono fonts:** add `inter-{400,500,700,800}.woff2` and `jetbrains-mono-{400,500,700}.woff2` to `admin/fonts/`. Add `@font-face` blocks at top of `citewp-aiso-admin.css`. Drop Plus Jakarta Sans and Fraunces font files (P37 dropped both).
+- **WP Dashboard widget review** — verify it stays WP-native per P39 Verdict 2 (Surface 2). Score colors allowed for emphasis, no Citrine, no decorative tints, no Inter, WP system font stack only. Likely already correct from Session 12 implementation; needs verification.
+- **Post list score column review** — verify minimal styling per P39 Verdict 2 (Surface 3). Score colors only. Already correct from prior sessions; needs verification.
+- **P31 metabox consolidation styled to v3** — universal meta box position `'normal'` + tabbed structure from Session 13/14 carryover. Light v3 styling per UI-DESIGN-SYSTEM.md (sits between Surface 1 and WP-native).
+- **P33 Posts/Pages stat split** — deferred from Session 13/14. Still relevant for Session 16 Dashboard data layer.
+- **Engine.php entities detector bug** (A11-gated, dedicated session) — `ContentAnalysis.php` line ~165 `count_entities()` regex bug. Requires explicit user approval before any Engine.php touch.
+- **DashboardData draft-exclusion comment** — `WHERE p.post_status = 'publish'` inline comment.
+- **`citewp_aiso/metabox/tabs` filter `$context` arg** — Session 12 carryover, should ship with P31 build.
+- **readme.txt + WP.org assets** — deferred until coordinated launch (website + Pro app + v0.7.0).
+
+**Next session focus:** Session 16 — plugin admin v3 migration via X13 pipeline. Long session expected (multi-file refactor with PHP + CSS + JS coordination + browser verification + code-reviewer pass).
+
+---
+
+## Session 14 — Brain folder backup setup + brand system reset (X10 + P36 + P37) ✅
+
+**Date:** 2026-04-30
+
+**Retroactive entry:** This entry was not written at Session 14 close (end-of-session protocol gap caught at Session 15 start by Claude Code). Reconstructed from DECISIONS.md rows logged + git commit history + chat history. SHA references verified against actual git log.
+
+**Deliverable:** Brain folder backed up to separate private GitHub repo (X10 executed); plugin admin styling experiments shipped (single-row header, soft gray rail, Teal tokens) then reset entirely when brand system was rebooted to Citrine on Navy. Three carry-over P-rows (P30, P31, P32) and one new X-row (X18) logged. Plugin code freeze imposed at session close pending Session 15 fleshout of v3 system.
+
+**Brain repo creation (X10 executed):**
+- New private GitHub repo `bradleyswpc/citewp-brain` created.
+- Brain folder initialized with git, `.gitignore` configured (excludes `Brain-BACKUP/` same-disk redundant copy, OS junk, editor temp).
+- Git identity configured (`bradleyswpc <131623150+bradleyswpc@users.noreply.github.com>` after initial placeholder identity discovered + corrected).
+- Per-edit commit + push cadence operational from Session 14 forward.
+- Brand assets relocated from `Desktop\CiteWP\brand\` → `Brain\brand\` to bring them under Brain repo cadence. `Brain\brand\` is canonical going forward.
+- `brand-kit-v2-yellow.html` renamed to `brand-kit-v2-yellow-ARCHIVED.html` at session close per P36 closeout.
+
+**Plugin code shipped (now superseded artifacts, will not reach users):**
+- `6ae59cf` — single-row header layout per P30 work (lockup + tagline below in single column)
+- `5633a69` — soft gray rail revert (replaced Session 13's experimental Obsidian rail) per P35
+- `d09b8a6` — Session 14 CSS tokens (Teal semantic tokens per P34, soft gray rail tokens per P35)
+
+**These plugin commits stay in dev-branch history but will be superseded by Session 16 v3 migration before any user sees them.** v0.6.0 stays in WP.org review hold; no SVN push to live until coordinated launch.
+
+**Decisions made:**
+- P30 — canonical brand tagline "SEO gets you ranked. CiteWP gets you cited." locked for all brand surfaces (placement amended later by P39 V1)
+- P31 — universal meta box position `'normal'` + tabbed structure mirroring Yoast/Rank Math (P22 amendment)
+- P32 — P27 amendment: column-count and card-grid pattern are distinct concerns; three-column permitted when columns hold distinct content types
+- P34 — Signal Teal `#006D70` added as citation/data semantic accent (later superseded by P38 — Teal demoted to decorative tint)
+- P35 — Admin rail soft gray `#F1EFE8` (Gray-50) with Obsidian text + 3px Citrine left-edge active (later superseded by P36/P38 — rail is now navy)
+- P36 — **brand system reset to Citrine on Navy.** Mid-session, user surfaced ChatGPT-generated dashboard mockup as visual reference. Three motivations: (1) v2 Citrine + Obsidian palette accumulated complexity that read sterile; (2) pre-launch timing meant zero users would see the reset; (3) Citrine on Navy works across plugin + website + Pro app where v2 only worked on plugin. P21, P30, P34, P35 superseded as a set pending Session 15 fleshout. **Plugin code freeze imposed:** no further admin styling touches the plugin until Session 15 ships the new system.
+- P37 — typography reset (Session 14 close addendum). Inter for UI + headings + wordmark; JetBrains Mono for numbers; Plus Jakarta Sans + Fraunces dropped entirely. Supersedes typography portion of P21.
+- X18 — process decisions (X-rows) with deferred execution must be re-surfaced at every session-start protocol until executed, amended, or withdrawn. Soft deferrals must convert to hard task entries. Session-start grep `\[EXEC:` audit. Caught the X10 5-session gap (Brain backup deferred since Session 8) at Session 14 start.
+
+**Brain edits Session 14 timeline:**
+- Session start: X10 [EXEC: Phase 1.5] surfaced and executed — Brain repo bradleyswpc/citewp-brain created, per-edit cadence operational.
+- Mid-session: P34 + P35 logged after Session 13 Obsidian rail experiment was reverted to soft gray + Teal added as semantic accent.
+- Mid-session: brand kit v2-yellow visual review prompted reference mockup discussion → P36 brand system reset.
+- Session close: P37 logged as addendum (typography settled before Session 15 starts).
+- Session close: X18 logged from the deferred-execution drift pattern X10's gap exposed.
+- Session close: SESSION-15-BRIEF.md written with rewrite scope.
+- Session close: brand-kit-v2-yellow.html renamed to brand-kit-v2-yellow-ARCHIVED.html.
+- Session close: UI-DESIGN-SYSTEM.md retained text + header note flagging pending Session 15 rewrite.
+
+**npm build:** ✅ clean (CSS-only changes). **PHP lint:** ✅. **debug.log:** ✅ clean. **Browser verification:** Session 14 plugin commits visually verified before brand reset; reset rendered all of them artifact.
+
+**Carryover into Session 15 (per SESSION-15-BRIEF.md, executed):**
+- ✅ Step 1 — palette decisions (P38 logged Session 15)
+- ✅ Step 2 — carry-over verdicts on P21/P30/P32/P34/P35/P26 (P39 logged Session 15)
+- ✅ Step 3 — brand-kit-v3-citrine-on-navy.html build (committed Session 15)
+- ✅ Step 4 — UI-DESIGN-SYSTEM.md major rewrite (committed Session 15)
+- ✅ Step 5 — X19 logged (Session 15)
+- ✅ Step 6 — SESSION-LOG.md retroactive Session 14 + Session 15 entries (this file, Session 15 close)
+- Step 7 — handoff to Session 16 (Session 15 close, this entry)
+
+**Next session focus (at Session 14 close):** Session 15 — full v3 brand system fleshout per SESSION-15-BRIEF.md. Plugin code freeze remains in effect through Session 15. (Session 15 executed all 7 brief steps; v3 system now ready for Session 16 plugin migration.)
+
+---
+
 ## Session 13 close — Admin layout refactor + brand identity (P27 + P28 + P29) ✅
 
 **Date:** 2026-04-29
