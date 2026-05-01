@@ -78,11 +78,8 @@ final class Plugin {
 			$this->modules['dashboard_widget'] = new Admin\DashboardWidget();
 			$this->modules['dashboard_widget']->register();
 
-			$this->modules['score_meta_box'] = new Admin\ScoreMetaBox();
-			$this->modules['score_meta_box']->register();
-
-			$this->modules['schema_meta_box'] = new Admin\SchemaMetaBox();
-			$this->modules['schema_meta_box']->register();
+			$this->modules['editor_panel'] = new Admin\EditorPanel();
+			$this->modules['editor_panel']->register();
 		}
 	}
 
