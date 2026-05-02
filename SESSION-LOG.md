@@ -6,6 +6,64 @@
 
 ---
 
+## Session 17 — Crawler Logs + Settings v3 polish ✅
+
+**Date:** 2026-05-02
+
+**Deliverable:** Full v3 treatment shipped to Crawler Logs and Settings admin pages per P40. Replaced light v3 styling with component-spec-compliant markup and CSS. Crawler Logs: page header strip (title + description + filter pills for date range), 4-col KPI row (Total Crawls / Unique Bots / Pages Crawled / Avg Crawl Frequency), full-width logs table in paper card container, Pro Tip footer. Settings: consolidated to single General tab with 3 stacked FSCards (AI Crawler Detection / llms.txt Generation / Maintenance), page header strip, blue Save Changes button, KPI Button–styled Regenerate action. CSS Sections 20–25 appended to `admin/css/citewp-aiso-admin.css` in Task 1 before PHP work to prevent merge conflicts. P40 Brain edits (DECISIONS.md + UI-DESIGN-SYSTEM.md) completed in brainstorming phase before implementation.
+
+**Commits (plugin repo, Session 17):**
+- `897e54a` — docs: Session 17 implementation plan
+- `467d3a7` — docs: plan-review resolutions — scope cut, schema verified
+- `3904508` — docs: plan amendment — per-card orb on FSCard
+- `69da08b` — feat: add v3 page header strip, filter pills, KPI v3, FSCard, settings tab nav CSS (Sections 20–25)
+- `1d468ba` — feat: Crawler Logs v3 polish — page header strip, filter pills, 4-col KPI row, paper table card, Pro Tip footer
+- `bb829cd` — feat: Settings v3 polish — page header strip with tab nav, Form Section Cards, blue Save button
+- `2abaf93` — fix: Settings v3 polish — FSCard two-col layout, tab consolidation, llms.txt URL row, Regenerate button, tab spacing
+
+**Brain edits (brainstorming phase, before plugin build):**
+- `DECISIONS.md` — P40 logged: page header strip pattern — Hero Card is Dashboard-only; all other admin pages use slim Page Header Strip (title + description + optional right-side controls).
+- `UI-DESIGN-SYSTEM.md` — "Other page layouts" section rewritten; Hero Card annotated as Dashboard-only; 4 new Component Library entries: Page Header Strip, KPI Card (page-level), Filter Pill, Form Section Card (FSCard).
+
+**Files modified (plugin):**
+- `admin/css/citewp-aiso-admin.css` — Sections 20–25 appended (page header strip, filter pills, KPI stat cards, logs table card, Pro Tip footer, FSCard, settings tab nav)
+- `includes/Admin/LogsPage.php` — rewritten: page header strip + filter pills, 4-col KPI queries (total/unique bots/pages/avg freq), paper table card wrapper, Pro Tip footer
+- `includes/Admin/LogsTable.php` — `extra_tablenav()` date range `<select>` removed (moved to header filter pills); bot filter preserved; early-return guard added
+- `includes/Settings/Page.php` — rewritten: page header strip, single General tab with 3 stacked FSCards, KPI Button–styled Regenerate, `__left` wrappers on all row left cells, `__row--info` for llms.txt URL
+- `docs/superpowers/plans/2026-05-02-crawler-logs-settings-v3.md` — implementation plan (new file)
+
+**Decisions made:**
+- Filter pills in page header strip replace `LogsTable::extra_tablenav()` date range select; bot filter kept in `extra_tablenav()` (data only available after `prepare_items()`)
+- Settings consolidated from 3 tabs to single General tab with 3 stacked FSCards; single-tab nav preserved for visual rhythm
+- Avg Crawl Frequency: `$count_30d / 30` → "X/day" (reuses existing 30d query, no extra DB hit)
+
+**Smoke test:** Manual browser verification passed. Crawler Logs: KPI row rendering with correct data, filter pills pass GET params, table wrapped in paper card, Pro Tip footer visible. Settings: FSCard two-col layout correct, Regenerate button KPI-styled, llms.txt URL rendered as info row inside card, tab nav underline active.
+
+**npm build:** Ran successfully (webpack 1037ms). No JavaScript changes this session — PHP and CSS only.
+
+**PHP lint:** Not run — PHP CLI not configured in LocalWP shell (per CLAUDE.md). No new PHP errors observed in debug.log.
+
+**WP.org status:** In review (submitted 2026-04-29). Awaiting approval email at hello@citewp.com. SVN commit held per X16.
+
+**Carryover into Session 18:**
+- **Cite Score page v3** — Donut Chart Panel + Line Chart Panel + signal breakdown table (Session 18 primary deliverable)
+- **Dashboard polish (6 items):** wordmark weight, hero card spacing, filter pill click handler, AI Insights button spacing, rail navy color / Quick Actions panel chrome, Pro Plans button spacing
+- **Settings polish (6 items):** single-tab nav right-alignment, Regenerate button end-of-row position, info-row spacing, FSCard header vertical padding, code URL tint verification, tab nav consistency cross-check
+- **EditorPanel + Gutenberg sidebar v3 polish** — candidate for Session 18 or 19
+- **Per-post surface consolidation doc** — document all post-level scoring surfaces in one place
+- **`citewp_aiso/metabox/tabs` filter `$context` arg** — Session 12 carryover, still open
+- **Brain consolidation session** — tighten DECISIONS.md entries after multiple consecutive amendment sessions
+- **readme.txt + WP.org assets** — v0.7.0 changelog, screenshots, banner/icon review (Session 16 carryover)
+- **Anti-cloaking content (S7)** — landing page section + first blog post (Session 16 carryover)
+- **"Suggest a Feature" link** in admin (Session 16 carryover)
+- **Page-builder canvas-mode awareness surface** (Session 16 carryover)
+- **P33 (Posts/Pages stat split)** — Dashboard data layer, still deferred
+- **Engine.php entities detector bug** — A11-gated, requires explicit user approval
+
+**Next session focus:** Session 18 — Cite Score page v3 (Donut Chart Panel + Line Chart Panel + signal breakdown table). Check WP.org approval status first — if approval email arrived at hello@citewp.com, SVN commit is Task 1.
+
+---
+
 ## Session 16 — Plugin admin v3 migration ✅
 
 **Date:** 2026-05-01
