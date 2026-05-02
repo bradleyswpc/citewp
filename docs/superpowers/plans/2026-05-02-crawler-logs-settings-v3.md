@@ -1,12 +1,16 @@
-# Session 17 — Crawler Logs + Settings v3 Polish Implementation Plan
+# Session 17a — Crawler Logs + Settings v3 Polish (Upper Composition) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the "light v3 styling" on Crawler Logs and Settings admin pages with the full component-spec-compliant v3 treatment per `UI-DESIGN-SYSTEM.md` (P40).
+**Goal:** Replace the "light v3 styling" on Crawler Logs and Settings admin pages with the full component-spec-compliant v3 treatment per `UI-DESIGN-SYSTEM.md` (P40) — **upper composition only**.
+
+**Scope cut (plan-review decision):** Session 17a ships the Crawler Logs *upper* composition (page header strip + filter pills + 4-KPI row + table card + Pro Tip footer) and the full Settings page. The Crawler Logs *lower* 2-column section (Top Crawlers donut chart + Crawl Activity line chart + Insights mini-card) is **deferred to Session 17b/18**. Rationale: those Component Library specs were still finalising at plan-write time; hand-rolled SVG math is meaningful scope on its own; shipping a clean upper composition beats a rushed full-page at session close.
 
 **Architecture:** Sequential delivery — Task 1 adds all new CSS classes with no PHP changes; Task 2 rewires Crawler Logs PHP to use them; Task 3 rewires Settings PHP to use them. Each task is independently testable and committed before the next begins. Shared CSS (`.citewp-aiso-page-header`) is written once in Task 1 and reused by both pages.
 
 **Tech Stack:** PHP 8.0+, WordPress 6.5+, WP_List_Table, `admin/css/citewp-aiso-admin.css` (append-only for new sections), no new PHP files, no JS libraries.
+
+**DB schema verified:** `bot_name VARCHAR(64)` and `request_uri VARCHAR(512)` confirmed in `includes/Database/Schema.php`. Queries `COUNT(DISTINCT bot_name)` and `COUNT(DISTINCT request_uri)` are valid.
 
 ---
 
@@ -74,11 +78,14 @@ These audits drive the BEFORE/AFTER framing in each task. Every ✗ BEFORE becom
 
 ---
 
-### Component 5 — Pro Tip Footer (both pages)
+### Component 5 — Pro Tip Footer (Crawler Logs only)
+
+> **Settings excluded (P40):** P40 explicitly states Settings has no contextual tip footer — it is a set-and-forget surface where contextual promotion has no place. Pro Tip footer is Crawler Logs only.
 
 | Spec requirement | BEFORE | AFTER |
 |---|---|---|
-| `.citewp-aiso-protip` present | ✗ Not rendered on Crawler Logs or Settings | ✓ Rendered at bottom of `.citewp-aiso-page-body` on both pages |
+| `.citewp-aiso-protip` present on Crawler Logs | ✗ Not rendered on Crawler Logs | ✓ Rendered at bottom of `.citewp-aiso-page-body` on Crawler Logs |
+| `.citewp-aiso-protip` absent on Settings | ✓ Not rendered | ✓ Not added (P40 compliance) |
 | CSS already exists (Section 17) | ✓ Defined in CSS from Dashboard session | ✓ Reused — no new CSS needed |
 | Purple gradient background | ✓ CSS exists | ✓ Rendered |
 | Orb + heading + body text | ✓ CSS exists | ✓ Page-specific copy added |
@@ -1153,18 +1160,10 @@ AFTER:
     <?php wp_nonce_field( 'citewp_aiso_regenerate_llms' ); ?>
 </form>
 
-<div class="citewp-aiso-protip">
-    <div class="citewp-aiso-protip__left">
-        <div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'sparkles', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-        <div class="citewp-aiso-protip__content">
-            <p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
-            <p class="citewp-aiso-protip__body"><?php esc_html_e( 'Unlock advanced llms.txt customization, custom bot rules, and white-label reports with CiteWP Pro.', 'ai-search-optimizer' ); ?></p>
-        </div>
-    </div>
-</div>
-
 </div><!-- .citewp-aiso-page-body -->
 ```
+
+> **No Pro Tip footer on Settings (P40).** Settings is a set-and-forget surface; contextual promotion has no place here. The protip block is intentionally absent.
 
 - [ ] **Step 6: Update the inline JavaScript selectors**
 
@@ -1243,7 +1242,7 @@ Checklist:
 - Save Changes button: blue (`#2563eb`) fill, white text, Inter 700
 - Saving settings works (form posts to `options.php`, redirects back with "Settings saved." notice)
 - Regenerate button works (submits regenerate form, redirects with "llms.txt cache cleared." notice)
-- Pro Tip footer at bottom
+- No Pro Tip footer (P40 — correct absence)
 - No PHP errors in LocalWP `debug.log`
 - No JS console errors
 
@@ -1325,7 +1324,7 @@ CHANGES (apply in order, with Read→Edit for each):
 3. Replace General tab citewp-aiso-section with Form Section Card [plan Task 3 Step 2]
 4. Replace Crawler Detection tab section with Form Section Card [plan Task 3 Step 3]
 5. Replace llms.txt tab section with Form Section Card [plan Task 3 Step 4]
-6. Replace submit_button() with primary action button + add Pro Tip footer [plan Task 3 Step 5]
+6. Replace submit_button() with primary action button — NO Pro Tip footer on Settings (P40) [plan Task 3 Step 5]
 7. Update inline JS selectors (3 replacements) + update all 4 panel class names [plan Task 3 Step 6]
 8. Add tabpanel display CSS to Section 24 in admin/css/citewp-aiso-admin.css [plan Task 3 Step 6 note]
 
@@ -1352,12 +1351,13 @@ DONE WHEN:
 | Bot filter dropdown kept in extra_tablenav() | Task 2 Step 6 |
 | Table in paper card wrapper | Task 1 (CSS) + Task 2 Step 5 |
 | Pro Tip footer on Crawler Logs | Task 2 Step 5 |
+| Crawler Logs lower section (donut + line chart + Insights) | **DEFERRED — Session 17b/18** |
 | Page Header Strip on Settings (title, desc, tab nav on right) | Task 3 Steps 1, 7 |
 | Settings tab nav: text-with-underline, active = `#2563eb` | Task 1 (CSS) + Task 3 Step 1 |
 | localStorage `citewp_aiso_settings_tab` preserved | Task 3 Step 6 |
 | Form Section Cards with two-column layout + icon orbs | Task 1 (CSS) + Task 3 Steps 2–4 |
 | Blue Save Changes button (`#2563eb` fill) | Task 1 (CSS) + Task 3 Step 5 |
-| Pro Tip footer on Settings | Task 3 Step 5 |
+| **No** Pro Tip footer on Settings (P40 — set-and-forget surface) | Absent by design (Task 3 Step 5) |
 | X15: `citewp_aiso/settings/tabs` filter preserved | Not touched — filter is in the PHP logic, not the markup |
 | Engine.php not touched | Not in any task |
 | Dashboard page not touched | Not in any task |
