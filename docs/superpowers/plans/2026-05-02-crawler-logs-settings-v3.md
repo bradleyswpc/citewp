@@ -99,8 +99,9 @@ These audits drive the BEFORE/AFTER framing in each task. Every ✗ BEFORE becom
 | Paper container, overflow:hidden | ✗ `.citewp-aiso-section` — partial styling | ✓ `.citewp-aiso-fscard` white bg, border, border-radius, overflow:hidden |
 | Section header strip (paper-tinted bg, Inter 700 14px) | ✗ `citewp-aiso-section__header` — different styling | ✓ `.citewp-aiso-fscard__header`: `var(--citewp-paper)` bg, 700 14px |
 | Field rows: 16px 20px padding + border-bottom | ✗ `.citewp-aiso-section__body` with stacked layout | ✓ `.citewp-aiso-fscard__row` grid rows with `padding: var(--sp-4) var(--sp-5)` |
-| Two-column layout: ~33% left / ~67% right | ✗ Stacked single-column layout | ✓ `grid-template-columns: 1fr 2fr` |
-| Icon orb on left (32px, colored bg) | ✗ No orbs on Settings fields | ✓ `.citewp-aiso-fscard__orb` with `--orange`, `--blue`, `--teal`, `--gray` variants |
+| Two-column layout: ~33% left / ~67% right | ✗ Stacked single-column layout | ✓ `grid-template-columns: 1fr 2fr` on `__row` |
+| Icon orb: one per card in `__header` (not per-row) | ✗ No orbs on Settings cards | ✓ `.citewp-aiso-fscard__orb` sits inside `__header` flex row beside title text |
+| Field rows: label + desc only on left, no per-row orb | ✗ Current plan had per-row orbs | ✓ `__row` left cell = bare div with `__field-title` + `__field-desc`, no `__left` wrapper needed |
 | Last row: no border-bottom | ✓ Implied by last-child | ✓ `.citewp-aiso-fscard__row:last-child { border-bottom: none }` |
 
 ---
@@ -300,6 +301,9 @@ Append this exact block to the end of `admin/css/citewp-aiso-admin.css`:
   padding: 10px var(--sp-5);
   font: 700 var(--fs-base)/1.2 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .citewp-aiso-fscard__row {
@@ -313,12 +317,6 @@ Append this exact block to the end of `admin/css/citewp-aiso-admin.css`:
 
 .citewp-aiso-fscard__row:last-child {
   border-bottom: none;
-}
-
-.citewp-aiso-fscard__left {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
 }
 
 .citewp-aiso-fscard__orb {
@@ -883,14 +881,14 @@ BEFORE (lines 177–203 — General tab panel inner content):
 AFTER:
 ```php
 <div class="citewp-aiso-fscard">
-    <div class="citewp-aiso-fscard__header"><?php esc_html_e( 'Maintenance', 'ai-search-optimizer' ); ?></div>
+    <div class="citewp-aiso-fscard__header">
+        <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--gray"><?php echo IconLibrary::icon( 'refresh-cw', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
+        <?php esc_html_e( 'Maintenance', 'ai-search-optimizer' ); ?>
+    </div>
     <div class="citewp-aiso-fscard__row">
-        <div class="citewp-aiso-fscard__left">
-            <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--gray"><?php echo IconLibrary::icon( 'refresh-cw', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-            <div>
-                <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Regenerate llms.txt', 'ai-search-optimizer' ); ?></p>
-                <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Clears the cache. The next request to /llms.txt rebuilds from scratch.', 'ai-search-optimizer' ); ?></p>
-            </div>
+        <div>
+            <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Regenerate llms.txt', 'ai-search-optimizer' ); ?></p>
+            <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Clears the cache. The next request to /llms.txt rebuilds from scratch.', 'ai-search-optimizer' ); ?></p>
         </div>
         <div class="citewp-aiso-fscard__right">
             <button
@@ -953,15 +951,15 @@ BEFORE (the full `citewp-aiso-section` block inside the crawler-detection tab, l
 AFTER:
 ```php
 <div class="citewp-aiso-fscard">
-    <div class="citewp-aiso-fscard__header"><?php esc_html_e( 'AI Crawler Detection', 'ai-search-optimizer' ); ?></div>
+    <div class="citewp-aiso-fscard__header">
+        <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--orange"><?php echo IconLibrary::icon( 'bot', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
+        <?php esc_html_e( 'AI Crawler Detection', 'ai-search-optimizer' ); ?>
+    </div>
 
     <div class="citewp-aiso-fscard__row">
-        <div class="citewp-aiso-fscard__left">
-            <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--orange"><?php echo IconLibrary::icon( 'bot', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-            <div>
-                <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable detection', 'ai-search-optimizer' ); ?></p>
-                <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Log AI crawler visits (GPTBot, ClaudeBot, PerplexityBot, and others).', 'ai-search-optimizer' ); ?></p>
-            </div>
+        <div>
+            <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable detection', 'ai-search-optimizer' ); ?></p>
+            <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Log AI crawler visits (GPTBot, ClaudeBot, PerplexityBot, and others).', 'ai-search-optimizer' ); ?></p>
         </div>
         <div class="citewp-aiso-fscard__right">
             <label class="citewp-aiso-toggle">
@@ -978,12 +976,9 @@ AFTER:
     </div>
 
     <div class="citewp-aiso-fscard__row">
-        <div class="citewp-aiso-fscard__left">
-            <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--blue"><?php echo IconLibrary::icon( 'calendar', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-            <div>
-                <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Log retention (days)', 'ai-search-optimizer' ); ?></p>
-                <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Free tier: 7 days. Older logs pruned daily.', 'ai-search-optimizer' ); ?></p>
-            </div>
+        <div>
+            <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Log retention (days)', 'ai-search-optimizer' ); ?></p>
+            <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Free tier: 7 days. Older logs pruned daily.', 'ai-search-optimizer' ); ?></p>
         </div>
         <div class="citewp-aiso-fscard__right">
             <input
@@ -1030,15 +1025,15 @@ AFTER:
 </p>
 
 <div class="citewp-aiso-fscard">
-    <div class="citewp-aiso-fscard__header"><?php esc_html_e( 'llms.txt Generation', 'ai-search-optimizer' ); ?></div>
+    <div class="citewp-aiso-fscard__header">
+        <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--teal"><?php echo IconLibrary::icon( 'llms-txt', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
+        <?php esc_html_e( 'llms.txt Generation', 'ai-search-optimizer' ); ?>
+    </div>
 
     <div class="citewp-aiso-fscard__row">
-        <div class="citewp-aiso-fscard__left">
-            <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--teal"><?php echo IconLibrary::icon( 'llms-txt', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-            <div>
-                <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable llms.txt', 'ai-search-optimizer' ); ?></p>
-                <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Serve dynamic llms.txt to AI engines.', 'ai-search-optimizer' ); ?></p>
-            </div>
+        <div>
+            <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable llms.txt', 'ai-search-optimizer' ); ?></p>
+            <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Serve dynamic llms.txt to AI engines.', 'ai-search-optimizer' ); ?></p>
         </div>
         <div class="citewp-aiso-fscard__right">
             <label class="citewp-aiso-toggle">
@@ -1055,12 +1050,9 @@ AFTER:
     </div>
 
     <div class="citewp-aiso-fscard__row">
-        <div class="citewp-aiso-fscard__left">
-            <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--blue"><?php echo IconLibrary::icon( 'settings', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-            <div>
-                <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Minimum word count', 'ai-search-optimizer' ); ?></p>
-                <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts shorter than this are skipped. Pages always included.', 'ai-search-optimizer' ); ?></p>
-            </div>
+        <div>
+            <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Minimum word count', 'ai-search-optimizer' ); ?></p>
+            <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts shorter than this are skipped. Pages always included.', 'ai-search-optimizer' ); ?></p>
         </div>
         <div class="citewp-aiso-fscard__right">
             <input
@@ -1077,12 +1069,9 @@ AFTER:
     </div>
 
     <div class="citewp-aiso-fscard__row">
-        <div class="citewp-aiso-fscard__left">
-            <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--blue"><?php echo IconLibrary::icon( 'calendar', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-            <div>
-                <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include posts from last (days)', 'ai-search-optimizer' ); ?></p>
-                <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts published before this window are excluded from llms.txt.', 'ai-search-optimizer' ); ?></p>
-            </div>
+        <div>
+            <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include posts from last (days)', 'ai-search-optimizer' ); ?></p>
+            <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts published before this window are excluded from llms.txt.', 'ai-search-optimizer' ); ?></p>
         </div>
         <div class="citewp-aiso-fscard__right">
             <input
@@ -1099,12 +1088,9 @@ AFTER:
 
     <?php if ( ! empty( $public_types ) ) : ?>
     <div class="citewp-aiso-fscard__row">
-        <div class="citewp-aiso-fscard__left">
-            <div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--gray"><?php echo IconLibrary::icon( 'settings', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-            <div>
-                <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include custom post types', 'ai-search-optimizer' ); ?></p>
-                <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Selected types will appear alongside posts and pages in llms.txt.', 'ai-search-optimizer' ); ?></p>
-            </div>
+        <div>
+            <p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include custom post types', 'ai-search-optimizer' ); ?></p>
+            <p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Selected types will appear alongside posts and pages in llms.txt.', 'ai-search-optimizer' ); ?></p>
         </div>
         <div class="citewp-aiso-fscard__right">
             <?php foreach ( $public_types as $type ) : ?>
