@@ -126,8 +126,11 @@ final class LogsTable extends \WP_List_Table {
 			return;
 		}
 
-		$current_bot   = $this->validated_bot_filter();
-		$current_range = $this->validated_range_filter();
+		$current_bot = $this->validated_bot_filter();
+
+		if ( empty( $this->distinct_bots ) ) {
+			return;
+		}
 		?>
 		<div class="alignleft actions">
 			<label class="screen-reader-text" for="citewp_aiso_bot_filter">
@@ -141,17 +144,6 @@ final class LogsTable extends \WP_List_Table {
 					</option>
 				<?php endforeach; ?>
 			</select>
-
-			<label class="screen-reader-text" for="citewp_aiso_range_filter">
-				<?php esc_html_e( 'Filter by date range', 'ai-search-optimizer' ); ?>
-			</label>
-			<select id="citewp_aiso_range_filter" name="citewp_aiso_range">
-				<option value=""><?php esc_html_e( 'All time', 'ai-search-optimizer' ); ?></option>
-				<option value="24h" <?php selected( $current_range, '24h' ); ?>><?php esc_html_e( 'Last 24 hours', 'ai-search-optimizer' ); ?></option>
-				<option value="7d"  <?php selected( $current_range, '7d' );  ?>><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></option>
-				<option value="30d" <?php selected( $current_range, '30d' ); ?>><?php esc_html_e( 'Last 30 days', 'ai-search-optimizer' ); ?></option>
-			</select>
-
 			<?php submit_button( __( 'Filter', 'ai-search-optimizer' ), '', 'filter_action', false ); ?>
 		</div>
 		<?php
