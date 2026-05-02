@@ -1493,7 +1493,38 @@
   flex-direction: column;
   gap: var(--sp-2);
   justify-content: flex-start;
+  align-items: flex-start;
   padding-top: 4px;
+}
+
+.citewp-aiso-fscard__left {
+  /* named grid cell — label + description column */
+}
+
+.citewp-aiso-fscard__row--info {
+  grid-template-columns: 1fr;
+}
+
+.citewp-aiso-fscard__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-3);
+  background: var(--citewp-paper);
+  color: var(--citewp-tint-blue);
+  border: 1px solid var(--citewp-border);
+  border-radius: 8px;
+  font: 600 var(--fs-sm)/1 'Inter', system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.citewp-aiso-fscard__btn:hover {
+  background: var(--citewp-paper-mid);
+  border-color: #94a3b8;
+  color: var(--citewp-tint-blue);
 }
 
 /* === SECTION 24: Settings tab nav — text-with-underline in page header strip === */
@@ -1509,7 +1540,7 @@
   display: inline-flex;
   align-items: center;
   height: 32px;
-  padding: 0 var(--sp-3);
+  padding: 0 var(--sp-4) 4px;
   font: 600 var(--fs-sm)/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-muted);
   border-bottom: 2px solid transparent;
