@@ -524,7 +524,7 @@ final class Menu {
 								<p class="citewp-aiso-insights__opp-body"><?php esc_html_e( 'Add structured schema markup to your highest-traffic posts to improve citation potential.', 'ai-search-optimizer' ); ?></p>
 								<p class="citewp-aiso-insights__opp-muted"><?php esc_html_e( 'Posts with schema are 3× more likely to be cited in AI responses.', 'ai-search-optimizer' ); ?></p>
 								<div class="citewp-aiso-insights__opp-actions">
-									<a href="#cite-score" class="citewp-aiso-btn--primary-action"><?php esc_html_e( 'View Recommendations →', 'ai-search-optimizer' ); ?></a>
+									<a href="#cite-score" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'View Recommendations →', 'ai-search-optimizer' ); ?></a>
 								</div>
 							</div>
 						</div>
@@ -637,7 +637,7 @@ final class Menu {
 								</div>
 							</div>
 							<?php if ( $edit_url ) : ?>
-								<a href="<?php echo esc_url( $edit_url ); ?>" class="citewp-aiso-btn--primary-action"><?php esc_html_e( 'Improve', 'ai-search-optimizer' ); ?></a>
+								<a href="<?php echo esc_url( $edit_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'Improve', 'ai-search-optimizer' ); ?></a>
 							<?php endif; ?>
 						</div>
 						<?php endforeach; ?>
@@ -685,7 +685,7 @@ final class Menu {
 						<p class="citewp-aiso-protip__body"><?php esc_html_e( 'Connect Google Search Console to see which pages get discovered before being crawled.', 'ai-search-optimizer' ); ?></p>
 					</div>
 				</div>
-				<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn--primary-action"><?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?></a>
+				<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?></a>
 			</div>
 
 		</div><!-- .citewp-aiso-col-b -->

@@ -370,7 +370,7 @@ final class Page {
 					<?php endforeach; ?>
 
 					<div class="citewp-aiso-save-bar">
-						<button type="submit" name="submit" class="citewp-aiso-btn--primary-action">
+						<button type="submit" name="submit" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
 							<?php esc_html_e( 'Save Changes', 'ai-search-optimizer' ); ?>
 						</button>
 					</div>
