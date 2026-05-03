@@ -1578,7 +1578,7 @@
   color: var(--citewp-white);
   border: 1px solid #2563eb;
   border-radius: 6px;
-  font: 700 var(--fs-base)/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 600 var(--fs-base)/1 'Inter', system-ui, -apple-system, sans-serif;
   cursor: pointer;
   text-decoration: none;
   transition: background 0.12s, border-color 0.12s;
@@ -1781,4 +1781,16 @@
 /* E5: pro card CTA button breathing room */
 .citewp-aiso-rail__pro-card .citewp-aiso-btn--citrine {
   margin-top: var(--sp-4);
+}
+
+/* === SECTION 29: Group H polish pass (Session 18) === */
+
+/* H1: KPI tooltip — right-anchor so content flows leftward, no clip */
+.citewp-aiso-kpi-tooltip__text {
+  left: auto;
+}
+
+/* H2 gap A: Welcome back title → subtitle spacing */
+.citewp-aiso-hero__title {
+  margin-bottom: var(--sp-4);
 }
