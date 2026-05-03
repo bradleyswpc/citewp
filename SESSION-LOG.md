@@ -6,11 +6,41 @@
 
 ---
 
-## Session 19 — P41 button taxonomy rollout + hero alignment fix 🔄
+## Session 19 — P41 button taxonomy + Cite Score sitewide dashboard ✅
 
 **Date:** 2026-05-03
 
-**Task 1 deliverable:** UI-DESIGN-SYSTEM.md button section rewritten per P41 four-style taxonomy (primary-paper / primary-navy / outline / soft). Plugin CSS renamed `--primary-action` → `--primary-paper`, spec fixed (padding 16px, font 13px, radius 8px), `--outline` updated to obsidian + hairline border, `--soft` class added. Improve buttons in Needs Attention demoted from primary-paper to outline. Post-smoke-test: hero top-justify fix (Section 30) + Top Crawlers cap 3 → 5.
+### Task 2 deliverable (Cite Score sitewide dashboard v3)
+
+First-pass per-post Cite Score page replaced with a full sitewide dashboard: semi-circle SVG gauge, Score Breakdown panel, Score History chart, AI Recommendations (BETA), paginated post-level score table. Infrastructure: `ScoreHistory.php` (daily cron, 365-entry WP options log) + `RecommendationMapper.php` (17 signals → copy). Brain design system updated with P42 component specs.
+
+**Commits (plugin repo, Session 19 Task 2):**
+- `2017b1f` — feat: ScoreHistory — daily avg cron + WP options, 365-entry cap (S19)
+- `9c59d5e` — feat: RecommendationMapper — 17-signal recommendation copy map (S19)
+- `aeb3171` — refactor: remove first-pass per-post Cite Score code (S19)
+- `91ec621` — feat: Cite Score sitewide dashboard CSS — Section 31 (S19)
+- `cba81d6` — feat: Cite Score sitewide dashboard — PHP render (gauge, breakdown, recs, table) (S19)
+- `c02a3f1` — fix: remove dead $issue_count variable in render_cite_score_panel (S19)
+
+**Brain edits (Session 19, Task 2):**
+- `UI-DESIGN-SYSTEM.md` — P42: Semi-circle gauge spec added to Donut Chart Panel; Score Breakdown Panel, AI Recommendations Panel, Post-Level Score Table added to Component Library; Cite Score layout in P40 updated to sitewide-only.
+
+**Files modified (plugin):**
+- `includes/Scoring/ScoreHistory.php` — NEW: daily avg cron hook, schedule/unschedule, get_history(days), 365-entry cap
+- `includes/Admin/RecommendationMapper.php` — NEW: 17-signal → {label, copy, category} map, get()/get_many()
+- `includes/Plugin.php` — ScoreHistory wired: register() in boot(), schedule() in activate(), unschedule() in deactivate()
+- `admin/css/citewp-aiso-admin.css` — Section 31 replaced: full sitewide dashboard styles (gauge panel, breakdown, history, recs, table, grade badges, pagination, empty state, responsive)
+- `includes/Admin/Menu.php` — render_cite_score_panel() replaced with sitewide dashboard; render_gauge_svg() + render_history_svg() added; render_donut_svg() removed; 2 use statements added
+
+**npm build:** Not run — PHP + CSS only, no JS changes.
+
+**Smoke test:** Playwright browser context closed; manual verification needed (see below).
+
+---
+
+### Task 1 deliverable (P41 button taxonomy rollout + hero alignment fix)
+
+UI-DESIGN-SYSTEM.md button section rewritten per P41 four-style taxonomy (primary-paper / primary-navy / outline / soft). Plugin CSS renamed `--primary-action` → `--primary-paper`, spec fixed (padding 16px, font 13px, radius 8px), `--outline` updated to obsidian + hairline border, `--soft` class added. Improve buttons in Needs Attention demoted from primary-paper to outline. Post-smoke-test: hero top-justify fix (Section 30) + Top Crawlers cap 3 → 5.
 
 **Commits (plugin repo, Session 19 Task 1):**
 - `da4fe3d` — feat: P41 button taxonomy — rename primary-action→primary-paper, fix spec, update outline, add soft
@@ -18,24 +48,23 @@
 - `c774809` — fix: hero top-justify + breathing room; Top Crawlers cap → 5 (Session 19)
 
 **Brain edits (Session 19, Task 1):**
-- `UI-DESIGN-SYSTEM.md` — Button section fully rewritten: four-style taxonomy, hierarchy rule, surface mapping, Why Blue rationale, CSS class naming per A14. 7 component library entries updated. Color token comment, critical rule paragraph, What NOT to Do list, and Cross-References section updated.
+- `UI-DESIGN-SYSTEM.md` — Button section fully rewritten: four-style taxonomy, hierarchy rule, surface mapping, Why Blue rationale, CSS class naming per A14. 7 component library entries updated.
 
 **Files modified (plugin):**
-- `admin/css/citewp-aiso-admin.css` — Section 25: `--primary-action` → `--primary-paper` + spec fix. ~Line 576: `--outline` updated. `--soft` added. Section 30: hero `align-items: flex-start`, `__left` flex-column, title/sub line-height bump, pill padding 7px 16px. S27 E1 + S29 margin patches reverted.
-- `includes/Admin/Menu.php` — View Recommendations, Improve (demoted to `--outline`), Connect Now classes updated. `get_top_crawlers(3)` → `get_top_crawlers(5)`.
-- `includes/Settings/Page.php` — Save Changes: `--primary-action` → `citewp-aiso-btn citewp-aiso-btn--primary-paper`.
+- `admin/css/citewp-aiso-admin.css` — Section 25: `--primary-action` → `--primary-paper` + spec fix. `--outline` updated. `--soft` added. Section 30: hero alignment fixes.
+- `includes/Admin/Menu.php` — Improve/View Recommendations/Connect Now classes updated. `get_top_crawlers(5)`.
+- `includes/Settings/Page.php` — Save Changes button class updated.
 
-**Decisions made:**
-- P41 expanded from three-style to four-style: `--soft` added as paper-tinted tertiary. Outline is the row-level action default (prevents button-soup in repeated lists).
-- CSS class A14 prefix confirmed: `citewp-aiso-btn` base + `citewp-aiso-btn--{modifier}` (corrected from `citewp-btn` shorthand in initial spec doc draft).
+**Decisions made (Task 1):**
+- P41 expanded to four-style: `--soft` added as paper-tinted tertiary.
+- CSS class A14 prefix confirmed: `citewp-aiso-btn` base + `citewp-aiso-btn--{modifier}`.
 
-**Smoke test:** LocalWP 502 prevented browser automation. User verified dashboard manually post-fix.
+**Smoke test (Task 1):** LocalWP 502 prevented browser automation. User verified dashboard manually post-fix.
 
-**npm build:** Not run — CSS-only + PHP changes, no JS modifications.
-
-**Carryover into Session 19 Task 2:**
-- **Cite Score page v3** — Donut Chart Panel + Line Chart Panel + signal breakdown table (S18 master deliverable, still open)
-- All other S18 carryover items unchanged
+**Carryover into Session 20:**
+- Manual smoke test of Cite Score sitewide dashboard (Playwright unavailable this session)
+- Score History chart will show empty state until cron runs — expected behaviour
+- `v0.7.0` release checklist (see Brain/FEATURE-BACKLOG.md)
 
 ---
 
