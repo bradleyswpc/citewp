@@ -283,7 +283,7 @@ final class Menu {
 		$trend        = $data->get_visit_trend();
 		$lowest_posts = $data->get_lowest_scoring_posts();
 		$issue_count  = $data->get_issue_count();
-		$top_crawlers = $data->get_top_crawlers( 3 );
+		$top_crawlers = $data->get_top_crawlers( 5 );
 
 		$avg_grade = 'empty';
 		if ( $avg_score !== null ) {

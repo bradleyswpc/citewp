@@ -1657,11 +1657,6 @@
 
 /* === SECTION 27: Group A/B/C polish pass (Session 18) === */
 
-/* E1: hero subtitle → filter pills breathing room */
-.citewp-aiso-hero__sub {
-  margin-bottom: var(--sp-8);
-}
-
 /* A2: "View Recommendations →" button spacing */
 .citewp-aiso-insights__opp-actions {
   margin-top: var(--sp-4);
@@ -1814,9 +1809,26 @@
   margin-top: var(--sp-4);
 }
 
-/* === SECTION 29: Group H polish pass (Session 18) === */
+/* === SECTION 30: Hero alignment — top-justify + breathing room (Session 19) === */
 
-/* H2 gap A: Welcome back title → subtitle spacing */
+.citewp-aiso-hero {
+  align-items: flex-start;
+}
+
+.citewp-aiso-hero__left {
+  display: flex;
+  flex-direction: column;
+}
+
 .citewp-aiso-hero__title {
-  margin-bottom: var(--sp-4);
+  line-height: 1.4;
+  margin-bottom: var(--sp-2);
+}
+
+.citewp-aiso-hero__sub {
+  line-height: 1.6;
+}
+
+.citewp-aiso-hero__filter {
+  padding: 7px 16px;
 }
