@@ -6,6 +6,58 @@
 
 ---
 
+## Session 18 — Dashboard polish rounds 1-3 + P41 button migration ✅
+
+**Date:** 2026-05-03
+
+**Deliverable:** Three rounds of Dashboard polish (Groups A/B/C, D/E/F, H/I) shipped. P41 button migration complete. Cite Score page v3 deferred to Session 19 (polish work consumed full session).
+
+**Commits (plugin repo, Session 18):**
+- `9c7ee19` — feat: Dashboard polish round 1 — section icon headers, KPI tooltips, Pro Tip relocation, type pills, Quick Actions arrow, data cap at 3 rows (Groups A/B/C)
+- `504ed66` — fix: Dashboard polish round 2 — tooltip fix (info icon added), KPI title color, grid overflow fix, icon stroke-width 2.5, navy darkened to #07111F, arrow inline, type pill in meta row, protip/hero/button spacing (Groups D/E/F + F1/F2)
+- `1e49d88` — feat: Dashboard polish round 3 — KPI tooltip right-anchor, hero dual-gap, P41 button migration: --primary-action weight 600, Improve/View Recommendations/Connect Now migrated to blue-on-paper (Groups H/I)
+- `f9bf068` — fix: consolidate tooltip left:auto into original block (code-reviewer H1)
+
+**Brain edits (Desktop Commander, before Code work):**
+- `DECISIONS.md` — P41 logged: Tint Blue `#2563EB` permitted as primary action color on paper surfaces; Citrine remains primary on navy; three-style button system defined (primary-paper / primary-navy / secondary-tertiary).
+
+**Files modified (plugin):**
+- `admin/css/citewp-aiso-admin.css` — Sections 27–29 appended; Section 25 `--primary-action` weight 700→600; `--citewp-navy` darkened #1E2A3B→#07111F; grid overflow fix; icon stroke-width 2.5
+- `includes/Admin/IconLibrary.php` — `info` icon added; stroke-width 1.5→2.5
+- `includes/Admin/Menu.php` — section icon+heading wrappers, KPI tooltip HTML, Pro Tip relocated to col-b, type pill moved into meta row, Improve/View Recommendations/Connect Now buttons migrated to `--primary-action`
+- `includes/Admin/DashboardData.php` — `get_lowest_scoring_posts()` capped at 3 rows
+- `includes/Settings/Page.php` — tab nav hidden when only one tab (single-tab rhythm fix)
+
+**Decisions made:**
+- P41: `--primary-action` is the canonical paper-primary button class (no new class added); blue on paper, Citrine on navy.
+- Connect Now (Pro Tip, col-b paper surface) confirmed as paper surface — citrine→blue migration correct.
+- `--citewp-navy` value change is a CSS token update under the existing P38 system, not a new P-row.
+
+**Smoke test:** Playwright process closed during verification — browser test could not complete. Manual verification required before S19 code work begins (open Dashboard, verify blue buttons on paper, Citrine on rail, tooltip right-anchor, hero gaps).
+
+**npm build:** Not run this session (CSS-only + PHP changes, no JS modifications).
+
+**PHP lint:** Not run — PHP CLI not configured in LocalWP shell (per CLAUDE.md).
+
+**X20 Audit:** UI-DESIGN-SYSTEM.md button entries (KPI Button component, token descriptions for `--citewp-paper-tinted` and `--citewp-tint-blue`) are stale — pre-P41 spec. Rewrite deferred to Session 19 Desktop work per carryover below.
+
+**Carryover into Session 19:**
+- **UI-DESIGN-SYSTEM.md button section rewrite per P41** — Desktop work, first task in Session 19. Three-style spec: primary-paper (blue), primary-navy (Citrine), secondary/tertiary. Update KPI Button component entry and token descriptions.
+- **Cite Score page v3** — Donut Chart Panel + Line Chart Panel + signal breakdown table. Session 18 master-file deliverable; polish work consumed full session.
+- **EditorPanel + Gutenberg sidebar v3 polish** — Session 17 carryover
+- **Per-post surface consolidation doc** — document all post-level scoring surfaces in one place
+- **`citewp_aiso/metabox/tabs` filter `$context` arg** — Session 12 carryover, still open
+- **Brain consolidation session** — tighten DECISIONS.md entries after multiple consecutive amendment sessions
+- **readme.txt + WP.org assets** — v0.7.0 changelog, screenshots, banner/icon review
+- **Anti-cloaking content (S7)** — landing page section + first blog post
+- **"Suggest a Feature" link** in admin
+- **Page-builder canvas-mode awareness surface**
+- **P33 (Posts/Pages stat split)** — Dashboard data layer, deferred
+- **Engine.php entities detector bug** — A11-gated
+- **Needs Attention "what's wrong" reasoning logic**
+
+---
+
 ## Session 17 — Crawler Logs + Settings v3 polish ✅
 
 **Date:** 2026-05-02
