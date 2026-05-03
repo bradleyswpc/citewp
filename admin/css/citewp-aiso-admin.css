@@ -1827,6 +1827,11 @@
 
 .citewp-aiso-hero__sub {
   line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.citewp-aiso-hero__filters {
+  margin-top: var(--sp-6);
 }
 
 .citewp-aiso-hero__filter {
