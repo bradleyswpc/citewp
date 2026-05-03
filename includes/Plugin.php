@@ -58,6 +58,10 @@ final class Plugin {
 		$this->modules['rest_schema_controller'] = new Rest\SchemaController();
 		$this->modules['rest_schema_controller']->register();
 
+		// Score history: cron callback registered on every request.
+		$this->modules['score_history'] = new Scoring\ScoreHistory();
+		$this->modules['score_history']->register();
+
 		// Admin-only modules.
 		if ( is_admin() ) {
 			$this->modules['admin_menu'] = new Admin\Menu();
@@ -108,6 +112,7 @@ final class Plugin {
 
 		// Register llms.txt rewrite rules and flush so /llms.txt resolves immediately.
 		Llms\Router::flush_rewrite_rules_on_activation();
+		( new Scoring\ScoreHistory() )->schedule();
 	}
 
 	/**
@@ -115,6 +120,7 @@ final class Plugin {
 	 */
 	public static function deactivate(): void {
 		flush_rewrite_rules();
+		( new Scoring\ScoreHistory() )->unschedule();
 	}
 
 	public function module( string $key ): ?object {
