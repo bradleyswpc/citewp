@@ -1597,17 +1597,13 @@
 }
 
 /* === SECTION 26: Polish pass (Session 18) === */
+/* NOTE: Full-width pro-card button removed here — A6 constrains to natural width. */
 
 .citewp-aiso-actions {
   background: var(--citewp-white);
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-md);
   padding: var(--sp-5);
-}
-
-.citewp-aiso-rail__pro-card .citewp-aiso-btn--citrine {
-  width: 100%;
-  justify-content: center;
 }
 
 .citewp-aiso-kpi-card__orb--blue {
@@ -1627,4 +1623,132 @@
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-size: 12px;
   color: var(--citewp-tint-blue);
+}
+
+/* === SECTION 27: Group A/B/C polish pass (Session 18) === */
+
+/* A1: hero subtitle → filter pills breathing room */
+.citewp-aiso-hero__sub {
+  margin-bottom: var(--sp-6);
+}
+
+/* A2: "View Recommendations →" button spacing */
+.citewp-aiso-insights__opp-actions {
+  margin-top: var(--sp-4);
+}
+
+/* A4 / A8: icon + heading inline helper */
+.citewp-aiso-section-head-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* A4: quick-actions section head row */
+.citewp-aiso-actions__head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--sp-4);
+}
+
+.citewp-aiso-actions__head .citewp-aiso-actions-heading {
+  margin-bottom: 0;
+}
+
+/* A4 / A8: opp-label icon alignment */
+.citewp-aiso-insights__opp-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* A6: pro card icon + title on same row */
+.citewp-aiso-pro__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.citewp-aiso-pro__title-row .citewp-aiso-pro__heading {
+  margin-bottom: 0;
+}
+
+.citewp-aiso-pro__copy {
+  line-height: 1.6;
+}
+
+/* A7: action card → indicator */
+.citewp-aiso-action-card {
+  position: relative;
+}
+
+.citewp-aiso-action-card::after {
+  content: '→';
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 13px;
+  color: var(--citewp-text-muted);
+  line-height: 1;
+}
+
+/* A9: KPI card tooltips */
+.citewp-aiso-kpi-card__title {
+  flex: 1;
+}
+
+.citewp-aiso-kpi-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: var(--citewp-text-muted);
+  cursor: help;
+  flex-shrink: 0;
+}
+
+.citewp-aiso-kpi-tooltip__text {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-3);
+  font: 400 12px/1.4 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-secondary);
+  max-width: 220px;
+  white-space: normal;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.citewp-aiso-kpi-tooltip:hover .citewp-aiso-kpi-tooltip__text {
+  opacity: 1;
+}
+
+/* B2: Needs Attention type pill */
+.citewp-aiso-needs__type-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--citewp-paper-mid);
+  border: 1px solid var(--citewp-border);
+  color: var(--citewp-text-secondary);
+  font: 600 11px/1.4 'Inter', system-ui, sans-serif;
+  margin-bottom: 3px;
+}
+
+.citewp-aiso-needs__title {
+  font-weight: 600;
+}
+
+/* C1: Pro Tip inside col-b — reset footer margins */
+.citewp-aiso-col-b .citewp-aiso-protip {
+  margin-top: 0;
+  margin-bottom: 0;
 }

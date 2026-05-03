@@ -104,7 +104,7 @@ final class DashboardData {
 			[
 				'post_type'      => [ 'post', 'page' ],
 				'post_status'    => 'publish',
-				'posts_per_page' => 5,
+				'posts_per_page' => 3,
 				'orderby'        => 'meta_value_num',
 				'order'          => 'ASC',
 				'meta_key'       => Repository::META_KEY_TOTAL, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Intentional; orderby meta_value_num requires meta_key.
