@@ -69,7 +69,7 @@
   --citewp-obsidian:      #1A1A1A;
   --citewp-white:         #FFFFFF;
   /* Navy */
-  --citewp-navy:          #1E2A3B;
+  --citewp-navy:          #07111F;
   --citewp-navy-deep:     #141F2E;
   /* Paper */
   --citewp-paper:         #F8F9FA;
@@ -597,7 +597,7 @@
 
 .citewp-aiso-lower {
   display: grid;
-  grid-template-columns: 45% 55%;
+  grid-template-columns: 45% 1fr;
   gap: var(--sp-6);
 }
 
@@ -1627,9 +1627,9 @@
 
 /* === SECTION 27: Group A/B/C polish pass (Session 18) === */
 
-/* A1: hero subtitle → filter pills breathing room */
+/* E1: hero subtitle → filter pills breathing room */
 .citewp-aiso-hero__sub {
-  margin-bottom: var(--sp-6);
+  margin-bottom: var(--sp-8);
 }
 
 /* A2: "View Recommendations →" button spacing */
@@ -1679,24 +1679,16 @@
   line-height: 1.6;
 }
 
-/* A7: action card → indicator */
-.citewp-aiso-action-card {
-  position: relative;
-}
-
-.citewp-aiso-action-card::after {
-  content: '→';
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  font-size: 13px;
+/* E3: action card → indicator — inline on description text */
+.citewp-aiso-action-card__desc::after {
+  content: ' →';
   color: var(--citewp-text-muted);
-  line-height: 1;
 }
 
 /* A9: KPI card tooltips */
 .citewp-aiso-kpi-card__title {
   flex: 1;
+  color: var(--citewp-text-primary);
 }
 
 .citewp-aiso-kpi-tooltip {
@@ -1729,6 +1721,7 @@
 
 .citewp-aiso-kpi-tooltip:hover .citewp-aiso-kpi-tooltip__text {
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* B2: Needs Attention type pill */
@@ -1751,4 +1744,41 @@
 .citewp-aiso-col-b .citewp-aiso-protip {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+/* === SECTION 28: Group D/E/F polish pass (Session 18) === */
+
+/* D4: Pro Tip heading — primary text, not tint-purple */
+.citewp-aiso-protip__heading {
+  color: var(--citewp-text-primary);
+}
+
+/* E2: section icon tint colours */
+.citewp-aiso-crawlers__head .citewp-icon {
+  color: var(--citewp-tint-blue);
+}
+
+.citewp-aiso-needs__head .citewp-icon {
+  color: var(--citewp-tint-orange);
+}
+
+.citewp-aiso-actions__head .citewp-icon {
+  color: var(--citewp-tint-purple);
+}
+
+/* E4: needs__meta row — flex + pill inline */
+.citewp-aiso-needs__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: 2px;
+}
+
+.citewp-aiso-needs__meta .citewp-aiso-needs__type-pill {
+  margin-bottom: 0;
+}
+
+/* E5: pro card CTA button breathing room */
+.citewp-aiso-rail__pro-card .citewp-aiso-btn--citrine {
+  margin-top: var(--sp-4);
 }

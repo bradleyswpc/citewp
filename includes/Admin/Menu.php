@@ -624,7 +624,6 @@ final class Menu {
 								<span class="citewp-aiso-needs__score-lbl"><?php esc_html_e( 'score', 'ai-search-optimizer' ); ?></span>
 							</div>
 							<div class="citewp-aiso-needs__info">
-								<span class="citewp-aiso-needs__type-pill"><?php echo esc_html( $type_name ); ?></span>
 								<div class="citewp-aiso-needs__title">
 									<?php if ( $edit_url ) : ?>
 										<a href="<?php echo esc_url( $edit_url ); ?>"><?php echo esc_html( get_the_title( $post ) ); ?></a>
@@ -632,7 +631,10 @@ final class Menu {
 										<?php echo esc_html( get_the_title( $post ) ); ?>
 									<?php endif; ?>
 								</div>
-								<div class="citewp-aiso-needs__meta"><?php echo esc_html( $time_ago . ' ' . __( 'ago', 'ai-search-optimizer' ) ); ?></div>
+								<div class="citewp-aiso-needs__meta">
+									<span class="citewp-aiso-needs__type-pill"><?php echo esc_html( $type_name ); ?></span>
+									<?php echo esc_html( $time_ago . ' ' . __( 'ago', 'ai-search-optimizer' ) ); ?>
+								</div>
 							</div>
 							<?php if ( $edit_url ) : ?>
 								<a href="<?php echo esc_url( $edit_url ); ?>" class="citewp-aiso-btn"><?php esc_html_e( 'Improve', 'ai-search-optimizer' ); ?></a>
