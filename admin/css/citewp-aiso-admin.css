@@ -331,7 +331,7 @@
 .citewp-aiso-hero {
   background: linear-gradient(135deg, var(--citewp-navy) 0%, var(--citewp-navy-deep) 100%);
   border-radius: var(--radius-lg);
-  padding: var(--sp-8);
+  padding: var(--sp-10) var(--sp-8);
   margin-bottom: var(--sp-6);
   position: relative;
   overflow: hidden;
@@ -1711,7 +1711,7 @@
   padding: var(--sp-2) var(--sp-3);
   font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-secondary);
-  max-width: 220px;
+  width: 220px;
   white-space: normal;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   z-index: 100;
