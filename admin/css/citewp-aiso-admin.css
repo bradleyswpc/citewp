@@ -1838,4 +1838,357 @@
   padding: 7px 16px;
 }
 
-/* === SECTION 31: Cite Score sitewide dashboard (Session 19) — styles added in Task 5 === */
+/* === SECTION 31: Cite Score sitewide dashboard (Session 19) === */
+
+/* ── Two-column body ── */
+.citewp-aiso-cs-body {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: var(--sp-4);
+  align-items: start;
+}
+
+.citewp-aiso-cs-left,
+.citewp-aiso-cs-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* ── Semi-circle Gauge Panel ── */
+.citewp-aiso-gauge-panel {
+  background: var(--citewp-paper);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.citewp-aiso-gauge-panel__meta {
+  font: 400 12px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  text-align: center;
+}
+
+/* ── Score Breakdown Panel ── */
+.citewp-aiso-breakdown {
+  background: var(--citewp-paper);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.citewp-aiso-breakdown__head {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--citewp-paper-tinted);
+  border-bottom: 1px solid var(--citewp-border);
+  font: 700 11px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.citewp-aiso-breakdown__row {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--citewp-border);
+}
+
+.citewp-aiso-breakdown__row:last-child {
+  border-bottom: none;
+}
+
+.citewp-aiso-breakdown__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-2);
+}
+
+.citewp-aiso-breakdown__label {
+  font: 500 13px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+}
+
+.citewp-aiso-breakdown__score {
+  font: 700 13px/1 'JetBrains Mono', monospace;
+}
+
+.citewp-aiso-breakdown__bar {
+  height: 4px;
+  background: var(--citewp-paper-tinted);
+  border: 1px solid var(--citewp-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.citewp-aiso-breakdown__fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* ── Score History Panel ── */
+.citewp-aiso-history-panel {
+  background: var(--citewp-paper);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
+}
+
+.citewp-aiso-history-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-3);
+}
+
+.citewp-aiso-history-panel__title {
+  font: 700 14px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+}
+
+.citewp-aiso-history-panel__pills {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.citewp-aiso-history-pill {
+  font: 700 11px/1 'Inter', system-ui, sans-serif;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  background: var(--citewp-paper-tinted);
+  color: var(--citewp-text-muted);
+}
+
+.citewp-aiso-history-pill.is-active {
+  background: var(--citewp-obsidian);
+  color: #fff;
+}
+
+.citewp-aiso-history-panel__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4) 0;
+}
+
+.citewp-aiso-history-panel__empty-text {
+  font: 400 12px/1.5 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  text-align: center;
+  max-width: 220px;
+}
+
+.citewp-aiso-history-panel__stats {
+  display: flex;
+  gap: var(--sp-6);
+  margin-top: var(--sp-3);
+}
+
+.citewp-aiso-history-panel__stat-label {
+  font: 700 11px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.citewp-aiso-history-panel__stat-value {
+  font: 700 20px/1 'JetBrains Mono', monospace;
+  color: var(--citewp-obsidian);
+  margin-top: 4px;
+}
+
+/* ── AI Recommendations Panel ── */
+.citewp-aiso-recs {
+  background: var(--citewp-paper);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.citewp-aiso-recs__head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--citewp-border);
+}
+
+.citewp-aiso-recs__icon {
+  color: var(--citewp-tint-purple);
+  flex-shrink: 0;
+}
+
+.citewp-aiso-recs__title {
+  font: 800 14px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+  flex: 1;
+}
+
+.citewp-aiso-recs__badge {
+  font: 800 10px/1 'Inter', system-ui, sans-serif;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--citewp-tint-purple);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.citewp-aiso-recs__row {
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--citewp-border);
+}
+
+.citewp-aiso-recs__row:last-child {
+  border-bottom: none;
+}
+
+.citewp-aiso-recs__label {
+  font: 700 13px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+}
+
+.citewp-aiso-recs__affected {
+  font: 400 11px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  margin-top: 3px;
+}
+
+.citewp-aiso-recs__copy {
+  font: 400 12px/1.5 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  margin-top: 5px;
+}
+
+/* ── Post-Level Score Table ── */
+.citewp-aiso-cs-table-wrap {
+  background: var(--citewp-paper);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.citewp-aiso-cs-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--citewp-border);
+  gap: var(--sp-2);
+}
+
+.citewp-aiso-cs-search,
+.citewp-aiso-cs-perpage {
+  font: 400 13px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+  background: var(--citewp-paper);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+}
+
+.citewp-aiso-cs-search {
+  min-width: 180px;
+}
+
+.citewp-aiso-cs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.citewp-aiso-cs-table th {
+  font: 700 11px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--citewp-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.citewp-aiso-cs-table td {
+  font: 400 13px/1.4 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--citewp-border);
+  vertical-align: middle;
+}
+
+.citewp-aiso-cs-table tr:last-child td {
+  border-bottom: none;
+}
+
+.citewp-aiso-cs-table tr:nth-child(even) td {
+  background: var(--citewp-paper-tinted);
+}
+
+.citewp-aiso-cs-table__score {
+  font: 700 15px/1 'JetBrains Mono', monospace;
+}
+
+.citewp-aiso-cs-table__type,
+.citewp-aiso-cs-table__time {
+  font: 400 12px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  white-space: nowrap;
+}
+
+.citewp-aiso-grade-badge {
+  display: inline-block;
+  font: 700 9px/1 'Inter', system-ui, sans-serif;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.citewp-aiso-grade-badge--green  { background: #dcfce7; color: var(--citewp-score-green); }
+.citewp-aiso-grade-badge--yellow { background: #fef3c7; color: #b45309; }
+.citewp-aiso-grade-badge--orange { background: #fee2e2; color: var(--citewp-score-red); }
+.citewp-aiso-grade-badge--red    { background: #fee2e2; color: var(--citewp-score-red); }
+
+.citewp-aiso-cs-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--citewp-border);
+}
+
+.citewp-aiso-cs-pagination__info {
+  font: 400 12px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+}
+
+.citewp-aiso-cs-pagination__nav {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+/* ── Empty state (no scored posts) ── */
+.citewp-aiso-cs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-10) var(--sp-8);
+  text-align: center;
+  gap: var(--sp-3);
+}
+
+/* ── Responsive: stack columns below 900px ── */
+@media (max-width: 900px) {
+  .citewp-aiso-cs-body {
+    grid-template-columns: 1fr;
+  }
+}
