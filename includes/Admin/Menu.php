@@ -866,6 +866,7 @@ final class Menu {
 				foreach ( $groups as $cat_key => $cat_label ) :
 					$cat_signals = array_filter( $signals, static fn( $s ) => $s['category'] === $cat_key );
 					if ( empty( $cat_signals ) ) { continue; }
+					if ( ! isset( $categories[ $cat_key ]['score'], $categories[ $cat_key ]['max'] ) ) { continue; }
 					$cat_score = (int) $categories[ $cat_key ]['score'];
 					$cat_max   = (int) $categories[ $cat_key ]['max'];
 				?>
@@ -969,7 +970,7 @@ final class Menu {
 			printf(
 				esc_html__( 'Cite Score: %1$d out of 100, %2$s band', 'ai-search-optimizer' ),
 				$total,
-				$grade
+				esc_html( $grade )
 			);
 			?>
 		</span>
