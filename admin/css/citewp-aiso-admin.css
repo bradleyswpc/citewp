@@ -1704,6 +1704,7 @@
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
+  left: auto;
   background: var(--citewp-white);
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-sm);
@@ -1784,11 +1785,6 @@
 }
 
 /* === SECTION 29: Group H polish pass (Session 18) === */
-
-/* H1: KPI tooltip — right-anchor so content flows leftward, no clip */
-.citewp-aiso-kpi-tooltip__text {
-  left: auto;
-}
 
 /* H2 gap A: Welcome back title → subtitle spacing */
 .citewp-aiso-hero__title {
