@@ -727,7 +727,6 @@ final class Menu {
 
 		// ── Site-wide stats (sample first 50 for signal analysis) ───────
 		$score_sum    = 0;
-		$issue_count  = 0;
 		$cat_sums     = [ 'structure' => 0, 'citability' => 0, 'authority' => 0 ];
 		$signal_fails = [];
 		$sample_cap   = 50;
@@ -735,9 +734,6 @@ final class Menu {
 		foreach ( $scored_ids as $i => $pid ) {
 			$total      = (int) get_post_meta( (int) $pid, Repository::META_KEY_TOTAL, true );
 			$score_sum += $total;
-			if ( $total < 50 ) {
-				++$issue_count;
-			}
 			if ( $i < $sample_cap ) {
 				$data = ( new Repository() )->get( (int) $pid );
 				if ( $data && isset( $data['categories'] ) ) {
