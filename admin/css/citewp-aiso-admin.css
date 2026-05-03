@@ -2022,7 +2022,7 @@
 
 .citewp-aiso-signal-row {
   padding: var(--sp-3) var(--sp-4);
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--citewp-border);
 }
 
 .citewp-aiso-signal-row:last-child {
