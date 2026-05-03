@@ -707,16 +707,274 @@ final class Menu {
 	}
 
 	private function render_cite_score_panel(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Resolve which post to show.
+		$post_id = isset( $_GET['post_id'] ) ? absint( wp_unslash( $_GET['post_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display param; no data modification.
+
+		if ( ! $post_id ) {
+			// Default: most recently scored post.
+			$recent = get_posts( [
+				'meta_key'    => Repository::META_KEY_TIME,
+				'orderby'     => 'meta_value',
+				'order'       => 'DESC',
+				'numberposts' => 1,
+				'post_type'   => [ 'post', 'page' ],
+				'post_status' => [ 'publish', 'draft' ],
+			] );
+			$post_id = ! empty( $recent ) ? (int) $recent[0]->ID : 0;
+		}
+
+		// All scored posts for the picker dropdown.
+		$scored_posts = get_posts( [
+			'meta_key'     => Repository::META_KEY_TOTAL,
+			'meta_compare' => 'EXISTS',
+			'orderby'      => 'meta_value_num',
+			'order'        => 'ASC',
+			'numberposts'  => 100,
+			'post_type'    => [ 'post', 'page' ],
+			'post_status'  => [ 'publish', 'draft' ],
+		] );
+
+		$score_data = $post_id ? ( new Repository() )->get( $post_id ) : null;
+		$post       = $post_id ? get_post( $post_id ) : null;
+
 		?>
-		<div class="citewp-aiso-panel__title-row">
-			<h2><?php esc_html_e( 'Cite Score', 'ai-search-optimizer' ); ?></h2>
-			<p class="citewp-aiso-panel__subtitle"><?php esc_html_e( 'Per-post score details and improvements.', 'ai-search-optimizer' ); ?></p>
+		<!-- Page header strip -->
+		<div class="citewp-aiso-page-header">
+			<div class="citewp-aiso-page-header__left">
+				<h2 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Cite Score', 'ai-search-optimizer' ); ?></h2>
+				<p class="citewp-aiso-page-header__desc"><?php esc_html_e( 'Optimize your content for AI citation.', 'ai-search-optimizer' ); ?></p>
+			</div>
+			<?php if ( ! empty( $scored_posts ) ) : ?>
+			<div class="citewp-aiso-page-header__actions">
+				<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+					<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
+					<select
+						name="post_id"
+						class="citewp-aiso-cs-picker"
+						onchange="this.form.submit()"
+						aria-label="<?php esc_attr_e( 'Select post', 'ai-search-optimizer' ); ?>"
+					>
+						<?php foreach ( $scored_posts as $sp ) : ?>
+							<option value="<?php echo esc_attr( (string) $sp->ID ); ?>"<?php selected( $sp->ID, $post_id ); ?>>
+								<?php echo esc_html( get_the_title( $sp ) ?: __( '(no title)', 'ai-search-optimizer' ) ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+				</form>
+			</div>
+			<?php endif; ?>
 		</div>
-		<div class="citewp-aiso-empty">
+
+		<?php if ( ! $score_data || ! $post ) : ?>
+		<!-- Empty state: no scored posts yet -->
+		<div class="citewp-aiso-cs-empty">
 			<div class="citewp-aiso-empty__icon"><?php echo IconLibrary::icon( 'gauge', 48 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></div>
-			<h3 class="citewp-aiso-empty__title"><?php esc_html_e( 'Cite Score full-page view — coming soon.', 'ai-search-optimizer' ); ?></h3>
-			<p class="citewp-aiso-empty__text"><?php esc_html_e( 'Open any post or page to see its Cite Score in the editor panel.', 'ai-search-optimizer' ); ?></p>
+			<h3 class="citewp-aiso-empty__title"><?php esc_html_e( 'No scored content yet.', 'ai-search-optimizer' ); ?></h3>
+			<p class="citewp-aiso-empty__text"><?php esc_html_e( 'Publish or save a post to generate your first Cite Score.', 'ai-search-optimizer' ); ?></p>
 		</div>
+		<?php return; endif;
+
+		$total      = (int) $score_data['total'];
+		$grade      = sanitize_key( $score_data['grade'] );
+		$categories = $score_data['categories'];
+		$signals    = $score_data['signals'];
+		$edit_url   = get_edit_post_link( $post->ID );
+
+		$grade_colors = [
+			'green'  => 'var(--citewp-score-green)',
+			'yellow' => 'var(--citewp-score-yellow)',
+			'orange' => 'var(--citewp-score-orange)',
+			'red'    => 'var(--citewp-score-red)',
+		];
+		$score_color = $grade_colors[ $grade ] ?? 'var(--citewp-score-red)';
+
+		$cat_color = static function( int $score, int $max ): string {
+			$pct = $max > 0 ? ( $score / $max ) * 100 : 0;
+			if ( $pct >= 80 ) { return 'var(--citewp-score-green)'; }
+			if ( $pct >= 60 ) { return 'var(--citewp-score-yellow)'; }
+			if ( $pct >= 40 ) { return 'var(--citewp-score-orange)'; }
+			return 'var(--citewp-score-red)';
+		};
+		?>
+
+		<!-- Two-column body -->
+		<div class="citewp-aiso-cs-body">
+
+			<!-- Left column: donut + history -->
+			<div class="citewp-aiso-cs-left">
+
+				<!-- Donut Chart Panel -->
+				<div class="citewp-aiso-donut-panel">
+					<div class="citewp-aiso-donut-panel__chart">
+						<?php $this->render_donut_svg( $total, $grade, $categories, $score_color, $cat_color ); ?>
+					</div>
+					<div class="citewp-aiso-donut-panel__cats">
+						<?php foreach ( $categories as $cat ) :
+							$c_score = (int) $cat['score'];
+							$c_max   = (int) $cat['max'];
+							$c_color = $cat_color( $c_score, $c_max );
+						?>
+						<div class="citewp-aiso-donut-panel__cat">
+							<span class="citewp-aiso-donut-panel__cat-dot" style="background:<?php echo esc_attr( $c_color ); ?>"></span>
+							<span class="citewp-aiso-donut-panel__cat-name"><?php echo esc_html( $cat['label'] ); ?></span>
+							<span class="citewp-aiso-donut-panel__cat-score" style="color:<?php echo esc_attr( $c_color ); ?>"><?php echo esc_html( (string) $c_score ); ?></span>
+							<span class="citewp-aiso-donut-panel__cat-max">/ <?php echo esc_html( (string) $c_max ); ?></span>
+						</div>
+						<?php endforeach; ?>
+					</div>
+					<?php if ( $edit_url ) : ?>
+					<div class="citewp-aiso-donut-panel__footer">
+						<a href="<?php echo esc_url( $edit_url ); ?>" class="citewp-aiso-donut-panel__link">
+							<?php esc_html_e( 'Improve this post', 'ai-search-optimizer' ); ?>
+						</a>
+					</div>
+					<?php endif; ?>
+				</div>
+
+				<!-- Score History Panel (empty state — history collection not yet implemented) -->
+				<div class="citewp-aiso-history-panel">
+					<div class="citewp-aiso-history-panel__head">
+						<span class="citewp-aiso-history-panel__title"><?php esc_html_e( 'Score History', 'ai-search-optimizer' ); ?></span>
+						<div class="citewp-aiso-history-panel__pills">
+							<button class="citewp-aiso-history-pill is-active" disabled>7D</button>
+							<button class="citewp-aiso-history-pill" disabled>30D</button>
+							<button class="citewp-aiso-history-pill" disabled>90D</button>
+						</div>
+					</div>
+					<div class="citewp-aiso-history-panel__empty">
+						<div class="citewp-aiso-history-panel__empty-line"></div>
+						<p class="citewp-aiso-history-panel__empty-text">
+							<?php esc_html_e( 'Not enough history yet. Scores appear after multiple saves.', 'ai-search-optimizer' ); ?>
+						</p>
+					</div>
+				</div>
+
+			</div><!-- /.citewp-aiso-cs-left -->
+
+			<!-- Right column: signal breakdown -->
+			<div class="citewp-aiso-signals">
+				<?php
+				$groups = [
+					'structure'  => __( 'Structure',  'ai-search-optimizer' ),
+					'citability' => __( 'Citability', 'ai-search-optimizer' ),
+					'authority'  => __( 'Authority',  'ai-search-optimizer' ),
+				];
+				foreach ( $groups as $cat_key => $cat_label ) :
+					$cat_signals = array_filter( $signals, static fn( $s ) => $s['category'] === $cat_key );
+					if ( empty( $cat_signals ) ) { continue; }
+					$cat_score = (int) $categories[ $cat_key ]['score'];
+					$cat_max   = (int) $categories[ $cat_key ]['max'];
+				?>
+				<div class="citewp-aiso-signals__cat-head">
+					<span class="citewp-aiso-signals__cat-label"><?php echo esc_html( $cat_label ); ?></span>
+					<span class="citewp-aiso-signals__cat-score"><?php echo esc_html( $cat_score . ' / ' . $cat_max ); ?></span>
+				</div>
+				<?php foreach ( $cat_signals as $sig ) :
+					$status = sanitize_key( $sig['status'] );
+					$badge_labels = [ 'pass' => 'Pass', 'partial' => 'Partial', 'fail' => 'Fail' ];
+					$badge_label  = $badge_labels[ $status ] ?? $status;
+				?>
+				<div class="citewp-aiso-signal-row">
+					<div class="citewp-aiso-signal-row__top">
+						<span class="citewp-aiso-signal-row__label"><?php echo esc_html( $sig['label'] ); ?></span>
+						<span class="citewp-aiso-signal-row__pts"><?php echo esc_html( $sig['score'] . ' / ' . $sig['max'] ); ?></span>
+						<span class="citewp-aiso-signal-badge citewp-aiso-signal-badge--<?php echo esc_attr( $status ); ?>">
+							<?php echo esc_html( $badge_label ); ?>
+						</span>
+					</div>
+					<?php if ( ! empty( $sig['message'] ) ) : ?>
+					<p class="citewp-aiso-signal-row__msg"><?php echo esc_html( $sig['message'] ); ?></p>
+					<?php endif; ?>
+					<?php if ( ! empty( $sig['recommendation'] ) && in_array( $status, [ 'partial', 'fail' ], true ) ) : ?>
+					<p class="citewp-aiso-signal-row__rec"><?php echo esc_html( $sig['recommendation'] ); ?></p>
+					<?php endif; ?>
+				</div>
+				<?php endforeach; ?>
+				<?php endforeach; ?>
+			</div><!-- /.citewp-aiso-signals -->
+
+		</div><!-- /.citewp-aiso-cs-body -->
+
+		<!-- Pro Tip footer -->
+		<div class="citewp-aiso-protip">
+			<div class="citewp-aiso-protip__left">
+				<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'zap', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></div>
+				<div class="citewp-aiso-protip__content">
+					<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-protip__body"><?php esc_html_e( 'Adding a FAQ section to your post can boost your Structure score by up to 10 points.', 'ai-search-optimizer' ); ?></p>
+				</div>
+			</div>
+			<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
+				<?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?>
+			</a>
+		</div>
+		<?php
+	}
+
+	private function render_donut_svg(
+		int $total,
+		string $grade,
+		array $categories,
+		string $score_color,
+		callable $cat_color
+	): void {
+		unset( $grade ); // reserved for future aria-label use
+
+		$cx       = 110;
+		$cy       = 110;
+		$r_inner  = 52;
+		$r_outer  = 76;
+		$sw_inner = 14;
+		$sw_outer = 10;
+
+		$circ_inner = 2 * M_PI * $r_inner;
+		$circ_outer = 2 * M_PI * $r_outer;
+
+		$inner_fill = round( ( $total / 100 ) * $circ_inner, 2 );
+		$inner_gap  = round( $circ_inner - $inner_fill, 2 );
+
+		$cat_order  = [ 'structure', 'citability', 'authority' ];
+		$gap_px     = 4.0;
+		$outer_segs = [];
+		$offset     = 0.0;
+		foreach ( $cat_order as $key ) {
+			if ( ! isset( $categories[ $key ] ) ) { continue; }
+			$cat = $categories[ $key ];
+			$len = round( ( (int) $cat['score'] / 100 ) * $circ_outer, 2 );
+			$outer_segs[] = [
+				'len'    => $len,
+				'color'  => $cat_color( (int) $cat['score'], (int) $cat['max'] ),
+				'offset' => round( $circ_outer - $offset, 2 ),
+			];
+			$offset += $len + $gap_px;
+		}
+
+		$rotate = 'rotate(-90 ' . $cx . ' ' . $cy . ')';
+		?>
+		<svg viewBox="0 0 220 220" width="200" height="200" aria-hidden="true" focusable="false">
+			<circle cx="<?php echo esc_attr( (string) $cx ); ?>" cy="<?php echo esc_attr( (string) $cy ); ?>" r="<?php echo esc_attr( (string) $r_inner ); ?>" fill="none" stroke="var(--citewp-paper-tinted)" stroke-width="<?php echo esc_attr( (string) $sw_inner ); ?>"/>
+			<circle cx="<?php echo esc_attr( (string) $cx ); ?>" cy="<?php echo esc_attr( (string) $cy ); ?>" r="<?php echo esc_attr( (string) $r_inner ); ?>" fill="none" stroke="var(--citewp-citrine)" stroke-width="<?php echo esc_attr( (string) $sw_inner ); ?>" stroke-linecap="round" stroke-dasharray="<?php echo esc_attr( $inner_fill . ' ' . $inner_gap ); ?>" transform="<?php echo esc_attr( $rotate ); ?>"/>
+			<circle cx="<?php echo esc_attr( (string) $cx ); ?>" cy="<?php echo esc_attr( (string) $cy ); ?>" r="<?php echo esc_attr( (string) $r_outer ); ?>" fill="none" stroke="var(--citewp-paper-tinted)" stroke-width="<?php echo esc_attr( (string) $sw_outer ); ?>"/>
+			<?php foreach ( $outer_segs as $seg ) : ?>
+			<circle cx="<?php echo esc_attr( (string) $cx ); ?>" cy="<?php echo esc_attr( (string) $cy ); ?>" r="<?php echo esc_attr( (string) $r_outer ); ?>" fill="none" stroke="<?php echo esc_attr( $seg['color'] ); ?>" stroke-width="<?php echo esc_attr( (string) $sw_outer ); ?>" stroke-linecap="round" stroke-dasharray="<?php echo esc_attr( $seg['len'] . ' ' . $circ_outer ); ?>" stroke-dashoffset="<?php echo esc_attr( (string) $seg['offset'] ); ?>" transform="<?php echo esc_attr( $rotate ); ?>"/>
+			<?php endforeach; ?>
+			<text x="<?php echo esc_attr( (string) $cx ); ?>" y="<?php echo esc_attr( (string) ( $cy - 6 ) ); ?>" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono', monospace" font-size="32" font-weight="800" fill="<?php echo esc_attr( $score_color ); ?>"><?php echo esc_html( (string) $total ); ?></text>
+			<text x="<?php echo esc_attr( (string) $cx ); ?>" y="<?php echo esc_attr( (string) ( $cy + 18 ) ); ?>" text-anchor="middle" dominant-baseline="middle" font-family="'Inter', sans-serif" font-size="10" font-weight="700" fill="var(--citewp-text-muted)" letter-spacing="0.06em">CITE SCORE</text>
+		</svg>
+		<span class="screen-reader-text">
+			<?php
+			/* translators: %1$d: score total, %2$s: grade band */
+			printf(
+				esc_html__( 'Cite Score: %1$d out of 100, %2$s band', 'ai-search-optimizer' ),
+				$total,
+				$grade
+			);
+			?>
+		</span>
 		<?php
 	}
 }
