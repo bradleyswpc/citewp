@@ -659,6 +659,17 @@ final class Menu {
 			<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--citrine"><?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?></a>
 		</div>
 
+		<script>
+		(function () {
+			var filters = document.querySelectorAll( '.citewp-aiso-hero__filter' );
+			filters.forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					filters.forEach( function ( b ) { b.classList.remove( 'is-active' ); } );
+					btn.classList.add( 'is-active' );
+				} );
+			} );
+		}() );
+		</script>
 		<?php
 	}
 

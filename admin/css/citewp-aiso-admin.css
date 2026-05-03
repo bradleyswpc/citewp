@@ -200,7 +200,7 @@
 
 .citewp-aiso-rail__wordmark {
   display: block;
-  font: 800 28px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 700 28px/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-on-navy);
   letter-spacing: -0.04em;
 }
@@ -395,7 +395,7 @@
 
 .citewp-aiso-hero__stats {
   display: flex;
-  gap: var(--sp-8);
+  gap: var(--sp-5);
   position: relative;
   flex-shrink: 0;
 }
@@ -711,7 +711,7 @@
 .citewp-aiso-insights__opp-muted {
   font: 400 12px/1.4 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-muted);
-  margin-bottom: 24px;
+  margin-bottom: var(--sp-4);
 }
 
 .citewp-aiso-insights__opp-actions {
@@ -1440,7 +1440,7 @@
 .citewp-aiso-fscard__header {
   background: var(--citewp-paper);
   border-bottom: 1px solid var(--citewp-border);
-  padding: 10px var(--sp-5);
+  padding: var(--sp-3) var(--sp-5);
   font: 700 var(--fs-base)/1.2 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-text-primary);
   display: flex;
@@ -1503,6 +1503,8 @@
 
 .citewp-aiso-fscard__row--info {
   grid-template-columns: 1fr;
+  padding-top: var(--sp-2);
+  padding-bottom: var(--sp-2);
 }
 
 .citewp-aiso-fscard__btn {
@@ -1559,7 +1561,7 @@
 
 .citewp-aiso-settings-tabnav__item--active {
   color: var(--citewp-text-primary);
-  border-bottom-color: #2563eb;
+  border-bottom-color: var(--citewp-tint-blue);
 }
 
 .citewp-aiso-settings-tabpanel { display: none; }
@@ -1592,4 +1594,37 @@
 .citewp-aiso-btn--primary-action:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
+}
+
+/* === SECTION 26: Polish pass (Session 18) === */
+
+.citewp-aiso-actions {
+  background: var(--citewp-white);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+}
+
+.citewp-aiso-rail__pro-card .citewp-aiso-btn--citrine {
+  width: 100%;
+  justify-content: center;
+}
+
+.citewp-aiso-kpi-card__orb--blue {
+  background: var(--citewp-blue-tint);
+  color: var(--citewp-tint-blue);
+}
+
+.citewp-aiso-fscard__btn {
+  align-self: flex-end;
+}
+
+.citewp-aiso-fscard code {
+  background: var(--citewp-paper-mid);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--citewp-tint-blue);
 }

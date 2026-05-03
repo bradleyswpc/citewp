@@ -140,6 +140,7 @@ final class Page {
 				<h1 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Settings', 'ai-search-optimizer' ); ?></h1>
 				<p class="citewp-aiso-page-header__desc"><?php esc_html_e( 'Configure your AI search optimization preferences.', 'ai-search-optimizer' ); ?></p>
 			</div>
+			<?php if ( count( $tabs ) > 1 ) : ?>
 			<div class="citewp-aiso-page-header__right">
 				<nav class="citewp-aiso-settings-tabnav" role="tablist">
 					<?php foreach ( $tabs as $slug => $label ) :
@@ -158,6 +159,7 @@ final class Page {
 					<?php endforeach; ?>
 				</nav>
 			</div>
+			<?php endif; ?>
 		</div>
 
 		<?php if ( sanitize_key( wp_unslash( $_GET['regenerated'] ?? '' ) ) === '1' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
