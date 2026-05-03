@@ -12,6 +12,8 @@ namespace CiteWP\Aiso\Admin;
 use CiteWP\Aiso\Admin\DashboardData;
 use CiteWP\Aiso\Admin\IconLibrary;
 use CiteWP\Aiso\Scoring\Repository;
+use CiteWP\Aiso\Admin\RecommendationMapper;
+use CiteWP\Aiso\Scoring\ScoreHistory;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -710,13 +712,532 @@ final class Menu {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
+
+		// ── All scored post IDs ─────────────────────────────────────────
+		$scored_ids   = get_posts( [
+			'post_type'      => [ 'post', 'page' ],
+			'post_status'    => [ 'publish', 'draft' ],
+			'posts_per_page' => 1000,
+			'meta_key'       => Repository::META_KEY_TOTAL,
+			'meta_compare'   => 'EXISTS',
+			'no_found_rows'  => true,
+			'fields'         => 'ids',
+		] );
+		$total_scored = count( $scored_ids );
+
+		// ── Site-wide stats (sample first 50 for signal analysis) ───────
+		$score_sum    = 0;
+		$issue_count  = 0;
+		$cat_sums     = [ 'structure' => 0, 'citability' => 0, 'authority' => 0 ];
+		$signal_fails = [];
+		$sample_cap   = 50;
+
+		foreach ( $scored_ids as $i => $pid ) {
+			$total      = (int) get_post_meta( (int) $pid, Repository::META_KEY_TOTAL, true );
+			$score_sum += $total;
+			if ( $total < 50 ) {
+				++$issue_count;
+			}
+			if ( $i < $sample_cap ) {
+				$data = ( new Repository() )->get( (int) $pid );
+				if ( $data && isset( $data['categories'] ) ) {
+					foreach ( array_keys( $cat_sums ) as $cat_key ) {
+						if ( isset( $data['categories'][ $cat_key ]['score'] ) ) {
+							$cat_sums[ $cat_key ] += (int) $data['categories'][ $cat_key ]['score'];
+						}
+					}
+				}
+				if ( $data && isset( $data['signals'] ) ) {
+					foreach ( $data['signals'] as $sig ) {
+						if ( in_array( $sig['status'], [ 'fail', 'partial' ], true ) ) {
+							$signal_fails[ $sig['id'] ] = ( $signal_fails[ $sig['id'] ] ?? 0 ) + 1;
+						}
+					}
+				}
+			}
+		}
+
+		$avg_score = $total_scored > 0 ? (int) round( $score_sum / $total_scored ) : null;
+		$avg_grade = 'empty';
+		if ( $avg_score !== null ) {
+			$avg_grade = match ( true ) {
+				$avg_score >= 80 => 'green',
+				$avg_score >= 60 => 'yellow',
+				$avg_score >= 40 => 'orange',
+				default          => 'red',
+			};
+		}
+
+		$sample_n = min( $total_scored, $sample_cap );
+		$cat_avgs = [];
+		foreach ( $cat_sums as $cat_key => $sum ) {
+			$cat_avgs[ $cat_key ] = $sample_n > 0 ? (int) round( $sum / $sample_n ) : 0;
+		}
+
+		// ── Top 3 failing signals → AI Recommendations ──────────────────
+		arsort( $signal_fails );
+		$top_signal_ids = array_slice( array_keys( $signal_fails ), 0, 3 );
+		$mapper         = new RecommendationMapper();
+		$top_recs       = $mapper->get_many( $top_signal_ids );
+		$top_rec_ids    = array_keys( $top_recs );
+
+		// Pad to exactly 3 rows.
+		$recs_display = array_values( $top_recs );
+		while ( count( $recs_display ) < 3 ) {
+			$recs_display[] = [
+				'label'    => __( 'Keep publishing', 'ai-search-optimizer' ),
+				'copy'     => __( 'Your content is performing well. Keep publishing high-quality posts to maintain your score.', 'ai-search-optimizer' ),
+				'category' => '',
+			];
+		}
+
+		// ── Score History ────────────────────────────────────────────────
+		$history_range = absint( $_GET['cs_range'] ?? 30 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$history_range = in_array( $history_range, [ 7, 30, 90 ], true ) ? $history_range : 30;
+		$history       = ( new ScoreHistory() )->get_history( $history_range );
+		$hist_avg      = ! empty( $history ) ? (int) round( array_sum( array_column( $history, 'avg' ) ) / count( $history ) ) : null;
+		$hist_peak     = ! empty( $history ) ? (int) round( (float) max( array_column( $history, 'avg' ) ) ) : null;
+
+		// ── Paginated post table ─────────────────────────────────────────
+		$paged     = max( 1, absint( $_GET['csp'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$per_page  = in_array( (int) ( $_GET['cspp'] ?? 20 ), [ 10, 20, 50 ], true ) ? (int) $_GET['cspp'] : 20; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$search_q  = sanitize_text_field( wp_unslash( $_GET['css'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$tbl_args  = [
+			'post_type'      => [ 'post', 'page' ],
+			'post_status'    => [ 'publish', 'draft' ],
+			'posts_per_page' => $per_page,
+			'paged'          => $paged,
+			'orderby'        => 'meta_value_num',
+			'meta_key'       => Repository::META_KEY_TOTAL,
+			'order'          => 'ASC',
+			'meta_query'     => [ [ 'key' => Repository::META_KEY_TOTAL, 'compare' => 'EXISTS' ] ],
+		];
+		if ( $search_q !== '' ) {
+			$tbl_args['s'] = $search_q;
+		}
+		$tbl_q       = new \WP_Query( $tbl_args );
+		$total_pages = $tbl_q->max_num_pages;
+		$first_item  = ( $paged - 1 ) * $per_page + 1;
+		$last_item   = min( $paged * $per_page, $tbl_q->found_posts );
+
+		// ── Category display metadata ────────────────────────────────────
+		$cat_meta = [
+			'structure'  => [ 'label' => __( 'Structure',  'ai-search-optimizer' ), 'max' => 35 ],
+			'citability' => [ 'label' => __( 'Citability', 'ai-search-optimizer' ), 'max' => 40 ],
+			'authority'  => [ 'label' => __( 'Authority',  'ai-search-optimizer' ), 'max' => 25 ],
+		];
+
+		$base_url   = admin_url( 'admin.php' );
+		$base_q     = [ 'page' => self::SLUG_PARENT ];
+		$band_color = static function ( string $grade ): string {
+			return match ( $grade ) {
+				'green'  => 'var(--citewp-score-green)',
+				'yellow' => 'var(--citewp-score-yellow)',
+				'orange' => 'var(--citewp-score-orange)',
+				default  => 'var(--citewp-score-red)',
+			};
+		};
 		?>
+
+		<!-- Page header strip -->
 		<div class="citewp-aiso-page-header">
 			<div class="citewp-aiso-page-header__left">
 				<h2 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Cite Score', 'ai-search-optimizer' ); ?></h2>
 				<p class="citewp-aiso-page-header__desc"><?php esc_html_e( 'Track and improve your site\'s AI citation potential.', 'ai-search-optimizer' ); ?></p>
 			</div>
 		</div>
+
+		<?php if ( 0 === $total_scored ) : ?>
+		<!-- Empty state -->
+		<div class="citewp-aiso-cs-empty">
+			<div class="citewp-aiso-empty__icon"><?php echo IconLibrary::icon( 'gauge', 48 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+			<h3 class="citewp-aiso-empty__title"><?php esc_html_e( 'No scored content yet.', 'ai-search-optimizer' ); ?></h3>
+			<p class="citewp-aiso-empty__text"><?php esc_html_e( 'Open and save any post or page to generate your first Cite Score.', 'ai-search-optimizer' ); ?></p>
+		</div>
+		<?php else : ?>
+
+		<!-- Two-column body -->
+		<div class="citewp-aiso-cs-body">
+
+			<!-- Left column -->
+			<div class="citewp-aiso-cs-left">
+
+				<!-- Semi-circle gauge -->
+				<div class="citewp-aiso-gauge-panel">
+					<?php $this->render_gauge_svg( $avg_score ?? 0, $avg_grade ); ?>
+					<p class="citewp-aiso-gauge-panel__meta">
+						<?php
+						$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
+						printf(
+							/* translators: %1$d: scored posts, %2$d: total published */
+							esc_html__( '%1$d of %2$d posts scored', 'ai-search-optimizer' ),
+							$total_scored,
+							$published_total
+						);
+						?>
+					</p>
+				</div>
+
+				<!-- Score breakdown -->
+				<div class="citewp-aiso-breakdown">
+					<div class="citewp-aiso-breakdown__head"><?php esc_html_e( 'Score Breakdown', 'ai-search-optimizer' ); ?></div>
+					<?php foreach ( $cat_meta as $cat_key => $cat_info ) :
+						$avg_cat   = $cat_avgs[ $cat_key ] ?? 0;
+						$cat_max   = $cat_info['max'];
+						$pct       = $cat_max > 0 ? ( $avg_cat / $cat_max ) * 100 : 0;
+						$cat_grade = match ( true ) {
+							$pct >= 80 => 'green',
+							$pct >= 60 => 'yellow',
+							$pct >= 40 => 'orange',
+							default    => 'red',
+						};
+						$bar_color = $band_color( $cat_grade );
+					?>
+					<div class="citewp-aiso-breakdown__row">
+						<div class="citewp-aiso-breakdown__label-row">
+							<span class="citewp-aiso-breakdown__label"><?php echo esc_html( $cat_info['label'] ); ?></span>
+							<span class="citewp-aiso-breakdown__score" style="color:<?php echo esc_attr( $bar_color ); ?>">
+								<?php echo esc_html( $avg_cat . ' / ' . $cat_max ); ?>
+							</span>
+						</div>
+						<div class="citewp-aiso-breakdown__bar">
+							<div class="citewp-aiso-breakdown__fill" style="width:<?php echo esc_attr( round( $pct, 1 ) . '%' ); ?>;background:<?php echo esc_attr( $bar_color ); ?>"></div>
+						</div>
+					</div>
+					<?php endforeach; ?>
+				</div>
+
+				<!-- Score history -->
+				<div class="citewp-aiso-history-panel">
+					<div class="citewp-aiso-history-panel__head">
+						<span class="citewp-aiso-history-panel__title"><?php esc_html_e( 'Score History', 'ai-search-optimizer' ); ?></span>
+						<div class="citewp-aiso-history-panel__pills">
+							<?php foreach ( [ 7, 30, 90 ] as $days ) :
+								$range_url = esc_url( add_query_arg( array_merge( $base_q, [ 'cs_range' => $days ] ), $base_url ) . '#cite-score' );
+							?>
+							<a href="<?php echo $range_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped — esc_url already applied ?>"
+							   class="citewp-aiso-history-pill<?php echo $days === $history_range ? ' is-active' : ''; ?>">
+								<?php echo esc_html( $days . 'D' ); ?>
+							</a>
+							<?php endforeach; ?>
+						</div>
+					</div>
+					<div class="citewp-aiso-history-panel__chart">
+						<?php $this->render_history_svg( $history ); ?>
+					</div>
+					<?php if ( $hist_avg !== null ) : ?>
+					<div class="citewp-aiso-history-panel__stats">
+						<div>
+							<div class="citewp-aiso-history-panel__stat-label"><?php esc_html_e( 'Avg Score', 'ai-search-optimizer' ); ?></div>
+							<div class="citewp-aiso-history-panel__stat-value"><?php echo esc_html( (string) $hist_avg ); ?></div>
+						</div>
+						<div>
+							<div class="citewp-aiso-history-panel__stat-label"><?php esc_html_e( 'Peak', 'ai-search-optimizer' ); ?></div>
+							<div class="citewp-aiso-history-panel__stat-value"><?php echo esc_html( (string) $hist_peak ); ?></div>
+						</div>
+					</div>
+					<?php endif; ?>
+				</div>
+
+			</div><!-- /.citewp-aiso-cs-left -->
+
+			<!-- Right column -->
+			<div class="citewp-aiso-cs-right">
+
+				<!-- AI Recommendations -->
+				<div class="citewp-aiso-recs">
+					<div class="citewp-aiso-recs__head">
+						<span class="citewp-aiso-recs__icon"><?php echo IconLibrary::icon( 'sparkles', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+						<span class="citewp-aiso-recs__title"><?php esc_html_e( 'AI Recommendations', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-recs__badge"><?php esc_html_e( 'BETA', 'ai-search-optimizer' ); ?></span>
+					</div>
+					<?php foreach ( $recs_display as $idx => $rec ) :
+						$rec_signal_id = $top_rec_ids[ $idx ] ?? '';
+						$fail_count    = $signal_fails[ $rec_signal_id ] ?? 0;
+					?>
+					<div class="citewp-aiso-recs__row">
+						<div class="citewp-aiso-recs__label"><?php echo esc_html( $rec['label'] ); ?></div>
+						<?php if ( $fail_count > 0 ) : ?>
+						<div class="citewp-aiso-recs__affected">
+							<?php
+							printf(
+								/* translators: %1$d: fail count, %2$d: sample size */
+								esc_html__( 'Failing on %1$d of %2$d sampled posts', 'ai-search-optimizer' ),
+								$fail_count,
+								$sample_n
+							);
+							?>
+						</div>
+						<?php endif; ?>
+						<div class="citewp-aiso-recs__copy"><?php echo esc_html( $rec['copy'] ); ?></div>
+					</div>
+					<?php endforeach; ?>
+				</div>
+
+				<!-- Post-level table -->
+				<div class="citewp-aiso-cs-table-wrap">
+					<div class="citewp-aiso-cs-controls">
+						<form method="get" action="<?php echo esc_url( $base_url ); ?>">
+							<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
+							<input type="hidden" name="cspp" value="<?php echo esc_attr( (string) $per_page ); ?>">
+							<input
+								type="search"
+								name="css"
+								class="citewp-aiso-cs-search"
+								value="<?php echo esc_attr( $search_q ); ?>"
+								placeholder="<?php esc_attr_e( 'Search posts…', 'ai-search-optimizer' ); ?>"
+							>
+						</form>
+						<form method="get" action="<?php echo esc_url( $base_url ); ?>">
+							<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
+							<input type="hidden" name="css" value="<?php echo esc_attr( $search_q ); ?>">
+							<select name="cspp" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
+								<?php foreach ( [ 10, 20, 50 ] as $pp ) : ?>
+								<option value="<?php echo esc_attr( (string) $pp ); ?>"<?php selected( $pp, $per_page ); ?>><?php echo esc_html( (string) $pp ); ?></option>
+								<?php endforeach; ?>
+							</select>
+						</form>
+					</div>
+
+					<?php if ( $tbl_q->have_posts() ) : ?>
+					<table class="citewp-aiso-cs-table">
+						<thead>
+							<tr>
+								<th><?php esc_html_e( 'Title',       'ai-search-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Type',        'ai-search-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Score',       'ai-search-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Grade',       'ai-search-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Last Scored', 'ai-search-optimizer' ); ?></th>
+								<th><?php esc_html_e( 'Action',      'ai-search-optimizer' ); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php while ( $tbl_q->have_posts() ) :
+								$tbl_q->the_post();
+								$t_id       = (int) get_the_ID();
+								$t_score    = (int) get_post_meta( $t_id, Repository::META_KEY_TOTAL, true );
+								$t_grade    = get_post_meta( $t_id, Repository::META_KEY_GRADE, true );
+								$t_grade    = is_string( $t_grade ) && in_array( $t_grade, [ 'red', 'orange', 'yellow', 'green' ], true ) ? $t_grade : 'red';
+								$t_time_raw = get_post_meta( $t_id, Repository::META_KEY_TIME, true );
+								$t_time_ts  = is_string( $t_time_raw ) && $t_time_raw !== '' ? (int) strtotime( $t_time_raw ) : 0;
+								$t_time_ago = $t_time_ts > 0 ? human_time_diff( $t_time_ts, time() ) . ' ' . __( 'ago', 'ai-search-optimizer' ) : '—';
+								$t_type_obj = get_post_type_object( (string) get_post_type() );
+								$t_type     = $t_type_obj ? $t_type_obj->labels->singular_name : (string) get_post_type();
+								$t_edit_url = get_edit_post_link( $t_id );
+							?>
+							<tr>
+								<td>
+									<?php if ( $t_edit_url ) : ?>
+									<a href="<?php echo esc_url( $t_edit_url ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
+									<?php else : ?>
+									<?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?>
+									<?php endif; ?>
+								</td>
+								<td class="citewp-aiso-cs-table__type"><?php echo esc_html( $t_type ); ?></td>
+								<td class="citewp-aiso-cs-table__score" style="color:<?php echo esc_attr( $band_color( $t_grade ) ); ?>"><?php echo esc_html( (string) $t_score ); ?></td>
+								<td><span class="citewp-aiso-grade-badge citewp-aiso-grade-badge--<?php echo esc_attr( $t_grade ); ?>"><?php echo esc_html( ucfirst( $t_grade ) ); ?></span></td>
+								<td class="citewp-aiso-cs-table__time"><?php echo esc_html( $t_time_ago ); ?></td>
+								<td>
+									<?php if ( $t_edit_url ) : ?>
+									<a href="<?php echo esc_url( $t_edit_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'Improve', 'ai-search-optimizer' ); ?></a>
+									<?php endif; ?>
+								</td>
+							</tr>
+							<?php endwhile; wp_reset_postdata(); ?>
+						</tbody>
+					</table>
+
+					<div class="citewp-aiso-cs-pagination">
+						<span class="citewp-aiso-cs-pagination__info">
+							<?php
+							printf(
+								/* translators: %1$d: first, %2$d: last, %3$d: total */
+								esc_html__( 'Showing %1$d–%2$d of %3$d posts', 'ai-search-optimizer' ),
+								$first_item,
+								$last_item,
+								$tbl_q->found_posts
+							);
+							?>
+						</span>
+						<div class="citewp-aiso-cs-pagination__nav">
+							<?php
+							$prev_url = esc_url( add_query_arg( array_merge( $base_q, [ 'csp' => $paged - 1, 'cspp' => $per_page, 'css' => $search_q ] ), $base_url ) . '#cite-score' );
+							$next_url = esc_url( add_query_arg( array_merge( $base_q, [ 'csp' => $paged + 1, 'cspp' => $per_page, 'css' => $search_q ] ), $base_url ) . '#cite-score' );
+							?>
+							<?php if ( $paged > 1 ) : ?>
+							<a href="<?php echo $prev_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( '← Prev', 'ai-search-optimizer' ); ?></a>
+							<?php else : ?>
+							<span class="citewp-aiso-btn citewp-aiso-btn--outline" aria-disabled="true" style="opacity:0.4;pointer-events:none"><?php esc_html_e( '← Prev', 'ai-search-optimizer' ); ?></span>
+							<?php endif; ?>
+							<?php if ( $paged < $total_pages ) : ?>
+							<a href="<?php echo $next_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'Next →', 'ai-search-optimizer' ); ?></a>
+							<?php else : ?>
+							<span class="citewp-aiso-btn citewp-aiso-btn--outline" aria-disabled="true" style="opacity:0.4;pointer-events:none"><?php esc_html_e( 'Next →', 'ai-search-optimizer' ); ?></span>
+							<?php endif; ?>
+						</div>
+					</div>
+
+					<?php else : ?>
+					<div class="citewp-aiso-cs-empty">
+						<div class="citewp-aiso-empty__icon"><?php echo IconLibrary::icon( 'gauge', 48 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+						<h3 class="citewp-aiso-empty__title">
+							<?php echo $search_q !== '' ? esc_html__( 'No posts match your search.', 'ai-search-optimizer' ) : esc_html__( 'No scored posts found.', 'ai-search-optimizer' ); ?>
+						</h3>
+					</div>
+					<?php endif; ?>
+
+				</div><!-- /.citewp-aiso-cs-table-wrap -->
+
+			</div><!-- /.citewp-aiso-cs-right -->
+
+		</div><!-- /.citewp-aiso-cs-body -->
+
+		<!-- Pro Tip footer -->
+		<div class="citewp-aiso-protip">
+			<div class="citewp-aiso-protip__left">
+				<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'zap', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+				<div class="citewp-aiso-protip__content">
+					<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-protip__body"><?php esc_html_e( 'Adding FAQ schema to your top posts is the fastest way to raise your site-wide Cite Score.', 'ai-search-optimizer' ); ?></p>
+				</div>
+			</div>
+			<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
+				<?php esc_html_e( 'Learn More →', 'ai-search-optimizer' ); ?>
+			</a>
+		</div>
+
+		<?php endif; // total_scored === 0
+	}
+
+	private function render_gauge_svg( int $score, string $grade ): void {
+		$cx      = 110;
+		$cy      = 100;
+		$r       = 80;
+		$sw      = 14;
+		$arc_len = round( M_PI * $r, 2 ); // ≈ 251.33
+
+		$x_left   = $cx - $r; // 30
+		$x_right  = $cx + $r; // 190
+		$fill_len = round( ( $score / 100 ) * $arc_len, 2 );
+
+		$angle_rad = ( 180.0 - ( $score / 100.0 ) * 180.0 ) * M_PI / 180.0;
+		$needle_r  = 68;
+		$needle_x  = round( $cx + $needle_r * cos( $angle_rad ), 2 );
+		$needle_y  = round( $cy - $needle_r * sin( $angle_rad ), 2 );
+
+		$score_colors = [
+			'green'  => 'var(--citewp-score-green)',
+			'yellow' => 'var(--citewp-score-yellow)',
+			'orange' => 'var(--citewp-score-orange)',
+			'red'    => 'var(--citewp-score-red)',
+			'empty'  => 'var(--citewp-text-muted)',
+		];
+		$grade_labels = [
+			'green'  => __( 'Good',       'ai-search-optimizer' ),
+			'yellow' => __( 'Fair',       'ai-search-optimizer' ),
+			'orange' => __( 'Needs Work', 'ai-search-optimizer' ),
+			'red'    => __( 'Poor',       'ai-search-optimizer' ),
+			'empty'  => __( 'No data',    'ai-search-optimizer' ),
+		];
+		$score_color = $score_colors[ $grade ] ?? 'var(--citewp-text-muted)';
+		$grade_label = $grade_labels[ $grade ] ?? '';
+		$arc_path    = 'M ' . $x_left . ' ' . $cy . ' A ' . $r . ' ' . $r . ' 0 0 0 ' . $x_right . ' ' . $cy;
+		?>
+		<svg viewBox="0 0 220 115" width="220" height="115" aria-hidden="true" focusable="false" style="display:block;margin:0 auto">
+			<defs>
+				<linearGradient id="citewp-gauge-ramp" x1="0%" y1="0%" x2="100%" y2="0%">
+					<stop offset="0%"   stop-color="var(--citewp-score-red)"/>
+					<stop offset="33%"  stop-color="var(--citewp-score-orange)"/>
+					<stop offset="66%"  stop-color="var(--citewp-score-yellow)"/>
+					<stop offset="100%" stop-color="var(--citewp-score-green)"/>
+				</linearGradient>
+			</defs>
+			<path d="<?php echo esc_attr( $arc_path ); ?>" fill="none"
+				stroke="url(#citewp-gauge-ramp)" stroke-width="<?php echo esc_attr( (string) $sw ); ?>"
+				stroke-linecap="round" opacity="0.35"/>
+			<path d="<?php echo esc_attr( $arc_path ); ?>" fill="none"
+				stroke="<?php echo esc_attr( $score_color ); ?>" stroke-width="<?php echo esc_attr( (string) $sw ); ?>"
+				stroke-linecap="round"
+				stroke-dasharray="<?php echo esc_attr( $fill_len . ' ' . $arc_len ); ?>"
+				stroke-dashoffset="0"/>
+			<line
+				x1="<?php echo esc_attr( (string) $cx ); ?>" y1="<?php echo esc_attr( (string) $cy ); ?>"
+				x2="<?php echo esc_attr( (string) $needle_x ); ?>" y2="<?php echo esc_attr( (string) $needle_y ); ?>"
+				stroke="var(--citewp-obsidian)" stroke-width="2.5" stroke-linecap="round"/>
+			<circle cx="<?php echo esc_attr( (string) $cx ); ?>" cy="<?php echo esc_attr( (string) $cy ); ?>"
+				r="5" fill="var(--citewp-obsidian)"/>
+			<text x="<?php echo esc_attr( (string) $cx ); ?>" y="<?php echo esc_attr( (string) ( $cy - 22 ) ); ?>"
+				text-anchor="middle" dominant-baseline="middle"
+				font-family="'JetBrains Mono', monospace" font-size="28" font-weight="800"
+				fill="<?php echo esc_attr( $score_color ); ?>"><?php echo esc_html( $score > 0 ? (string) $score : '—' ); ?></text>
+			<text x="<?php echo esc_attr( (string) $cx ); ?>" y="<?php echo esc_attr( (string) ( $cy - 6 ) ); ?>"
+				text-anchor="middle" dominant-baseline="middle"
+				font-family="'Inter', sans-serif" font-size="10" font-weight="700"
+				fill="var(--citewp-text-muted)" letter-spacing="0.06em"><?php echo esc_html( strtoupper( $grade_label ) ); ?></text>
+		</svg>
+		<span class="screen-reader-text">
+			<?php
+			printf(
+				/* translators: %1$d: score, %2$s: grade band */
+				esc_html__( 'Average Cite Score: %1$d out of 100, %2$s', 'ai-search-optimizer' ),
+				$score,
+				esc_html( $grade_label )
+			);
+			?>
+		</span>
+		<?php
+	}
+
+	/**
+	 * @param array<int, array{date: string, avg: float}> $history
+	 */
+	private function render_history_svg( array $history ): void {
+		if ( empty( $history ) ) {
+			?>
+			<div class="citewp-aiso-history-panel__empty">
+				<svg viewBox="0 0 340 60" width="100%" height="60" aria-hidden="true">
+					<line x1="0" y1="30" x2="340" y2="30" stroke="var(--citewp-border)" stroke-width="2" stroke-dasharray="6 4"/>
+				</svg>
+				<p class="citewp-aiso-history-panel__empty-text">
+					<?php esc_html_e( 'Not enough history yet. Scores appear after the daily cron runs.', 'ai-search-optimizer' ); ?>
+				</p>
+			</div>
+			<?php
+			return;
+		}
+
+		$w      = 340;
+		$h      = 80;
+		$n      = count( $history );
+		$scores = array_column( $history, 'avg' );
+		$min_s  = (float) min( $scores );
+		$max_s  = (float) max( $scores );
+		$rng    = max( 1.0, $max_s - $min_s );
+
+		$pts = [];
+		foreach ( $history as $i => $entry ) {
+			$x     = $n > 1 ? (int) round( ( $i / ( $n - 1 ) ) * $w ) : (int) ( $w / 2 );
+			$y     = (int) round( $h - ( ( (float) $entry['avg'] - $min_s ) / $rng ) * ( $h * 0.8 ) - $h * 0.1 );
+			$pts[] = [ 'x' => $x, 'y' => $y ];
+		}
+
+		$poly = implode( ' ', array_map( static fn( $p ) => "{$p['x']},{$p['y']}", $pts ) );
+		$last = end( $pts );
+		$frst = reset( $pts );
+		$area = 'M ' . implode( ' L ', array_map( static fn( $p ) => "{$p['x']} {$p['y']}", $pts ) )
+		        . " L {$last['x']} {$h} L {$frst['x']} {$h} Z";
+		?>
+		<svg viewBox="0 0 <?php echo esc_attr( (string) $w ); ?> <?php echo esc_attr( (string) $h ); ?>"
+			width="100%" height="<?php echo esc_attr( (string) $h ); ?>" aria-hidden="true">
+			<path d="<?php echo esc_attr( $area ); ?>" fill="rgba(232,212,0,0.08)"/>
+			<polyline points="<?php echo esc_attr( $poly ); ?>" fill="none"
+				stroke="var(--citewp-citrine)" stroke-width="2"
+				stroke-linejoin="round" stroke-linecap="round"/>
+			<?php foreach ( $pts as $pt ) : ?>
+			<circle cx="<?php echo esc_attr( (string) $pt['x'] ); ?>" cy="<?php echo esc_attr( (string) $pt['y'] ); ?>"
+				r="3" fill="var(--citewp-citrine)"/>
+			<?php endforeach; ?>
+		</svg>
 		<?php
 	}
 }
