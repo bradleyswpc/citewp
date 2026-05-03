@@ -6,17 +6,18 @@
 
 ---
 
-## Session 18 — Dashboard polish rounds 1-3 + P41 button migration ✅
+## Session 18 — Dashboard polish rounds 1-4 + P41 button migration ✅
 
 **Date:** 2026-05-03
 
-**Deliverable:** Three rounds of Dashboard polish (Groups A/B/C, D/E/F, H/I) shipped. P41 button migration complete. Cite Score page v3 deferred to Session 19 (polish work consumed full session).
+**Deliverable:** Four rounds of Dashboard polish (Groups A/B/C, D/E/F, H/I, J/K) shipped. P41 button migration complete. Cite Score page v3 deferred to Session 19 (polish work consumed full session).
 
 **Commits (plugin repo, Session 18):**
 - `9c7ee19` — feat: Dashboard polish round 1 — section icon headers, KPI tooltips, Pro Tip relocation, type pills, Quick Actions arrow, data cap at 3 rows (Groups A/B/C)
 - `504ed66` — fix: Dashboard polish round 2 — tooltip fix (info icon added), KPI title color, grid overflow fix, icon stroke-width 2.5, navy darkened to #07111F, arrow inline, type pill in meta row, protip/hero/button spacing (Groups D/E/F + F1/F2)
 - `1e49d88` — feat: Dashboard polish round 3 — KPI tooltip right-anchor, hero dual-gap, P41 button migration: --primary-action weight 600, Improve/View Recommendations/Connect Now migrated to blue-on-paper (Groups H/I)
 - `f9bf068` — fix: consolidate tooltip left:auto into original block (code-reviewer H1)
+- `17d1ba6` — fix: Dashboard polish round 4 — hero padding-block sp-8→sp-10 (taller hero card, gaps now have room); tooltip width max-width→explicit 220px (root cause of tall-narrow render: absolute element was shrinking to icon parent width ~16px) (Groups J/K)
 
 **Brain edits (Desktop Commander, before Code work):**
 - `DECISIONS.md` — P41 logged: Tint Blue `#2563EB` permitted as primary action color on paper surfaces; Citrine remains primary on navy; three-style button system defined (primary-paper / primary-navy / secondary-tertiary).
