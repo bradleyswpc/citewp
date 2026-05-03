@@ -6,6 +6,39 @@
 
 ---
 
+## Session 19 — P41 button taxonomy rollout + hero alignment fix 🔄
+
+**Date:** 2026-05-03
+
+**Task 1 deliverable:** UI-DESIGN-SYSTEM.md button section rewritten per P41 four-style taxonomy (primary-paper / primary-navy / outline / soft). Plugin CSS renamed `--primary-action` → `--primary-paper`, spec fixed (padding 16px, font 13px, radius 8px), `--outline` updated to obsidian + hairline border, `--soft` class added. Improve buttons in Needs Attention demoted from primary-paper to outline. Post-smoke-test: hero top-justify fix (Section 30) + Top Crawlers cap 3 → 5.
+
+**Commits (plugin repo, Session 19 Task 1):**
+- `da4fe3d` — feat: P41 button taxonomy — rename primary-action→primary-paper, fix spec, update outline, add soft
+- `f8cbc12` — fix: demote Needs Attention Improve buttons to outline; rename primary-action→primary-paper in PHP
+- `c774809` — fix: hero top-justify + breathing room; Top Crawlers cap → 5 (Session 19)
+
+**Brain edits (Session 19, Task 1):**
+- `UI-DESIGN-SYSTEM.md` — Button section fully rewritten: four-style taxonomy, hierarchy rule, surface mapping, Why Blue rationale, CSS class naming per A14. 7 component library entries updated. Color token comment, critical rule paragraph, What NOT to Do list, and Cross-References section updated.
+
+**Files modified (plugin):**
+- `admin/css/citewp-aiso-admin.css` — Section 25: `--primary-action` → `--primary-paper` + spec fix. ~Line 576: `--outline` updated. `--soft` added. Section 30: hero `align-items: flex-start`, `__left` flex-column, title/sub line-height bump, pill padding 7px 16px. S27 E1 + S29 margin patches reverted.
+- `includes/Admin/Menu.php` — View Recommendations, Improve (demoted to `--outline`), Connect Now classes updated. `get_top_crawlers(3)` → `get_top_crawlers(5)`.
+- `includes/Settings/Page.php` — Save Changes: `--primary-action` → `citewp-aiso-btn citewp-aiso-btn--primary-paper`.
+
+**Decisions made:**
+- P41 expanded from three-style to four-style: `--soft` added as paper-tinted tertiary. Outline is the row-level action default (prevents button-soup in repeated lists).
+- CSS class A14 prefix confirmed: `citewp-aiso-btn` base + `citewp-aiso-btn--{modifier}` (corrected from `citewp-btn` shorthand in initial spec doc draft).
+
+**Smoke test:** LocalWP 502 prevented browser automation. User verified dashboard manually post-fix.
+
+**npm build:** Not run — CSS-only + PHP changes, no JS modifications.
+
+**Carryover into Session 19 Task 2:**
+- **Cite Score page v3** — Donut Chart Panel + Line Chart Panel + signal breakdown table (S18 master deliverable, still open)
+- All other S18 carryover items unchanged
+
+---
+
 ## Session 18 — Dashboard polish rounds 1-4 + P41 button migration ✅
 
 **Date:** 2026-05-03
