@@ -922,8 +922,6 @@ final class Menu {
 		string $score_color,
 		callable $cat_color
 	): void {
-		unset( $grade ); // reserved for future aria-label use
-
 		$cx       = 110;
 		$cy       = 110;
 		$r_inner  = 52;
