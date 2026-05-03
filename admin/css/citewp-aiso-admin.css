@@ -574,14 +574,44 @@
 }
 
 .citewp-aiso-btn--outline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-4);
   background: transparent;
-  color: var(--citewp-navy);
-  border: 1px solid var(--citewp-navy);
+  color: var(--citewp-obsidian);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  font: 600 var(--fs-sm)/1 'Inter', system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.12s, border-color 0.12s;
 }
 
 .citewp-aiso-btn--outline:hover {
-  color: var(--citewp-navy);
-  opacity: 0.75;
+  background: var(--citewp-paper);
+  border-color: #C5CEE0;
+  color: var(--citewp-obsidian);
+}
+
+.citewp-aiso-btn--soft {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--citewp-paper);
+  color: var(--citewp-obsidian);
+  border: 1px solid var(--citewp-border);
+  border-radius: var(--radius-md);
+  font: 600 var(--fs-sm)/1 'Inter', system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.citewp-aiso-btn--soft:hover {
+  background: var(--citewp-paper-mid);
+  color: var(--citewp-obsidian);
 }
 
 .citewp-aiso-btn--citrine {
@@ -1567,32 +1597,32 @@
 .citewp-aiso-settings-tabpanel { display: none; }
 .citewp-aiso-settings-tabpanel--active { display: block; }
 
-/* === SECTION 25: Primary Action button (page-level save / submit) === */
+/* === SECTION 25: Primary-paper button (genuine primary CTA on paper surfaces, P41) === */
 
-.citewp-aiso-btn--primary-action {
+.citewp-aiso-btn--primary-paper {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-1);
-  padding: var(--sp-2) var(--sp-5);
-  background: #2563eb;
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--citewp-tint-blue);
   color: var(--citewp-white);
-  border: 1px solid #2563eb;
-  border-radius: 6px;
-  font: 600 var(--fs-base)/1 'Inter', system-ui, -apple-system, sans-serif;
+  border: 1px solid var(--citewp-tint-blue);
+  border-radius: var(--radius-md);
+  font: 600 var(--fs-sm)/1 'Inter', system-ui, -apple-system, sans-serif;
   cursor: pointer;
   text-decoration: none;
   transition: background 0.12s, border-color 0.12s;
 }
 
-.citewp-aiso-btn--primary-action:hover,
-.citewp-aiso-btn--primary-action:focus {
+.citewp-aiso-btn--primary-paper:hover,
+.citewp-aiso-btn--primary-paper:focus {
   background: #1d4ed8;
   border-color: #1d4ed8;
   color: var(--citewp-white);
 }
 
-.citewp-aiso-btn--primary-action:focus-visible {
-  outline: 2px solid #2563eb;
+.citewp-aiso-btn--primary-paper:focus-visible {
+  outline: 2px solid var(--citewp-tint-blue);
   outline-offset: 2px;
 }
 
