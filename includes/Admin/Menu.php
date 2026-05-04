@@ -1260,16 +1260,23 @@ final class Menu {
 		</div><!-- /.citewp-aiso-cs-lower-grid -->
 
 		<!-- Row 4: Pro Tip footer -->
+		<?php
+		$cs_protip = apply_filters(
+			'citewp_aiso/protip',
+			__( 'Connect Google Search Console to get more insights and improve your Cite Score faster.', 'ai-search-optimizer' ),
+			'cite-score'
+		);
+		?>
 		<div class="citewp-aiso-protip">
 			<div class="citewp-aiso-protip__left">
 				<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'zap', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 				<div class="citewp-aiso-protip__content">
 					<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
-					<p class="citewp-aiso-protip__body"><?php esc_html_e( 'Adding FAQ schema to your top posts is the fastest way to raise your site-wide Cite Score.', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-protip__body"><?php echo esc_html( $cs_protip ); ?></p>
 				</div>
 			</div>
 			<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
-				<?php esc_html_e( 'Learn More →', 'ai-search-optimizer' ); ?>
+				<?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?>
 			</a>
 		</div>
 
