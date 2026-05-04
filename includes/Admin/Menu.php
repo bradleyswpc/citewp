@@ -1049,7 +1049,7 @@ final class Menu {
 							<th><?php esc_html_e( 'Trend',        'ai-search-optimizer' ); ?></th>
 							<th><?php esc_html_e( 'Last Updated', 'ai-search-optimizer' ); ?></th>
 							<th><?php esc_html_e( 'Issues',       'ai-search-optimizer' ); ?></th>
-							<th></th>
+							<th><?php esc_html_e( 'Actions', 'ai-search-optimizer' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -1083,8 +1083,8 @@ final class Menu {
 						?>
 						<tr>
 							<td>
-								<span style="display:inline-flex;align-items:center;gap:4px">
-									<span style="color:var(--citewp-text-muted);display:inline-flex"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+								<span style="display:inline-flex;align-items:flex-start;gap:8px">
+									<span style="color:var(--citewp-text-muted);display:inline-flex;flex-shrink:0;margin-top:2px"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 									<?php if ( $t_edit_url ) : ?>
 									<a href="<?php echo esc_url( $t_edit_url ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
 									<?php else : ?>

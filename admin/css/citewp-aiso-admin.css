@@ -1955,6 +1955,11 @@
   text-decoration: none;
 }
 
+/* Post title links: bold — scoped to first-child only (not Optimize button) */
+.citewp-aiso-cs-table td:first-child a {
+  font-weight: 700;
+}
+
 /* ── Generic paper card chrome (for top-grid and lower-grid panels) ── */
 .citewp-aiso-cs-panel {
   background: var(--citewp-paper);
@@ -2282,19 +2287,20 @@
 }
 
 .citewp-aiso-cs-table th {
-  font: 700 11px/1 'Inter', system-ui, sans-serif;
+  font: 700 12px/1 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-muted);
   letter-spacing: 0.04em;
   padding: var(--sp-2) var(--sp-3);
   border-bottom: 1px solid var(--citewp-border);
   text-align: left;
   white-space: nowrap;
+  text-transform: none;
 }
 
 .citewp-aiso-cs-table td {
   font: 400 13px/1.4 'Inter', system-ui, sans-serif;
   color: var(--citewp-obsidian);
-  padding: var(--sp-3);
+  padding: 16px 12px;
   border-bottom: 1px solid var(--citewp-border);
   vertical-align: middle;
 }
@@ -2383,6 +2389,11 @@
 .citewp-aiso-cs-table__trend--flat { color: var(--citewp-text-muted); font: 700 12px/1 'Inter', system-ui, sans-serif; }
 .citewp-aiso-cs-table__issues--active { color: var(--citewp-tint-orange); font: 700 12px/1 'Inter', system-ui, sans-serif; }
 .citewp-aiso-cs-table__issues--none   { color: var(--citewp-tint-green);  font: 700 12px/1 'Inter', system-ui, sans-serif; }
+
+/* Prevent Optimize button from wrapping in narrow action column */
+.citewp-aiso-cs-table .citewp-aiso-btn--outline {
+  white-space: nowrap;
+}
 
 /* Pagination: 3-zone footer layout */
 .citewp-aiso-cs-pagination {
