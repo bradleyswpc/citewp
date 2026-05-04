@@ -939,8 +939,8 @@ final class Menu {
 					printf(
 						/* translators: %1$d: scored posts, %2$d: total published */
 						esc_html__( '%1$d of %2$d posts scored', 'ai-search-optimizer' ),
-						$total_scored,
-						$published_total
+						(int) $total_scored,
+						(int) $published_total
 					);
 					?>
 				</p>
@@ -1187,7 +1187,7 @@ final class Menu {
 		<div class="citewp-cite-score-gauge citewp-cite-score-gauge--<?php echo esc_attr( $grade ); ?>"
 		     style="--score:<?php echo esc_attr( (string) $score ); ?>">
 			<svg viewBox="0 0 240 140" role="img"
-			     aria-label="<?php printf( esc_attr__( 'Cite Score %1$d out of 100, %2$s', 'ai-search-optimizer' ), $score, $grade_label ); ?>">
+			     aria-label="<?php echo esc_attr( sprintf( /* translators: 1: score integer 0-100, 2: grade label e.g. "Excellent" */ __( 'Cite Score %1$d out of 100, %2$s', 'ai-search-optimizer' ), $score, $grade_label ) ); ?>">
 				<defs>
 					<linearGradient id="citewp-gauge-gradient" x1="30" y1="120" x2="210" y2="120" gradientUnits="userSpaceOnUse">
 						<stop offset="0%"   stop-color="#ef4444" />
