@@ -6,6 +6,55 @@
 
 ---
 
+## Session 21 — Cite Score smoke test + Dashboard/Cite Score CSS polish ✅
+
+**Date:** 2026-05-04
+
+### Deliverable
+
+Manual Cite Score page smoke test completed (user). Two CSS polish fixes shipped.
+
+**Fix 1 — Tooltip width reduced**
+- `.citewp-aiso-kpi-tooltip__text`: `min-width: 220px → 200px`, `max-width: 280px → 260px`
+- Resolves Score Breakdown panel-title tooltip clipping at right edge.
+
+**Fix 2 — Needs Attention card height aligned with AI Insights**
+- `.citewp-aiso-needs`: `padding: var(--sp-5)` → `padding: var(--sp-5) var(--sp-5) var(--sp-8)`
+- Adds 12px extra bottom padding (20px→32px) so card bottom aligns with AI Insights card in col-a.
+- Note: `--sp-7` does not exist in the spacing scale (jumps sp-6→sp-8); using an undefined token in a shorthand invalidates the entire property (all padding collapses to 0).
+
+**Files modified:**
+- `admin/css/citewp-aiso-admin.css` — tooltip width, Needs Attention bottom padding
+
+**npm build:** Not required (CSS only).
+
+**Commit:** `4eea11a` — pushed to `origin/main`.
+
+**WP.org status:** Still awaiting approval at hello@citewp.com. SVN commit is priority 1 when email arrives.
+
+**Decisions made:** None.
+
+### Carryover into Session 22
+
+**Next session focus:** EditorPanel + Gutenberg sidebar v3 polish (multi-file, X13 pipeline).
+
+**Deferred:**
+- Cite Score badge rectangular shape (S20 Group 6)
+- WP.org approval → SVN commit (user action — check hello@citewp.com)
+
+**Rolling carryover:**
+- readme.txt polish + WP.org assets
+- Anti-cloaking content (S7)
+- "Suggest a Feature" link in admin
+- Page-builder canvas-mode awareness surface
+- Per-post surface consolidation doc
+- `citewp_aiso/metabox/tabs` filter `$context` arg
+- Brain consolidation session
+- Needs Attention "what's wrong" reasoning logic
+- P33 (Posts/Pages stat split)
+
+---
+
 ## Session 20 — Cite Score page Run #8 polish ✅
 
 **Date:** 2026-05-04
