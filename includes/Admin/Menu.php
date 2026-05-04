@@ -925,9 +925,15 @@ final class Menu {
 
 			<!-- Panel 1: Cite Score Health (gauge) -->
 			<div class="citewp-aiso-cs-panel">
-				<h3 class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Cite Score Health', 'ai-search-optimizer' ); ?></h3>
+				<h3 class="citewp-aiso-cs-panel__title">
+					<?php esc_html_e( 'Cite Score Health', 'ai-search-optimizer' ); ?>
+					<span class="citewp-aiso-kpi-tooltip">
+						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is the average across all scored posts. Higher scores mean better AI citation potential.', 'ai-search-optimizer' ); ?></span>
+					</span>
+				</h3>
 				<?php $this->render_gauge_svg( $avg_score ?? 0, $avg_grade ); ?>
-				<p class="citewp-aiso-cs-gauge__meta">
+				<p class="citewp-cite-score-gauge__meta">
 					<?php
 					$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
 					printf(
@@ -1178,28 +1184,24 @@ final class Menu {
 		];
 		$grade_label = $grade_labels[ $grade ] ?? '';
 		?>
-		<div class="citewp-aiso-cs-gauge citewp-aiso-cs-gauge--<?php echo esc_attr( $grade ); ?>"
+		<div class="citewp-cite-score-gauge citewp-cite-score-gauge--<?php echo esc_attr( $grade ); ?>"
 		     style="--score:<?php echo esc_attr( (string) $score ); ?>">
 			<svg viewBox="0 0 240 140" role="img"
 			     aria-label="<?php printf( esc_attr__( 'Cite Score %1$d out of 100, %2$s', 'ai-search-optimizer' ), $score, $grade_label ); ?>">
 				<defs>
 					<linearGradient id="citewp-gauge-gradient" x1="30" y1="120" x2="210" y2="120" gradientUnits="userSpaceOnUse">
-						<stop offset="0%"   stop-color="var(--citewp-score-red)"/>
-						<stop offset="45%"  stop-color="var(--citewp-citrine)"/>
-						<stop offset="100%" stop-color="var(--citewp-score-green)"/>
+						<stop offset="0%"   stop-color="#ef4444" />
+						<stop offset="45%"  stop-color="#f7d84a" />
+						<stop offset="100%" stop-color="#16a34a" />
 					</linearGradient>
 				</defs>
-				<path class="citewp-aiso-cs-gauge__bg"
-				      d="M 30 120 A 90 90 0 0 1 210 120"
-				      pathLength="100"/>
-				<path class="citewp-aiso-cs-gauge__arc"
-				      d="M 30 120 A 90 90 0 0 1 210 120"
-				      pathLength="100"/>
-				<text x="120" y="88" text-anchor="middle" class="citewp-aiso-cs-gauge__number">
+				<path class="gauge-bg" d="M 30 120 A 90 90 0 0 1 210 120" pathLength="100" />
+				<path class="gauge-score" d="M 30 120 A 90 90 0 0 1 210 120" pathLength="100" />
+				<text x="120" y="88" text-anchor="middle" class="gauge-number">
 					<?php echo esc_html( $score > 0 ? (string) $score : '—' ); ?>
 				</text>
-				<text x="120" y="112" text-anchor="middle" class="citewp-aiso-cs-gauge__total">/100</text>
-				<text x="120" y="132" text-anchor="middle" class="citewp-aiso-cs-gauge__label">
+				<text x="120" y="112" text-anchor="middle" class="gauge-total">/100</text>
+				<text x="120" y="132" text-anchor="middle" class="gauge-label">
 					<?php echo esc_html( $grade_label ); ?>
 				</text>
 			</svg>
