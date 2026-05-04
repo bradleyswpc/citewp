@@ -1868,6 +1868,49 @@
   color: var(--citewp-text-muted);
 }
 
+/* KPI card compact variant: single horizontal row, no __visual block */
+.citewp-aiso-kpi-card--compact {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+}
+
+.citewp-aiso-kpi-card--compact .citewp-aiso-kpi-card__orb {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.citewp-aiso-kpi-card--compact .citewp-aiso-kpi-card__data {
+  flex: 1;
+  min-width: 0;
+}
+
+.citewp-aiso-kpi-card--compact .citewp-aiso-kpi-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+.citewp-aiso-kpi-card--compact .citewp-aiso-kpi-card__title {
+  font: 700 12px/1.2 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  text-transform: none;
+}
+
+.citewp-aiso-kpi-card--compact .citewp-aiso-kpi-card__value {
+  font: 800 28px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+  margin: var(--sp-1) 0;
+}
+
+.citewp-aiso-kpi-card--compact .citewp-aiso-kpi-card__caption {
+  font: 400 12px/1.3 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+}
+
 /* ── Layout grids ── */
 .citewp-aiso-cs-top-grid {
   display: grid;
