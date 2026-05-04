@@ -11,9 +11,34 @@ import { useSelect, useDispatch, select } from '@wordpress/data';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Spinner, PanelBody } from '@wordpress/components';
-import { chartBar } from '@wordpress/icons';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
+
+function CiteWPIcon() {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 512 512"
+			width="24"
+			height="24"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<rect width="512" height="512" fill="#E8D400" />
+			<text
+				x="256"
+				y="318"
+				fontFamily="system-ui, -apple-system, sans-serif"
+				fontWeight="800"
+				fontSize="248"
+				fill="#0C0C0D"
+				textAnchor="middle"
+			>
+				[A]
+			</text>
+		</svg>
+	);
+}
 
 /**
  * Color tokens — kept in JS for now to avoid pulling in the full block editor styles.
@@ -88,13 +113,13 @@ function ScoreSidebar() {
 
 	return (
 		<>
-			<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ chartBar }>
+			<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ CiteWPIcon }>
 				CiteWP GEO Score
 			</PluginSidebarMoreMenuItem>
 			<PluginSidebar
 				name="citewp-aiso-geo-score"
 				title="CiteWP GEO Score"
-				icon={ chartBar }
+				icon={ CiteWPIcon }
 			>
 				<PanelBody>
 					{ loading && ! score && (
