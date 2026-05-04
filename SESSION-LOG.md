@@ -6,6 +6,82 @@
 
 ---
 
+## Session 20 — Cite Score page Run #7 polish ✅
+
+**Date:** 2026-05-04
+
+### Deliverable
+
+CSS/PHP fix-in-place pass on the Cite Score sitewide dashboard. 5 groups of visual polish, direct edits + code-reviewer pass. No new components, no scoring math touched, no JS changes.
+
+**Group 1 — Page header strip parity**
+- Replaced `.citewp-aiso-cs-header-band` (custom 1fr/auto grid with title+KPI in one row) with the shared `.citewp-aiso-page-header` strip (matching Crawler Logs / Settings).
+- KPI cards moved to a separate `.citewp-aiso-kpi-row--3col` row below the strip.
+- Removed `.citewp-aiso-cs-header-band*` CSS; added `.citewp-aiso-cs-kpi-row { margin-top: var(--sp-5); }`.
+
+**Group 2 — Left sub-row column ratio + score-copy**
+- `.citewp-aiso-cite-score-page__left-row`: `1fr 1fr` → `1.3fr 1fr` (Health panel wider).
+- `.citewp-aiso-cs-score-copy`: `max-width: 280px; font 13px/1.6` → `max-width: none; font 12px/1.55`.
+
+**Group 3 — Right column natural height**
+- `.citewp-aiso-cite-score-page__right`: added `align-self: start` (prevents grid from force-stretching right column to left column height).
+- Scoped override: `.citewp-aiso-cite-score-page__right .citewp-aiso-cs-panel { height: auto; }`.
+- `.citewp-aiso-history-panel`: added `min-height: 280px` floor for empty state.
+
+**Group 4 — Table header breathing room + column widths**
+- `.citewp-aiso-cs-table-head`: added `padding: var(--sp-4) var(--sp-5)` (was no padding).
+- `.citewp-aiso-cs-pagination`: consolidated duplicate blocks into one with `padding: var(--sp-3) var(--sp-5)`; removed dead `__info`/`__nav` child rules (caught by code-reviewer).
+- `<th>` column widths: Post 36% / Cite Score 10% / Trend 8% / Last Updated 14% / Issues 12% / Actions 20%.
+- `.citewp-aiso-cs-table__issues--active/none`: added `white-space: nowrap`.
+
+**Group 5 — Tooltip width**
+- `.citewp-aiso-kpi-tooltip__text`: `max-width: 360px` → `max-width: 280px`; added `min-width: 220px`.
+
+**Commits (6):**
+- `b8603dd` — fix: Cite Score page run #7 — Group 1 — page-header strip + separate KPI row (S20)
+- `e012614` — fix: Cite Score page run #7 — Group 2 — left-row 1.3fr/1fr + score-copy 12px no max-width (S20)
+- `c4e1db9` — fix: Cite Score page run #7 — Group 3 — right column natural height, history min-height 280px (S20)
+- `0d1db0b` — fix: Cite Score page run #7 — Group 4 — table-head/pagination padding, column widths, issues nowrap (S20)
+- `87bd05e` — fix: Cite Score page run #7 — Group 5 — tooltip min-width 220px, max-width 280px (S20)
+- `1ac66e9` — fix: Cite Score run #7 — remove duplicate pagination CSS block (code-reviewer S20)
+
+**Files modified:**
+- `admin/css/citewp-aiso-admin.css` — Section 31: header-band → cs-kpi-row; left-row ratio; right column height; table-head padding; pagination dedup + padding; issues nowrap; tooltip width
+- `includes/Admin/Menu.php` — render_cite_score_panel(): page-header strip markup; KPI row as separate block; `<th>` column widths
+
+**npm build:** Not required (CSS + PHP only, no JS changes).
+
+**Smoke test:** Visual verification required by user — open `admin.php?page=citewp#cite-score` and check header strip parity with Crawler Logs, tooltip behaviour, right column height, table column widths.
+
+**Code reviewer:** Ran post-Group 5. One Important issue found and fixed (duplicate pagination block). No Critical issues. Verdict: Ready to merge (with fix applied).
+
+**Carryover into Session 21:**
+
+**Still required (smoke tests):**
+- Manual Cite Score page smoke test (22-item checklist from `docs/superpowers/plans/2026-05-03-cite-score-run6-final-polish.md`) — visual verification by user, not yet completed
+- S18 Dashboard / Crawler Logs / Settings smoke test — still outstanding
+
+**S20 deferred items (not in scope for Run #7):**
+- KPI orb size 28×28 → 36×36 with 18px Lucide icon (deferred; schedule when Dashboard parity work happens)
+- Token name reconciliation (`--citewp-text-primary` / `--citewp-text-secondary` / `--citewp-text-muted` drift vs UI-DESIGN-SYSTEM.md) — defer to Brain consolidation session
+- WP.org approval check — user action (check hello@citewp.com)
+- Dashboard KPI orb alignment — schedule after Cite Score orb bump lands
+
+**Pre-S20 rolling carryover:**
+- **EditorPanel + Gutenberg sidebar v3 polish** — S17 carryover
+- **Per-post surface consolidation doc** — S12 carryover
+- **`citewp_aiso/metabox/tabs` filter `$context` arg** — S12 carryover
+- **Brain consolidation session** — tighten DECISIONS.md after amendment sessions
+- **readme.txt + WP.org assets** — v0.7.0 changelog, screenshots review
+- **Anti-cloaking content (S7)** — landing page section + first blog post
+- **"Suggest a Feature" link** in admin
+- **Page-builder canvas-mode awareness surface**
+- **P33** — Posts/Pages stat split
+- **Engine.php entities detector bug** — A11-gated
+- **Needs Attention "what's wrong" reasoning logic**
+
+---
+
 ## Session 19 — P41 button taxonomy + Cite Score sitewide dashboard ✅
 
 **Date:** 2026-05-03
