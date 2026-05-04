@@ -221,36 +221,22 @@ function CategoryRow( { id, category, signals, isOpen, onToggle } ) {
 }
 
 function SignalRow( { signal } ) {
-	const color = signal.status === 'pass' ? GRADE_COLORS.green
-		: signal.status === 'partial' ? GRADE_COLORS.yellow
-		: GRADE_COLORS.red;
 	return (
-		<div style={ {
-			padding: '8px 0',
-			borderTop: '1px solid #f3f4f6',
-			fontSize: 13,
-		} }>
-			<div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }>
-				<span>
-					<span style={ { color, fontWeight: 700, marginRight: 6 } }>
+		<div className="citewp-aiso-sidebar-signal">
+			<div className="citewp-aiso-sidebar-signal__header">
+				<span className="citewp-aiso-sidebar-signal__label">
+					<span className={ `citewp-aiso-sidebar-signal__icon citewp-aiso-sidebar-signal__icon--${ signal.status }` }>
 						{ STATUS_ICONS[ signal.status ] || '?' }
 					</span>
 					{ signal.label }
 				</span>
-				<span style={ { color: '#6b7280', fontVariantNumeric: 'tabular-nums' } }>
+				<span className="citewp-aiso-sidebar-signal__score">
 					{ signal.score }/{ signal.max }
 				</span>
 			</div>
-			<div style={ { color: '#4b5563', marginTop: 2 } }>{ signal.message }</div>
+			<div className="citewp-aiso-sidebar-signal__message">{ signal.message }</div>
 			{ signal.recommendation && (
-				<div style={ {
-					marginTop: 4,
-					padding: 6,
-					background: '#f9fafb',
-					borderLeft: `2px solid ${ color }`,
-					color: '#374151',
-					fontSize: 12,
-				} }>
+				<div className={ `citewp-aiso-sidebar-signal__rec citewp-aiso-sidebar-signal__rec--${ signal.status }` }>
 					💡 { signal.recommendation }
 				</div>
 			) }
