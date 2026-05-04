@@ -1031,8 +1031,9 @@ final class Menu {
 				<div class="citewp-aiso-insights__body">
 					<div class="citewp-aiso-insights__nested">
 						<div class="citewp-aiso-insights__nested-top">
-							<div class="citewp-aiso-insights__orb">
-								<?php echo IconLibrary::icon( 'sparkles', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<div class="citewp-aiso-insights__orb"
+								 style="width:64px;height:64px;border-radius:14px;background:rgba(20,184,166,0.08);color:var(--citewp-tint-teal);flex-shrink:0">
+								<?php echo IconLibrary::icon( 'bot', 32 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</div>
 							<div class="citewp-aiso-insights__headline-wrap">
 								<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content can rank higher in AI search results.', 'ai-search-optimizer' ); ?></p>
@@ -1077,7 +1078,10 @@ final class Menu {
 							<?php endforeach; ?>
 						</div>
 					</div>
-					<a href="<?php echo esc_url( $cs_recs_url ); ?>" class="citewp-aiso-crawlers__view-all"><?php esc_html_e( 'View All Recommendations →', 'ai-search-optimizer' ); ?></a>
+					<a href="<?php echo esc_url( $cs_recs_url ); ?>"
+                   class="citewp-aiso-btn citewp-aiso-btn--outline citewp-aiso-cs-recs-btn">
+					    <?php esc_html_e( 'View All Recommendations →', 'ai-search-optimizer' ); ?>
+					</a>
 				</div>
 			</div>
 
