@@ -1736,7 +1736,8 @@
   padding: var(--sp-2) var(--sp-3);
   font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-secondary);
-  max-width: 360px;
+  min-width: 220px;
+  max-width: 280px;
   white-space: normal;
   text-transform: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
