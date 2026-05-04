@@ -1911,21 +1911,37 @@
   color: var(--citewp-text-muted);
 }
 
-/* ── Layout grids ── */
-.citewp-aiso-cs-top-grid {
+/* === Two-column independent stack — replaces old top-grid + lower-grid (run #6) === */
+.citewp-aiso-cite-score-page__body {
   display: grid;
-  grid-template-columns: 1.3fr 1.1fr 1.35fr;
-  gap: var(--sp-4);
-  align-items: stretch;
-  margin-top: var(--sp-4);
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+  margin-top: 24px;
 }
 
-.citewp-aiso-cs-lower-grid {
+.citewp-aiso-cite-score-page__left {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.citewp-aiso-cite-score-page__left-row {
   display: grid;
-  grid-template-columns: 1.65fr 1fr;
-  gap: var(--sp-4);
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
   align-items: stretch;
-  margin-top: var(--sp-4);
+}
+
+.citewp-aiso-cite-score-page__left-row > .citewp-aiso-cs-panel,
+.citewp-aiso-cite-score-page__left-row > .citewp-aiso-breakdown {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.citewp-aiso-cite-score-page__right {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 /* Post-Level table: post title links — Obsidian, no underline */

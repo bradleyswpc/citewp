@@ -935,8 +935,14 @@ final class Menu {
 		</div>
 		<?php else : ?>
 
-		<!-- Row 2: 3-column top grid -->
-		<div class="citewp-aiso-cs-top-grid">
+		<!-- Body: Two-column independent stack -->
+		<div class="citewp-aiso-cite-score-page__body">
+
+			<!-- Left column: 2fr — Cite Score Health + Score Breakdown sub-row, then Post table -->
+			<div class="citewp-aiso-cite-score-page__left">
+
+				<!-- Left sub-row: Cite Score Health + Score Breakdown (equal height via stretch) -->
+				<div class="citewp-aiso-cite-score-page__left-row">
 
 			<!-- Panel 1: Cite Score Health (gauge) -->
 			<div class="citewp-aiso-cs-panel">
@@ -1007,90 +1013,9 @@ final class Menu {
 				<?php endforeach; ?>
 			</div>
 
-			<?php
-			// Category → orb tint + icon mapping for rec rows
-			$rec_cat_meta = [
-				'structure'  => [ 'bg' => 'rgba(124,58,237,0.12)', 'color' => 'var(--citewp-tint-purple)', 'icon' => 'layout'   ],
-				'citability' => [ 'bg' => 'rgba(37,99,235,0.12)',   'color' => 'var(--citewp-tint-blue)',   'icon' => 'quote'    ],
-				'authority'  => [ 'bg' => 'rgba(20,184,166,0.12)',  'color' => 'var(--citewp-tint-teal)',   'icon' => 'shield'   ],
-				''           => [ 'bg' => 'rgba(100,116,139,0.12)', 'color' => 'var(--citewp-text-muted)',  'icon' => 'sparkles' ],
-			];
-			$recs_count = count( array_filter( $recs_display, static fn( $r ) => isset( $r['label'] ) && $r['label'] !== __( 'Keep publishing', 'ai-search-optimizer' ) ) );
-			$cs_recs_url = admin_url( 'edit.php' );
-			?>
-			<!-- Panel 3: AI Recommendations (uses citewp-aiso-insights class — same as Dashboard AI Insights) -->
-			<div class="citewp-aiso-insights">
-				<div class="citewp-aiso-insights__header">
-					<span class="citewp-aiso-insights__title"><?php esc_html_e( 'AI Recommendations', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-insights__badge"><?php esc_html_e( 'BETA', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-right">
-						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Recommendations are derived from the most common failed signals across your scored posts. Fixing these has the highest impact on your overall Cite Score.', 'ai-search-optimizer' ); ?></span>
-					</span>
-				</div>
-				<div class="citewp-aiso-insights__body">
-					<div class="citewp-aiso-insights__nested">
-						<div class="citewp-aiso-insights__nested-top">
-							<div class="citewp-aiso-insights__orb"
-								 style="width:64px;height:64px;border-radius:14px;background:rgba(20,184,166,0.08);color:var(--citewp-tint-teal);flex-shrink:0">
-								<?php echo IconLibrary::icon( 'bot', 32 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-							</div>
-							<div class="citewp-aiso-insights__headline-wrap">
-								<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content can rank higher in AI search results.', 'ai-search-optimizer' ); ?></p>
-								<?php if ( $recs_count > 0 ) : ?>
-								<p class="citewp-aiso-insights__sub">
-									<?php
-									printf(
-										/* translators: %d: number of high-impact opportunities */
-										esc_html__( 'We found %d high-impact opportunities to improve.', 'ai-search-optimizer' ),
-										(int) $recs_count
-									);
-									?>
-								</p>
-								<?php else : ?>
-								<p class="citewp-aiso-insights__sub"><?php esc_html_e( 'Your content is performing well. Keep publishing to improve further.', 'ai-search-optimizer' ); ?></p>
-								<?php endif; ?>
-							</div>
-						</div>
-						<div class="citewp-aiso-insights__nested-bottom">
-							<?php foreach ( $recs_display as $idx => $rec ) :
-								$rec_signal_id = $top_rec_ids[ $idx ] ?? '';
-								$fail_count    = $signal_fails[ $rec_signal_id ] ?? 0;
-								$cat_key       = $rec['category'] ?? '';
-								$cat_orb       = $rec_cat_meta[ $cat_key ] ?? $rec_cat_meta[''];
-								$view_url      = admin_url( 'edit.php' );
-							?>
-							<div class="citewp-aiso-cs-rec-row">
-								<div class="citewp-aiso-cs-rec-row__orb" style="background:<?php echo esc_attr( $cat_orb['bg'] ); ?>;color:<?php echo esc_attr( $cat_orb['color'] ); ?>">
-									<?php echo IconLibrary::icon( $cat_orb['icon'], 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								</div>
-								<div class="citewp-aiso-cs-rec-row__text">
-									<div class="citewp-aiso-cs-rec-row__title">
-										<?php echo esc_html( $rec['label'] );
-										if ( $fail_count > 0 ) {
-											echo esc_html( ' (' . $fail_count . ' ' . _n( 'page', 'pages', $fail_count, 'ai-search-optimizer' ) . ')' );
-										} ?>
-									</div>
-									<div class="citewp-aiso-cs-rec-row__sub"><?php echo esc_html( $rec['copy'] ); ?></div>
-								</div>
-								<a href="<?php echo esc_url( $view_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Pages', 'ai-search-optimizer' ); ?></a>
-							</div>
-							<?php endforeach; ?>
-						</div>
-					</div>
-					<a href="<?php echo esc_url( $cs_recs_url ); ?>"
-                   class="citewp-aiso-btn citewp-aiso-btn--outline citewp-aiso-cs-recs-btn">
-					    <?php esc_html_e( 'View All Recommendations →', 'ai-search-optimizer' ); ?>
-					</a>
-				</div>
-			</div>
+			</div><!-- /.citewp-aiso-cite-score-page__left-row -->
 
-		</div><!-- /.citewp-aiso-cs-top-grid -->
-
-		<!-- Row 3: 2-column lower grid -->
-		<div class="citewp-aiso-cs-lower-grid">
-
-			<!-- Lower-left: Post-level score table -->
+			<!-- Post-Level Cite Scores table — full width of left column -->
 			<div class="citewp-aiso-cs-table-wrap">
 
 				<!-- Panel head: title + tooltip + search -->
@@ -1229,12 +1154,95 @@ final class Menu {
 
 			</div><!-- /.citewp-aiso-cs-table-wrap -->
 
-			<!-- Lower-right: Cite Score Over Time -->
+		</div><!-- /.citewp-aiso-cite-score-page__left -->
+
+		<!-- Right column: 1fr — AI Recommendations + Cite Score Over Time -->
+		<div class="citewp-aiso-cite-score-page__right">
+
+			<?php
+			// Category → orb tint + icon mapping for rec rows
+			$rec_cat_meta = [
+				'structure'  => [ 'bg' => 'rgba(124,58,237,0.12)', 'color' => 'var(--citewp-tint-purple)', 'icon' => 'layout'   ],
+				'citability' => [ 'bg' => 'rgba(37,99,235,0.12)',   'color' => 'var(--citewp-tint-blue)',   'icon' => 'quote'    ],
+				'authority'  => [ 'bg' => 'rgba(20,184,166,0.12)',  'color' => 'var(--citewp-tint-teal)',   'icon' => 'shield'   ],
+				''           => [ 'bg' => 'rgba(100,116,139,0.12)', 'color' => 'var(--citewp-text-muted)',  'icon' => 'sparkles' ],
+			];
+			$recs_count = count( array_filter( $recs_display, static fn( $r ) => isset( $r['label'] ) && $r['label'] !== __( 'Keep publishing', 'ai-search-optimizer' ) ) );
+			$cs_recs_url = admin_url( 'edit.php' );
+			?>
+			<!-- Panel 3: AI Recommendations (uses citewp-aiso-insights class — same as Dashboard AI Insights) -->
+			<div class="citewp-aiso-insights">
+				<div class="citewp-aiso-insights__header">
+					<span class="citewp-aiso-insights__title"><?php esc_html_e( 'AI Recommendations', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-insights__badge"><?php esc_html_e( 'BETA', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
+						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Recommendations are derived from the most common failed signals across your scored posts. Fixing these has the highest impact on your overall Cite Score.', 'ai-search-optimizer' ); ?></span>
+					</span>
+				</div>
+				<div class="citewp-aiso-insights__body">
+					<div class="citewp-aiso-insights__nested">
+						<div class="citewp-aiso-insights__nested-top">
+							<div class="citewp-aiso-insights__orb"
+								 style="width:64px;height:64px;border-radius:14px;background:rgba(20,184,166,0.08);color:var(--citewp-tint-teal);flex-shrink:0">
+								<?php echo IconLibrary::icon( 'bot', 32 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</div>
+							<div class="citewp-aiso-insights__headline-wrap">
+								<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content can rank higher in AI search results.', 'ai-search-optimizer' ); ?></p>
+								<?php if ( $recs_count > 0 ) : ?>
+								<p class="citewp-aiso-insights__sub">
+									<?php
+									printf(
+										/* translators: %d: number of high-impact opportunities */
+										esc_html__( 'We found %d high-impact opportunities to improve.', 'ai-search-optimizer' ),
+										(int) $recs_count
+									);
+									?>
+								</p>
+								<?php else : ?>
+								<p class="citewp-aiso-insights__sub"><?php esc_html_e( 'Your content is performing well. Keep publishing to improve further.', 'ai-search-optimizer' ); ?></p>
+								<?php endif; ?>
+							</div>
+						</div>
+						<div class="citewp-aiso-insights__nested-bottom">
+							<?php foreach ( $recs_display as $idx => $rec ) :
+								$rec_signal_id = $top_rec_ids[ $idx ] ?? '';
+								$fail_count    = $signal_fails[ $rec_signal_id ] ?? 0;
+								$cat_key       = $rec['category'] ?? '';
+								$cat_orb       = $rec_cat_meta[ $cat_key ] ?? $rec_cat_meta[''];
+								$view_url      = admin_url( 'edit.php' );
+							?>
+							<div class="citewp-aiso-cs-rec-row">
+								<div class="citewp-aiso-cs-rec-row__orb" style="background:<?php echo esc_attr( $cat_orb['bg'] ); ?>;color:<?php echo esc_attr( $cat_orb['color'] ); ?>">
+									<?php echo IconLibrary::icon( $cat_orb['icon'], 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								</div>
+								<div class="citewp-aiso-cs-rec-row__text">
+									<div class="citewp-aiso-cs-rec-row__title">
+										<?php echo esc_html( $rec['label'] );
+										if ( $fail_count > 0 ) {
+											echo esc_html( ' (' . $fail_count . ' ' . _n( 'page', 'pages', $fail_count, 'ai-search-optimizer' ) . ')' );
+										} ?>
+									</div>
+									<div class="citewp-aiso-cs-rec-row__sub"><?php echo esc_html( $rec['copy'] ); ?></div>
+								</div>
+								<a href="<?php echo esc_url( $view_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Pages', 'ai-search-optimizer' ); ?></a>
+							</div>
+							<?php endforeach; ?>
+						</div>
+					</div>
+					<a href="<?php echo esc_url( $cs_recs_url ); ?>"
+					   class="citewp-aiso-btn citewp-aiso-btn--outline citewp-aiso-cs-recs-btn">
+					    <?php esc_html_e( 'View All Recommendations →', 'ai-search-optimizer' ); ?>
+					</a>
+				</div>
+			</div>
+
+			<!-- Cite Score Over Time -->
 			<div class="citewp-aiso-cs-panel">
 				<div class="citewp-aiso-cs-history-head">
 					<h3 class="citewp-aiso-cs-panel__title">
 						<?php esc_html_e( 'Cite Score Over Time', 'ai-search-optimizer' ); ?>
-						<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-right">
+						<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is recorded daily. The chart shows your average across the selected timeframe.', 'ai-search-optimizer' ); ?></span>
 						</span>
@@ -1266,7 +1274,9 @@ final class Menu {
 				<?php endif; ?>
 			</div>
 
-		</div><!-- /.citewp-aiso-cs-lower-grid -->
+		</div><!-- /.citewp-aiso-cite-score-page__right -->
+
+	</div><!-- /.citewp-aiso-cite-score-page__body -->
 
 		<!-- Row 4: Pro Tip footer -->
 		<?php
