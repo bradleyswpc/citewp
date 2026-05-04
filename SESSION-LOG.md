@@ -10,9 +10,9 @@
 
 **Date:** 2026-05-03
 
-### Task 2 deliverable (Cite Score sitewide dashboard v3)
+### Task 2 deliverable (Cite Score sitewide dashboard v3 — run #3 layout)
 
-First-pass per-post Cite Score page replaced with a full sitewide dashboard: semi-circle SVG gauge, Score Breakdown panel, Score History chart, AI Recommendations (BETA), paginated post-level score table. Infrastructure: `ScoreHistory.php` (daily cron, 365-entry WP options log) + `RecommendationMapper.php` (17 signals → copy). Brain design system updated with P42 component specs.
+First-pass per-post Cite Score page replaced with a full sitewide dashboard using the structural mockup layout (4-row spec): page header strip → 3 KPI stat cards → 3-col top grid (Cite Score Health gauge / Score Breakdown / AI Recommendations) → 2-col lower grid (Post-Level Scores table / Cite Score Over Time chart) → purple-tint Pro Tip footer. Gauge uses pathLength=100 + CSS `--score` variable + linearGradient approach. Infrastructure: `ScoreHistory.php` (daily cron, 365-entry WP options log) + `RecommendationMapper.php` (17 signals → copy). Brain design system updated with P42 component specs.
 
 **Commits (plugin repo, Session 19 Task 2):**
 - `2017b1f` — feat: ScoreHistory — daily avg cron + WP options, 365-entry cap (S19)
@@ -21,6 +21,8 @@ First-pass per-post Cite Score page replaced with a full sitewide dashboard: sem
 - `91ec621` — feat: Cite Score sitewide dashboard CSS — Section 31 (S19)
 - `cba81d6` — feat: Cite Score sitewide dashboard — PHP render (gauge, breakdown, recs, table) (S19)
 - `c02a3f1` — fix: remove dead $issue_count variable in render_cite_score_panel (S19)
+- `83048ff` — feat: Cite Score page run #3 — 4-row mockup layout (KPI row, 3-col panels, 2-col lower, pathLength gauge) (S19)
+- `f57a1bb` — fix: clamp gauge --score CSS var to 0-100 (S19 run #3 reviewer note)
 
 **Brain edits (Session 19, Task 2):**
 - `UI-DESIGN-SYSTEM.md` — P42: Semi-circle gauge spec added to Donut Chart Panel; Score Breakdown Panel, AI Recommendations Panel, Post-Level Score Table added to Component Library; Cite Score layout in P40 updated to sitewide-only.
@@ -29,12 +31,12 @@ First-pass per-post Cite Score page replaced with a full sitewide dashboard: sem
 - `includes/Scoring/ScoreHistory.php` — NEW: daily avg cron hook, schedule/unschedule, get_history(days), 365-entry cap
 - `includes/Admin/RecommendationMapper.php` — NEW: 17-signal → {label, copy, category} map, get()/get_many()
 - `includes/Plugin.php` — ScoreHistory wired: register() in boot(), schedule() in activate(), unschedule() in deactivate()
-- `admin/css/citewp-aiso-admin.css` — Section 31 replaced: full sitewide dashboard styles (gauge panel, breakdown, history, recs, table, grade badges, pagination, empty state, responsive)
-- `includes/Admin/Menu.php` — render_cite_score_panel() replaced with sitewide dashboard; render_gauge_svg() + render_history_svg() added; render_donut_svg() removed; 2 use statements added
+- `admin/css/citewp-aiso-admin.css` — Section 31 replaced: 4-row layout grids (.citewp-aiso-cs-top-grid 1.3fr/1.1fr/1.35fr, .citewp-aiso-cs-lower-grid 1.65fr/1fr), .citewp-aiso-cs-panel chrome, pathLength=100 gauge classes (.citewp-aiso-cs-gauge*), breakdown/recs/table/history/pagination/empty-state classes
+- `includes/Admin/Menu.php` — render_cite_score_panel(): 4-row layout with KPI row + 3-col top grid + 2-col lower grid; render_gauge_svg(): pathLength=100 + CSS variable + score clamp; render_history_svg(): unchanged
 
 **npm build:** Not run — PHP + CSS only, no JS changes.
 
-**Smoke test:** Playwright browser context closed; manual verification needed (see below).
+**Smoke test:** Playwright browser context closed; manual verification needed (see Carryover).
 
 ---
 
@@ -62,8 +64,9 @@ UI-DESIGN-SYSTEM.md button section rewritten per P41 four-style taxonomy (primar
 **Smoke test (Task 1):** LocalWP 502 prevented browser automation. User verified dashboard manually post-fix.
 
 **Carryover into Session 20:**
-- Manual smoke test of Cite Score sitewide dashboard (Playwright unavailable this session)
+- Manual smoke test of Cite Score page: open `/wp-admin/admin.php?page=citewp#cite-score`, verify 3 KPI cards + 3-col row + 2-col lower row + Pro Tip footer render, check `debug.log` for PHP errors
 - Score History chart will show empty state until cron runs — expected behaviour
+- Brain/UI-DESIGN-SYSTEM.md gauge spec may need update from 2-col to 4-row layout (the P42 spec was written for the 2-col version; check if it needs an addendum for the pathLength=100 gauge approach)
 - `v0.7.0` release checklist (see Brain/FEATURE-BACKLOG.md)
 
 ---
