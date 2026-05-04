@@ -36,7 +36,44 @@ First-pass per-post Cite Score page replaced with a full sitewide dashboard usin
 
 **npm build:** Not run — PHP + CSS only, no JS changes.
 
-**Smoke test:** Playwright browser context closed; manual verification needed (see Carryover).
+**Smoke test (run #3):** Playwright browser context closed; manual verification needed (see Carryover).
+
+---
+
+### Task 2 polish — Runs #4–6 (subagent-driven fix-in-place passes)
+
+Three fix-in-place polish runs after run #3 shipped the structural build. All executed via subagent-driven development (fresh subagent per task + spec compliance + code quality gates per X13 pipeline).
+
+**Run #4 (10 commits) — Root Cause A+B isolation + 12 targeted fixes**
+
+Root Cause A: `text-transform: uppercase` leaking from WP admin baseline into panel titles. Root Cause B: tooltip `--align-right` modifier built backward. 10 targeted fixes: KPI compact layout, gauge 4-stop gradient, score-wrap grid, 9px bar thickness, AI Recs bot icon, outline button, per-page default 5, post link styles, Issues count data bug (`is_array` not `is_object`), card height enforcement (`align-items: stretch`).
+
+**Run #5 (10 commits) — Root Cause A+B resolved + remaining polish**
+
+Root Cause A fixed: `text-transform: none` on `.citewp-aiso-cs-panel__title`. Root Cause B fixed: `--align-right` modifier correctly adds right-anchor. All run #4 fixes applied. Pushed to `origin/main` (`50e36bf` head after push).
+
+**Run #6 (7 commits) — Final polish: 2-col layout + tooltip reversal + table**
+
+- **FIX L1:** Replaced 3-col+2-col row structure with 2fr/1fr two-column independent stack. AI Recs + Over Time moved to right column. Health + Breakdown in left sub-row (1fr/1fr, stretch).
+- **FIX T1+T2:** Tooltip default reversed to right-anchored (`right:0; left:auto`). `--align-left` modifier for rightmost icons. Dashboard KPI cards 1–3 patched with `--align-left` to prevent left-edge overflow. Max-width 360px.
+- **FIX 5.1:** Score Breakdown `__head` → Inter 700 14px, obsidian, `text-transform:none`, `letter-spacing:0`.
+- **FIX 6.1–6.6:** Post table — `td` padding 16px/12px, bold title links, icon top-align (flex-start), `th` 12px, Actions column header, nowrap Optimize button.
+- **FIX 4.1:** `$avg_grade` thresholds corrected to 90/70/50 per spec (were 80/60/40).
+
+**Commits (Run #6):**
+- `3ac2ec2` — feat: FIX L1 — two-column independent stack (S19 run #6)
+- `58785d5` — fix: remove dead media query CSS for old grids (S19 run #6)
+- `7b2953b` — fix: FIX T1+T2 — tooltip right-anchored default, --align-left modifier, 360px (S19 run #6)
+- `8a950fa` — fix: Dashboard KPI cards 1-3 --align-left overflow fix (S19 run #6)
+- `4fb52b0` — fix: FIX 5.1 — Score Breakdown title Inter 700 14px obsidian (S19 run #6)
+- `95cf187` — fix: FIX 6.1-6.6 — post table polish (S19 run #6)
+- `ef656eb` — fix: FIX 4.1 — avg_grade thresholds corrected to 90/70/50 per spec (S19 run #6)
+
+**Brain edits (Runs #4–6, file-save only — Brain folder has no git repo):**
+`UI-DESIGN-SYSTEM.md` — tooltip default reversed to right-anchored; `--align-left` modifier documented; Two-Column Independent Stack layout pattern added; Post-Level Score Table column header + Actions spec locked; stale anatomy bullet corrected; Last Updated: 2026-05-03 run #6.
+
+**Key learning — run #1–3 reuse-failure pattern:**
+Runs #1–3 adapted/extended a prior 2-col mockup structure rather than treating the reference design as an independent spec. The reference uses a 2-col independent stack (not 3-col+2-col rows). Structural mismatch caused compounding debt requiring 3 extra runs. Lesson: always implement from the reference design directly — do not carry forward structural decisions from a superseded build.
 
 ---
 
@@ -64,10 +101,16 @@ UI-DESIGN-SYSTEM.md button section rewritten per P41 four-style taxonomy (primar
 **Smoke test (Task 1):** LocalWP 502 prevented browser automation. User verified dashboard manually post-fix.
 
 **Carryover into Session 20:**
-- Manual smoke test of Cite Score page: open `/wp-admin/admin.php?page=citewp#cite-score`, verify 3 KPI cards + 3-col row + 2-col lower row + Pro Tip footer render, check `debug.log` for PHP errors
-- Score History chart will show empty state until cron runs — expected behaviour
-- Brain/UI-DESIGN-SYSTEM.md gauge spec may need update from 2-col to 4-row layout (the P42 spec was written for the 2-col version; check if it needs an addendum for the pathLength=100 gauge approach)
-- `v0.7.0` release checklist (see Brain/FEATURE-BACKLOG.md)
+- **Manual smoke test of Cite Score page (REQUIRED before S20 code work):** Open `admin.php?page=citewp#cite-score`, run the 22-item smoke test checklist from `docs/superpowers/plans/2026-05-03-cite-score-run6-final-polish.md` (tooltip directions, 2-col layout, post table, Score Breakdown title, Dashboard KPI overflow). If anything fails → log as S20 fix. No Run #7.
+- Score History chart shows empty state until cron runs — expected behaviour.
+- **EditorPanel + Gutenberg sidebar v3 polish** — S17 carryover, still open
+- **Per-post surface consolidation doc** — S12 carryover, still open
+- **`citewp_aiso/metabox/tabs` filter `$context` arg** — S12 carryover, still open
+- **Brain consolidation session** — tighten DECISIONS.md entries after multiple amendment sessions
+- **readme.txt + WP.org assets** — v0.7.0 changelog, screenshots review
+- **Anti-cloaking content (S7)** — landing page section + first blog post
+- **"Suggest a Feature" link** in admin
+- **Page-builder canvas-mode awareness surface**
 
 ---
 
