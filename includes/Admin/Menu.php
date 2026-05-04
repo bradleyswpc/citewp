@@ -1015,15 +1015,19 @@ final class Menu {
 							</div>
 							<div class="citewp-aiso-insights__headline-wrap">
 								<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content can rank higher in AI search results.', 'ai-search-optimizer' ); ?></p>
+								<?php if ( $recs_count > 0 ) : ?>
 								<p class="citewp-aiso-insights__sub">
 									<?php
 									printf(
 										/* translators: %d: number of high-impact opportunities */
 										esc_html__( 'We found %d high-impact opportunities to improve.', 'ai-search-optimizer' ),
-										max( 1, (int) $recs_count )
+										(int) $recs_count
 									);
 									?>
 								</p>
+								<?php else : ?>
+								<p class="citewp-aiso-insights__sub"><?php esc_html_e( 'Your content is performing well. Keep publishing to improve further.', 'ai-search-optimizer' ); ?></p>
+								<?php endif; ?>
 							</div>
 						</div>
 						<div class="citewp-aiso-insights__nested-bottom">
