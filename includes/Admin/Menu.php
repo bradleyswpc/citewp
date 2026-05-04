@@ -1168,6 +1168,7 @@ final class Menu {
 	}
 
 	private function render_gauge_svg( int $score, string $grade ): void {
+		$score        = max( 0, min( 100, $score ) );
 		$grade_labels = [
 			'green'  => __( 'Excellent',         'ai-search-optimizer' ),
 			'yellow' => __( 'Good',              'ai-search-optimizer' ),
