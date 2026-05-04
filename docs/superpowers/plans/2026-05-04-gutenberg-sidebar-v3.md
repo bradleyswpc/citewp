@@ -28,7 +28,7 @@ Two Gutenberg-registered plugins in `src/sidebar/index.js` get v3 polish:
 
 ### GAP E — Sidebar icon
 - Replace `chartBar` (from `@wordpress/icons`) with a `CiteWPIcon` React component
-- Source: `Brain/brand/logos/icon.svg` — `viewBox="0 0 512 512"`, Citrine (`#E8D400`) rect background, `[A]` text in Plus Jakarta Sans 800 / system-ui, `fill="#0C0C0D"`
+- Source: `Brain/brand/logos/icon.svg` — `viewBox="0 0 512 512"`, Citrine (`#E8D400`) rect background, `[A]` text in `system-ui, -apple-system, sans-serif` at `font-weight="800"`, `fill="#0C0C0D"`. Plus Jakarta Sans was dropped from the brand system in P37 (Session 14); the sidebar icon uses the system font fallback for portability — the bracket + Citrine background + letter shape are the recognisable identity, not the specific typeface.
 - Strip all SMIL: remove `<animate>` on rect, remove `@keyframes mark-breathe` CSS animation, remove `@import` Google Fonts
 - Result: static SVG React component, inlined at top of `src/sidebar/index.js`
 - Passed as `icon={ <CiteWPIcon /> }` to `registerPlugin` and `PluginSidebarMoreMenuItem`
@@ -222,11 +222,11 @@ wp_enqueue_style(
 6. Replace all inline `style={{ ... }}` with `className` strings per naming map
 7. Apply grade/status modifier classes (`--${grade}`, `--${status}`):
    - `TotalScore`: grade comes from `score.grade` API field — use directly
-   - `CategoryRow`: compute `grade` string from percentage (`pct >= 80 → 'green'`, `>= 60 → 'yellow'`, `>= 40 → 'orange'`, else `'red'`) replacing current `color` hex computation. Same thresholds as before, new output type.
+   - `CategoryRow`: compute `grade` string from percentage (`pct >= 80 → 'green'`, `>= 60 → 'yellow'`, `>= 40 → 'orange'`, else `'red'`) replacing current `color` hex computation. Same thresholds as before, new output type. Add an inline code comment: `// Category bars use the top-line score thresholds (80/60/40) by visual convention; per-category thresholds are not formally defined in SCORING-RUBRIC.md.`
    - `SignalRow`: `signal.status` is already `'pass' | 'partial' | 'fail'` — use directly
 8. Keep `STATUS_ICONS` constant; render characters in DOM with modifier class for color
 9. Replace hardcoded `SchemaTypeRow` elements with `SCHEMA_TYPES.map()`
-10. `otherDetected` trailing render: collect `(schema.detected || []).filter(t => !allKnownVariants.includes(t) && t !== 'Question')` where `allKnownVariants = SCHEMA_TYPES.flatMap(t => t.variants)`. Render as single line. The `'Question'` exclusion matches current behaviour (API returns it alongside `'FAQPage'`, not a standalone detectable type).
+10. `otherDetected` trailing render: before writing this block, **read `includes/Schema/Generator.php`** (specifically whatever method detects existing schema types — look for `detect_existing_types` or equivalent). Confirm whether `'Question'` is emitted as a standalone `@type` by the generator or only as a child node of `FAQPage`. If it is NOT standalone (current assumption — it appears alongside `FAQPage` in the API response as a child type, not an independent detection): proceed with `(schema.detected || []).filter(t => !allKnownVariants.includes(t) && t !== 'Question')` where `allKnownVariants = SCHEMA_TYPES.flatMap(t => t.variants)`. Add an inline comment: `// 'Question' is a child node type of FAQPage schema, not a standalone @type from the generator — excluded to avoid double-counting alongside FAQPage.` If the assumption is WRONG and `'Question'` is a legitimate standalone detection: adjust the filter and document accordingly. Do not silently drop it.
 11. Verify: no `style={{` props remain (grep); no "GEO Score" strings remain (grep)
 
 ### Subagent 2 — `style.scss` + `EditorAssets.php` + build
