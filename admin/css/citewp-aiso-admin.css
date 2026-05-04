@@ -2085,67 +2085,44 @@
   margin-top: 4px;
 }
 
-/* ── AI Recommendations Panel ── */
-.citewp-aiso-recs {
-  background: var(--citewp-paper);
-  border: 1px solid var(--citewp-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.citewp-aiso-recs__head {
+/* AI Recommendations rec rows (Cite Score-specific, inside citewp-aiso-insights) */
+.citewp-aiso-cs-rec-row {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-4) var(--sp-5);
-  border-bottom: 1px solid var(--citewp-border);
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--citewp-border);
 }
 
-.citewp-aiso-recs__icon {
-  color: var(--citewp-tint-purple);
+.citewp-aiso-cs-rec-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.citewp-aiso-cs-rec-row__orb {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.citewp-aiso-recs__title {
-  font: 800 14px/1 'Inter', system-ui, sans-serif;
-  color: var(--citewp-obsidian);
+.citewp-aiso-cs-rec-row__text {
   flex: 1;
+  min-width: 0;
 }
 
-.citewp-aiso-recs__badge {
-  font: 800 10px/1 'Inter', system-ui, sans-serif;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(124, 58, 237, 0.12);
-  color: var(--citewp-tint-purple);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.citewp-aiso-cs-rec-row__title {
+  font: 600 13px/1.3 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-primary);
 }
 
-.citewp-aiso-recs__row {
-  padding: var(--sp-4) var(--sp-5);
-  border-bottom: 1px solid var(--citewp-border);
-}
-
-.citewp-aiso-recs__row:last-child {
-  border-bottom: none;
-}
-
-.citewp-aiso-recs__label {
-  font: 700 13px/1 'Inter', system-ui, sans-serif;
-  color: var(--citewp-obsidian);
-}
-
-.citewp-aiso-recs__affected {
-  font: 400 11px/1 'Inter', system-ui, sans-serif;
+.citewp-aiso-cs-rec-row__sub {
+  font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-muted);
-  margin-top: 3px;
-}
-
-.citewp-aiso-recs__copy {
-  font: 400 12px/1.5 'Inter', system-ui, sans-serif;
-  color: var(--citewp-text-muted);
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
 /* ── Post-Level Score Table ── */

@@ -986,34 +986,74 @@ final class Menu {
 				<?php endforeach; ?>
 			</div>
 
-			<!-- Panel 3: AI Recommendations -->
-			<div class="citewp-aiso-recs">
-				<div class="citewp-aiso-recs__head">
-					<span class="citewp-aiso-recs__icon"><?php echo IconLibrary::icon( 'sparkles', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-					<span class="citewp-aiso-recs__title"><?php esc_html_e( 'AI Recommendations', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-recs__badge"><?php esc_html_e( 'BETA', 'ai-search-optimizer' ); ?></span>
+			<?php
+			// Category → orb tint + icon mapping for rec rows
+			$rec_cat_meta = [
+				'structure'  => [ 'bg' => 'rgba(124,58,237,0.12)', 'color' => 'var(--citewp-tint-purple)', 'icon' => 'layout'   ],
+				'citability' => [ 'bg' => 'rgba(37,99,235,0.12)',   'color' => 'var(--citewp-tint-blue)',   'icon' => 'quote'    ],
+				'authority'  => [ 'bg' => 'rgba(20,184,166,0.12)',  'color' => 'var(--citewp-tint-teal)',   'icon' => 'shield'   ],
+				''           => [ 'bg' => 'rgba(100,116,139,0.12)', 'color' => 'var(--citewp-text-muted)',  'icon' => 'sparkles' ],
+			];
+			$recs_count = count( array_filter( $recs_display, static fn( $r ) => isset( $r['label'] ) && $r['label'] !== __( 'Keep publishing', 'ai-search-optimizer' ) ) );
+			$cs_recs_url = admin_url( 'edit.php' );
+			?>
+			<!-- Panel 3: AI Recommendations (uses citewp-aiso-insights class — same as Dashboard AI Insights) -->
+			<div class="citewp-aiso-insights">
+				<div class="citewp-aiso-insights__header">
+					<span class="citewp-aiso-insights__title"><?php esc_html_e( 'AI Recommendations', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-insights__badge"><?php esc_html_e( 'BETA', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-tooltip">
+						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Recommendations are derived from the most common failed signals across your scored posts. Fixing these has the highest impact on your overall Cite Score.', 'ai-search-optimizer' ); ?></span>
+					</span>
 				</div>
-				<?php foreach ( $recs_display as $idx => $rec ) :
-					$rec_signal_id = $top_rec_ids[ $idx ] ?? '';
-					$fail_count    = $signal_fails[ $rec_signal_id ] ?? 0;
-				?>
-				<div class="citewp-aiso-recs__row">
-					<div class="citewp-aiso-recs__label"><?php echo esc_html( $rec['label'] ); ?></div>
-					<?php if ( $fail_count > 0 ) : ?>
-					<div class="citewp-aiso-recs__affected">
-						<?php
-						printf(
-							/* translators: %1$d: fail count, %2$d: sample size */
-							esc_html__( 'Failing on %1$d of %2$d sampled posts', 'ai-search-optimizer' ),
-							$fail_count,
-							$sample_n
-						);
-						?>
+				<div class="citewp-aiso-insights__body">
+					<div class="citewp-aiso-insights__nested">
+						<div class="citewp-aiso-insights__nested-top">
+							<div class="citewp-aiso-insights__orb">
+								<?php echo IconLibrary::icon( 'sparkles', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</div>
+							<div class="citewp-aiso-insights__headline-wrap">
+								<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content can rank higher in AI search results.', 'ai-search-optimizer' ); ?></p>
+								<p class="citewp-aiso-insights__sub">
+									<?php
+									printf(
+										/* translators: %d: number of high-impact opportunities */
+										esc_html__( 'We found %d high-impact opportunities to improve.', 'ai-search-optimizer' ),
+										max( 1, (int) $recs_count )
+									);
+									?>
+								</p>
+							</div>
+						</div>
+						<div class="citewp-aiso-insights__nested-bottom">
+							<?php foreach ( $recs_display as $idx => $rec ) :
+								$rec_signal_id = $top_rec_ids[ $idx ] ?? '';
+								$fail_count    = $signal_fails[ $rec_signal_id ] ?? 0;
+								$cat_key       = $rec['category'] ?? '';
+								$cat_orb       = $rec_cat_meta[ $cat_key ] ?? $rec_cat_meta[''];
+								$view_url      = admin_url( 'edit.php' );
+							?>
+							<div class="citewp-aiso-cs-rec-row">
+								<div class="citewp-aiso-cs-rec-row__orb" style="background:<?php echo esc_attr( $cat_orb['bg'] ); ?>;color:<?php echo esc_attr( $cat_orb['color'] ); ?>">
+									<?php echo IconLibrary::icon( $cat_orb['icon'], 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								</div>
+								<div class="citewp-aiso-cs-rec-row__text">
+									<div class="citewp-aiso-cs-rec-row__title">
+										<?php echo esc_html( $rec['label'] );
+										if ( $fail_count > 0 ) {
+											echo esc_html( ' (' . $fail_count . ' ' . _n( 'page', 'pages', $fail_count, 'ai-search-optimizer' ) . ')' );
+										} ?>
+									</div>
+									<div class="citewp-aiso-cs-rec-row__sub"><?php echo esc_html( $rec['copy'] ); ?></div>
+								</div>
+								<a href="<?php echo esc_url( $view_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Pages', 'ai-search-optimizer' ); ?></a>
+							</div>
+							<?php endforeach; ?>
+						</div>
 					</div>
-					<?php endif; ?>
-					<div class="citewp-aiso-recs__copy"><?php echo esc_html( $rec['copy'] ); ?></div>
+					<a href="<?php echo esc_url( $cs_recs_url ); ?>" class="citewp-aiso-crawlers__view-all"><?php esc_html_e( 'View All Recommendations →', 'ai-search-optimizer' ); ?></a>
 				</div>
-				<?php endforeach; ?>
 			</div>
 
 		</div><!-- /.citewp-aiso-cs-top-grid -->
