@@ -40,16 +40,6 @@ function CiteWPIcon() {
 	);
 }
 
-/**
- * Color tokens — kept in JS for now to avoid pulling in the full block editor styles.
- */
-const GRADE_COLORS = {
-	green:  '#16a34a',
-	yellow: '#ca8a04',
-	orange: '#ea580c',
-	red:    '#dc2626',
-};
-
 const STATUS_ICONS = {
 	pass:    '✓',
 	partial: '~',
@@ -311,8 +301,6 @@ registerPlugin( 'citewp-aiso-geo-score', {
 } );
 
 // === Schema Suggestions — Document Settings panel ===
-
-const ARTICLE_VARIANTS = [ 'Article', 'NewsArticle', 'BlogPosting' ];
 
 function SchemaSuggestions() {
 	const postId       = useSelect( ( s ) => s( 'core/editor' ).getCurrentPostId(), [] );
