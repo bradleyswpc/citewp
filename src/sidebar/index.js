@@ -154,31 +154,13 @@ function ScoreSidebar() {
 }
 
 function TotalScore( { score } ) {
-	const color = GRADE_COLORS[ score.grade ] || GRADE_COLORS.red;
 	return (
-		<div style={ {
-			textAlign: 'center',
-			padding: '16px 0 20px',
-			borderBottom: '1px solid #e5e7eb',
-			marginBottom: 16,
-		} }>
-			<div style={ {
-				fontSize: 48,
-				fontWeight: 700,
-				color,
-				lineHeight: 1,
-				fontVariantNumeric: 'tabular-nums',
-			} }>
+		<div className="citewp-aiso-sidebar-score">
+			<div className={ `citewp-aiso-sidebar-score__value citewp-aiso-sidebar-score__value--${ score.grade }` }>
 				{ score.total }
-				<span style={ { fontSize: 20, color: '#9ca3af', fontWeight: 400 } }>/100</span>
+				<span className="citewp-aiso-sidebar-score__denom">/100</span>
 			</div>
-			<div style={ {
-				marginTop: 4,
-				color: '#6b7280',
-				fontSize: 13,
-				textTransform: 'uppercase',
-				letterSpacing: '0.05em',
-			} }>
+			<div className="citewp-aiso-sidebar-score__label">
 				Cite Score
 			</div>
 		</div>
