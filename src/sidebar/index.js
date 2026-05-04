@@ -113,13 +113,13 @@ function ScoreSidebar() {
 
 	return (
 		<>
-			<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ CiteWPIcon }>
-				CiteWP GEO Score
+			<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ <CiteWPIcon /> }>
+				Cite Score
 			</PluginSidebarMoreMenuItem>
 			<PluginSidebar
 				name="citewp-aiso-geo-score"
-				title="CiteWP GEO Score"
-				icon={ CiteWPIcon }
+				title="Cite Score"
+				icon={ <CiteWPIcon /> }
 			>
 				<PanelBody>
 					{ loading && ! score && (
@@ -189,7 +189,7 @@ function TotalScore( { score } ) {
 				textTransform: 'uppercase',
 				letterSpacing: '0.05em',
 			} }>
-				GEO Score
+				Cite Score
 			</div>
 		</div>
 	);
@@ -307,7 +307,7 @@ function SignalRow( { signal } ) {
 
 registerPlugin( 'citewp-aiso-geo-score', {
 	render: ScoreSidebar,
-	icon: chartBar,
+	icon: CiteWPIcon,
 } );
 
 // === Schema Suggestions — Document Settings panel ===
