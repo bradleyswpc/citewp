@@ -36,13 +36,18 @@ Fix-in-place final polish pass on the Cite Score sitewide dashboard, continuing 
 - Removed `citewp-aiso-kpi-card__orb` div (14px icon circle) from `__head` of all 4 Dashboard KPI cards (Avg Cite Score, Bot Visits, Indexed Pages, llms.txt).
 - `__visual` blocks with 36px icons preserved untouched.
 
-**Commit:** `c441b28` — fix: S20 Run #8 — Cite Score page final polish pass
+**Commits (4):**
+- `c441b28` — fix: S20 Run #8 — Cite Score page final polish pass (Groups 1,3,5 + Extra)
+- `ac811e8` — fix: add --align-left to 3 Cite Score panel-title tooltips (open right, prevent left clip)
+- `94a43b4` — fix: Cite Score KPI cards — drop compact variant, use full card layout with 36px square visual icons
 
 **Files modified:**
-- `includes/Admin/Menu.php` — KPI card tooltip removal; AI Recs header tooltip removal; Pro Tip relocated; Dashboard KPI orb divs removed
+- `includes/Admin/Menu.php` — KPI card tooltip removal; AI Recs header tooltip removal; Pro Tip relocated; Dashboard KPI orb divs removed; panel-title tooltips `--align-left` added; compact card structure → full card with `__head`/`__body`/`__visual`
 - `admin/css/citewp-aiso-admin.css` — Section 13: `.citewp-aiso-insights__badge` enlarged
 
 **npm build:** Not required (CSS + PHP only, no JS changes).
+
+**debug.log:** File absent — no PHP errors this session.
 
 **Code reviewer:** Clean pass — all 8 checklist items passed, no issues found. Verdict: Production ready.
 
