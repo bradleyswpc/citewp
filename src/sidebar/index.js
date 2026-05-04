@@ -186,52 +186,33 @@ function Categories( { score, expanded, onToggle } ) {
 
 function CategoryRow( { id, category, signals, isOpen, onToggle } ) {
 	const pct = category.max > 0 ? ( category.score / category.max ) * 100 : 0;
-	const color = pct >= 80 ? GRADE_COLORS.green
-		: pct >= 60 ? GRADE_COLORS.yellow
-		: pct >= 40 ? GRADE_COLORS.orange
-		: GRADE_COLORS.red;
+	// Category bars use the top-line score thresholds (80/60/40) by visual convention;
+	// per-category thresholds are not formally defined in SCORING-RUBRIC.md.
+	const grade = pct >= 80 ? 'green' : pct >= 60 ? 'yellow' : pct >= 40 ? 'orange' : 'red';
 
 	return (
-		<div style={ { marginBottom: 10 } }>
+		<div className="citewp-aiso-sidebar-category">
 			<button
 				onClick={ onToggle }
-				style={ {
-					width: '100%',
-					background: 'transparent',
-					border: 'none',
-					padding: '8px 0',
-					cursor: 'pointer',
-					textAlign: 'left',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-				} }
+				className="citewp-aiso-sidebar-category__toggle"
 			>
-				<span style={ { fontWeight: 600, fontSize: 14 } }>
+				<span className="citewp-aiso-sidebar-category__label">
 					{ isOpen ? '▾' : '▸' } { category.label }
 				</span>
-				<span style={ { fontVariantNumeric: 'tabular-nums', color: '#374151' } }>
+				<span className="citewp-aiso-sidebar-category__score">
 					{ category.score }/{ category.max }
 				</span>
 			</button>
 
-			<div style={ {
-				height: 4,
-				background: '#e5e7eb',
-				borderRadius: 2,
-				overflow: 'hidden',
-				marginBottom: 4,
-			} }>
-				<div style={ {
-					height: '100%',
-					width: `${ pct }%`,
-					background: color,
-					transition: 'width 0.3s ease',
-				} } />
+			<div className="citewp-aiso-sidebar-category__bar">
+				<div
+					className={ `citewp-aiso-sidebar-category__fill citewp-aiso-sidebar-category__fill--${ grade }` }
+					style={ { width: `${ pct }%` } }
+				/>
 			</div>
 
 			{ isOpen && (
-				<div style={ { paddingLeft: 8, marginTop: 8 } }>
+				<div className="citewp-aiso-sidebar-category__signals">
 					{ signals.map( ( s ) => <SignalRow key={ s.id } signal={ s } /> ) }
 				</div>
 			) }
