@@ -2072,7 +2072,7 @@
 }
 
 .citewp-aiso-breakdown__bar {
-  height: 4px;
+  height: 9px;
   background: var(--citewp-paper-tinted);
   border: 1px solid var(--citewp-border);
   border-radius: 999px;
