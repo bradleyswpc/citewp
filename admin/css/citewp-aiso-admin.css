@@ -1926,6 +1926,11 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  align-self: start;
+}
+
+.citewp-aiso-cite-score-page__right .citewp-aiso-cs-panel {
+  height: auto;
 }
 
 /* Post-Level table: post title links — Obsidian, no underline */
@@ -2110,6 +2115,7 @@
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-lg);
   padding: var(--sp-5);
+  min-height: 280px;
 }
 
 .citewp-aiso-cs-history-head {
