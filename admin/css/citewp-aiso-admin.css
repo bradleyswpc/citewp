@@ -1728,8 +1728,8 @@
 .citewp-aiso-kpi-tooltip__text {
   position: absolute;
   top: calc(100% + 6px);
-  right: 0;
-  left: auto;
+  left: 0;
+  right: auto;
   background: var(--citewp-white);
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-sm);
