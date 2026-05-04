@@ -2070,9 +2070,10 @@
   padding: var(--sp-3) var(--sp-4);
   background: var(--citewp-paper-tinted);
   border-bottom: 1px solid var(--citewp-border);
-  font: 700 11px/1 'Inter', system-ui, sans-serif;
+  font: 700 14px/1.2 'Inter', system-ui, sans-serif;
   color: var(--citewp-obsidian);
-  letter-spacing: 0.06em;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .citewp-aiso-breakdown__row {
