@@ -1751,6 +1751,12 @@
   pointer-events: auto;
 }
 
+/* Right-align modifier: anchors tooltip right edge to icon right edge */
+.citewp-aiso-kpi-tooltip--align-right .citewp-aiso-kpi-tooltip__text {
+  left: auto;
+  right: 0;
+}
+
 /* B2: Needs Attention type pill */
 .citewp-aiso-needs__type-pill {
   display: inline-block;

@@ -913,7 +913,7 @@ final class Menu {
 							<?php echo IconLibrary::icon( 'alert-triangle', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 						<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Issues Detected', 'ai-search-optimizer' ); ?></span>
-						<span class="citewp-aiso-kpi-tooltip">
+						<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-right">
 							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Posts and pages with a Cite Score below 50 — they have the most room for improvement.', 'ai-search-optimizer' ); ?></span>
 						</span>
@@ -1018,7 +1018,7 @@ final class Menu {
 				<div class="citewp-aiso-insights__header">
 					<span class="citewp-aiso-insights__title"><?php esc_html_e( 'AI Recommendations', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-aiso-insights__badge"><?php esc_html_e( 'BETA', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-kpi-tooltip">
+					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-right">
 						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Recommendations are derived from the most common failed signals across your scored posts. Fixing these has the highest impact on your overall Cite Score.', 'ai-search-optimizer' ); ?></span>
 					</span>
@@ -1225,7 +1225,7 @@ final class Menu {
 				<div class="citewp-aiso-cs-history-head">
 					<h3 class="citewp-aiso-cs-panel__title">
 						<?php esc_html_e( 'Cite Score Over Time', 'ai-search-optimizer' ); ?>
-						<span class="citewp-aiso-kpi-tooltip">
+						<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-right">
 							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is recorded daily. The chart shows your average across the selected timeframe.', 'ai-search-optimizer' ); ?></span>
 						</span>
