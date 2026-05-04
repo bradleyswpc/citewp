@@ -1306,7 +1306,8 @@ final class Menu {
 				<defs>
 					<linearGradient id="citewp-gauge-gradient" x1="30" y1="120" x2="210" y2="120" gradientUnits="userSpaceOnUse">
 						<stop offset="0%"   stop-color="#ef4444" />
-						<stop offset="45%"  stop-color="#f7d84a" />
+						<stop offset="33%"  stop-color="#f97316" />
+						<stop offset="66%"  stop-color="#f7d84a" />
 						<stop offset="100%" stop-color="#16a34a" />
 					</linearGradient>
 				</defs>
