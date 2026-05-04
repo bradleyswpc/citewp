@@ -926,7 +926,7 @@ final class Menu {
 			<div class="citewp-aiso-cs-panel">
 				<h3 class="citewp-aiso-cs-panel__title">
 					<?php esc_html_e( 'Cite Score Health', 'ai-search-optimizer' ); ?>
-					<span class="citewp-aiso-kpi-tooltip">
+					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is the average across all scored posts. Higher scores mean better AI citation potential.', 'ai-search-optimizer' ); ?></span>
 					</span>
@@ -960,7 +960,7 @@ final class Menu {
 			<div class="citewp-aiso-breakdown">
 				<div class="citewp-aiso-breakdown__head">
 					<?php esc_html_e( 'Score Breakdown', 'ai-search-optimizer' ); ?>
-					<span class="citewp-aiso-kpi-tooltip">
+					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Your Cite Score breaks down across 3 categories. Each category contains multiple signals that AI engines consider when citing content.', 'ai-search-optimizer' ); ?></span>
 					</span>
@@ -1000,7 +1000,7 @@ final class Menu {
 				<div class="citewp-aiso-cs-table-head">
 					<span class="citewp-aiso-cs-table-head__title">
 						<?php esc_html_e( 'Post-Level Cite Scores', 'ai-search-optimizer' ); ?>
-						<span class="citewp-aiso-kpi-tooltip">
+						<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'All scored posts on your site, sorted by lowest Cite Score first. Click Optimize to open the post and improve its score.', 'ai-search-optimizer' ); ?></span>
 						</span>
