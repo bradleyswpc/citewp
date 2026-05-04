@@ -101,16 +101,38 @@ UI-DESIGN-SYSTEM.md button section rewritten per P41 four-style taxonomy (primar
 **Smoke test (Task 1):** LocalWP 502 prevented browser automation. User verified dashboard manually post-fix.
 
 **Carryover into Session 20:**
-- **Manual smoke test of Cite Score page (REQUIRED before S20 code work):** Open `admin.php?page=citewp#cite-score`, run the 22-item smoke test checklist from `docs/superpowers/plans/2026-05-03-cite-score-run6-final-polish.md` (tooltip directions, 2-col layout, post table, Score Breakdown title, Dashboard KPI overflow). If anything fails → log as S20 fix. No Run #7.
-- Score History chart shows empty state until cron runs — expected behaviour.
-- **EditorPanel + Gutenberg sidebar v3 polish** — S17 carryover, still open
-- **Per-post surface consolidation doc** — S12 carryover, still open
-- **`citewp_aiso/metabox/tabs` filter `$context` arg** — S12 carryover, still open
+
+**Required first tasks:**
+- **Manual smoke test — Cite Score page (REQUIRED):** Open `admin.php?page=citewp#cite-score`, run the 22-item checklist from `docs/superpowers/plans/2026-05-03-cite-score-run6-final-polish.md`. If anything fails → S20 fix, no Run #7.
+- **S18 Dashboard / Crawler Logs / Settings smoke test** — outstanding from S18, still not completed.
+
+**S20 polish (Run #7 items that didn't ship):**
+- Right column natural height — AI Recommendations panel cropping, Cite Score Over Time panel stretching
+- Cite Score Health vs Score Breakdown sub-row width ratio: 1.3fr / 1fr
+- Cite Score Over Time `min-height: 280px` for empty state
+- KPI orb size in row 1: bump 28×28 → 36×36 with 18px Lucide icon
+- Post-Level table column widths: Post 36% / Score 10% / Trend 8% / Updated 14% / Issues 12% / Actions 20%
+- View Score Guide button `white-space: nowrap`
+- Tooltip positioning context verification — right-column cards still cropping
+
+**S19 carryover still open:**
+- Token name reconciliation: `citewp-aiso-admin.css` uses `--citewp-text-primary` / `--citewp-text-secondary` / `--citewp-text-muted`; `UI-DESIGN-SYSTEM.md` names `--citewp-text-muted` only — defer to Brain consolidation session
+- WP.org approval check — still pending as of S19 open; check at start of S20
+- Dashboard KPI orb alignment — if Cite Score page bumps orbs to 36×36 in S20, Dashboard (28×28) becomes the inconsistent surface; schedule Dashboard polish to match
+- Score History chart empty state until cron runs — expected behaviour
+
+**Pre-S19 rolling carryover:**
+- **EditorPanel + Gutenberg sidebar v3 polish** — S17 carryover
+- **Per-post surface consolidation doc** — S12 carryover
+- **`citewp_aiso/metabox/tabs` filter `$context` arg** — S12 carryover
 - **Brain consolidation session** — tighten DECISIONS.md entries after multiple amendment sessions
 - **readme.txt + WP.org assets** — v0.7.0 changelog, screenshots review
 - **Anti-cloaking content (S7)** — landing page section + first blog post
 - **"Suggest a Feature" link** in admin
 - **Page-builder canvas-mode awareness surface**
+- **P33** — Posts/Pages stat split
+- **Engine.php entities detector bug** — A11-gated (requires Engine.php edit approval)
+- **Needs Attention "what's wrong" reasoning logic**
 
 ---
 
