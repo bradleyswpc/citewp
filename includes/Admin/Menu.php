@@ -1141,13 +1141,13 @@ final class Menu {
 							$t_type_icon = $t_post_type === 'page' ? 'file-text' : 'file';
 							$t_edit_url  = get_edit_post_link( $t_id );
 							// Issues: count failed signals from full score result
-							$t_full_raw  = get_post_meta( $t_id, '_citewp_aiso_geo_score', true );
-							$t_issues    = 0;
+							$t_full_raw = get_post_meta( $t_id, Repository::META_KEY_FULL, true );
+							$t_issues   = 0;
 							if ( $t_full_raw !== '' ) {
 								$t_full = maybe_unserialize( $t_full_raw );
-								if ( is_object( $t_full ) && isset( $t_full->signals ) && is_array( $t_full->signals ) ) {
-									foreach ( $t_full->signals as $sig ) {
-										if ( isset( $sig->status ) && $sig->status === 'fail' ) {
+								if ( is_array( $t_full ) && ! empty( $t_full['signals'] ) && is_array( $t_full['signals'] ) ) {
+									foreach ( $t_full['signals'] as $sig ) {
+										if ( is_array( $sig ) && ( $sig['status'] ?? '' ) === 'fail' ) {
 											$t_issues++;
 										}
 									}
