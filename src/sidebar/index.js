@@ -251,6 +251,21 @@ registerPlugin( 'citewp-aiso-geo-score', {
 
 // === Schema Suggestions — Document Settings panel ===
 
+const SCHEMA_TYPES = [
+	{
+		key: 'article',
+		label: 'Article',
+		variants: [ 'Article', 'NewsArticle', 'BlogPosting' ],
+		emptyMessage: null,
+	},
+	{
+		key: 'faqpage',
+		label: 'FAQPage',
+		variants: [ 'FAQPage' ],
+		emptyMessage: 'No FAQ content detected (need ≥ 2 Q&A pairs)',
+	},
+];
+
 function SchemaSuggestions() {
 	const postId       = useSelect( ( s ) => s( 'core/editor' ).getCurrentPostId(), [] );
 	const isSavingPost = useSelect( ( s ) => s( 'core/editor' ).isSavingPost(), [] );
@@ -310,53 +325,51 @@ function SchemaSuggestions() {
 
 	if ( loading && ! schema ) {
 		return (
-			<div style={ { textAlign: 'center', padding: '12px 0' } }>
+			<div className="citewp-aiso-sidebar-loading">
 				<Spinner />
 			</div>
 		);
 	}
 
 	if ( error ) {
-		return <div style={ { color: '#dc2626', fontSize: 13 } }>{ error }</div>;
+		return <div className="citewp-aiso-sidebar-error">{ error }</div>;
 	}
 
 	if ( ! schema ) return null;
 
-	const detected       = schema.detected || [];
-	const articleDetected = detected.some( ( t ) => ARTICLE_VARIANTS.includes( t ) );
-	const faqDetected     = detected.includes( 'FAQPage' );
-	const otherDetected   = detected.filter(
-		( t ) => ! [ ...ARTICLE_VARIANTS, 'FAQPage', 'Question' ].includes( t )
+	const detected         = schema.detected || [];
+	const allKnownVariants = SCHEMA_TYPES.flatMap( ( t ) => t.variants );
+	// 'Question' is a child node type of FAQPage schema (in mainEntity), not a
+	// standalone @type from the generator — excluded to avoid double-counting alongside FAQPage.
+	// A manually inserted root-level @type="Question" block would be detected, but
+	// the generator does not produce this (confirmed: collect_root_types() does not
+	// recurse into mainEntity, only @graph).
+	const otherDetected = detected.filter(
+		( t ) => ! allKnownVariants.includes( t ) && t !== 'Question'
 	);
 
 	return (
-		<div style={ { fontSize: 13 } }>
-			<SchemaTypeRow
-				label="Article"
-				detected={ articleDetected }
-				generated={ !! schema.article }
-				inserted={ !! inserted.article }
-				inserting={ !! inserting.article }
-				onInsert={ () => insertSchemaBlock( 'article' ) }
-			/>
-			<SchemaTypeRow
-				label="FAQPage"
-				detected={ faqDetected }
-				generated={ !! schema.faqpage }
-				inserted={ !! inserted.faqpage }
-				inserting={ !! inserting.faqpage }
-				onInsert={ () => insertSchemaBlock( 'faqpage' ) }
-				emptyMessage="No FAQ content detected (need ≥ 2 Q&A pairs)"
-			/>
-			{ otherDetected.map( ( type ) => (
-				<div key={ type } style={ {
-					padding: '6px 0',
-					borderTop: '1px solid #f3f4f6',
-					color: '#6b7280',
-				} }>
-					{ type } schema detected — more types coming soon
+		<div className="citewp-aiso-sidebar-schema">
+			{ SCHEMA_TYPES.map( ( type ) => {
+				const isDetected = detected.some( ( t ) => type.variants.includes( t ) );
+				return (
+					<SchemaTypeRow
+						key={ type.key }
+						label={ type.label }
+						detected={ isDetected }
+						generated={ !! schema[ type.key ] }
+						inserted={ !! inserted[ type.key ] }
+						inserting={ !! inserting[ type.key ] }
+						onInsert={ () => insertSchemaBlock( type.key ) }
+						emptyMessage={ type.emptyMessage }
+					/>
+				);
+			} ) }
+			{ otherDetected.length > 0 && (
+				<div className="citewp-aiso-sidebar-schema-other">
+					{ `Other detected types: ${ otherDetected.join( ', ' ) } — more types coming soon` }
 				</div>
-			) ) }
+			) }
 		</div>
 	);
 }
