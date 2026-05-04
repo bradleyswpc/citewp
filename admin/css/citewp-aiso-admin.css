@@ -1911,7 +1911,7 @@
 
 .citewp-aiso-cite-score-page__left-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.3fr 1fr;
   gap: 18px;
   align-items: stretch;
 }
@@ -2032,9 +2032,9 @@
 }
 
 .citewp-aiso-cs-score-copy {
-  font: 400 13px/1.6 'Inter', system-ui, sans-serif;
+  font: 400 12px/1.55 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-muted);
-  max-width: 280px;
+  max-width: none;
 }
 
 .citewp-aiso-cs-score-right {
