@@ -1728,15 +1728,15 @@
 .citewp-aiso-kpi-tooltip__text {
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
-  right: auto;
+  left: auto;
+  right: 0;
   background: var(--citewp-white);
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-sm);
   padding: var(--sp-2) var(--sp-3);
   font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-secondary);
-  max-width: 320px;
+  max-width: 360px;
   white-space: normal;
   text-transform: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -1751,10 +1751,10 @@
   pointer-events: auto;
 }
 
-/* Right-align modifier: anchors tooltip right edge to icon right edge */
-.citewp-aiso-kpi-tooltip--align-right .citewp-aiso-kpi-tooltip__text {
-  left: auto;
-  right: 0;
+/* Left-align modifier: tooltip extends RIGHT from icon — use on rightmost page cards */
+.citewp-aiso-kpi-tooltip--align-left .citewp-aiso-kpi-tooltip__text {
+  left: 0;
+  right: auto;
 }
 
 /* B2: Needs Attention type pill */

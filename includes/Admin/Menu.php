@@ -913,7 +913,7 @@ final class Menu {
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__title-row">
 							<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Issues Detected', 'ai-search-optimizer' ); ?></span>
-							<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-right">
+							<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 								<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 								<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Posts and pages with a Cite Score below 50 — they have the most room for improvement.', 'ai-search-optimizer' ); ?></span>
 							</span>
