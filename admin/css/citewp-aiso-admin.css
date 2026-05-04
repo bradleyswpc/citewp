@@ -662,11 +662,11 @@
 }
 
 .citewp-aiso-insights__badge {
-  font: 600 10px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 700 11px/1 'Inter', system-ui, -apple-system, sans-serif;
   background: rgba(139, 92, 246, 0.15);
   color: rgb(139, 92, 246);
-  padding: 3px 8px;
-  border-radius: 20px;
+  padding: 4px 8px;
+  border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
