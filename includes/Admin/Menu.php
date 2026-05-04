@@ -770,6 +770,15 @@ final class Menu {
 			};
 		}
 
+		$cs_status_copy = [
+			'red'    => __( 'Your site needs improvement. Fix the issues below to increase your AI citation potential.',       'ai-search-optimizer' ),
+			'orange' => __( 'Your site has moderate AI citation potential. Fix the issues below to increase your score.',     'ai-search-optimizer' ),
+			'yellow' => __( 'Your site is performing well. Continue improving to maximize AI citation.',                       'ai-search-optimizer' ),
+			'green'  => __( 'Your site is excellently optimized for AI citation.',                                            'ai-search-optimizer' ),
+			'empty'  => __( 'No posts have been scored yet. Score a post to see your site\'s AI citation potential.',         'ai-search-optimizer' ),
+		];
+		$cs_status_text = $cs_status_copy[ $avg_grade ] ?? $cs_status_copy['empty'];
+
 		$sample_n = min( $total_scored, $sample_cap );
 		$cat_avgs = [];
 		foreach ( $cat_sums as $cat_key => $sum ) {
@@ -938,19 +947,30 @@ final class Menu {
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is the average across all scored posts. Higher scores mean better AI citation potential.', 'ai-search-optimizer' ); ?></span>
 					</span>
 				</h3>
-				<?php $this->render_gauge_svg( $avg_score ?? 0, $avg_grade ); ?>
-				<p class="citewp-cite-score-gauge__meta">
-					<?php
-					$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
-					printf(
-						/* translators: %1$d: scored posts, %2$d: total published */
-						esc_html__( '%1$d of %2$d posts scored', 'ai-search-optimizer' ),
-						(int) $total_scored,
-						(int) $published_total
-					);
-					?>
-				</p>
-			</div>
+				<div class="citewp-aiso-cs-score-wrap">
+					<div>
+						<?php $this->render_gauge_svg( $avg_score ?? 0, $avg_grade ); ?>
+						<p class="citewp-cite-score-gauge__meta">
+							<?php
+							$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
+							printf(
+								/* translators: %1$d: scored post count, %2$d: total published post count */
+								esc_html__( 'Based on %1$d of %2$d published posts', 'ai-search-optimizer' ),
+								(int) $total_scored,
+								(int) $published_total
+							);
+							?>
+						</p>
+					</div><!-- /gauge col -->
+					<div class="citewp-aiso-cs-score-right">
+						<p class="citewp-aiso-cs-score-copy"><?php echo esc_html( $cs_status_text ); ?></p>
+						<a href="https://citewp.com/cite-score-guide" target="_blank" rel="noopener noreferrer"
+						   class="citewp-aiso-btn citewp-aiso-btn--outline citewp-aiso-cs-score-guide-btn">
+							<?php esc_html_e( 'View Score Guide →', 'ai-search-optimizer' ); ?>
+						</a>
+					</div><!-- /copy col -->
+				</div><!-- /.citewp-aiso-cs-score-wrap -->
+				</div>
 
 			<!-- Panel 2: Score Breakdown -->
 			<div class="citewp-aiso-breakdown">

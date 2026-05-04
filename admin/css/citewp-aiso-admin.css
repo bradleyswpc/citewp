@@ -2004,6 +2004,31 @@
   text-align: center;
 }
 
+/* Cite Score Health — 2-col grid: gauge left (240px), copy + button right */
+.citewp-aiso-cs-score-wrap {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  align-items: center;
+  gap: var(--sp-6);
+  margin-top: var(--sp-4);
+}
+
+.citewp-aiso-cs-score-copy {
+  font: 400 13px/1.6 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  max-width: 280px;
+}
+
+.citewp-aiso-cs-score-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.citewp-aiso-cs-score-guide-btn {
+  align-self: flex-start;
+}
+
 /* ── Score Breakdown Panel ── */
 .citewp-aiso-breakdown {
   background: var(--citewp-paper);
