@@ -113,13 +113,13 @@ function ScoreSidebar() {
 			>
 				<PanelBody>
 					{ loading && ! score && (
-						<div style={ { textAlign: 'center', padding: '20px 0' } }>
+						<div className="citewp-aiso-sidebar-loading">
 							<Spinner />
 						</div>
 					) }
 
 					{ error && (
-						<div style={ { color: '#dc2626', padding: '8px 0' } }>
+						<div className="citewp-aiso-sidebar-error">
 							{ error }
 						</div>
 					) }
@@ -132,7 +132,7 @@ function ScoreSidebar() {
 								expanded={ expandedCategory }
 								onToggle={ setExpandedCategory }
 							/>
-							<div style={ { marginTop: 16 } }>
+							<div className="citewp-aiso-sidebar-recalc">
 								<Button
 									variant="secondary"
 									onClick={ recalculate }
@@ -141,7 +141,7 @@ function ScoreSidebar() {
 								>
 									Recalculate
 								</Button>
-								<p style={ { margin: '6px 0 0', fontSize: 12, color: '#6b7280' } }>
+								<p className="citewp-aiso-sidebar-recalc-hint">
 									Saves trigger auto-recalculation.
 								</p>
 							</div>
