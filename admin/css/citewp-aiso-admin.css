@@ -2330,24 +2330,6 @@
 .citewp-aiso-grade-badge--orange { background: #fee2e2; color: var(--citewp-score-red); }
 .citewp-aiso-grade-badge--red    { background: #fee2e2; color: var(--citewp-score-red); }
 
-.citewp-aiso-cs-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--sp-3) var(--sp-4);
-  border-top: 1px solid var(--citewp-border);
-}
-
-.citewp-aiso-cs-pagination__info {
-  font: 400 12px/1 'Inter', system-ui, sans-serif;
-  color: var(--citewp-text-muted);
-}
-
-.citewp-aiso-cs-pagination__nav {
-  display: flex;
-  gap: var(--sp-2);
-}
-
 /* ── Empty state (no scored posts) ── */
 .citewp-aiso-cs-empty {
   display: flex;
