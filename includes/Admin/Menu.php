@@ -1046,12 +1046,12 @@ final class Menu {
 				<table class="citewp-aiso-cs-table">
 					<thead>
 						<tr>
-							<th><?php esc_html_e( 'Post',         'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Cite Score',   'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Trend',        'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Last Updated', 'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Issues',       'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Actions', 'ai-search-optimizer' ); ?></th>
+							<th style="width:36%"><?php esc_html_e( 'Post',         'ai-search-optimizer' ); ?></th>
+							<th style="width:10%"><?php esc_html_e( 'Cite Score',   'ai-search-optimizer' ); ?></th>
+							<th style="width:8%"><?php esc_html_e( 'Trend',        'ai-search-optimizer' ); ?></th>
+							<th style="width:14%"><?php esc_html_e( 'Last Updated', 'ai-search-optimizer' ); ?></th>
+							<th style="width:12%"><?php esc_html_e( 'Issues',       'ai-search-optimizer' ); ?></th>
+							<th style="width:20%"><?php esc_html_e( 'Actions',      'ai-search-optimizer' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
