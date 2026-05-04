@@ -1220,20 +1220,27 @@ final class Menu {
 
 			</div><!-- /.citewp-aiso-cs-table-wrap -->
 
-			<!-- Lower-right: Score history chart -->
+			<!-- Lower-right: Cite Score Over Time -->
 			<div class="citewp-aiso-cs-panel">
-				<h3 class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Cite Score Over Time', 'ai-search-optimizer' ); ?></h3>
-				<div class="citewp-aiso-history-panel__head" style="margin-top:0">
-					<div class="citewp-aiso-history-panel__pills">
-						<?php foreach ( [ 7, 30, 90 ] as $days ) :
-							$range_url = esc_url( add_query_arg( array_merge( $base_q, [ 'cs_range' => $days ] ), $base_url ) . '#cite-score' );
-						?>
-						<a href="<?php echo $range_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>"
-						   class="citewp-aiso-history-pill<?php echo $days === $history_range ? ' is-active' : ''; ?>">
-							<?php echo esc_html( $days . 'D' ); ?>
-						</a>
-						<?php endforeach; ?>
-					</div>
+				<div class="citewp-aiso-cs-history-head">
+					<h3 class="citewp-aiso-cs-panel__title">
+						<?php esc_html_e( 'Cite Score Over Time', 'ai-search-optimizer' ); ?>
+						<span class="citewp-aiso-kpi-tooltip">
+							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is recorded daily. The chart shows your average across the selected timeframe.', 'ai-search-optimizer' ); ?></span>
+						</span>
+					</h3>
+					<form method="get" action="<?php echo esc_url( $base_url ); ?>" style="margin:0">
+						<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
+						<input type="hidden" name="csp"  value="<?php echo esc_attr( (string) $paged ); ?>">
+						<input type="hidden" name="cspp" value="<?php echo esc_attr( (string) $per_page ); ?>">
+						<input type="hidden" name="css"  value="<?php echo esc_attr( $search_q ); ?>">
+						<select name="cs_range" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
+							<?php foreach ( [ 7 => __( 'Last 7 Days', 'ai-search-optimizer' ), 30 => __( 'Last 30 Days', 'ai-search-optimizer' ), 90 => __( 'Last 90 Days', 'ai-search-optimizer' ) ] as $days => $label ) : ?>
+							<option value="<?php echo esc_attr( (string) $days ); ?>"<?php selected( $days, $history_range ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</form>
 				</div>
 				<?php $this->render_history_svg( $history ); ?>
 				<?php if ( $hist_avg !== null ) : ?>
@@ -1316,7 +1323,7 @@ final class Menu {
 					<line x1="0" y1="30" x2="340" y2="30" stroke="var(--citewp-border)" stroke-width="2" stroke-dasharray="6 4"/>
 				</svg>
 				<p class="citewp-aiso-history-panel__empty-text">
-					<?php esc_html_e( 'Not enough history yet. Scores appear after the daily cron runs.', 'ai-search-optimizer' ); ?>
+					<?php esc_html_e( 'Not enough history yet. Site Cite Score is recorded daily — check back tomorrow for your first data point.', 'ai-search-optimizer' ); ?>
 				</p>
 			</div>
 			<?php
