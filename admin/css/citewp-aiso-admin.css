@@ -1928,6 +1928,17 @@
   margin-top: var(--sp-4);
 }
 
+/* Post-Level table: post title links — Obsidian, no underline */
+.citewp-aiso-cs-table td a {
+  color: var(--citewp-obsidian);
+  text-decoration: none;
+}
+
+.citewp-aiso-cs-table td a:hover {
+  color: var(--citewp-tint-blue);
+  text-decoration: none;
+}
+
 /* ── Generic paper card chrome (for top-grid and lower-grid panels) ── */
 .citewp-aiso-cs-panel {
   background: var(--citewp-paper);

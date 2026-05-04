@@ -811,7 +811,7 @@ final class Menu {
 
 		// ── Paginated post table ─────────────────────────────────────────
 		$paged     = max( 1, absint( $_GET['csp'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$per_page  = in_array( (int) ( $_GET['cspp'] ?? 10 ), [ 5, 10, 25 ], true ) ? (int) ( $_GET['cspp'] ?? 10 ) : 10; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$per_page  = in_array( (int) ( $_GET['cspp'] ?? 5 ), [ 5, 10, 25 ], true ) ? (int) ( $_GET['cspp'] ?? 5 ) : 5; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$search_q  = sanitize_text_field( wp_unslash( $_GET['css'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$tbl_args  = [
 			'post_type'      => [ 'post', 'page' ],
