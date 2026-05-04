@@ -1840,37 +1840,95 @@
 
 /* === SECTION 31: Cite Score sitewide dashboard (Session 19) === */
 
-/* ── Two-column body ── */
-.citewp-aiso-cs-body {
+/* ── Layout grids ── */
+.citewp-aiso-cs-top-grid {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: 1.3fr 1.1fr 1.35fr;
   gap: var(--sp-4);
   align-items: start;
+  margin-top: var(--sp-4);
 }
 
-.citewp-aiso-cs-left,
-.citewp-aiso-cs-right {
-  display: flex;
-  flex-direction: column;
+.citewp-aiso-cs-lower-grid {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
   gap: var(--sp-4);
+  align-items: start;
+  margin-top: var(--sp-4);
 }
 
-/* ── Semi-circle Gauge Panel ── */
-.citewp-aiso-gauge-panel {
+/* ── Generic paper card chrome (for top-grid and lower-grid panels) ── */
+.citewp-aiso-cs-panel {
   background: var(--citewp-paper);
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-lg);
   padding: var(--sp-5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-2);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-.citewp-aiso-gauge-panel__meta {
-  font: 400 12px/1 'Inter', system-ui, sans-serif;
+.citewp-aiso-cs-panel__title {
+  font: 700 15px/1 'Inter', system-ui, sans-serif;
+  color: var(--citewp-obsidian);
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--sp-4);
+}
+
+/* ── Cite Score gauge (pathLength=100 + CSS variable approach) ── */
+.citewp-aiso-cs-gauge {
+  width: 240px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.citewp-aiso-cs-gauge svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.citewp-aiso-cs-gauge__bg {
+  fill: none;
+  stroke: #e5e7eb;
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.citewp-aiso-cs-gauge__arc {
+  fill: none;
+  stroke: url(#citewp-gauge-gradient);
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-dasharray: var(--score, 0) 100;
+  stroke-dashoffset: 0;
+}
+
+.citewp-aiso-cs-gauge__number {
+  font-size: 52px;
+  font-weight: 800;
+  fill: var(--citewp-obsidian);
+}
+
+.citewp-aiso-cs-gauge__total {
+  font-size: 18px;
+  fill: var(--citewp-text-muted);
+}
+
+.citewp-aiso-cs-gauge__label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.citewp-aiso-cs-gauge--red    .citewp-aiso-cs-gauge__label { fill: var(--citewp-score-red); }
+.citewp-aiso-cs-gauge--orange .citewp-aiso-cs-gauge__label { fill: var(--citewp-score-orange); }
+.citewp-aiso-cs-gauge--yellow .citewp-aiso-cs-gauge__label { fill: var(--citewp-score-yellow); }
+.citewp-aiso-cs-gauge--green  .citewp-aiso-cs-gauge__label { fill: var(--citewp-score-green); }
+.citewp-aiso-cs-gauge--empty  .citewp-aiso-cs-gauge__label { fill: var(--citewp-text-muted); }
+
+.citewp-aiso-cs-gauge__meta {
+  font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-muted);
   text-align: center;
+  margin-top: var(--sp-3);
 }
 
 /* ── Score Breakdown Panel ── */
@@ -2186,9 +2244,10 @@
   gap: var(--sp-3);
 }
 
-/* ── Responsive: stack columns below 900px ── */
-@media (max-width: 900px) {
-  .citewp-aiso-cs-body {
+/* ── Responsive: stack columns below 1100px ── */
+@media (max-width: 1100px) {
+  .citewp-aiso-cs-top-grid,
+  .citewp-aiso-cs-lower-grid {
     grid-template-columns: 1fr;
   }
 }
