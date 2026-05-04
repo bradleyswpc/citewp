@@ -763,9 +763,9 @@ final class Menu {
 		$avg_grade = 'empty';
 		if ( $avg_score !== null ) {
 			$avg_grade = match ( true ) {
-				$avg_score >= 80 => 'green',
-				$avg_score >= 60 => 'yellow',
-				$avg_score >= 40 => 'orange',
+				$avg_score >= 90 => 'green',
+				$avg_score >= 70 => 'yellow',
+				$avg_score >= 50 => 'orange',
 				default          => 'red',
 			};
 		}
