@@ -1736,8 +1736,9 @@
   padding: var(--sp-2) var(--sp-3);
   font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-secondary);
-  width: 220px;
+  max-width: 320px;
   white-space: normal;
+  text-transform: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   z-index: 100;
   opacity: 0;
@@ -1891,6 +1892,7 @@
   font: 700 15px/1 'Inter', system-ui, sans-serif;
   color: var(--citewp-obsidian);
   letter-spacing: -0.02em;
+  text-transform: none;
   margin: 0 0 var(--sp-4);
 }
 
@@ -1967,7 +1969,6 @@
   border-bottom: 1px solid var(--citewp-border);
   font: 700 11px/1 'Inter', system-ui, sans-serif;
   color: var(--citewp-obsidian);
-  text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
@@ -2179,7 +2180,6 @@
 .citewp-aiso-cs-table th {
   font: 700 11px/1 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-muted);
-  text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: var(--sp-2) var(--sp-3);
   border-bottom: 1px solid var(--citewp-border);
