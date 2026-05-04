@@ -828,6 +828,16 @@ final class Menu {
 			'citability' => [ 'label' => __( 'Citability', 'ai-search-optimizer' ), 'max' => 40 ],
 			'authority'  => [ 'label' => __( 'Authority',  'ai-search-optimizer' ), 'max' => 25 ],
 		];
+		$cat_colors = [
+			'structure'  => 'var(--citewp-tint-purple)',
+			'citability' => 'var(--citewp-tint-blue)',
+			'authority'  => 'var(--citewp-tint-teal)',
+		];
+		$cat_icons = [
+			'structure'  => 'layout',
+			'citability' => 'quote',
+			'authority'  => 'shield',
+		];
 
 		$base_url   = admin_url( 'admin.php' );
 		$base_q     = [ 'page' => self::SLUG_PARENT ];
@@ -959,23 +969,29 @@ final class Menu {
 
 			<!-- Panel 2: Score Breakdown -->
 			<div class="citewp-aiso-breakdown">
-				<div class="citewp-aiso-breakdown__head"><?php esc_html_e( 'Score Breakdown', 'ai-search-optimizer' ); ?></div>
+				<div class="citewp-aiso-breakdown__head">
+					<?php esc_html_e( 'Score Breakdown', 'ai-search-optimizer' ); ?>
+					<span class="citewp-aiso-kpi-tooltip">
+						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Your Cite Score breaks down across 3 categories. Each category contains multiple signals that AI engines consider when citing content.', 'ai-search-optimizer' ); ?></span>
+					</span>
+				</div>
 				<?php foreach ( $cat_meta as $cat_key => $cat_info ) :
 					$avg_cat   = $cat_avgs[ $cat_key ] ?? 0;
 					$cat_max   = $cat_info['max'];
 					$pct       = $cat_max > 0 ? ( $avg_cat / $cat_max ) * 100 : 0;
-					$cat_grade = match ( true ) {
-						$pct >= 80 => 'green',
-						$pct >= 60 => 'yellow',
-						$pct >= 40 => 'orange',
-						default    => 'red',
-					};
-					$bar_color = $band_color( $cat_grade );
+					$bar_color = $cat_colors[ $cat_key ] ?? 'var(--citewp-text-muted)';
+					$cat_icon  = $cat_icons[ $cat_key ] ?? 'gauge';
 				?>
 				<div class="citewp-aiso-breakdown__row">
 					<div class="citewp-aiso-breakdown__label-row">
-						<span class="citewp-aiso-breakdown__label"><?php echo esc_html( $cat_info['label'] ); ?></span>
-						<span class="citewp-aiso-breakdown__score" style="color:<?php echo esc_attr( $bar_color ); ?>">
+						<span class="citewp-aiso-breakdown__label">
+							<span style="color:<?php echo esc_attr( $bar_color ); ?>;display:inline-flex;align-items:center;margin-right:4px">
+								<?php echo IconLibrary::icon( $cat_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</span>
+							<?php echo esc_html( $cat_info['label'] ); ?>
+						</span>
+						<span class="citewp-aiso-breakdown__score" style="color:var(--citewp-obsidian)">
 							<?php echo esc_html( $avg_cat . ' / ' . $cat_max ); ?>
 						</span>
 					</div>
