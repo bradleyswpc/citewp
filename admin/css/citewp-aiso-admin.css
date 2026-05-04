@@ -1847,25 +1847,9 @@
 
 /* === SECTION 31: Cite Score sitewide dashboard (Session 19) === */
 
-/* Row 1: header band (title+desc left, 3 KPI cards right) */
-.citewp-aiso-cs-header-band {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: var(--sp-6);
-  margin-bottom: var(--sp-6);
-}
-
-.citewp-aiso-cs-header-band__left h2 {
-  margin: 0 0 var(--sp-1);
-  font: 800 20px/1.2 'Inter', system-ui, sans-serif;
-  color: var(--citewp-text-primary);
-}
-
-.citewp-aiso-cs-header-band__left p {
-  margin: 0;
-  font: 400 13px/1.5 'Inter', system-ui, sans-serif;
-  color: var(--citewp-text-muted);
+/* KPI row spacing below page-header strip */
+.citewp-aiso-cs-kpi-row {
+  margin-top: var(--sp-5);
 }
 
 /* KPI card compact variant: single horizontal row, no __visual block */
