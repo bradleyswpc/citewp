@@ -6,6 +6,60 @@
 
 ---
 
+## Session 20 — Cite Score page Run #8 polish ✅
+
+**Date:** 2026-05-04
+
+### Deliverable
+
+Fix-in-place final polish pass on the Cite Score sitewide dashboard, continuing from Run #7. 4 active groups (2 were no-ops) + 1 extra Dashboard request. All direct edits, code-reviewer clean pass.
+
+**Group 1 — Remove KPI card tooltips (Cite Score page only)**
+- Removed `.citewp-aiso-kpi-tooltip` wrapper + info icon + tooltip text from all 3 compact KPI cards in `citewp-aiso-cs-kpi-row` (Average Cite Score, Posts Optimized, Issues Detected).
+- Removed same tooltip wrapper from AI Recommendations panel header.
+- Panel-title tooltips (Cite Score Health, Score Breakdown, Post-Level Cite Scores) intentionally left intact.
+
+**Group 2 — Panel-title `--align-left` removal (no-op)**
+- All 3 panel-title tooltips already had no `--align-left` modifier. No changes needed.
+
+**Group 3 — Move Pro Tip into left column**
+- Moved `citewp-aiso-protip` block (including `apply_filters('citewp_aiso/protip', ...)` PHP call) from full-width position after `citewp-aiso-cite-score-page__body` into `citewp-aiso-cite-score-page__left` as last child, after the table wrap.
+
+**Group 4 — Post-type icon mapping (no-op)**
+- Current code (`page` → `file-text`, everything else → `file`) already handles `elementor_library` and all non-page types correctly. No changes needed.
+
+**Group 5 — BETA pill enlargement**
+- `.citewp-aiso-insights__badge`: font 600→700, size 10px→11px, padding 3px→4px (vertical), border-radius 20px→6px (pill → chip).
+- Right-justification already handled by `flex: 1` on `__title` — no additional CSS needed.
+
+**Extra — Remove Dashboard KPI card orb divs**
+- Removed `citewp-aiso-kpi-card__orb` div (14px icon circle) from `__head` of all 4 Dashboard KPI cards (Avg Cite Score, Bot Visits, Indexed Pages, llms.txt).
+- `__visual` blocks with 36px icons preserved untouched.
+
+**Commit:** `c441b28` — fix: S20 Run #8 — Cite Score page final polish pass
+
+**Files modified:**
+- `includes/Admin/Menu.php` — KPI card tooltip removal; AI Recs header tooltip removal; Pro Tip relocated; Dashboard KPI orb divs removed
+- `admin/css/citewp-aiso-admin.css` — Section 13: `.citewp-aiso-insights__badge` enlarged
+
+**npm build:** Not required (CSS + PHP only, no JS changes).
+
+**Code reviewer:** Clean pass — all 8 checklist items passed, no issues found. Verdict: Production ready.
+
+**Carryover into Session 21:**
+
+**Still required (smoke tests):**
+- Manual Cite Score page smoke test (22-item checklist from `docs/superpowers/plans/2026-05-03-cite-score-run6-final-polish.md`) — visual verification by user, not yet completed
+- S18 Dashboard / Crawler Logs / Settings smoke test — still outstanding
+
+**Deferred items:**
+- Cite Score badge rectangular shape (S20 Group 6 — deferred)
+- KPI orb size 28×28 → 36×36 with 18px Lucide icon (deferred; schedule when Dashboard parity work happens)
+- Token name reconciliation (`--citewp-text-primary` / `--citewp-text-secondary` / `--citewp-text-muted` drift vs UI-DESIGN-SYSTEM.md) — defer to Brain consolidation session
+- WP.org approval check — user action (check hello@citewp.com)
+
+---
+
 ## Session 20 — Cite Score page Run #7 polish ✅
 
 **Date:** 2026-05-04
@@ -55,17 +109,7 @@ CSS/PHP fix-in-place pass on the Cite Score sitewide dashboard. 5 groups of visu
 
 **Code reviewer:** Ran post-Group 5. One Important issue found and fixed (duplicate pagination block). No Critical issues. Verdict: Ready to merge (with fix applied).
 
-**Carryover into Session 21:**
-
-**Still required (smoke tests):**
-- Manual Cite Score page smoke test (22-item checklist from `docs/superpowers/plans/2026-05-03-cite-score-run6-final-polish.md`) — visual verification by user, not yet completed
-- S18 Dashboard / Crawler Logs / Settings smoke test — still outstanding
-
-**S20 deferred items (not in scope for Run #7):**
-- KPI orb size 28×28 → 36×36 with 18px Lucide icon (deferred; schedule when Dashboard parity work happens)
-- Token name reconciliation (`--citewp-text-primary` / `--citewp-text-secondary` / `--citewp-text-muted` drift vs UI-DESIGN-SYSTEM.md) — defer to Brain consolidation session
-- WP.org approval check — user action (check hello@citewp.com)
-- Dashboard KPI orb alignment — schedule after Cite Score orb bump lands
+**→ Continued in Run #8 (same session date). See entry above.**
 
 **Pre-S20 rolling carryover:**
 - **EditorPanel + Gutenberg sidebar v3 polish** — S17 carryover
