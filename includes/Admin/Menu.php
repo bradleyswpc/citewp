@@ -802,7 +802,7 @@ final class Menu {
 
 		// ── Paginated post table ─────────────────────────────────────────
 		$paged     = max( 1, absint( $_GET['csp'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$per_page  = in_array( (int) ( $_GET['cspp'] ?? 20 ), [ 10, 20, 50 ], true ) ? (int) ( $_GET['cspp'] ?? 20 ) : 20; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$per_page  = in_array( (int) ( $_GET['cspp'] ?? 10 ), [ 5, 10, 25 ], true ) ? (int) ( $_GET['cspp'] ?? 10 ) : 10; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$search_q  = sanitize_text_field( wp_unslash( $_GET['css'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$tbl_args  = [
 			'post_type'      => [ 'post', 'page' ],
@@ -1083,7 +1083,16 @@ final class Menu {
 
 			<!-- Lower-left: Post-level score table -->
 			<div class="citewp-aiso-cs-table-wrap">
-				<div class="citewp-aiso-cs-controls">
+
+				<!-- Panel head: title + tooltip + search -->
+				<div class="citewp-aiso-cs-table-head">
+					<span class="citewp-aiso-cs-table-head__title">
+						<?php esc_html_e( 'Post-Level Cite Scores', 'ai-search-optimizer' ); ?>
+						<span class="citewp-aiso-kpi-tooltip">
+							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'All scored posts on your site, sorted by lowest Cite Score first. Click Optimize to open the post and improve its score.', 'ai-search-optimizer' ); ?></span>
+						</span>
+					</span>
 					<form method="get" action="<?php echo esc_url( $base_url ); ?>">
 						<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
 						<input type="hidden" name="cspp" value="<?php echo esc_attr( (string) $per_page ); ?>">
@@ -1095,27 +1104,18 @@ final class Menu {
 							placeholder="<?php esc_attr_e( 'Search posts…', 'ai-search-optimizer' ); ?>"
 						>
 					</form>
-					<form method="get" action="<?php echo esc_url( $base_url ); ?>">
-						<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
-						<input type="hidden" name="css" value="<?php echo esc_attr( $search_q ); ?>">
-						<select name="cspp" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
-							<?php foreach ( [ 10, 20, 50 ] as $pp ) : ?>
-							<option value="<?php echo esc_attr( (string) $pp ); ?>"<?php selected( $pp, $per_page ); ?>><?php echo esc_html( (string) $pp ); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</form>
 				</div>
 
 				<?php if ( $tbl_q->have_posts() ) : ?>
 				<table class="citewp-aiso-cs-table">
 					<thead>
 						<tr>
-							<th><?php esc_html_e( 'Title',       'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Type',        'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Score',       'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Grade',       'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Last Scored', 'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Action',      'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Post',         'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Cite Score',   'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Trend',        'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Last Updated', 'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Issues',       'ai-search-optimizer' ); ?></th>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -1128,25 +1128,49 @@ final class Menu {
 							$t_time_raw = get_post_meta( $t_id, Repository::META_KEY_TIME, true );
 							$t_time_ts  = is_string( $t_time_raw ) && $t_time_raw !== '' ? (int) strtotime( $t_time_raw ) : 0;
 							$t_time_ago = $t_time_ts > 0 ? human_time_diff( $t_time_ts, time() ) . ' ' . __( 'ago', 'ai-search-optimizer' ) : '—';
-							$t_type_obj = get_post_type_object( (string) get_post_type() );
-							$t_type     = $t_type_obj ? $t_type_obj->labels->singular_name : (string) get_post_type();
-							$t_edit_url = get_edit_post_link( $t_id );
+							$t_post_type = (string) get_post_type();
+							$t_type_icon = $t_post_type === 'page' ? 'file-text' : 'file';
+							$t_edit_url  = get_edit_post_link( $t_id );
+							// Issues: count failed signals from full score result
+							$t_full_raw  = get_post_meta( $t_id, '_citewp_aiso_geo_score', true );
+							$t_issues    = 0;
+							if ( $t_full_raw !== '' ) {
+								$t_full = maybe_unserialize( $t_full_raw );
+								if ( is_object( $t_full ) && isset( $t_full->signals ) && is_array( $t_full->signals ) ) {
+									foreach ( $t_full->signals as $sig ) {
+										if ( isset( $sig->status ) && $sig->status === 'fail' ) {
+											$t_issues++;
+										}
+									}
+								}
+							}
+							// Trend: no per-post history available yet → show "—"
+							$t_trend_html = '<span class="citewp-aiso-cs-table__trend--flat">—</span>';
 						?>
 						<tr>
 							<td>
-								<?php if ( $t_edit_url ) : ?>
-								<a href="<?php echo esc_url( $t_edit_url ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
-								<?php else : ?>
-								<?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?>
-								<?php endif; ?>
+								<span style="display:inline-flex;align-items:center;gap:4px">
+									<span style="color:var(--citewp-text-muted);display:inline-flex"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+									<?php if ( $t_edit_url ) : ?>
+									<a href="<?php echo esc_url( $t_edit_url ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
+									<?php else : ?>
+									<?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?>
+									<?php endif; ?>
+								</span>
 							</td>
-							<td class="citewp-aiso-cs-table__type"><?php echo esc_html( $t_type ); ?></td>
-							<td class="citewp-aiso-cs-table__score" style="color:<?php echo esc_attr( $band_color( $t_grade ) ); ?>"><?php echo esc_html( (string) $t_score ); ?></td>
-							<td><span class="citewp-aiso-grade-badge citewp-aiso-grade-badge--<?php echo esc_attr( $t_grade ); ?>"><?php echo esc_html( ucfirst( $t_grade ) ); ?></span></td>
+							<td><span class="citewp-aiso-score-pill citewp-aiso-score-pill--<?php echo esc_attr( $t_grade ); ?>"><?php echo esc_html( (string) $t_score ); ?></span></td>
+							<td><?php echo $t_trend_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
 							<td class="citewp-aiso-cs-table__time"><?php echo esc_html( $t_time_ago ); ?></td>
 							<td>
+								<?php if ( $t_issues > 0 ) : ?>
+								<span class="citewp-aiso-cs-table__issues--active"><?php echo esc_html( $t_issues . ' ' . _n( 'issue', 'issues', $t_issues, 'ai-search-optimizer' ) ); ?></span>
+								<?php else : ?>
+								<span class="citewp-aiso-cs-table__issues--none"><?php esc_html_e( 'No issues', 'ai-search-optimizer' ); ?></span>
+								<?php endif; ?>
+							</td>
+							<td>
 								<?php if ( $t_edit_url ) : ?>
-								<a href="<?php echo esc_url( $t_edit_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'Improve', 'ai-search-optimizer' ); ?></a>
+								<a href="<?php echo esc_url( $t_edit_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'Optimize →', 'ai-search-optimizer' ); ?></a>
 								<?php endif; ?>
 							</td>
 						</tr>
@@ -1154,34 +1178,35 @@ final class Menu {
 					</tbody>
 				</table>
 
+				<!-- Footer: View All Posts (left) | numbered pagination (center) | per-page select (right) -->
 				<div class="citewp-aiso-cs-pagination">
-					<span class="citewp-aiso-cs-pagination__info">
-						<?php
-						printf(
-							/* translators: %1$d: first, %2$d: last, %3$d: total */
-							esc_html__( 'Showing %1$d–%2$d of %3$d posts', 'ai-search-optimizer' ),
-							$first_item,
-							$last_item,
-							$tbl_q->found_posts
-						);
+					<a href="<?php echo esc_url( admin_url( 'edit.php' ) ); ?>" class="citewp-aiso-crawlers__view-all"><?php esc_html_e( 'View All Posts →', 'ai-search-optimizer' ); ?></a>
+
+					<?php if ( $total_pages > 1 ) : ?>
+					<div class="citewp-aiso-cs-pagination__pages">
+						<?php for ( $pg = 1; $pg <= $total_pages; $pg++ ) :
+							$pg_url = esc_url( add_query_arg( array_merge( $base_q, [ 'csp' => $pg, 'cspp' => $per_page, 'css' => $search_q ] ), $base_url ) . '#cite-score' );
 						?>
-					</span>
-					<div class="citewp-aiso-cs-pagination__nav">
-						<?php
-						$prev_url = esc_url( add_query_arg( array_merge( $base_q, [ 'csp' => $paged - 1, 'cspp' => $per_page, 'css' => $search_q ] ), $base_url ) . '#cite-score' );
-						$next_url = esc_url( add_query_arg( array_merge( $base_q, [ 'csp' => $paged + 1, 'cspp' => $per_page, 'css' => $search_q ] ), $base_url ) . '#cite-score' );
-						?>
-						<?php if ( $paged > 1 ) : ?>
-						<a href="<?php echo $prev_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( '← Prev', 'ai-search-optimizer' ); ?></a>
+						<?php if ( $pg === $paged ) : ?>
+						<span class="citewp-aiso-cs-pagination__page is-active"><?php echo esc_html( (string) $pg ); ?></span>
 						<?php else : ?>
-						<span class="citewp-aiso-btn citewp-aiso-btn--outline" aria-disabled="true" style="opacity:0.4;pointer-events:none"><?php esc_html_e( '← Prev', 'ai-search-optimizer' ); ?></span>
+						<a href="<?php echo $pg_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" class="citewp-aiso-cs-pagination__page"><?php echo esc_html( (string) $pg ); ?></a>
 						<?php endif; ?>
-						<?php if ( $paged < $total_pages ) : ?>
-						<a href="<?php echo $next_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'Next →', 'ai-search-optimizer' ); ?></a>
-						<?php else : ?>
-						<span class="citewp-aiso-btn citewp-aiso-btn--outline" aria-disabled="true" style="opacity:0.4;pointer-events:none"><?php esc_html_e( 'Next →', 'ai-search-optimizer' ); ?></span>
-						<?php endif; ?>
+						<?php endfor; ?>
 					</div>
+					<?php else : ?>
+					<span></span>
+					<?php endif; ?>
+
+					<form method="get" action="<?php echo esc_url( $base_url ); ?>">
+						<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
+						<input type="hidden" name="css"  value="<?php echo esc_attr( $search_q ); ?>">
+						<select name="cspp" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
+							<?php foreach ( [ 5, 10, 25 ] as $pp ) : ?>
+							<option value="<?php echo esc_attr( (string) $pp ); ?>"<?php selected( $pp, $per_page ); ?>><?php echo esc_html( $pp . ' ' . __( 'per page', 'ai-search-optimizer' ) ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</form>
 				</div>
 
 				<?php else : ?>
