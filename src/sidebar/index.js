@@ -13,6 +13,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { Button, Spinner, PanelBody } from '@wordpress/components';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
+import './style.scss';
 
 function CiteWPIcon() {
 	return (
