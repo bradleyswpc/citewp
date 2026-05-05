@@ -168,13 +168,14 @@ final class EditorPanel {
 										$score = (int) ( $cat['score'] ?? 0 );
 										$max   = (int) ( $cat['max'] ?? 0 );
 										$pct   = $max > 0 ? (int) round( ( $score / $max ) * 100 ) : 0;
+									$grade_cat = $pct >= 80 ? 'green' : ( $pct >= 60 ? 'yellow' : ( $pct >= 40 ? 'orange' : 'red' ) );
 										?>
 										<div class="citewp-aiso-mb-cat-row">
 											<span class="citewp-aiso-mb-cat-label">
 												<?php echo esc_html( (string) ( $cat['label'] ?? '' ) ); ?>
 											</span>
 											<div class="citewp-aiso-mb-cat-bar-wrap">
-												<div class="citewp-aiso-mb-cat-bar-fill"
+												<div class="citewp-aiso-mb-cat-bar-fill citewp-aiso-mb-cat-bar-fill--<?php echo esc_attr( $grade_cat ); ?>"
 													 style="width:<?php echo esc_attr( (string) $pct ); ?>%"></div>
 											</div>
 											<span class="citewp-aiso-mb-cat-score">
@@ -263,9 +264,10 @@ final class EditorPanel {
 								var score = cats[k].score ?? 0;
 								var max   = cats[k].max   ?? 0;
 								var pct   = max ? Math.round( ( score / max ) * 100 ) : 0;
+								var grade_cat = pct >= 80 ? 'green' : pct >= 60 ? 'yellow' : pct >= 40 ? 'orange' : 'red';
 								html += '<div class="citewp-aiso-mb-cat-row">'
 								      + '<span class="citewp-aiso-mb-cat-label">' + esc( cats[k].label ?? '' ) + '</span>'
-								      + '<div class="citewp-aiso-mb-cat-bar-wrap"><div class="citewp-aiso-mb-cat-bar-fill" style="width:' + pct + '%"></div></div>'
+								      + '<div class="citewp-aiso-mb-cat-bar-wrap"><div class="citewp-aiso-mb-cat-bar-fill citewp-aiso-mb-cat-bar-fill--' + esc(grade_cat) + '" style="width:' + pct + '%"></div></div>'
 								      + '<span class="citewp-aiso-mb-cat-score">' + esc( String(score) ) + '/' + esc( String(max) ) + '</span>'
 								      + '</div>';
 							}

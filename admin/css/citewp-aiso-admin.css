@@ -2474,7 +2474,7 @@
 /* --- 2-column General tab grid --------------------------------------------- */
 #citewp_aiso_editor_panel .citewp-aiso-ep-columns {
 	display: grid;
-	grid-template-columns: 45% 55%;
+	grid-template-columns: 50% 50%;
 	min-height: 160px;
 }
 #citewp_aiso_editor_panel .citewp-aiso-ep-col-left {
@@ -2536,10 +2536,13 @@
 }
 #citewp_aiso_editor_panel .citewp-aiso-mb-cat-bar-fill {
 	height: 100%;
-	background: var(--citewp-navy);
 	border-radius: 2px;
 	transition: width 0.3s ease;
 }
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-bar-fill--green  { background: var(--citewp-score-green); }
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-bar-fill--yellow { background: var(--citewp-score-yellow); }
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-bar-fill--orange { background: var(--citewp-score-orange); }
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-bar-fill--red    { background: var(--citewp-score-red); }
 #citewp_aiso_editor_panel .citewp-aiso-mb-cat-score {
 	color: var(--citewp-text-primary);
 	font-weight: 600;
