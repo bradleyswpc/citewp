@@ -1,0 +1,237 @@
+// CiteWP Sidebar — v3 palette + typography
+// SNAPSHOT of P38 brand system (2026-05-04).
+// Score color tokens mirror P38 $citewp-score-* — update manually if P38 changes.
+// JetBrains Mono registered here (not in admin CSS) because enqueue_block_editor_assets
+// is a separate hook from admin_enqueue_scripts; admin stylesheet does not reach
+// the editor sidebar chrome. Only jetbrains-mono-400.woff2 exists on disk —
+// heavier weights use browser synthetic bold (same behaviour as admin CSS).
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../admin/fonts/jetbrains-mono-400.woff2') format('woff2');
+}
+
+// Score-band tokens (P38 canonical)
+$citewp-score-green:  #00A32A;
+$citewp-score-yellow: #DBA617;
+$citewp-score-orange: #D63638;
+$citewp-score-red:    #8C1B1B;
+
+// Text tokens (P38 paper-surface)
+$citewp-text-body:  #0C0C0D; // Obsidian
+$citewp-text-muted: #64748B; // P38 canonical muted
+
+// Surface tokens
+$citewp-border:       #e5e7eb;
+$citewp-border-faint: #f3f4f6;
+$citewp-bg-subtle:    #f9fafb;
+
+// ─── Score block ────────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-score {
+  text-align: center;
+  padding: 16px 0 20px;
+  border-bottom: 1px solid $citewp-border;
+  margin-bottom: 16px;
+
+  &__value {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+
+    &--green  { color: $citewp-score-green; }
+    &--yellow { color: $citewp-score-yellow; }
+    &--orange { color: $citewp-score-orange; }
+    &--red    { color: $citewp-score-red; }
+  }
+
+  &__denom {
+    font-size: 20px;
+    color: $citewp-text-muted;
+    font-weight: 400;
+  }
+
+  &__label {
+    margin-top: 4px;
+    color: $citewp-text-muted;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// ─── Loading / error ────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-loading {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.citewp-aiso-sidebar-error {
+  color: $citewp-score-red;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+// ─── Recalculate area ───────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-recalc {
+  margin-top: 16px;
+}
+
+.citewp-aiso-sidebar-recalc-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: $citewp-text-muted;
+}
+
+// ─── Category block ─────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-category {
+  margin-bottom: 10px;
+
+  &__toggle {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 8px 0;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &__score {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+    color: $citewp-text-body;
+  }
+
+  &__bar {
+    height: 4px;
+    background: $citewp-border;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  &__fill {
+    height: 100%;
+    // width set via inline style (dynamic runtime percentage — cannot be a static class)
+    transition: width 0.3s ease;
+
+    &--green  { background: $citewp-score-green; }
+    &--yellow { background: $citewp-score-yellow; }
+    &--orange { background: $citewp-score-orange; }
+    &--red    { background: $citewp-score-red; }
+  }
+
+  &__signals {
+    padding-left: 8px;
+    margin-top: 8px;
+  }
+}
+
+// ─── Signal block ───────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-signal {
+  padding: 8px 0;
+  border-top: 1px solid $citewp-border-faint;
+  font-size: 13px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__icon {
+    font-weight: 700;
+    margin-right: 6px;
+
+    &--pass    { color: $citewp-score-green; }
+    &--partial { color: $citewp-score-yellow; }
+    &--fail    { color: $citewp-score-red; }
+  }
+
+  &__score {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+    color: $citewp-text-muted;
+  }
+
+  &__message {
+    color: $citewp-text-muted;
+    margin-top: 2px;
+  }
+
+  &__rec {
+    margin-top: 4px;
+    padding: 6px;
+    background: $citewp-bg-subtle;
+    font-size: 12px;
+    color: $citewp-text-body;
+    border-left: 2px solid transparent;
+
+    &--pass    { border-left-color: $citewp-score-green; }
+    &--partial { border-left-color: $citewp-score-yellow; }
+    &--fail    { border-left-color: $citewp-score-red; }
+  }
+}
+
+// ─── Schema block ───────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-schema {
+  font-size: 13px;
+}
+
+.citewp-aiso-sidebar-schema-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid $citewp-border-faint;
+
+  &__label {
+    font-weight: 600;
+  }
+
+  &__pill {
+    background: rgba($citewp-score-green, 0.1);
+    color: $citewp-score-green;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 600;
+  }
+
+  &__empty {
+    padding: 6px 0;
+    border-top: 1px solid $citewp-border-faint;
+    color: $citewp-text-muted;
+    font-size: 12px;
+  }
+}
+
+.citewp-aiso-sidebar-schema-other {
+  padding: 6px 0;
+  border-top: 1px solid $citewp-border-faint;
+  color: $citewp-text-muted;
+}
