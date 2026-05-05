@@ -1,112 +1,869 @@
-# Gutenberg Sidebar v3 Polish — Session 22 Plan
+# Gutenberg Sidebar v3 Polish Implementation Plan
 
-**Date:** 2026-05-04  
-**Session:** 22  
-**Pipeline:** X13 (multi-file React + SCSS + PHP + npm build + code-reviewer)  
-**Status:** Brainstorm approved — ready for subagent execution
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
----
+**Goal:** Polish the Gutenberg plugin sidebar (Cite Score) and Document Settings panel (Schema Suggestions) to v3 brand standards — replacing inline styles with class-based CSS, updating labels and icon, aligning colours to P38 palette, and creating the companion SCSS stylesheet.
 
-## Scope Summary
+**Architecture:** Two strictly sequential phases. Phase 1 (SA1) refactors `src/sidebar/index.js` — changing labels, replacing inline styles with class names, deleting GRADE_COLORS, restructuring the schema panel. Phase 2 (SA2) creates `src/sidebar/style.scss` using the class names SA1 produced, runs `npm run build` to confirm the CSS output filename, and updates `EditorAssets.php` to enqueue the compiled CSS. **SA2 must not start until SA1 is committed.** Parallel execution risks class-name drift between JS and CSS.
 
-Two Gutenberg-registered plugins in `src/sidebar/index.js` get v3 polish:
-
-1. **`citewp-aiso-geo-score`** (`PluginSidebar`) — Cite Score display with category breakdown and Recalculate button
-2. **`citewp-aiso-schema-suggestions`** (`PluginDocumentSettingPanel`) — Article and FAQPage schema suggestion rows
-
-**Not in scope:** Engine.php, REST endpoints, PHP meta box, new schema types (FB29 build), Cite Bridges (FB30), new tab structure, gauge SVG render, per-signal recommendation copy, WP.org tasks, Cite Score badge rectangular shape.
+**Tech Stack:** React (via `@wordpress/scripts`), `@wordpress/plugins`, `@wordpress/editor`, `@wordpress/components`, Sass/SCSS compiled by `@wordpress/scripts` webpack, PHP 8.0+, WordPress 6.5+.
 
 ---
 
-## Design Decisions (locked in brainstorm)
+## Key decisions (reference — do not relitigate)
 
-### GAP A — Label renames
-- `PluginSidebarMoreMenuItem` text: `"CiteWP GEO Score"` → `"Cite Score"`
-- `PluginSidebar title` prop: `"CiteWP GEO Score"` → `"Cite Score"`
-- `TotalScore` inline label: `"GEO Score"` → `"Cite Score"`
-- Plugin slug `citewp-aiso-geo-score` and `registerPlugin` name **stay unchanged** — changing them breaks `PluginSidebarMoreMenuItem`'s `target` prop and user-pinned sidebar state
-
-### GAP E — Sidebar icon
-- Replace `chartBar` (from `@wordpress/icons`) with a `CiteWPIcon` React component
-- Source: `Brain/brand/logos/icon.svg` — `viewBox="0 0 512 512"`, Citrine (`#E8D400`) rect background, `[A]` text in `system-ui, -apple-system, sans-serif` at `font-weight="800"`, `fill="#0C0C0D"`. Plus Jakarta Sans was dropped from the brand system in P37 (Session 14); the sidebar icon uses the system font fallback for portability — the bracket + Citrine background + letter shape are the recognisable identity, not the specific typeface.
-- Strip all SMIL: remove `<animate>` on rect, remove `@keyframes mark-breathe` CSS animation, remove `@import` Google Fonts
-- Result: static SVG React component, inlined at top of `src/sidebar/index.js`
-- Passed as `icon={ <CiteWPIcon /> }` to `registerPlugin` and `PluginSidebarMoreMenuItem`
-
-### GAP F — Score color ramp
-- **`GRADE_COLORS` constant deleted from JS entirely**
-- P38 hex values live exclusively in `style.scss` via `$citewp-score-*` Sass variables → CSS modifier classes
-- Grade thresholds verified against `ScoreResult.php::compute_total()` — **80 / 60 / 40** (not 90/70/50):
-  ```php
-  $this->total >= 80 => 'green'
-  $this->total >= 60 => 'yellow'
-  $this->total >= 40 => 'orange'
-  default            => 'red'
-  ```
-- JS retains the `grade` string from the API response (`green / yellow / orange / red`) for class name construction only
-
-### GAP D — Schema panel pill
-- "Already detected" pill aligns to v3 grade badge pattern: tint of `$citewp-score-green` background, `$citewp-score-green` text, `border-radius: 9999px`
-- Class: `.citewp-aiso-sidebar-schema-row__pill`
-
-### Inline styles — modifier class strategy
-- **All structural inline styles** (`style={{ ... }}`) replaced by `className` strings
-- **Dynamic color values** use CSS modifier classes — no inline hex in JS:
-  - Grade color: `citewp-aiso-sidebar-score__value--{grade}` (four rules in SCSS)
-  - Category fill color: `citewp-aiso-sidebar-category__fill--{grade}`
-  - Signal status color: `citewp-aiso-sidebar-signal__icon--{status}` (pass / partial / fail)
-  - Recommendation border-left: `citewp-aiso-sidebar-signal__rec--{status}`
-- `STATUS_ICONS` constant **survives** (accessibility: characters stay in DOM, not CSS `::before`)
-  - Render: `<span className={`citewp-aiso-sidebar-signal__icon citewp-aiso-sidebar-signal__icon--${status}`}>{STATUS_ICONS[status]}</span>`
-  - Color controlled by modifier class only
-
-### FB29 — Schema panel refactor (option a)
-- Replace two hardcoded `SchemaTypeRow` elements with `SCHEMA_TYPES.map()`
-- Data shape (user-specified):
-  ```js
-  const SCHEMA_TYPES = [
-    {
-      key: 'article',
-      label: 'Article',
-      variants: ['Article', 'NewsArticle', 'BlogPosting'],
-      emptyMessage: null,
-    },
-    {
-      key: 'faqpage',
-      label: 'FAQPage',
-      variants: ['FAQPage'],
-      emptyMessage: 'No FAQ content detected (need ≥ 2 Q&A pairs)',
-    },
-  ];
-  ```
-- Detection per row: `schema.detected.some(t => type.variants.includes(t))`
-- REST access: `schema[type.key]` — keys `schema.article` and `schema.faqpage` **unchanged**. No REST contract change.
-- `otherDetected` block: after the `.map()`, collect `detected` types not found in any `SCHEMA_TYPES.variants` entry → render as a single generic line: `"Other detected types: X, Y — more types coming soon"`. Per-type rows not needed for this trailing block.
+- **Labels:** "CiteWP GEO Score" → "Cite Score" in all visible strings. Plugin slug `citewp-aiso-geo-score` stays unchanged.
+- **Icon:** `chartBar` replaced by inline `CiteWPIcon` React component (static `[A]` SVG, no SMIL).
+- **Colours:** `GRADE_COLORS` JS constant deleted. P38 hex values live in SCSS only as `$citewp-score-*` variables → CSS modifier classes. Grade/status strings remain in JS.
+- **Thresholds:** `TotalScore` grade comes from `score.grade` API field (computed by `ScoreResult.php::compute_total()` at 80/60/40). Category bars compute grade locally at the same thresholds by visual convention (not a formal rubric requirement).
+- **`STATUS_ICONS`:** Survives in JS. Characters render in DOM (accessibility). Modifier class controls colour only.
+- **Schema panel:** `SCHEMA_TYPES` array drives rendering. REST keys `schema.article` / `schema.faqpage` unchanged. `'Question'` excluded from otherDetected because it is a nested child node of FAQPage in `mainEntity`, not a root `@type` (confirmed by reading `collect_root_types()` in `Generator.php`).
+- **Tokens:** Sass `$citewp-` variables, P38 snapshot header comment, two text tokens only (`$citewp-text-body` / `$citewp-text-muted`).
+- **JetBrains Mono:** Registered via `@font-face` in `style.scss` (not admin CSS) because `enqueue_block_editor_assets` is a separate hook from `admin_enqueue_scripts`. Only the 400-weight file exists on disk (`admin/fonts/jetbrains-mono-400.woff2`).
+- **CSS version:** `filemtime()` on the compiled CSS file — busts cache on every build regardless of JS changes.
 
 ---
 
-## Files Changed
+## Files
 
-| File | Action | Notes |
-|------|--------|-------|
-| `src/sidebar/index.js` | Modify | Label renames, CiteWPIcon, GRADE_COLORS deletion, class names, SCHEMA_TYPES |
-| `src/sidebar/style.scss` | **Create** | Sass tokens, @font-face, all class definitions |
-| `includes/Admin/EditorAssets.php` | Modify | Add `wp_enqueue_style` with `filemtime` version |
-| `build/style-index.css` | Generated | Emitted by `npm run build`; stage as new untracked file |
+| File | Action |
+|------|--------|
+| `src/sidebar/index.js` | Modify (Phase 1) |
+| `src/sidebar/style.scss` | Create (Phase 2) |
+| `includes/Admin/EditorAssets.php` | Modify (Phase 2) |
+| `build/index.css` | Generated by npm build — stage as new file (Phase 2) |
 
-**`.gitignore` status:** `build/` is fully tracked (confirmed — no exclusion in `.gitignore`). `build/style-index.css` stages as a new file after first build. No `.gitignore` edit needed.
+`.gitignore` note: `build/` is fully tracked. `build/index.css` stages as a new untracked file after first build — `git add build/index.css`.
 
 ---
 
-## `src/sidebar/style.scss` — Full Structure
+## PHASE 1 — `src/sidebar/index.js` refactor
+
+---
+
+### Task 1: Add `CiteWPIcon` component and update imports
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Open the file and locate the import block (lines 1–16)**
+
+The file currently imports `chartBar` from `@wordpress/icons`. Remove that import — it will no longer be used.
+
+- [ ] **Step 2: Remove the chartBar import**
+
+Find and delete this line:
+```js
+import { chartBar } from '@wordpress/icons';
+```
+
+- [ ] **Step 3: Add the `CiteWPIcon` component immediately after the import block (before `GRADE_COLORS`)**
+
+```jsx
+function CiteWPIcon() {
+	return (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 512 512"
+			width="24"
+			height="24"
+			aria-hidden="true"
+			focusable="false"
+		>
+			<rect width="512" height="512" fill="#E8D400" />
+			<text
+				x="256"
+				y="318"
+				fontFamily="system-ui, -apple-system, sans-serif"
+				fontWeight="800"
+				fontSize="248"
+				fill="#0C0C0D"
+				textAnchor="middle"
+			>
+				[A]
+			</text>
+		</svg>
+	);
+}
+```
+
+Note: `fontFamily`, `fontWeight`, `fontSize`, `textAnchor` are camelCase React SVG props. The original `icon.svg` used Plus Jakarta Sans — that typeface was dropped in P37 (Session 14). `system-ui` is the correct v3 fallback.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "feat: add CiteWPIcon static SVG component, remove chartBar import (S22)"
+```
+
+---
+
+### Task 2: Label renames and icon swap
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Replace the three visible label strings**
+
+In `ScoreSidebar()`, find:
+```jsx
+<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ chartBar }>
+    CiteWP GEO Score
+</PluginSidebarMoreMenuItem>
+<PluginSidebar
+    name="citewp-aiso-geo-score"
+    title="CiteWP GEO Score"
+    icon={ chartBar }
+>
+```
+
+Replace with:
+```jsx
+<PluginSidebarMoreMenuItem target="citewp-aiso-geo-score" icon={ <CiteWPIcon /> }>
+    Cite Score
+</PluginSidebarMoreMenuItem>
+<PluginSidebar
+    name="citewp-aiso-geo-score"
+    title="Cite Score"
+    icon={ <CiteWPIcon /> }
+>
+```
+
+The `name` prop `"citewp-aiso-geo-score"` stays unchanged — changing it breaks the `target` prop link and any user-pinned sidebar state.
+
+- [ ] **Step 2: Fix the `registerPlugin` icon prop (line ~283)**
+
+Find:
+```js
+registerPlugin( 'citewp-aiso-geo-score', {
+    render: ScoreSidebar,
+    icon: chartBar,
+} );
+```
+
+Replace with:
+```js
+registerPlugin( 'citewp-aiso-geo-score', {
+    render: ScoreSidebar,
+    icon: CiteWPIcon,
+} );
+```
+
+Note: `registerPlugin`'s `icon` prop accepts a component reference (not JSX), so pass `CiteWPIcon` not `<CiteWPIcon />` here.
+
+- [ ] **Step 3: Fix the "GEO Score" inline label in `TotalScore()`**
+
+Find in the `TotalScore` return block:
+```jsx
+<div style={ { ... } }>
+    GEO Score
+</div>
+```
+
+Change the string to `Cite Score` (the surrounding element will be replaced in Task 4, but fix the string now so no "GEO Score" text survives).
+
+- [ ] **Step 4: Verify no "GEO Score" strings remain in visible labels**
+
+```bash
+grep -n "GEO Score" src/sidebar/index.js
+```
+
+Expected: no matches (the plugin slug strings like `citewp-aiso-geo-score` and the file comment are acceptable — only visible UI strings matter).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "feat: rename GEO Score → Cite Score labels, swap chartBar for CiteWPIcon (S22)"
+```
+
+---
+
+### Task 3: Delete `GRADE_COLORS` and `ARTICLE_VARIANTS` constants
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Delete the `GRADE_COLORS` constant block**
+
+Find and delete:
+```js
+const GRADE_COLORS = {
+	green:  '#16a34a',
+	yellow: '#ca8a04',
+	orange: '#ea580c',
+	red:    '#dc2626',
+};
+```
+
+- [ ] **Step 2: Delete the `ARTICLE_VARIANTS` constant**
+
+Find and delete:
+```js
+const ARTICLE_VARIANTS = [ 'Article', 'NewsArticle', 'BlogPosting' ];
+```
+
+This is absorbed into `SCHEMA_TYPES[0].variants` in Task 8.
+
+- [ ] **Step 3: Verify the file still has no remaining references to `GRADE_COLORS`**
+
+```bash
+grep -n "GRADE_COLORS" src/sidebar/index.js
+```
+
+Expected: no matches. (There will be existing uses in `TotalScore`, `CategoryRow`, `SignalRow` — these are replaced in Tasks 4–6. Do this grep after Tasks 4–6 to confirm clean removal.)
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "refactor: delete GRADE_COLORS and ARTICLE_VARIANTS constants (S22)"
+```
+
+Note: the file will have broken references to `GRADE_COLORS` after this commit. That is expected — Tasks 4–6 fix them. Keep commits granular per X4.
+
+---
+
+### Task 4: Refactor `TotalScore` component
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Replace the entire `TotalScore` function body**
+
+Current code:
+```jsx
+function TotalScore( { score } ) {
+	const color = GRADE_COLORS[ score.grade ] || GRADE_COLORS.red;
+	return (
+		<div style={ {
+			textAlign: 'center',
+			padding: '16px 0 20px',
+			borderBottom: '1px solid #e5e7eb',
+			marginBottom: 16,
+		} }>
+			<div style={ {
+				fontSize: 48,
+				fontWeight: 700,
+				color,
+				lineHeight: 1,
+				fontVariantNumeric: 'tabular-nums',
+			} }>
+				{ score.total }
+				<span style={ { fontSize: 20, color: '#9ca3af', fontWeight: 400 } }>/100</span>
+			</div>
+			<div style={ {
+				marginTop: 4,
+				color: '#6b7280',
+				fontSize: 13,
+				textTransform: 'uppercase',
+				letterSpacing: '0.05em',
+			} }>
+				Cite Score
+			</div>
+		</div>
+	);
+}
+```
+
+Replace with:
+```jsx
+function TotalScore( { score } ) {
+	return (
+		<div className="citewp-aiso-sidebar-score">
+			<div className={ `citewp-aiso-sidebar-score__value citewp-aiso-sidebar-score__value--${ score.grade }` }>
+				{ score.total }
+				<span className="citewp-aiso-sidebar-score__denom">/100</span>
+			</div>
+			<div className="citewp-aiso-sidebar-score__label">
+				Cite Score
+			</div>
+		</div>
+	);
+}
+```
+
+`score.grade` is one of `green | yellow | orange | red` from the API response. The modifier class drives colour via SCSS.
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "refactor: TotalScore — inline styles → class names, grade modifier class (S22)"
+```
+
+---
+
+### Task 5: Refactor `CategoryRow` component
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Replace the entire `CategoryRow` function body**
+
+Current code:
+```jsx
+function CategoryRow( { id, category, signals, isOpen, onToggle } ) {
+	const pct = category.max > 0 ? ( category.score / category.max ) * 100 : 0;
+	const color = pct >= 80 ? GRADE_COLORS.green
+		: pct >= 60 ? GRADE_COLORS.yellow
+		: pct >= 40 ? GRADE_COLORS.orange
+		: GRADE_COLORS.red;
+
+	return (
+		<div style={ { marginBottom: 10 } }>
+			<button
+				onClick={ onToggle }
+				style={ {
+					width: '100%',
+					background: 'transparent',
+					border: 'none',
+					padding: '8px 0',
+					cursor: 'pointer',
+					textAlign: 'left',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+				} }
+			>
+				<span style={ { fontWeight: 600, fontSize: 14 } }>
+					{ isOpen ? '▾' : '▸' } { category.label }
+				</span>
+				<span style={ { fontVariantNumeric: 'tabular-nums', color: '#374151' } }>
+					{ category.score }/{ category.max }
+				</span>
+			</button>
+
+			<div style={ {
+				height: 4,
+				background: '#e5e7eb',
+				borderRadius: 2,
+				overflow: 'hidden',
+				marginBottom: 4,
+			} }>
+				<div style={ {
+					height: '100%',
+					width: `${ pct }%`,
+					background: color,
+					transition: 'width 0.3s ease',
+				} } />
+			</div>
+
+			{ isOpen && (
+				<div style={ { paddingLeft: 8, marginTop: 8 } }>
+					{ signals.map( ( s ) => <SignalRow key={ s.id } signal={ s } /> ) }
+				</div>
+			) }
+		</div>
+	);
+}
+```
+
+Replace with:
+```jsx
+function CategoryRow( { id, category, signals, isOpen, onToggle } ) {
+	const pct = category.max > 0 ? ( category.score / category.max ) * 100 : 0;
+	// Category bars use the top-line score thresholds (80/60/40) by visual convention;
+	// per-category thresholds are not formally defined in SCORING-RUBRIC.md.
+	const grade = pct >= 80 ? 'green' : pct >= 60 ? 'yellow' : pct >= 40 ? 'orange' : 'red';
+
+	return (
+		<div className="citewp-aiso-sidebar-category">
+			<button
+				onClick={ onToggle }
+				className="citewp-aiso-sidebar-category__toggle"
+			>
+				<span className="citewp-aiso-sidebar-category__label">
+					{ isOpen ? '▾' : '▸' } { category.label }
+				</span>
+				<span className="citewp-aiso-sidebar-category__score">
+					{ category.score }/{ category.max }
+				</span>
+			</button>
+
+			<div className="citewp-aiso-sidebar-category__bar">
+				<div
+					className={ `citewp-aiso-sidebar-category__fill citewp-aiso-sidebar-category__fill--${ grade }` }
+					style={ { width: `${ pct }%` } }
+				/>
+			</div>
+
+			{ isOpen && (
+				<div className="citewp-aiso-sidebar-category__signals">
+					{ signals.map( ( s ) => <SignalRow key={ s.id } signal={ s } /> ) }
+				</div>
+			) }
+		</div>
+	);
+}
+```
+
+Note: the progress bar `width` remains as an inline style — it is a dynamic runtime value (percentage) that cannot be encoded in a static class.
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "refactor: CategoryRow — inline styles → class names, grade modifier class (S22)"
+```
+
+---
+
+### Task 6: Refactor `SignalRow` component
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Replace the entire `SignalRow` function body**
+
+Current code:
+```jsx
+function SignalRow( { signal } ) {
+	const color = signal.status === 'pass' ? GRADE_COLORS.green
+		: signal.status === 'partial' ? GRADE_COLORS.yellow
+		: GRADE_COLORS.red;
+	return (
+		<div style={ {
+			padding: '8px 0',
+			borderTop: '1px solid #f3f4f6',
+			fontSize: 13,
+		} }>
+			<div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }>
+				<span>
+					<span style={ { color, fontWeight: 700, marginRight: 6 } }>
+						{ STATUS_ICONS[ signal.status ] || '?' }
+					</span>
+					{ signal.label }
+				</span>
+				<span style={ { color: '#6b7280', fontVariantNumeric: 'tabular-nums' } }>
+					{ signal.score }/{ signal.max }
+				</span>
+			</div>
+			<div style={ { color: '#4b5563', marginTop: 2 } }>{ signal.message }</div>
+			{ signal.recommendation && (
+				<div style={ {
+					marginTop: 4,
+					padding: 6,
+					background: '#f9fafb',
+					borderLeft: `2px solid ${ color }`,
+					color: '#374151',
+					fontSize: 12,
+				} }>
+					💡 { signal.recommendation }
+				</div>
+			) }
+		</div>
+	);
+}
+```
+
+Replace with:
+```jsx
+function SignalRow( { signal } ) {
+	return (
+		<div className="citewp-aiso-sidebar-signal">
+			<div className="citewp-aiso-sidebar-signal__header">
+				<span className="citewp-aiso-sidebar-signal__label">
+					<span className={ `citewp-aiso-sidebar-signal__icon citewp-aiso-sidebar-signal__icon--${ signal.status }` }>
+						{ STATUS_ICONS[ signal.status ] || '?' }
+					</span>
+					{ signal.label }
+				</span>
+				<span className="citewp-aiso-sidebar-signal__score">
+					{ signal.score }/{ signal.max }
+				</span>
+			</div>
+			<div className="citewp-aiso-sidebar-signal__message">{ signal.message }</div>
+			{ signal.recommendation && (
+				<div className={ `citewp-aiso-sidebar-signal__rec citewp-aiso-sidebar-signal__rec--${ signal.status }` }>
+					💡 { signal.recommendation }
+				</div>
+			) }
+		</div>
+	);
+}
+```
+
+`signal.status` is one of `pass | partial | fail` from the API response.
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "refactor: SignalRow — inline styles → class names, status modifier class (S22)"
+```
+
+---
+
+### Task 7: Refactor loading/error/recalculate inline styles in `ScoreSidebar`
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Replace the loading spinner wrapper in `ScoreSidebar`**
+
+Find:
+```jsx
+{ loading && ! score && (
+    <div style={ { textAlign: 'center', padding: '20px 0' } }>
+        <Spinner />
+    </div>
+) }
+```
+
+Replace with:
+```jsx
+{ loading && ! score && (
+    <div className="citewp-aiso-sidebar-loading">
+        <Spinner />
+    </div>
+) }
+```
+
+- [ ] **Step 2: Replace the error wrapper**
+
+Find:
+```jsx
+{ error && (
+    <div style={ { color: '#dc2626', padding: '8px 0' } }>
+        { error }
+    </div>
+) }
+```
+
+Replace with:
+```jsx
+{ error && (
+    <div className="citewp-aiso-sidebar-error">
+        { error }
+    </div>
+) }
+```
+
+- [ ] **Step 3: Replace the recalculate wrapper and hint text**
+
+Find:
+```jsx
+<div style={ { marginTop: 16 } }>
+    <Button
+        variant="secondary"
+        onClick={ recalculate }
+        disabled={ loading }
+        isBusy={ loading }
+    >
+        Recalculate
+    </Button>
+    <p style={ { margin: '6px 0 0', fontSize: 12, color: '#6b7280' } }>
+        Saves trigger auto-recalculation.
+    </p>
+</div>
+```
+
+Replace with:
+```jsx
+<div className="citewp-aiso-sidebar-recalc">
+    <Button
+        variant="secondary"
+        onClick={ recalculate }
+        disabled={ loading }
+        isBusy={ loading }
+    >
+        Recalculate
+    </Button>
+    <p className="citewp-aiso-sidebar-recalc-hint">
+        Saves trigger auto-recalculation.
+    </p>
+</div>
+```
+
+- [ ] **Step 4: Verify no `style={{` props remain anywhere in the file**
+
+```bash
+grep -n "style={" src/sidebar/index.js
+```
+
+Expected output — only ONE match: the `style={ { width: \`${ pct }%\` } }` on the category fill bar (dynamic percentage, acceptable). If other matches appear, fix them before continuing.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "refactor: ScoreSidebar loading/error/recalc — inline styles → class names (S22)"
+```
+
+---
+
+### Task 8: Refactor `SchemaSuggestions` — add `SCHEMA_TYPES` array
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Add the `SCHEMA_TYPES` constant above `SchemaSuggestions`**
+
+Find the line `function SchemaSuggestions()` and insert above it:
+
+```js
+const SCHEMA_TYPES = [
+	{
+		key: 'article',
+		label: 'Article',
+		variants: [ 'Article', 'NewsArticle', 'BlogPosting' ],
+		emptyMessage: null,
+	},
+	{
+		key: 'faqpage',
+		label: 'FAQPage',
+		variants: [ 'FAQPage' ],
+		emptyMessage: 'No FAQ content detected (need ≥ 2 Q&A pairs)',
+	},
+];
+```
+
+- [ ] **Step 2: Replace the detection variables and render block in `SchemaSuggestions`**
+
+Find the block starting from:
+```js
+const detected       = schema.detected || [];
+const articleDetected = detected.some( ... );
+```
+
+through to the closing `</div>` of the return statement, and replace the entire `return (...)` block with:
+
+```jsx
+const detected         = schema.detected || [];
+const allKnownVariants = SCHEMA_TYPES.flatMap( ( t ) => t.variants );
+// 'Question' is a child node type of FAQPage schema (in mainEntity), not a
+// standalone @type from the generator — excluded to avoid double-counting alongside FAQPage.
+// A manually inserted root-level @type="Question" block would be detected, but
+// the generator does not produce this (confirmed: collect_root_types() does not
+// recurse into mainEntity, only @graph).
+const otherDetected = detected.filter(
+    ( t ) => ! allKnownVariants.includes( t ) && t !== 'Question'
+);
+
+return (
+    <div className="citewp-aiso-sidebar-schema">
+        { SCHEMA_TYPES.map( ( type ) => {
+            const isDetected = detected.some( ( t ) => type.variants.includes( t ) );
+            return (
+                <SchemaTypeRow
+                    key={ type.key }
+                    label={ type.label }
+                    detected={ isDetected }
+                    generated={ !! schema[ type.key ] }
+                    inserted={ !! inserted[ type.key ] }
+                    inserting={ !! inserting[ type.key ] }
+                    onInsert={ () => insertSchemaBlock( type.key ) }
+                    emptyMessage={ type.emptyMessage }
+                />
+            );
+        } ) }
+        { otherDetected.length > 0 && (
+            <div className="citewp-aiso-sidebar-schema-other">
+                { `Other detected types: ${ otherDetected.join( ', ' ) } — more types coming soon` }
+            </div>
+        ) }
+    </div>
+);
+```
+
+Also replace the `SchemaSuggestions` loading/error states (they still use inline styles):
+
+Find:
+```jsx
+if ( loading && ! schema ) {
+    return (
+        <div style={ { textAlign: 'center', padding: '12px 0' } }>
+            <Spinner />
+        </div>
+    );
+}
+
+if ( error ) {
+    return <div style={ { color: '#dc2626', fontSize: 13 } }>{ error }</div>;
+}
+```
+
+Replace with:
+```jsx
+if ( loading && ! schema ) {
+    return (
+        <div className="citewp-aiso-sidebar-loading">
+            <Spinner />
+        </div>
+    );
+}
+
+if ( error ) {
+    return <div className="citewp-aiso-sidebar-error">{ error }</div>;
+}
+```
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "refactor: SchemaSuggestions — SCHEMA_TYPES array, otherDetected trailing render (S22)"
+```
+
+---
+
+### Task 9: Refactor `SchemaTypeRow` component
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Replace the entire `SchemaTypeRow` function body**
+
+Current code:
+```jsx
+function SchemaTypeRow( { label, detected, generated, inserted, inserting, onInsert, emptyMessage } ) {
+	if ( ! generated && ! detected ) {
+		return emptyMessage ? (
+			<div style={ {
+				padding: '6px 0',
+				borderTop: '1px solid #f3f4f6',
+				color: '#9ca3af',
+				fontSize: 12,
+			} }>
+				{ emptyMessage }
+			</div>
+		) : null;
+	}
+
+	let action;
+	if ( detected || inserted ) {
+		const label2 = ( inserted && ! detected ) ? '✓ Added' : 'Already detected';
+		action = (
+			<span style={ {
+				background: '#f0fdf4',
+				color: '#16a34a',
+				fontSize: 11,
+				padding: '2px 8px',
+				borderRadius: 9999,
+				fontWeight: 600,
+			} }>
+				{ label2 }
+			</span>
+		);
+	} else {
+		action = (
+			<Button
+				variant="secondary"
+				size="small"
+				onClick={ onInsert }
+				isBusy={ inserting }
+				disabled={ inserting }
+			>
+				Insert
+			</Button>
+		);
+	}
+
+	return (
+		<div style={ {
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+			padding: '8px 0',
+			borderTop: '1px solid #f3f4f6',
+		} }>
+			<span style={ { fontWeight: 600 } }>{ label }</span>
+			{ action }
+		</div>
+	);
+}
+```
+
+Replace with:
+```jsx
+function SchemaTypeRow( { label, detected, generated, inserted, inserting, onInsert, emptyMessage } ) {
+	if ( ! generated && ! detected ) {
+		return emptyMessage ? (
+			<div className="citewp-aiso-sidebar-schema-row__empty">
+				{ emptyMessage }
+			</div>
+		) : null;
+	}
+
+	let action;
+	if ( detected || inserted ) {
+		const statusLabel = ( inserted && ! detected ) ? '✓ Added' : 'Already detected';
+		action = (
+			<span className="citewp-aiso-sidebar-schema-row__pill">
+				{ statusLabel }
+			</span>
+		);
+	} else {
+		action = (
+			<Button
+				variant="secondary"
+				size="small"
+				onClick={ onInsert }
+				isBusy={ inserting }
+				disabled={ inserting }
+			>
+				Insert
+			</Button>
+		);
+	}
+
+	return (
+		<div className="citewp-aiso-sidebar-schema-row">
+			<span className="citewp-aiso-sidebar-schema-row__label">{ label }</span>
+			{ action }
+		</div>
+	);
+}
+```
+
+- [ ] **Step 2: Final sweep — verify no `style={{` remain and no `GRADE_COLORS` references**
+
+```bash
+grep -n "style={" src/sidebar/index.js
+grep -n "GRADE_COLORS" src/sidebar/index.js
+grep -n "ARTICLE_VARIANTS" src/sidebar/index.js
+grep -n "GEO Score" src/sidebar/index.js
+```
+
+Expected:
+- `style={` → exactly 1 match: `style={ { width: \`${ pct }%\` } }` in CategoryRow
+- `GRADE_COLORS` → 0 matches
+- `ARTICLE_VARIANTS` → 0 matches
+- `GEO Score` → 0 matches
+
+Fix anything that appears before committing.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "refactor: SchemaTypeRow — inline styles → class names, v3 pill style (S22)"
+```
+
+**Phase 1 complete. SA2 may now begin.**
+
+---
+
+## PHASE 2 — `style.scss` + `EditorAssets.php` + build
+
+---
+
+### Task 10: Create `src/sidebar/style.scss`
+
+**Files:**
+- Create: `src/sidebar/style.scss`
+
+- [ ] **Step 1: Create the file with the full stylesheet**
 
 ```scss
 // CiteWP Sidebar — v3 palette + typography
 // SNAPSHOT of P38 brand system (2026-05-04).
-// Score color tokens mirror $citewp-score-* — update manually if P38 changes.
-// JetBrains Mono registered here because enqueue_block_editor_assets is a
-// separate hook from admin_enqueue_scripts; admin CSS does not reach the
-// editor sidebar chrome.
+// Score color tokens mirror P38 $citewp-score-* — update manually if P38 changes.
+// JetBrains Mono registered here (not in admin CSS) because enqueue_block_editor_assets
+// is a separate hook from admin_enqueue_scripts; admin stylesheet does not reach
+// the editor sidebar chrome. Only jetbrains-mono-400.woff2 exists on disk —
+// heavier weights use browser synthetic bold (same behaviour as admin CSS).
 
 @font-face {
   font-family: 'JetBrains Mono';
@@ -123,149 +880,451 @@ $citewp-score-orange: #D63638;
 $citewp-score-red:    #8C1B1B;
 
 // Text tokens (P38 paper-surface)
-$citewp-text-body:  #0C0C0D;   // Obsidian
-$citewp-text-muted: #64748B;   // P38 canonical muted
+$citewp-text-body:  #0C0C0D; // Obsidian
+$citewp-text-muted: #64748B; // P38 canonical muted
 
 // Surface tokens
 $citewp-border:       #e5e7eb;
 $citewp-border-faint: #f3f4f6;
 $citewp-bg-subtle:    #f9fafb;
+
+// ─── Score block ────────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-score {
+  text-align: center;
+  padding: 16px 0 20px;
+  border-bottom: 1px solid $citewp-border;
+  margin-bottom: 16px;
+
+  &__value {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+
+    &--green  { color: $citewp-score-green; }
+    &--yellow { color: $citewp-score-yellow; }
+    &--orange { color: $citewp-score-orange; }
+    &--red    { color: $citewp-score-red; }
+  }
+
+  &__denom {
+    font-size: 20px;
+    color: $citewp-text-muted;
+    font-weight: 400;
+  }
+
+  &__label {
+    margin-top: 4px;
+    color: $citewp-text-muted;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// ─── Loading / error ────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-loading {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.citewp-aiso-sidebar-error {
+  color: $citewp-score-red;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+// ─── Recalculate area ───────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-recalc {
+  margin-top: 16px;
+}
+
+.citewp-aiso-sidebar-recalc-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: $citewp-text-muted;
+}
+
+// ─── Category block ─────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-category {
+  margin-bottom: 10px;
+
+  &__toggle {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 8px 0;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__label {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &__score {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+    color: $citewp-text-body;
+  }
+
+  &__bar {
+    height: 4px;
+    background: $citewp-border;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  &__fill {
+    height: 100%;
+    // width set via inline style (dynamic runtime percentage — cannot be a static class)
+    transition: width 0.3s ease;
+
+    &--green  { background: $citewp-score-green; }
+    &--yellow { background: $citewp-score-yellow; }
+    &--orange { background: $citewp-score-orange; }
+    &--red    { background: $citewp-score-red; }
+  }
+
+  &__signals {
+    padding-left: 8px;
+    margin-top: 8px;
+  }
+}
+
+// ─── Signal block ───────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-signal {
+  padding: 8px 0;
+  border-top: 1px solid $citewp-border-faint;
+  font-size: 13px;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__icon {
+    font-weight: 700;
+    margin-right: 6px;
+
+    &--pass    { color: $citewp-score-green; }
+    &--partial { color: $citewp-score-yellow; }
+    &--fail    { color: $citewp-score-red; }
+  }
+
+  &__score {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-variant-numeric: tabular-nums;
+    color: $citewp-text-muted;
+  }
+
+  &__message {
+    color: $citewp-text-muted;
+    margin-top: 2px;
+  }
+
+  &__rec {
+    margin-top: 4px;
+    padding: 6px;
+    background: $citewp-bg-subtle;
+    font-size: 12px;
+    color: $citewp-text-body;
+    border-left: 2px solid transparent;
+
+    &--pass    { border-left-color: $citewp-score-green; }
+    &--partial { border-left-color: $citewp-score-yellow; }
+    &--fail    { border-left-color: $citewp-score-red; }
+  }
+}
+
+// ─── Schema block ───────────────────────────────────────────────────────────
+
+.citewp-aiso-sidebar-schema {
+  font-size: 13px;
+}
+
+.citewp-aiso-sidebar-schema-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid $citewp-border-faint;
+
+  &__label {
+    font-weight: 600;
+  }
+
+  &__pill {
+    background: rgba($citewp-score-green, 0.1);
+    color: $citewp-score-green;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 600;
+  }
+
+  &__empty {
+    padding: 6px 0;
+    border-top: 1px solid $citewp-border-faint;
+    color: $citewp-text-muted;
+    font-size: 12px;
+  }
+}
+
+.citewp-aiso-sidebar-schema-other {
+  padding: 6px 0;
+  border-top: 1px solid $citewp-border-faint;
+  color: $citewp-text-muted;
+}
 ```
 
-**Font note:** Only `admin/fonts/jetbrains-mono-400.woff2` exists on disk. The @font-face declares weight 400; bold rendering at heavier weights uses browser synthesis (same behaviour as the existing admin CSS). Fallback: `'Courier New', monospace`.
+- [ ] **Step 2: Commit**
 
-**Relative path:** `style.scss` compiles to `build/style-index.css`. From there, `../admin/fonts/jetbrains-mono-400.woff2` resolves correctly. Lock during writing-plans by verifying the actual emitted file path.
-
----
-
-## Class Naming Map (BEM: `citewp-aiso-sidebar-{block}__{element}--{modifier}`)
-
-### Score block
-| Element | Class |
-|---------|-------|
-| Score wrapper | `.citewp-aiso-sidebar-score` |
-| Score number | `.citewp-aiso-sidebar-score__value` |
-| Grade modifier | `.citewp-aiso-sidebar-score__value--green/yellow/orange/red` |
-| `/100` denominator | `.citewp-aiso-sidebar-score__denom` |
-| "Cite Score" label | `.citewp-aiso-sidebar-score__label` |
-| Loading wrapper | `.citewp-aiso-sidebar-loading` |
-| Error wrapper | `.citewp-aiso-sidebar-error` |
-| Recalculate hint | `.citewp-aiso-sidebar-recalc-hint` |
-
-### Category block
-| Element | Class |
-|---------|-------|
-| Category wrapper | `.citewp-aiso-sidebar-category` |
-| Toggle button | `.citewp-aiso-sidebar-category__toggle` |
-| Score fraction | `.citewp-aiso-sidebar-category__score` |
-| Progress bar track | `.citewp-aiso-sidebar-category__bar` |
-| Progress bar fill | `.citewp-aiso-sidebar-category__fill` |
-| Grade modifier | `.citewp-aiso-sidebar-category__fill--green/yellow/orange/red` |
-| Signals container | `.citewp-aiso-sidebar-category__signals` |
-
-### Signal block
-| Element | Class |
-|---------|-------|
-| Signal wrapper | `.citewp-aiso-sidebar-signal` |
-| Header row | `.citewp-aiso-sidebar-signal__header` |
-| Status icon span | `.citewp-aiso-sidebar-signal__icon` |
-| Status modifier | `.citewp-aiso-sidebar-signal__icon--pass/partial/fail` |
-| Signal label | `.citewp-aiso-sidebar-signal__label` |
-| Score fraction | `.citewp-aiso-sidebar-signal__score` |
-| Message line | `.citewp-aiso-sidebar-signal__message` |
-| Recommendation block | `.citewp-aiso-sidebar-signal__rec` |
-| Rec status modifier | `.citewp-aiso-sidebar-signal__rec--pass/partial/fail` |
-
-### Schema block
-| Element | Class |
-|---------|-------|
-| Schema row wrapper | `.citewp-aiso-sidebar-schema-row` |
-| Row label | `.citewp-aiso-sidebar-schema-row__label` |
-| "Already detected" pill | `.citewp-aiso-sidebar-schema-row__pill` |
-| Empty message | `.citewp-aiso-sidebar-schema-row__empty` |
-| "Other detected" line | `.citewp-aiso-sidebar-schema-other` |
+```bash
+git add src/sidebar/style.scss
+git commit -m "feat: create src/sidebar/style.scss — v3 palette tokens, all sidebar class definitions (S22)"
+```
 
 ---
 
-## `EditorAssets.php` — Enqueue Addition
+### Task 11: Wire SCSS into the JS entry point
+
+**Files:**
+- Modify: `src/sidebar/index.js`
+
+- [ ] **Step 1: Add the SCSS import at the top of `index.js` (after the existing imports)**
+
+Add this line at the end of the import block (after the last `import` statement, before `const GRADE_COLORS` was — which is now deleted):
+
+```js
+import './style.scss';
+```
+
+This tells webpack's `mini-css-extract-plugin` to extract the compiled SCSS into a separate CSS file in `build/`.
+
+- [ ] **Step 2: Commit**
+
+```bash
+git add src/sidebar/index.js
+git commit -m "feat: import style.scss into sidebar entry point for webpack CSS extraction (S22)"
+```
+
+---
+
+### Task 12: Run `npm run build`, confirm CSS output filename, update `EditorAssets.php`
+
+**Files:**
+- Run: `npm run build` (from plugin root)
+- Modify: `includes/Admin/EditorAssets.php`
+- Stage: `build/{css-filename}`
+
+- [ ] **Step 1: Run the build**
+
+```bash
+npm run build
+```
+
+Expected: build succeeds with no errors. Look at the output summary or run:
+
+```bash
+ls build/
+```
+
+Identify the CSS file that was emitted. Expected filename: `build/index.css` (entry key is `index`, mini-css-extract-plugin outputs `[name].css`). If a different filename appears (e.g., `style-index.css`), use that filename in all subsequent steps.
+
+- [ ] **Step 2: Verify the CSS file is non-empty**
+
+```bash
+# Replace index.css with actual filename if different
+wc -c build/index.css
+```
+
+Expected: several kilobytes (not 0 bytes). If empty or missing, check that `import './style.scss'` was saved correctly in Task 11.
+
+- [ ] **Step 3: Open `includes/Admin/EditorAssets.php` and add `wp_enqueue_style`**
+
+Current file content:
+```php
+<?php
+/**
+ * Enqueues the compiled Gutenberg sidebar in the block editor.
+ *
+ * @package CiteWP\Aiso
+ */
+
+declare( strict_types=1 );
+
+namespace CiteWP\Aiso\Admin;
+
+defined( 'ABSPATH' ) || exit;
+
+final class EditorAssets {
+
+	public function register(): void {
+		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue' ] );
+	}
+
+	public function enqueue(): void {
+		$asset_file = CITEWP_AISO_PLUGIN_DIR . 'build/index.asset.php';
+
+		// If JS hasn't been built yet (e.g. fresh checkout), bail silently —
+		// the PHP scoring still works, the sidebar just won't load.
+		if ( ! file_exists( $asset_file ) ) {
+			return;
+		}
+
+		$asset = require $asset_file;
+
+		wp_enqueue_script(
+			'citewp-aiso-sidebar',
+			CITEWP_AISO_PLUGIN_URL . 'build/index.js',
+			$asset['dependencies'] ?? [],
+			$asset['version']      ?? CITEWP_AISO_VERSION,
+			true
+		);
+	}
+}
+```
+
+Replace the `enqueue()` method body with the version below. **Substitute the actual CSS filename you observed in Step 1 for `{CSS_FILENAME}`** (e.g., `index.css`):
 
 ```php
-// Resolve actual CSS filename from build output (confirmed during writing-plans)
-$css_path    = CITEWP_AISO_PLUGIN_DIR . 'build/{ACTUAL_FILENAME}';
-$css_version = file_exists( $css_path ) ? filemtime( $css_path ) : CITEWP_AISO_VERSION;
+	public function enqueue(): void {
+		$asset_file = CITEWP_AISO_PLUGIN_DIR . 'build/index.asset.php';
 
-wp_enqueue_style(
-    'citewp-aiso-sidebar',
-    CITEWP_AISO_PLUGIN_URL . 'build/{ACTUAL_FILENAME}',
-    [],
-    $css_version
-);
+		// If JS hasn't been built yet (e.g. fresh checkout), bail silently —
+		// the PHP scoring still works, the sidebar just won't load.
+		if ( ! file_exists( $asset_file ) ) {
+			return;
+		}
+
+		$asset = require $asset_file;
+
+		wp_enqueue_script(
+			'citewp-aiso-sidebar',
+			CITEWP_AISO_PLUGIN_URL . 'build/index.js',
+			$asset['dependencies'] ?? [],
+			$asset['version']      ?? CITEWP_AISO_VERSION,
+			true
+		);
+
+		$css_path    = CITEWP_AISO_PLUGIN_DIR . 'build/{CSS_FILENAME}';
+		$css_version = file_exists( $css_path ) ? filemtime( $css_path ) : CITEWP_AISO_VERSION;
+
+		wp_enqueue_style(
+			'citewp-aiso-sidebar',
+			CITEWP_AISO_PLUGIN_URL . 'build/{CSS_FILENAME}',
+			[],
+			$css_version
+		);
+	}
 ```
 
-- `{ACTUAL_FILENAME}` locked from observed `npm run build` output during writing-plans — not assumed
-- Shared `file_exists( $asset_file )` guard at top of `enqueue()` covers both JS and CSS — no second guard needed
-- `filemtime()` busts cache on every CSS rebuild regardless of JS change; OS-cached, microsecond-cheap
-- Style handle `citewp-aiso-sidebar` matches script handle — WP script/style registries are separate
+Notes:
+- The shared `file_exists( $asset_file )` guard at the top covers both JS and CSS — no second guard needed. Both files emit from the same `npm run build` invocation.
+- `filemtime()` busts the browser CSS cache on every rebuild regardless of whether the JS changed. The JS version from `index.asset.php` reflects only JS source changes; using it for CSS would serve stale CSS after SCSS-only changes.
+- Script and style handles may share the name `citewp-aiso-sidebar` — WP's script and style registries are separate namespaces.
+
+- [ ] **Step 4: Stage and commit**
+
+```bash
+git add build/{CSS_FILENAME}
+git add includes/Admin/EditorAssets.php
+git commit -m "feat: enqueue sidebar CSS in EditorAssets, stage compiled style (S22)"
+```
 
 ---
 
-## Subagent Execution Order (strictly sequential)
+### Task 13: Final commit and verification checklist
 
-**SA1 must complete before SA2 starts** — SA1 produces the class names SA2's SCSS consumes. Parallel execution risks class-name drift between JS and CSS.
+**Files:**
+- Verify: all of the above
 
-### Subagent 1 — `src/sidebar/index.js` refactor
-1. Add `CiteWPIcon` component (static SVG, SMIL stripped)
-2. Delete `GRADE_COLORS` constant
-3. Delete `ARTICLE_VARIANTS` constant (absorbed into `SCHEMA_TYPES[0].variants`)
-4. Label renames (three strings → "Cite Score")
-5. Replace all `icon={ chartBar }` with `icon={ <CiteWPIcon /> }`
-6. Replace all inline `style={{ ... }}` with `className` strings per naming map
-7. Apply grade/status modifier classes (`--${grade}`, `--${status}`):
-   - `TotalScore`: grade comes from `score.grade` API field — use directly
-   - `CategoryRow`: compute `grade` string from percentage (`pct >= 80 → 'green'`, `>= 60 → 'yellow'`, `>= 40 → 'orange'`, else `'red'`) replacing current `color` hex computation. Same thresholds as before, new output type. Add an inline code comment: `// Category bars use the top-line score thresholds (80/60/40) by visual convention; per-category thresholds are not formally defined in SCORING-RUBRIC.md.`
-   - `SignalRow`: `signal.status` is already `'pass' | 'partial' | 'fail'` — use directly
-8. Keep `STATUS_ICONS` constant; render characters in DOM with modifier class for color
-9. Replace hardcoded `SchemaTypeRow` elements with `SCHEMA_TYPES.map()`
-10. `otherDetected` trailing render: before writing this block, **read `includes/Schema/Generator.php`** (specifically whatever method detects existing schema types — look for `detect_existing_types` or equivalent). Confirm whether `'Question'` is emitted as a standalone `@type` by the generator or only as a child node of `FAQPage`. If it is NOT standalone (current assumption — it appears alongside `FAQPage` in the API response as a child type, not an independent detection): proceed with `(schema.detected || []).filter(t => !allKnownVariants.includes(t) && t !== 'Question')` where `allKnownVariants = SCHEMA_TYPES.flatMap(t => t.variants)`. Add an inline comment: `// 'Question' is a child node type of FAQPage schema, not a standalone @type from the generator — excluded to avoid double-counting alongside FAQPage.` If the assumption is WRONG and `'Question'` is a legitimate standalone detection: adjust the filter and document accordingly. Do not silently drop it.
-11. Verify: no `style={{` props remain (grep); no "GEO Score" strings remain (grep)
+- [ ] **Step 1: Run the verification greps**
 
-### Subagent 2 — `style.scss` + `EditorAssets.php` + build
-1. Create `src/sidebar/style.scss` with preamble (header comment, @font-face, Sass variables)
-2. Write all class definitions per naming map using SA1's output as source of truth
-3. Write grade modifier rules (4 per grade block: `.--green`, `.--yellow`, `.--orange`, `.--red`)
-4. Write status modifier rules (pass=green, partial=yellow, fail=red) for signal icon + rec border
-5. Write schema pill styles aligned to v3 grade badge pattern
-6. Run `npm run build` — observe actual CSS output filename in `build/`
-7. Update `EditorAssets.php`: add `wp_enqueue_style` with observed filename and `filemtime` version
-8. `git add build/{observed-filename}`
-9. Verify: `build/style-index.css` (or observed name) exists and is non-empty
+```bash
+grep -n "style={" src/sidebar/index.js
+grep -n "GRADE_COLORS" src/sidebar/index.js
+grep -n "ARTICLE_VARIANTS" src/sidebar/index.js
+grep -rn "GEO Score" src/sidebar/
+```
+
+Expected:
+- `style={` → 1 match only (the progress bar `width`)
+- `GRADE_COLORS` → 0 matches
+- `ARTICLE_VARIANTS` → 0 matches
+- `GEO Score` → 0 matches
+
+- [ ] **Step 2: Open a post in the block editor at http://citewp-dev.local/wp-admin/**
+
+- Sidebar more menu (⋮ icon, top-right) → look for "Cite Score" entry (not "CiteWP GEO Score")
+- Click to open sidebar → title bar shows "Cite Score"
+- Icon is the Citrine `[A]` square (not the bar chart icon)
+- Score number renders in the correct grade colour (green for high, yellow/orange/red for lower)
+- Category bars render with coloured fills
+- Click a category to expand → signal rows render with status icons (✓/~/✗) coloured by status
+- Recommendations show coloured left border
+- Click Recalculate → score updates
+
+- [ ] **Step 3: Open Document Settings → Schema Suggestions panel**
+
+- Article and FAQPage rows render with v3 styling
+- "Already detected" pill is green (background tint + green text, rounded)
+- If a type isn't generated and has no emptyMessage → row is absent (not an empty div)
+- FAQPage empty message shows if no FAQ pairs detected
+- Click Insert on a generated type → Custom HTML block with JSON-LD is appended to post
+
+- [ ] **Step 4: Save the post and verify auto-recalculate fires**
+
+Save the post. Wait 2-3 seconds. The sidebar score should update (REST re-fetch triggered by `isSavingPost` → `wasSaving` transition).
+
+- [ ] **Step 5: Check debug.log for PHP errors**
+
+```bash
+# In LocalWP Shell or check the log file:
+cat "C:/Users/KingpinBWP/Local Sites/citewp-dev/logs/php/error.log" | tail -20
+```
+
+Expected: no new PHP errors related to CiteWP.
+
+- [ ] **Step 6: Check browser console for JS errors**
+
+Open DevTools → Console. Interact with the sidebar and schema panel. Expected: 0 errors, 0 warnings related to `citewp-aiso`.
+
+- [ ] **Step 7: Final commit**
+
+```bash
+git add -A
+git commit -m "feat: Gutenberg sidebar + Schema Suggestions panel v3 polish (S22)"
+git push
+```
 
 ---
 
-## Verification Checklist
-
-- [ ] No `style={{ ... }}` props remain in `src/sidebar/index.js`
-- [ ] No "GEO Score" string remains in any visible UI label
-- [ ] `GRADE_COLORS` constant deleted from JS
-- [ ] `CiteWPIcon` component renders `[A]` SVG with no SMIL attributes
-- [ ] `SCHEMA_TYPES` array drives schema panel rendering; REST keys `schema.article` / `schema.faqpage` unchanged
-- [ ] `src/sidebar/style.scss` exists with P38 Sass variables and snapshot header comment
-- [ ] `EditorAssets.php` enqueues both JS (`wp_enqueue_script`) and CSS (`wp_enqueue_style`) with `filemtime` version on CSS
-- [ ] `npm run build` succeeds with no new warnings
-- [ ] Block editor: sidebar opens → title "Cite Score" → score renders in correct grade color → category bars render → signal rows expand → Recalculate works
-- [ ] Block editor: Document Settings → Schema Suggestions → rows render with v3 styling → "Already detected" pill matches v3 green badge → Insert adds Custom HTML block
-- [ ] Save post → score auto-recalculates (regression check)
-- [ ] No PHP errors in LocalWP `debug.log`
-- [ ] No console errors in browser devtools during sidebar/schema panel interaction
-
----
-
-## Carryover / Deferrals
+## Carryover / out-of-scope
 
 - EditorPanel PHP meta box v3 polish → Session 23
-- New schema types FB29 (HowTo, Product, LocalBusiness) → FB29 build session
-- Cite Bridges tab FB30 → FB30 build session
-- Global meta defaults FB34 → FB34 build session
-- Score gauge SVG render in sidebar → feature work, not polish
+- FB29 new schema types (HowTo, Product, LocalBusiness) → FB29 build session
+- FB30 Cite Bridges tab → FB30 build session
+- FB34 Global meta defaults → FB34 build session
+- Score gauge SVG in sidebar → feature work, not polish
 - Cite Score badge rectangular shape → separate deferred task
-- UI-DESIGN-SYSTEM.md "Block Editor Sidebar" component entry → Brain consolidation session (Desktop, not Code)
+- UI-DESIGN-SYSTEM.md "Block Editor Sidebar" component entry → Brain consolidation session (Desktop edit, not Code)
