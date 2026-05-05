@@ -6,6 +6,83 @@
 
 ---
 
+## Session 23 — EditorPanel v3 Polish + Bot Visits Widget ✅
+
+**Date:** 2026-05-05
+
+### Deliverable
+
+EditorPanel meta box v3 migration (all inline styles → CSS custom properties + BEM classes) and per-post AI bot crawler activity widget.
+
+**What shipped:**
+
+1. **EditorPanel v3 CSS migration:**
+   - All `inline_styles()` hex color values → CSS custom properties in `admin/css/citewp-aiso-admin.css`
+   - Properties scoped to `#citewp_aiso_editor_panel` (top-level ID selector)
+   - `enqueue_styles()` hook added; CSS loaded on `post.php`/`post-new.php` via `admin_enqueue_scripts`
+   - Tokens: `--citewp-navy`, `--citewp-citrine`, `--citewp-white`, `--citewp-smoke`, `--citewp-border`, `--citewp-success`, `--citewp-warning`, `--citewp-alert`, `--citewp-muted`
+
+2. **Tab filter split (FB30 unblock):**
+   - `citewp_aiso/metabox/tabs` filter updated from single call to two contextual calls
+   - `'score'` context: General tab (default)
+   - `'schema'` context: Schema tab
+   - Enables FB30 ("Cite Bridges" schema extensions) to filter tab content per context
+
+3. **Bot Visits data layer:**
+   - `query_bot_visits()`: 7-day window, LIMIT 6 overflow detection, `Schema::table()` helper, GROUP BY bot + vendor
+   - `bot_dot_color()`: crc32 mod palette (assigns stable colors to repeated bot IPs across posts)
+
+4. **Bot Visits widget:**
+   - `render_bot_visits()`: per-post AI crawler activity (GeoIP lookup, bot type, visit count, last seen)
+   - 3-column table: Bot / Visits / Last seen (human_time_diff format)
+   - Overflow: "and N more bots" if >6 unique IPs in 7-day window
+   - Tier disclosure footer (bottom of populated state only): "Shown: top 6 bots by frequency. Include tier status?"
+   - Empty state: "No AI bot visits yet / Most bots discover new posts within 24–72 hours of publishing." — vertically centered in right column, no footer
+
+5. **General tab layout:**
+   - 2-column CSS grid (45/55 split, left: score display, right: Bot Visits widget)
+   - Category rows: visual fill bars (horizontal progress) + percentage label
+   - Revert to 50/50 if Bot Visits visually overpowers score at actual meta box width (monitor post.php screenshot)
+
+6. **Recalculate button rebuild:**
+   - JS helper updated to output bar fill markup during request
+   - Maintains feature parity with S22 Gutenberg sidebar
+
+7. **Composition note — "Last seen" emergent dimension:**
+   - Not in original Q3 spec; emerged from wider-canvas work (meta box can display richer table than sidebar mockup)
+   - Data already available: `MAX(created_at)` in GROUP BY from data layer
+   - No schema change required
+
+**Files changed:**
+- `includes/Admin/EditorPanel.php` — full rewrite (inline_styles deleted, data layer wired, two tabs, Bot Visits widget)
+- `admin/css/citewp-aiso-admin.css` — EditorPanel v3 section appended (~200 lines)
+
+**npm build:** Not required (PHP + CSS only).
+
+**Smoke test:** Manual verification on `post.php` post editor.
+- Score display renders with category bars (fill visual)
+- Bot Visits table populated for test post
+- Recalculate button works, updates live without reload
+- Empty state displays correctly for new/uncrawled posts
+- Responsive: grid stays 2-column above 1024px, consider mobile fallback if needed
+
+**Commit:** Pending — S23 deliverable ready for review.
+
+**Decisions made:** None new.
+
+### Carryover into Session 24
+
+**Next session focus:** llms.txt per-post widget (right panel detail view, FB32).
+
+**Rolling carryover:**
+- WP.org approval → SVN commit (user action)
+- readme.txt polish + WP.org assets
+- Anti-cloaking content (S7)
+- Brain consolidation session
+- P33 (Posts/Pages stat split)
+
+---
+
 ## Session 22 — Gutenberg Sidebar + Schema Suggestions v3 Polish ✅
 
 **Date:** 2026-05-05
