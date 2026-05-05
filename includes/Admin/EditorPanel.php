@@ -46,27 +46,49 @@ final class EditorPanel {
 			return;
 		}
 
-		// Default tabs: General (score) + Schema
-		$default_tabs = [
-			[
-				'slug'   => 'general',
-				'label'  => __( 'General', 'ai-search-optimizer' ),
-				'render' => [ $this, 'render_general_tab' ],
-			],
-			[
-				'slug'   => 'schema',
-				'label'  => __( 'Schema', 'ai-search-optimizer' ),
-				'render' => [ $this, 'render_schema_tab' ],
-			],
-		];
-
 		/**
-		 * Filters the EditorPanel tab definitions. Reserved for Pro tab registration.
+		 * Filters EditorPanel tabs for the score (General) context.
+		 * Add tabs here to appear alongside or after the General tab.
 		 *
 		 * @param array<int, array{slug: string, label: string, render: callable}> $tabs
 		 * @param \WP_Post $post
+		 * @param string   $context Always 'score' for this call.
 		 */
-		$tabs = apply_filters( 'citewp_aiso/metabox/tabs', $default_tabs, $post );
+		$score_tabs = apply_filters(
+			'citewp_aiso/metabox/tabs',
+			[
+				[
+					'slug'   => 'general',
+					'label'  => __( 'General', 'ai-search-optimizer' ),
+					'render' => [ $this, 'render_general_tab' ],
+				],
+			],
+			$post,
+			'score'
+		);
+
+		/**
+		 * Filters EditorPanel tabs for the schema context.
+		 * Add tabs here to appear alongside or after the Schema tab.
+		 *
+		 * @param array<int, array{slug: string, label: string, render: callable}> $tabs
+		 * @param \WP_Post $post
+		 * @param string   $context Always 'schema' for this call.
+		 */
+		$schema_tabs = apply_filters(
+			'citewp_aiso/metabox/tabs',
+			[
+				[
+					'slug'   => 'schema',
+					'label'  => __( 'Schema', 'ai-search-optimizer' ),
+					'render' => [ $this, 'render_schema_tab' ],
+				],
+			],
+			$post,
+			'schema'
+		);
+
+		$tabs = array_merge( $score_tabs, $schema_tabs );
 
 		$box_id = 'citewp-editor-panel-' . $post->ID;
 		?>
