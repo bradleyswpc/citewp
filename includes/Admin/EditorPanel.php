@@ -429,4 +429,107 @@ final class EditorPanel {
 		return $palette[ abs( crc32( $sig ) ) % count( $palette ) ];
 	}
 
+	private function render_bot_visits( \WP_Post $post ): void {
+		$result   = $this->query_bot_visits( $post->ID );
+		$rows     = $result['rows'];
+		$n_more   = $result['n_more'];
+		$has_data = ! empty( $rows );
+
+		// Lucide bot SVG — citrine stroke for icon block, currentColor for empty state
+		$bot_svg_citrine = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#e8d400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
+		$bot_svg_muted   = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
+		?>
+		<div class="citewp-aiso-bv">
+			<div class="citewp-aiso-bv__header">
+				<div class="citewp-aiso-bv__title-wrap">
+					<span class="citewp-aiso-bv__icon">
+						<?php
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						echo $bot_svg_citrine;
+						?>
+					</span>
+					<span class="citewp-aiso-bv__title"><?php esc_html_e( 'Bot Visits', 'ai-search-optimizer' ); ?></span>
+				</div>
+				<span class="citewp-aiso-bv__pill"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
+			</div>
+
+			<?php if ( $has_data ) : ?>
+
+				<table class="citewp-aiso-bv__table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Bot', 'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Visits', 'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Last seen', 'ai-search-optimizer' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ( $rows as $row ) : ?>
+							<?php
+							$dot_color = $this->bot_dot_color( (string) $row->bot_signature );
+							$last_seen = sprintf(
+								/* translators: %s: human-readable time difference, e.g. "2 hours" */
+								__( '%s ago', 'ai-search-optimizer' ),
+								human_time_diff( (int) strtotime( (string) $row->last_seen ), time() )
+							);
+							?>
+							<tr>
+								<td>
+									<div class="citewp-aiso-bv__bot-cell">
+										<span class="citewp-aiso-bv__dot"
+											  style="background:<?php echo esc_attr( $dot_color ); ?>;"
+											  aria-hidden="true"></span>
+										<?php echo esc_html( (string) $row->bot_signature ); ?>
+									</div>
+								</td>
+								<td class="citewp-aiso-bv__visits"><?php echo esc_html( (string) $row->visits ); ?></td>
+								<td><?php echo esc_html( $last_seen ); ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+
+				<?php if ( $n_more > 0 ) : ?>
+					<p class="citewp-aiso-bv__overflow">
+						<?php
+						printf(
+							/* translators: %d: number of additional bot signatures */
+							esc_html__( 'and %d more', 'ai-search-optimizer' ),
+							(int) $n_more
+						);
+						?>
+					</p>
+				<?php endif; ?>
+
+				<p class="citewp-aiso-bv__footer">
+					<?php
+					echo wp_kses(
+						__( 'Free tier shows 7 days of crawler activity. <strong>Pro extends to 90 days.</strong>', 'ai-search-optimizer' ),
+						[ 'strong' => [] ]
+					);
+					?>
+				</p>
+
+			<?php else : ?>
+
+				<div class="citewp-aiso-bv__empty">
+					<div class="citewp-aiso-bv__empty-icon">
+						<?php
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						echo $bot_svg_muted;
+						?>
+					</div>
+					<p class="citewp-aiso-bv__empty-title">
+						<?php esc_html_e( 'No AI bot visits yet', 'ai-search-optimizer' ); ?>
+					</p>
+					<p class="citewp-aiso-bv__empty-desc">
+						<?php esc_html_e( 'Most bots discover new posts within 24–72 hours of publishing.', 'ai-search-optimizer' ); ?>
+					</p>
+				</div>
+
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
 }
