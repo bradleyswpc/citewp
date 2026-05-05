@@ -136,7 +136,6 @@ final class EditorPanel {
 	}
 
 	public function render_general_tab( \WP_Post $post ): void {
-		// Migrated from ScoreMetaBox::render() — score display + recalc button
 		$repo       = new Repository();
 		$data       = $repo->get( $post->ID );
 		$total      = isset( $data['total'] ) ? (int) $data['total'] : null;
@@ -148,58 +147,81 @@ final class EditorPanel {
 		$content_id = 'citewp-ep-general-' . $post->ID;
 		?>
 		<div class="citewp-aiso-ep-general" id="<?php echo esc_attr( $content_id ); ?>">
-			<div class="citewp-aiso-mb-content">
-				<?php if ( $total !== null ) : ?>
-					<div class="citewp-aiso-mb-score">
-						<span class="citewp-aiso-mb-badge citewp-aiso-mb-badge--<?php echo esc_attr( $grade ); ?>">
-							<?php echo esc_html( (string) $total ); ?>
-						</span>
-						<span class="citewp-aiso-mb-total-label"><?php esc_html_e( '/ 100', 'ai-search-optimizer' ); ?></span>
-					</div>
-					<?php if ( ! empty( $categories ) ) : ?>
-						<div class="citewp-aiso-mb-categories">
-							<?php foreach ( $categories as $cat ) : ?>
-								<?php if ( ! is_array( $cat ) ) { continue; } ?>
-								<div class="citewp-aiso-mb-cat-row">
-									<span class="citewp-aiso-mb-cat-label"><?php echo esc_html( (string) ( $cat['label'] ?? '' ) ); ?></span>
-									<span class="citewp-aiso-mb-cat-score">
-										<?php echo esc_html( ( $cat['score'] ?? 0 ) . ' / ' . ( $cat['max'] ?? 0 ) ); ?>
-									</span>
+			<div class="citewp-aiso-ep-columns">
+
+				<div class="citewp-aiso-ep-col-left">
+					<div class="citewp-aiso-mb-content">
+						<?php if ( $total !== null ) : ?>
+							<div class="citewp-aiso-mb-score">
+								<span class="citewp-aiso-mb-badge citewp-aiso-mb-badge--<?php echo esc_attr( $grade ); ?>">
+									<?php echo esc_html( (string) $total ); ?>
+								</span>
+								<span class="citewp-aiso-mb-total-label"><?php esc_html_e( '/ 100', 'ai-search-optimizer' ); ?></span>
+							</div>
+							<?php if ( ! empty( $categories ) ) : ?>
+								<div class="citewp-aiso-mb-categories">
+									<?php foreach ( $categories as $cat ) : ?>
+										<?php
+										if ( ! is_array( $cat ) ) {
+											continue;
+										}
+										$score = (int) ( $cat['score'] ?? 0 );
+										$max   = (int) ( $cat['max'] ?? 0 );
+										$pct   = $max > 0 ? (int) round( ( $score / $max ) * 100 ) : 0;
+										?>
+										<div class="citewp-aiso-mb-cat-row">
+											<span class="citewp-aiso-mb-cat-label">
+												<?php echo esc_html( (string) ( $cat['label'] ?? '' ) ); ?>
+											</span>
+											<div class="citewp-aiso-mb-cat-bar-wrap">
+												<div class="citewp-aiso-mb-cat-bar-fill"
+													 style="width:<?php echo esc_attr( (string) $pct ); ?>%"></div>
+											</div>
+											<span class="citewp-aiso-mb-cat-score">
+												<?php echo esc_html( $score . '/' . $max ); ?>
+											</span>
+										</div>
+									<?php endforeach; ?>
 								</div>
-							<?php endforeach; ?>
-						</div>
-					<?php endif; ?>
-					<?php
-					$ts = $scored_at && is_string( $scored_at ) ? strtotime( $scored_at ) : false;
-					if ( false !== $ts ) :
-					?>
-						<p class="citewp-aiso-mb-time">
+							<?php endif; ?>
 							<?php
-							printf(
-								/* translators: %s: human-readable time difference */
-								esc_html__( 'Scored %s ago', 'ai-search-optimizer' ),
-								esc_html( human_time_diff( $ts, time() ) )
-							);
+							$ts = $scored_at && is_string( $scored_at ) ? strtotime( $scored_at ) : false;
+							if ( false !== $ts ) :
 							?>
-						</p>
-					<?php endif; ?>
-				<?php else : ?>
-					<p class="citewp-aiso-mb-empty">
-						<?php esc_html_e( 'Score not yet calculated.', 'ai-search-optimizer' ); ?>
+								<p class="citewp-aiso-mb-time">
+									<?php
+									printf(
+										/* translators: %s: human-readable time difference */
+										esc_html__( 'Scored %s ago', 'ai-search-optimizer' ),
+										esc_html( human_time_diff( $ts, time() ) )
+									);
+									?>
+								</p>
+							<?php endif; ?>
+						<?php else : ?>
+							<p class="citewp-aiso-mb-empty">
+								<?php esc_html_e( 'Score not yet calculated.', 'ai-search-optimizer' ); ?>
+							</p>
+						<?php endif; ?>
+					</div>
+					<p class="citewp-aiso-mb-action">
+						<button type="button"
+								class="button button-secondary citewp-aiso-recalc-btn"
+								data-nonce="<?php echo esc_attr( $nonce ); ?>"
+								data-url="<?php echo esc_url( $recalc_url ); ?>">
+							<?php esc_html_e( 'Recalculate', 'ai-search-optimizer' ); ?>
+						</button>
 					</p>
-				<?php endif; ?>
+					<p class="citewp-aiso-recalc-error" style="display:none;">
+						<?php esc_html_e( 'Recalculation failed — please try again.', 'ai-search-optimizer' ); ?>
+					</p>
+				</div>
+
+				<div class="citewp-aiso-ep-col-right">
+					<?php $this->render_bot_visits( $post ); ?>
+				</div>
+
 			</div>
-			<p class="citewp-aiso-mb-action">
-				<button type="button"
-				        class="button button-secondary citewp-aiso-recalc-btn"
-				        data-nonce="<?php echo esc_attr( $nonce ); ?>"
-				        data-url="<?php echo esc_url( $recalc_url ); ?>">
-					<?php esc_html_e( 'Recalculate', 'ai-search-optimizer' ); ?>
-				</button>
-			</p>
-			<p class="citewp-aiso-recalc-error" style="display:none;">
-				<?php esc_html_e( 'Recalculation failed — please try again.', 'ai-search-optimizer' ); ?>
-			</p>
 		</div>
 		<script>
 		(function() {
@@ -217,7 +239,7 @@ final class EditorPanel {
 
 			btn.addEventListener( 'click', function() {
 				var origText = btn.textContent;
-				btn.disabled = true;
+				btn.disabled    = true;
 				btn.textContent = <?php echo wp_json_encode( __( 'Recalculating…', 'ai-search-optimizer' ) ); ?>;
 				errEl.style.display = 'none';
 
@@ -238,9 +260,13 @@ final class EditorPanel {
 						html += '<div class="citewp-aiso-mb-categories">';
 						[ 'structure', 'citability', 'authority' ].forEach( function( k ) {
 							if ( cats[ k ] ) {
+								var score = cats[k].score ?? 0;
+								var max   = cats[k].max   ?? 0;
+								var pct   = max ? Math.round( ( score / max ) * 100 ) : 0;
 								html += '<div class="citewp-aiso-mb-cat-row">'
-								      + '<span class="citewp-aiso-mb-cat-label">' + esc(cats[ k ].label ?? '') + '</span>'
-								      + '<span class="citewp-aiso-mb-cat-score">' + esc(String(cats[ k ].score ?? 0)) + ' / ' + esc(String(cats[ k ].max ?? 0)) + '</span>'
+								      + '<span class="citewp-aiso-mb-cat-label">' + esc( cats[k].label ?? '' ) + '</span>'
+								      + '<div class="citewp-aiso-mb-cat-bar-wrap"><div class="citewp-aiso-mb-cat-bar-fill" style="width:' + pct + '%"></div></div>'
+								      + '<span class="citewp-aiso-mb-cat-score">' + esc( String(score) ) + '/' + esc( String(max) ) + '</span>'
 								      + '</div>';
 							}
 						} );
