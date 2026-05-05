@@ -377,12 +377,7 @@ function SchemaSuggestions() {
 function SchemaTypeRow( { label, detected, generated, inserted, inserting, onInsert, emptyMessage } ) {
 	if ( ! generated && ! detected ) {
 		return emptyMessage ? (
-			<div style={ {
-				padding: '6px 0',
-				borderTop: '1px solid #f3f4f6',
-				color: '#9ca3af',
-				fontSize: 12,
-			} }>
+			<div className="citewp-aiso-sidebar-schema-row__empty">
 				{ emptyMessage }
 			</div>
 		) : null;
@@ -390,17 +385,10 @@ function SchemaTypeRow( { label, detected, generated, inserted, inserting, onIns
 
 	let action;
 	if ( detected || inserted ) {
-		const label2 = ( inserted && ! detected ) ? '✓ Added' : 'Already detected';
+		const statusLabel = ( inserted && ! detected ) ? '✓ Added' : 'Already detected';
 		action = (
-			<span style={ {
-				background: '#f0fdf4',
-				color: '#16a34a',
-				fontSize: 11,
-				padding: '2px 8px',
-				borderRadius: 9999,
-				fontWeight: 600,
-			} }>
-				{ label2 }
+			<span className="citewp-aiso-sidebar-schema-row__pill">
+				{ statusLabel }
 			</span>
 		);
 	} else {
@@ -418,14 +406,8 @@ function SchemaTypeRow( { label, detected, generated, inserted, inserting, onIns
 	}
 
 	return (
-		<div style={ {
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'space-between',
-			padding: '8px 0',
-			borderTop: '1px solid #f3f4f6',
-		} }>
-			<span style={ { fontWeight: 600 } }>{ label }</span>
+		<div className="citewp-aiso-sidebar-schema-row">
+			<span className="citewp-aiso-sidebar-schema-row__label">{ label }</span>
 			{ action }
 		</div>
 	);
