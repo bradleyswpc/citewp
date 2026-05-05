@@ -6,6 +6,67 @@
 
 ---
 
+## Session 22 — Gutenberg Sidebar + Schema Suggestions v3 Polish ✅
+
+**Date:** 2026-05-05
+
+### Deliverable
+
+Full v3 polish of both Gutenberg registered plugins in `src/sidebar/index.js`:
+
+- **Cite Score PluginSidebar:** label "CiteWP GEO Score" → "Cite Score", `chartBar` → `CiteWPIcon` (inline `[A]` SVG, P37-compliant `system-ui` font), all inline styles → BEM class names, `GRADE_COLORS` deleted, grade/status strings drive CSS modifier classes.
+- **Schema Suggestions PluginDocumentSettingPanel:** `ARTICLE_VARIANTS` deleted, `SCHEMA_TYPES` data-driven array introduced, `SchemaTypeRow` all inline styles → BEM classes, `otherDetected` trailing block with `Question` exclusion (verified against `Generator.php::collect_root_types()`).
+- **`src/sidebar/style.scss` (new):** P38 palette tokens (`$citewp-score-green: #00A32A` etc.), JetBrains Mono 400 `@font-face` (required here because `enqueue_block_editor_assets` ≠ `admin_enqueue_scripts`), all BEM block/element/modifier definitions.
+- **`includes/Admin/EditorAssets.php`:** `wp_enqueue_style()` added with `filemtime()`-based cache busting.
+
+**CSS output filename:** `build/style-index.css` (not `index.css` — `@wordpress/scripts` uses `style-index` for SCSS extracted via entry point). Font copied to `build/fonts/jetbrains-mono-400.2fe080a3.woff2`.
+
+**Font path fix (auto-corrected by SA2):** `../admin/fonts/` → `../../admin/fonts/` (correct relative path from `src/sidebar/`).
+
+**Browser verification (DevTools):**
+- Citability bar (30/40 = 75%): class `citewp-aiso-sidebar-category__fill--yellow`, computed bg `rgb(219, 166, 23)` = `#DBA617`. Correct per 80/60/40 ramp. No bugs.
+- Sidebar label: "Cite Score", icon: `[A]` yellow square confirmed.
+
+**Files modified/created:**
+- `src/sidebar/index.js` — 9 refactor commits (Tasks 1–9)
+- `src/sidebar/style.scss` — created
+- `includes/Admin/EditorAssets.php` — `wp_enqueue_style` added
+- `build/style-index.css`, `build/style-index-rtl.css`, `build/fonts/jetbrains-mono-400.2fe080a3.woff2` — generated
+
+**npm build:** Required and completed. Build clean.
+
+**Commits:** 15 commits — `a1c6f16` through `a1ef65c` — pushed to `origin/main`.
+
+**Decisions made:**
+- CSS output filename is `style-index.css` for SCSS-via-entry-point (not `index.css`)
+- `filemtime()` used for CSS version (JS `index.asset.php` hash does not reflect SCSS-only changes)
+- `STATUS_ICONS` characters stay in DOM (not moved to CSS `::before`) for screen reader compatibility
+
+### Carryover into Session 23
+
+**Next session focus:** EditorPanel PHP meta box v3 polish.
+
+**Deferred from this session:**
+- FB29 new schema types (HowTo, Product, LocalBusiness)
+- FB30 Cite Bridges tab
+- FB34 Global meta defaults
+- Score gauge SVG in sidebar
+- Cite Score badge rectangular shape
+- UI-DESIGN-SYSTEM.md "Block Editor Sidebar" component entry → Brain consolidation session
+
+**Rolling carryover:**
+- WP.org approval → SVN commit (user action — check hello@citewp.com)
+- readme.txt polish + WP.org assets
+- Anti-cloaking content (S7)
+- "Suggest a Feature" link in admin
+- Page-builder canvas-mode awareness surface
+- Per-post surface consolidation doc
+- Brain consolidation session
+- Needs Attention "what's wrong" reasoning logic
+- P33 (Posts/Pages stat split)
+
+---
+
 ## Session 21 — Cite Score smoke test + Dashboard/Cite Score CSS polish ✅
 
 **Date:** 2026-05-04
