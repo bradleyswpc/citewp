@@ -40,9 +40,8 @@ EditorPanel meta box v3 migration (all inline styles → CSS custom properties +
    - Empty state: "No AI bot visits yet / Most bots discover new posts within 24–72 hours of publishing." — vertically centered in right column, no footer
 
 5. **General tab layout:**
-   - 2-column CSS grid (45/55 split, left: score display, right: Bot Visits widget)
-   - Category rows: visual fill bars (horizontal progress) + percentage label
-   - Revert to 50/50 if Bot Visits visually overpowers score at actual meta box width (monitor post.php screenshot)
+   - 2-column CSS grid (50/50 split, left: score display, right: Bot Visits widget)
+   - Category rows: visual fill bars (horizontal progress) with grade-specific colors (green/yellow/orange/red, thresholds ≥80/≥60/≥40/else) matching S22 sidebar pattern
 
 6. **Recalculate button rebuild:**
    - JS helper updated to output bar fill markup during request
@@ -66,7 +65,13 @@ EditorPanel meta box v3 migration (all inline styles → CSS custom properties +
 - Empty state displays correctly for new/uncrawled posts
 - Responsive: grid stays 2-column above 1024px, consider mobile fallback if needed
 
-**Commit:** Pending — S23 deliverable ready for review.
+**Commits:** 7 commits shipped and pushed to `origin/main`.
+
+**Post-ship fixes (same session):** Two issues caught during browser verification:
+- Column ratio changed from 45/55 → 50/50 (45/55 gave Bot Visits too much visual weight)
+- Category bar colors: initial implementation used flat `--citewp-navy`; fixed to emit grade modifier classes (`citewp-aiso-mb-cat-bar-fill--{grade}`) with grade computed from pct thresholds (≥80/≥60/≥40/else), matching S22 sidebar pattern. Both PHP render and JS recalculate rebuild updated.
+
+**X20 pipeline gap flagged:** Both post-ship issues (column ratio, bar modifier classes) should have been caught by an X20 component spec compliance audit comparing rendered output against UI-DESIGN-SYSTEM.md before manual browser verification. X20 was not explicitly run in the S23 execution pipeline. S24 plan should include an X20 audit step between code-reviewer and smoke test.
 
 **Decisions made:** None new.
 
