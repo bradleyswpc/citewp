@@ -35,5 +35,15 @@ final class EditorAssets {
 			$asset['version']      ?? CITEWP_AISO_VERSION,
 			true
 		);
+
+		$css_path    = CITEWP_AISO_PLUGIN_DIR . 'build/style-index.css';
+		$css_version = file_exists( $css_path ) ? filemtime( $css_path ) : CITEWP_AISO_VERSION;
+
+		wp_enqueue_style(
+			'citewp-aiso-sidebar',
+			CITEWP_AISO_PLUGIN_URL . 'build/style-index.css',
+			[],
+			$css_version
+		);
 	}
 }
