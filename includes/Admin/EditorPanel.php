@@ -5,6 +5,7 @@ namespace CiteWP\Aiso\Admin;
 
 use CiteWP\Aiso\Scoring\Repository;
 use CiteWP\Aiso\Schema\Generator;
+use CiteWP\Aiso\Database\Schema;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -376,6 +377,56 @@ final class EditorPanel {
 		})();
 		</script>
 		<?php
+	}
+
+	/**
+	 * @return array{rows: list<object>, n_more: int}
+	 */
+	private function query_bot_visits( int $post_id ): array {
+		global $wpdb;
+
+		$table = Schema::table( 'citewp_aiso_crawler_logs' );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT bot_signature, COUNT(*) AS visits, MAX(created_at) AS last_seen
+				 FROM {$table}
+				 WHERE post_id = %d
+				   AND created_at > NOW() - INTERVAL 7 DAY
+				 GROUP BY bot_signature
+				 ORDER BY visits DESC
+				 LIMIT 6",
+				$post_id
+			)
+		);
+
+		if ( null === $rows ) {
+			return [ 'rows' => [], 'n_more' => 0 ];
+		}
+
+		$n_more = 0;
+		if ( count( $rows ) === 6 ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$total  = (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(DISTINCT bot_signature)
+					 FROM {$table}
+					 WHERE post_id = %d
+					   AND created_at > NOW() - INTERVAL 7 DAY",
+					$post_id
+				)
+			);
+			$n_more = max( 0, $total - 5 );
+			$rows   = array_slice( $rows, 0, 5 );
+		}
+
+		return [ 'rows' => $rows, 'n_more' => $n_more ];
+	}
+
+	private function bot_dot_color( string $sig ): string {
+		$palette = [ '#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6' ];
+		return $palette[ abs( crc32( $sig ) ) % count( $palette ) ];
 	}
 
 }
