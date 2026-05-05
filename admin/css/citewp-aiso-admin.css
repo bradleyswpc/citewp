@@ -2427,3 +2427,313 @@
   text-align: center;
   margin-top: var(--sp-3);
 }
+
+/* =============================================================================
+   EditorPanel v3 — meta box (post.php / post-new.php)
+   Token definitions are scoped here; not shared with Gutenberg sidebar.
+   ============================================================================= */
+
+#citewp_aiso_editor_panel {
+	--citewp-navy: #1e2a3b;
+	--citewp-citrine: #e8d400;
+	--citewp-border: #e5e7eb;
+	--citewp-text-muted: #9ca3af;
+	--citewp-text-secondary: #374151;
+	--citewp-text-primary: #111827;
+	--citewp-score-green: #00A32A;
+	--citewp-score-yellow: #DBA617;
+	--citewp-score-orange: #D63638;
+	--citewp-score-red: #8C1B1B;
+}
+
+/* --- Tabs ------------------------------------------------------------------ */
+#citewp_aiso_editor_panel .citewp-aiso-ep__tabs {
+	display: flex;
+	gap: 0;
+	border-bottom: 2px solid var(--citewp-border);
+	margin-bottom: 12px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-ep__tab {
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--citewp-text-muted);
+	cursor: pointer;
+}
+#citewp_aiso_editor_panel .citewp-aiso-ep__tab.is-active {
+	color: var(--citewp-navy);
+	border-bottom-color: var(--citewp-citrine);
+}
+#citewp_aiso_editor_panel .citewp-aiso-ep__panel { display: none; }
+#citewp_aiso_editor_panel .citewp-aiso-ep__panel.is-active { display: block; }
+
+/* --- 2-column General tab grid --------------------------------------------- */
+#citewp_aiso_editor_panel .citewp-aiso-ep-columns {
+	display: grid;
+	grid-template-columns: 45% 55%;
+	min-height: 160px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-ep-col-left {
+	padding-right: 24px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-ep-col-right {
+	border-left: 1px solid var(--citewp-border);
+	padding-left: 24px;
+	display: flex;
+	flex-direction: column;
+}
+
+/* --- Score badge ----------------------------------------------------------- */
+#citewp_aiso_editor_panel .citewp-aiso-mb-score {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-badge {
+	font-size: 48px;
+	font-weight: 800;
+	line-height: 1;
+	font-family: 'JetBrains Mono', monospace;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-badge--green  { color: var(--citewp-score-green); }
+#citewp_aiso_editor_panel .citewp-aiso-mb-badge--yellow { color: var(--citewp-score-yellow); }
+#citewp_aiso_editor_panel .citewp-aiso-mb-badge--orange { color: var(--citewp-score-orange); }
+#citewp_aiso_editor_panel .citewp-aiso-mb-badge--red    { color: var(--citewp-score-red); }
+#citewp_aiso_editor_panel .citewp-aiso-mb-total-label {
+	font-size: 13px;
+	color: var(--citewp-text-muted);
+}
+
+/* --- Category rows with bar fill ------------------------------------------ */
+#citewp_aiso_editor_panel .citewp-aiso-mb-categories {
+	border-top: 1px solid var(--citewp-border);
+	padding-top: 8px;
+	margin-bottom: 8px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 3px 0;
+	font-size: 12px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-label {
+	color: var(--citewp-text-secondary);
+	width: 72px;
+	flex-shrink: 0;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-bar-wrap {
+	flex: 1;
+	height: 4px;
+	background: var(--citewp-border);
+	border-radius: 2px;
+	overflow: hidden;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-bar-fill {
+	height: 100%;
+	background: var(--citewp-navy);
+	border-radius: 2px;
+	transition: width 0.3s ease;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-cat-score {
+	color: var(--citewp-text-primary);
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	width: 36px;
+	text-align: right;
+	flex-shrink: 0;
+}
+
+/* --- Scored time, empty, action ------------------------------------------- */
+#citewp_aiso_editor_panel .citewp-aiso-mb-time {
+	font-size: 11px;
+	color: var(--citewp-text-muted);
+	margin: 0 0 8px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-empty {
+	font-size: 12px;
+	color: var(--citewp-text-muted);
+	margin: 0 0 8px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-action { margin: 8px 0 0; }
+#citewp_aiso_editor_panel .citewp-aiso-recalc-error {
+	font-size: 12px;
+	color: var(--citewp-score-orange);
+	margin: 4px 0 0;
+}
+
+/* --- Schema tab ------------------------------------------------------------ */
+#citewp_aiso_editor_panel .citewp-aiso-mb-schema-row { margin-bottom: 10px; }
+#citewp_aiso_editor_panel .citewp-aiso-mb-schema-label {
+	display: block;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--citewp-text-secondary);
+	margin-bottom: 4px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-detected {
+	font-size: 12px;
+	color: var(--citewp-score-green);
+	font-weight: 600;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-empty-note {
+	font-size: 12px;
+	color: var(--citewp-text-muted);
+}
+#citewp_aiso_editor_panel .citewp-aiso-copy-btn { font-size: 12px; }
+#citewp_aiso_editor_panel .citewp-aiso-mb-copy-note {
+	display: none;
+	font-size: 11px;
+	color: var(--citewp-text-muted);
+	margin-top: 6px;
+	line-height: 1.5;
+}
+#citewp_aiso_editor_panel .citewp-aiso-mb-other-types {
+	font-size: 11px;
+	color: var(--citewp-text-muted);
+	margin: 8px 0 0;
+	border-top: 1px solid var(--citewp-border);
+	padding-top: 8px;
+}
+
+/* --- Bot Visits section ---------------------------------------------------- */
+#citewp_aiso_editor_panel .citewp-aiso-bv {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-top: 1px solid var(--citewp-border);
+	padding-top: 10px;
+	margin-bottom: 10px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__title-wrap {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	background: var(--citewp-navy);
+	border-radius: 3px;
+	flex-shrink: 0;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__icon svg {
+	width: 12px;
+	height: 12px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__title {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--citewp-text-primary);
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__pill {
+	font-size: 11px;
+	color: var(--citewp-text-muted);
+	background: #f3f4f6;
+	padding: 2px 8px;
+	border-radius: 10px;
+}
+
+/* --- Bot Visits table ------------------------------------------------------ */
+#citewp_aiso_editor_panel .citewp-aiso-bv__table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+	flex: 1;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__table th {
+	text-align: left;
+	font-weight: 600;
+	color: var(--citewp-text-muted);
+	font-size: 11px;
+	padding: 0 0 6px;
+	border-bottom: 1px solid var(--citewp-border);
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__table th:last-child,
+#citewp_aiso_editor_panel .citewp-aiso-bv__table td:last-child { text-align: right; }
+#citewp_aiso_editor_panel .citewp-aiso-bv__table td {
+	padding: 5px 0;
+	color: var(--citewp-text-secondary);
+	border-bottom: 1px solid var(--citewp-border);
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__table tr:last-child td { border-bottom: none; }
+#citewp_aiso_editor_panel .citewp-aiso-bv__bot-cell {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__visits { font-variant-numeric: tabular-nums; }
+#citewp_aiso_editor_panel .citewp-aiso-bv__overflow {
+	font-size: 11px;
+	color: var(--citewp-text-muted);
+	margin: 6px 0 0;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__footer {
+	font-size: 11px;
+	color: var(--citewp-text-muted);
+	margin: 8px 0 0;
+	padding-top: 8px;
+	border-top: 1px solid var(--citewp-border);
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__footer strong {
+	font-weight: 600;
+	color: var(--citewp-text-secondary);
+}
+
+/* --- Bot Visits empty state ------------------------------------------------ */
+#citewp_aiso_editor_panel .citewp-aiso-bv__empty {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 16px 0;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__empty-icon {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: #f3f4f6;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 8px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__empty-icon svg {
+	width: 18px;
+	height: 18px;
+	color: var(--citewp-text-muted);
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__empty-title {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--citewp-text-primary);
+	margin: 0 0 4px;
+}
+#citewp_aiso_editor_panel .citewp-aiso-bv__empty-desc {
+	font-size: 11px;
+	color: var(--citewp-text-muted);
+	margin: 0;
+	line-height: 1.5;
+	max-width: 220px;
+}

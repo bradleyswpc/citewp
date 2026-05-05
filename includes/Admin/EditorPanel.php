@@ -10,8 +10,20 @@ defined( 'ABSPATH' ) || exit;
 
 final class EditorPanel {
 	public function register(): void {
-		add_action( 'add_meta_boxes', [ $this, 'register_meta_box' ], 20 );
-		add_action( 'admin_head',     [ $this, 'inline_styles' ] );
+		add_action( 'add_meta_boxes',        [ $this, 'register_meta_box' ], 20 );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_styles' ] );
+	}
+
+	public function enqueue_styles( string $hook ): void {
+		if ( $hook !== 'post.php' && $hook !== 'post-new.php' ) {
+			return;
+		}
+		wp_enqueue_style(
+			'citewp-aiso-editor-panel',
+			CITEWP_AISO_PLUGIN_URL . 'admin/css/citewp-aiso-admin.css',
+			[],
+			CITEWP_AISO_VERSION
+		);
 	}
 
 	public function register_meta_box( string $post_type = '' ): void {
@@ -344,44 +356,4 @@ final class EditorPanel {
 		<?php
 	}
 
-	public function inline_styles(): void {
-		$screen = get_current_screen();
-		if ( ! $screen || $screen->base !== 'post' || ! in_array( $screen->post_type, [ 'post', 'page' ], true ) ) {
-			return;
-		}
-		?>
-		<style>
-			/* EditorPanel tabs */
-			#citewp_aiso_editor_panel .citewp-aiso-ep__tabs { display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; margin-bottom: 12px; }
-			#citewp_aiso_editor_panel .citewp-aiso-ep__tab { background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #6b7280; cursor: pointer; }
-			#citewp_aiso_editor_panel .citewp-aiso-ep__tab.is-active { color: #1e2a3b; border-bottom-color: #e8d400; }
-			#citewp_aiso_editor_panel .citewp-aiso-ep__panel { display: none; }
-			#citewp_aiso_editor_panel .citewp-aiso-ep__panel.is-active { display: block; }
-			/* Score display */
-			#citewp_aiso_editor_panel .citewp-aiso-mb-score { display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-badge { font-size: 48px; font-weight: 800; line-height: 1; font-family: 'JetBrains Mono', monospace; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-badge--green  { color: #00A32A; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-badge--yellow { color: #DBA617; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-badge--orange { color: #D63638; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-badge--red    { color: #8C1B1B; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-total-label { font-size: 13px; color: #6b7280; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-categories { border-top: 1px solid #e5e7eb; padding-top: 8px; margin-bottom: 8px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-cat-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-cat-label { color: #374151; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-cat-score { color: #111827; font-weight: 600; font-variant-numeric: tabular-nums; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-time { font-size: 11px; color: #9ca3af; margin: 0 0 8px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-empty { font-size: 12px; color: #6b7280; margin: 0 0 8px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-action { margin: 8px 0 0; }
-			#citewp_aiso_editor_panel .citewp-aiso-recalc-error { font-size: 12px; color: #D63638; margin: 4px 0 0; }
-			/* Schema tab */
-			#citewp_aiso_editor_panel .citewp-aiso-mb-schema-row { margin-bottom: 10px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-schema-label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-detected { font-size: 12px; color: #00A32A; font-weight: 600; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-empty-note { font-size: 12px; color: #9ca3af; }
-			#citewp_aiso_editor_panel .citewp-aiso-copy-btn { font-size: 12px; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-copy-note { display: none; font-size: 11px; color: #6b7280; margin-top: 6px; line-height: 1.5; }
-			#citewp_aiso_editor_panel .citewp-aiso-mb-other-types { font-size: 11px; color: #6b7280; margin: 8px 0 0; border-top: 1px solid #e5e7eb; padding-top: 8px; }
-		</style>
-		<?php
-	}
 }
