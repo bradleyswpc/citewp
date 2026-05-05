@@ -4,7 +4,7 @@
 
 **Goal:** Rewrite `EditorPanel.php` to add a 2-column General tab (score left / Bot Visits right), migrate all hardcoded hex values to v3 CSS tokens, add category bar fill, add the `$context` arg to the tabs filter, and render per-post AI crawler activity from `wp_citewp_aiso_crawler_logs`.
 
-**Architecture:** All styles move from the `inline_styles()` PHP method to a new section in `admin/css/citewp-aiso-admin.css`, enqueued on `post.php`/`post-new.php` via a new `enqueue_styles()` method on `EditorPanel`. The General tab panel becomes a CSS grid (45% left / 55% right). Bot Visits data comes from a direct `$wpdb` query — no new REST endpoints, no schema changes.
+**Architecture:** All styles move from the `inline_styles()` PHP method to a new section in `admin/css/citewp-aiso-admin.css`, enqueued on `post.php`/`post-new.php` via a new `enqueue_styles()` method on `EditorPanel`. The General tab panel becomes a CSS grid (45% left / 55% right) — 45/55 favors the Bot Visits table which needs horizontal room; if browser verification shows the Bot Visits column visually overpowering the score, revert to 50/50 (see Task 5 Step 2). Bot Visits data comes from a direct `$wpdb` query — no new REST endpoints, no schema changes.
 
 **Tech Stack:** PHP 8.0+, WordPress 6.5+, `$wpdb->prepare()`, `human_time_diff()`, plain CSS grid (no JS framework).
 
@@ -876,7 +876,7 @@ public function render_general_tab( \WP_Post $post ): void {
 }
 ```
 
-- [ ] **Step 2: Verify in browser — golden path**
+- [ ] **Step 2: Verify in browser — golden path + column ratio check**
 
 Open a scored post in Classic Editor (non-Gutenberg). Confirm:
 - 2-column layout renders at meta box width
@@ -884,6 +884,8 @@ Open a scored post in Classic Editor (non-Gutenberg). Confirm:
 - Right column: Bot Visits section (populated table OR empty state depending on data in wp_citewp_aiso_crawler_logs)
 - Column divider line visible between columns
 - "Bot Visits" header with navy icon block + citrine SVG + "Last 7 days" pill
+
+**Column ratio check (design decision):** The grid uses `45% 55%` (favoring Bot Visits). If the Bot Visits column visually overpowers the score — the score feels cramped or subordinate — change `grid-template-columns: 45% 55%` to `grid-template-columns: 50% 50%` in `admin/css/citewp-aiso-admin.css`. 50/50 communicates equal priority; only revert if 45/55 creates imbalance at the actual meta box width.
 
 - [ ] **Step 3: Verify Recalculate JS**
 
