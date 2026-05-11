@@ -368,8 +368,10 @@ final class Menu {
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Across all scored posts', 'ai-search-optimizer' ); ?></div>
 						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
-						<a href="#cite-score" class="citewp-aiso-btn citewp-aiso-btn--dial-inline"><?php esc_html_e( 'View Scores →', 'ai-search-optimizer' ); ?></a>
 					</div>
+				</div>
+				<div class="citewp-aiso-kpi-card__footer">
+					<a href="#cite-score" class="citewp-aiso-btn"><?php esc_html_e( 'View Scores →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
