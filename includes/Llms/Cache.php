@@ -39,6 +39,11 @@ final class Cache {
 		add_action( 'activated_plugin', [ $this, 'flush' ] );
 		add_action( 'deactivated_plugin', [ $this, 'flush' ] );
 		add_action( 'switch_theme', [ $this, 'flush' ] );
+
+		// Flush when the per-post llms.txt toggle is written via any code path.
+		// Covers direct update_post_meta() calls that don't trigger save_post.
+		add_action( 'updated_post_meta', [ $this, 'on_meta_update' ], 10, 3 );
+		add_action( 'added_post_meta',   [ $this, 'on_meta_update' ], 10, 3 );
 	}
 
 	public function get_short(): ?string {
@@ -86,6 +91,27 @@ final class Cache {
 			return;
 		}
 		if ( $post->post_status !== 'publish' ) {
+			return;
+		}
+		$this->flush();
+	}
+
+	/**
+	 * Flush when _citewp_aiso_exclude_from_llms is updated via any path.
+	 *
+	 * Hooks: updated_post_meta, added_post_meta.
+	 * Both fire with ( $meta_id, $object_id, $meta_key, $meta_value ) — we only
+	 * need the first three args to filter by key and check post status.
+	 *
+	 * @param int    $meta_id  wp_postmeta row ID (unused).
+	 * @param int    $post_id  Post being updated.
+	 * @param string $meta_key Meta key that changed.
+	 */
+	public function on_meta_update( int $meta_id, int $post_id, string $meta_key ): void {
+		if ( $meta_key !== '_citewp_aiso_exclude_from_llms' ) {
+			return;
+		}
+		if ( get_post_status( $post_id ) !== 'publish' ) {
 			return;
 		}
 		$this->flush();
