@@ -496,18 +496,6 @@
   flex-shrink: 0;
 }
 
-.citewp-aiso-kpi-card__visual--dial-badge {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  padding: 4px;
-  box-sizing: border-box;
-}
-
-.citewp-cite-score-gauge--mini {
-  width: 100%;
-}
 
 .citewp-aiso-kpi-card__data {
   flex: 1;

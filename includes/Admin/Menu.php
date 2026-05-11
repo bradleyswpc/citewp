@@ -362,18 +362,8 @@ final class Menu {
 		<!-- KPI card row -->
 		<div class="citewp-aiso-kpi-row">
 
-			<!-- Card 1: Site Score Health — mini dial badge -->
-			<?php
-			$kpi_score_color_map = [
-				'green'  => 'var(--citewp-score-green)',
-				'yellow' => 'var(--citewp-score-yellow)',
-				'orange' => 'var(--citewp-score-orange)',
-				'red'    => 'var(--citewp-score-red)',
-				'empty'  => 'var(--citewp-text-muted)',
-			];
-			$kpi_score_grade = $avg_grade ?: 'empty';
-			$kpi_score_color = $kpi_score_color_map[ $kpi_score_grade ] ?? 'var(--citewp-text-muted)';
-			?>
+			<!-- Card 1: Site Score Health -->
+			<?php $kpi_score_grade = $avg_grade ?: 'empty'; ?>
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Site Score Health', 'ai-search-optimizer' ); ?></span>
@@ -383,9 +373,8 @@ final class Menu {
 					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual citewp-aiso-kpi-card__visual--dial-badge"
-					     style="background:color-mix(in srgb, <?php echo esc_attr( $kpi_score_color ); ?> 12%, transparent);color:<?php echo esc_attr( $kpi_score_color ); ?>">
-						<?php ScoreDial::render_mini( $avg_score ?? 0, $kpi_score_grade ); ?>
+					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-purple-tint);color:var(--citewp-tint-purple)">
+						<?php echo IconLibrary::icon( 'gauge', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
