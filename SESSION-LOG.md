@@ -6,6 +6,68 @@
 
 ---
 
+## Session 25 — llms.txt Per-Post Toggle Widget ✅
+
+**Date:** 2026-05-11
+
+### Deliverable
+
+A binary "Include in llms.txt" toggle exposed on every post/page in two surfaces: (A1) Classic Editor "Publishing Controls" meta box section, and (G2) Gutenberg "AI Visibility" `PluginDocumentSettingPanel`. Meta key: `_citewp_aiso_exclude_from_llms` ('1' = exclude, absent/'0' = include). Full X13 pipeline: planning → subagents → spec + quality review → X20 audit → browser verification → smoke test.
+
+**What shipped:**
+
+1. **Post meta registration (`Plugin.php`):**
+   - `register_post_meta_fields()` called on `init`; registers `_citewp_aiso_exclude_from_llms` for `post` and `page` with `type: 'string'`, `show_in_rest: true`, `sanitize_callback: 'sanitize_text_field'`, `auth_callback` checks `edit_post` capability
+
+2. **Cache flush on meta-only updates (`Cache.php`):**
+   - Registered `updated_post_meta` + `added_post_meta` hooks → `on_meta_update()` method
+   - Flushes `citewp_aiso_llms_short` / `_full` transients when `_citewp_aiso_exclude_from_llms` changes on a published post
+   - Belt-and-suspenders alongside existing `on_save_post` (priority 10) flush
+
+3. **Classic Editor "Publishing Controls" section (`EditorPanel.php`):**
+   - `save_meta()` method: DOING_AUTOSAVE guard → nonce verify → capability check → `update_post_meta()`; hooked to `save_post` at priority 20
+   - `render_publishing_controls()`: BEM wrapper `.citewp-aiso-pc`, pill-switch toggle (checkbox + `.citewp-aiso-pc__slider`), label + help text, nonce field; rendered inside `render_general_tab()` via `apply_filters( 'citewp_aiso/publishing_controls/items', [], $post )` for X15 extensibility
+   - `register()`: added `save_post` (priority 20, 2 args) hook
+
+4. **Gutenberg "AI Visibility" panel (`src/sidebar/index.js`):**
+   - `AiVisibility` component: reads `_citewp_aiso_exclude_from_llms` via `getEditedPostAttribute('meta')`, drives `ToggleControl` `checked={isIncluded}`, dispatches `editPost({ meta: { ... } })` on change; uses `?? {}` for null-safe meta access
+   - Registered via `registerPlugin('citewp-aiso-ai-visibility')` → `PluginDocumentSettingPanel`
+
+5. **Publishing Controls CSS (Section 31, `admin/css/citewp-aiso-admin.css`):**
+   - All `.citewp-aiso-pc*` BEM selectors: wrapper, header/title, row, label-wrap, label, help, pill-switch toggle + slider
+   - Also fixed: `--citewp-score-orange: #E86612` (was `#D63638` — wrong red) in both `:root` and scoped `#citewp_aiso_editor_panel` blocks
+
+6. **SCSS token alignment (`src/sidebar/style.scss`):**
+   - `$citewp-score-orange: #E86612` (matched CSS token fix)
+
+**Files created:** None.
+
+**Files modified:**
+- `includes/Plugin.php` — `register_post_meta_fields()` method + `init` hook
+- `includes/Llms/Cache.php` — `on_meta_update()` + two new hook registrations
+- `includes/Admin/EditorPanel.php` — `save_meta()`, `render_publishing_controls()`, updated `register()`
+- `src/sidebar/index.js` — `AiVisibility` component + `registerPlugin`
+- `admin/css/citewp-aiso-admin.css` — Section 31 Publishing Controls CSS + orange token fix
+- `src/sidebar/style.scss` — orange token fix
+
+**npm build:** ✅ Clean — `webpack compiled successfully` (no new warnings).
+
+**Decisions made:** P45 (see DECISIONS.md) — per-post llms.txt toggle placement locked: Classic EditorPanel "Publishing Controls" + Gutenberg "AI Visibility". P46 — `--citewp-score-orange` corrected `#D63638` → `#E86612` (resolves P44 known cleanup).
+
+**Verified:**
+- Classic Editor: toggle renders, saves meta '1'/'0' correctly, cache flushes, llms.txt excludes post ✓
+- Gutenberg: AI Visibility panel renders in Document Settings, ToggleControl reflects live meta, save round-trip works ✓
+- `ContentSelector::is_excluded()` correctly respects meta '1' ✓
+- Browser HTTP cache (`Cache-Control: public, max-age=3600`) was the red herring in earlier testing — `cache: 'reload'` confirmed correct behavior ✓
+- Smoke test: 9/9 applicable steps pass (Step 10 deferred — `uninstall.php` unchanged) ✓
+- `debug.log`: not present (no PHP errors) ✓
+
+**Carryover into next session:** None.
+
+**Next session focus:** TBD — see master file backlog.
+
+---
+
 ## Session 24 — Cite Score KPI Densification + AI Recommendations Filter ✅
 
 **Date:** 2026-05-11
