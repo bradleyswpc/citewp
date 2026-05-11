@@ -431,7 +431,7 @@ registerPlugin( 'citewp-aiso-schema-suggestions', {
 function AiVisibility() {
 	const meta         = useSelect( ( s ) => s( 'core/editor' ).getEditedPostAttribute( 'meta' ) ?? {}, [] );
 	const { editPost } = useDispatch( 'core/editor' );
-	const isIncluded   = ! meta['_citewp_aiso_exclude_from_llms'];
+	const isIncluded   = meta['_citewp_aiso_exclude_from_llms'] !== '1';
 
 	return (
 		<div className="citewp-aiso-ai-visibility">
@@ -440,7 +440,7 @@ function AiVisibility() {
 				help="AI search engines may discover this post via llms.txt. Toggle off to exclude this post from the file."
 				checked={ isIncluded }
 				onChange={ ( newValue ) => {
-					editPost( { meta: { _citewp_aiso_exclude_from_llms: ! newValue } } );
+					editPost( { meta: { _citewp_aiso_exclude_from_llms: newValue ? '0' : '1' } } );
 				} }
 			/>
 		</div>

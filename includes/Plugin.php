@@ -106,10 +106,10 @@ final class Plugin {
 				$post_type,
 				'_citewp_aiso_exclude_from_llms',
 				[
-					'type'              => 'boolean',
+					'type'              => 'string',
 					'single'            => true,
 					'show_in_rest'      => true,
-					'sanitize_callback' => 'rest_sanitize_boolean',
+					'sanitize_callback' => 'sanitize_text_field',
 					'auth_callback'     => static function ( bool $allowed, string $meta_key, int $post_id ): bool {
 						return current_user_can( 'edit_post', $post_id );
 					},
