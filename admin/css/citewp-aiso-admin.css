@@ -373,6 +373,9 @@
 }
 
 .citewp-aiso-hero__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font: 500 12px/1 'Inter', system-ui, -apple-system, sans-serif;
   padding: 6px 14px;
   border-radius: 20px;

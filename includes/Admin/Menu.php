@@ -333,9 +333,18 @@ final class Menu {
 				<h2 class="citewp-aiso-hero__title"><?php echo esc_html( sprintf( __( 'Welcome back, %s 👋', 'ai-search-optimizer' ), $greeting_name ) ); ?></h2>
 				<p class="citewp-aiso-hero__sub"><?php esc_html_e( "Here's how your site is performing in AI search.", 'ai-search-optimizer' ); ?></p>
 				<div class="citewp-aiso-hero__filters">
-					<span class="citewp-aiso-hero__filter is-active"><?php esc_html_e( 'Last 7 Days', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-hero__filter"><?php echo esc_html( number_format_i18n( $unique_bots ) . ' ' . __( 'Bots', 'ai-search-optimizer' ) ); ?></span>
-					<span class="citewp-aiso-hero__filter"><?php echo esc_html( number_format_i18n( $this_week ) . ' ' . __( 'Visits', 'ai-search-optimizer' ) ); ?></span>
+					<span class="citewp-aiso-hero__filter is-active">
+						<?php echo IconLibrary::icon( 'calendar', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php esc_html_e( 'Last 7 Days', 'ai-search-optimizer' ); ?>
+					</span>
+					<span class="citewp-aiso-hero__filter">
+						<?php echo IconLibrary::icon( 'bot', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo esc_html( number_format_i18n( $unique_bots ) . ' ' . __( 'Bots', 'ai-search-optimizer' ) ); ?>
+					</span>
+					<span class="citewp-aiso-hero__filter">
+						<?php echo IconLibrary::icon( 'eye', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo esc_html( number_format_i18n( $this_week ) . ' ' . __( 'Visits', 'ai-search-optimizer' ) ); ?>
+					</span>
 				</div>
 			</div>
 			<div class="citewp-aiso-hero__stats">
