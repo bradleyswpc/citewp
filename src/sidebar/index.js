@@ -429,7 +429,7 @@ registerPlugin( 'citewp-aiso-schema-suggestions', {
 // === AI Visibility — Document Settings panel ===
 
 function AiVisibility() {
-	const meta         = useSelect( ( s ) => s( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {}, [] );
+	const meta         = useSelect( ( s ) => s( 'core/editor' ).getEditedPostAttribute( 'meta' ) ?? {}, [] );
 	const { editPost } = useDispatch( 'core/editor' );
 	const isIncluded   = ! meta['_citewp_aiso_exclude_from_llms'];
 
