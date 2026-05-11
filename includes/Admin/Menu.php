@@ -286,6 +286,7 @@ final class Menu {
 		$lowest_posts = $data->get_lowest_scoring_posts();
 		$issue_count  = $data->get_issue_count();
 		$top_crawlers = $data->get_top_crawlers( 5 );
+		$unique_bots  = $data->get_unique_bot_count();
 
 		$avg_grade = 'empty';
 		if ( $avg_score !== null ) {
@@ -332,9 +333,9 @@ final class Menu {
 				<h2 class="citewp-aiso-hero__title"><?php echo esc_html( sprintf( __( 'Welcome back, %s 👋', 'ai-search-optimizer' ), $greeting_name ) ); ?></h2>
 				<p class="citewp-aiso-hero__sub"><?php esc_html_e( "Here's how your site is performing in AI search.", 'ai-search-optimizer' ); ?></p>
 				<div class="citewp-aiso-hero__filters">
-					<button class="citewp-aiso-hero__filter is-active"><?php esc_html_e( '7 Days', 'ai-search-optimizer' ); ?></button>
-					<button class="citewp-aiso-hero__filter"><?php esc_html_e( '30 Days', 'ai-search-optimizer' ); ?></button>
-					<button class="citewp-aiso-hero__filter"><?php esc_html_e( 'All Time', 'ai-search-optimizer' ); ?></button>
+					<span class="citewp-aiso-hero__filter is-active"><?php esc_html_e( 'Last 7 Days', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-hero__filter"><?php echo esc_html( number_format_i18n( $unique_bots ) . ' ' . __( 'Bots', 'ai-search-optimizer' ) ); ?></span>
+					<span class="citewp-aiso-hero__filter"><?php echo esc_html( number_format_i18n( $this_week ) . ' ' . __( 'Visits', 'ai-search-optimizer' ) ); ?></span>
 				</div>
 			</div>
 			<div class="citewp-aiso-hero__stats">

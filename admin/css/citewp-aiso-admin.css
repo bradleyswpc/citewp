@@ -378,14 +378,6 @@
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.65);
-  border: none;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
-
-.citewp-aiso-hero__filter:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--citewp-white);
 }
 
 .citewp-aiso-hero__filter.is-active {

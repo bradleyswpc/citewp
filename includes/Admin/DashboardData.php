@@ -96,6 +96,24 @@ final class DashboardData {
 		return [ 'this_week' => $this_week, 'last_week' => $last_week ];
 	}
 
+	public function get_unique_bot_count(): int {
+		global $wpdb;
+
+		$table     = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
+		$seven_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table is esc_sql() of a hardcoded constant. Real-time widget data.
+		$count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(DISTINCT bot_name) FROM {$table} WHERE detected_at >= %s",
+				$seven_ago
+			)
+		);
+		// phpcs:enable
+
+		return $count;
+	}
+
 	/**
 	 * @return \WP_Post[]
 	 */
