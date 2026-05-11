@@ -2316,6 +2316,14 @@
   margin-top: 2px;
 }
 
+/* Empty state inside AI Recommendations nested-bottom */
+.citewp-aiso-cs-rec-empty {
+  font: 400 13px/1.5 'Inter', system-ui, sans-serif;
+  color: var(--citewp-text-muted);
+  padding: var(--sp-2) 0;
+  margin: 0;
+}
+
 /* ── Post-Level Score Table ── */
 .citewp-aiso-cs-table-wrap {
   background: var(--citewp-paper);

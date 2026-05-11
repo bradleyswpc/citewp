@@ -84,6 +84,9 @@ final class Plugin {
 
 			$this->modules['editor_panel'] = new Admin\EditorPanel();
 			$this->modules['editor_panel']->register();
+
+			$this->modules['recommendation_filter'] = new Admin\RecommendationFilter();
+			$this->modules['recommendation_filter']->register();
 		}
 	}
 

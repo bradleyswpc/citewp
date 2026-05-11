@@ -1205,7 +1205,25 @@ final class Menu {
 				'authority'  => [ 'bg' => 'rgba(20,184,166,0.12)',  'color' => 'var(--citewp-tint-teal)',   'icon' => 'shield'   ],
 				''           => [ 'bg' => 'rgba(100,116,139,0.12)', 'color' => 'var(--citewp-text-muted)',  'icon' => 'sparkles' ],
 			];
-			$recs_count = count( array_filter( $recs_display, static fn( $r ) => isset( $r['label'] ) && $r['label'] !== __( 'Keep publishing', 'ai-search-optimizer' ) ) );
+			// Pre-compute exact affected-post counts so button labels and card
+			// visibility are accurate (uses full meta scan, not the 50-post sample).
+			$displayable_recs = [];
+			foreach ( $recs_display as $idx => $rec ) {
+				$sig_id = $top_rec_ids[ $idx ] ?? '';
+				if ( '' === $sig_id ) {
+					continue;
+				}
+				$cnt = count( RecommendationFilter::get_affected_ids( $sig_id ) );
+				if ( $cnt > 0 ) {
+					$displayable_recs[] = [
+						'rec'       => $rec,
+						'signal_id' => $sig_id,
+						'count'     => $cnt,
+					];
+				}
+			}
+
+			$recs_count  = count( array_filter( $recs_display, static fn( $r ) => isset( $r['label'] ) && $r['label'] !== __( 'Keep publishing', 'ai-search-optimizer' ) ) );
 			$cs_recs_url = admin_url( 'edit.php' );
 			?>
 			<!-- Panel 3: AI Recommendations (uses citewp-aiso-insights class — same as Dashboard AI Insights) -->
@@ -1239,12 +1257,27 @@ final class Menu {
 							</div>
 						</div>
 						<div class="citewp-aiso-insights__nested-bottom">
-							<?php foreach ( $recs_display as $idx => $rec ) :
-								$rec_signal_id = $top_rec_ids[ $idx ] ?? '';
-								$fail_count    = $signal_fails[ $rec_signal_id ] ?? 0;
+							<?php if ( empty( $displayable_recs ) ) : ?>
+							<p class="citewp-aiso-cs-rec-empty"><?php esc_html_e( 'No recommendations right now. Your content is well-optimized for AI citation.', 'ai-search-optimizer' ); ?></p>
+							<?php else : ?>
+							<?php foreach ( $displayable_recs as $item ) :
+								$rec           = $item['rec'];
+								$rec_signal_id = $item['signal_id'];
+								$affected_cnt  = $item['count'];
 								$cat_key       = $rec['category'] ?? '';
 								$cat_orb       = $rec_cat_meta[ $cat_key ] ?? $rec_cat_meta[''];
-								$view_url      = admin_url( 'edit.php' );
+								$view_url      = add_query_arg(
+									[
+										'post_type'           => 'post',
+										'aiso_recommendation' => $rec_signal_id,
+									],
+									admin_url( 'edit.php' )
+								);
+								$btn_label = sprintf(
+									/* translators: %d: number of affected posts */
+									_n( 'View %d post', 'View %d posts', $affected_cnt, 'ai-search-optimizer' ),
+									$affected_cnt
+								);
 							?>
 							<div class="citewp-aiso-cs-rec-row">
 								<div class="citewp-aiso-cs-rec-row__orb" style="background:<?php echo esc_attr( $cat_orb['bg'] ); ?>;color:<?php echo esc_attr( $cat_orb['color'] ); ?>">
@@ -1252,16 +1285,14 @@ final class Menu {
 								</div>
 								<div class="citewp-aiso-cs-rec-row__text">
 									<div class="citewp-aiso-cs-rec-row__title">
-										<?php echo esc_html( $rec['label'] );
-										if ( $fail_count > 0 ) {
-											echo esc_html( ' (' . $fail_count . ' ' . _n( 'page', 'pages', $fail_count, 'ai-search-optimizer' ) . ')' );
-										} ?>
+										<?php echo esc_html( $rec['label'] . ' (' . $affected_cnt . ' ' . _n( 'page', 'pages', $affected_cnt, 'ai-search-optimizer' ) . ')' ); ?>
 									</div>
 									<div class="citewp-aiso-cs-rec-row__sub"><?php echo esc_html( $rec['copy'] ); ?></div>
 								</div>
-								<a href="<?php echo esc_url( $view_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Pages', 'ai-search-optimizer' ); ?></a>
+								<a href="<?php echo esc_url( $view_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php echo esc_html( $btn_label ); ?></a>
 							</div>
 							<?php endforeach; ?>
+							<?php endif; ?>
 						</div>
 					</div>
 					<a href="<?php echo esc_url( $cs_recs_url ); ?>"
