@@ -6,6 +6,61 @@
 
 ---
 
+## Session 24 — Cite Score KPI Densification + AI Recommendations Filter ✅
+
+**Date:** 2026-05-11
+
+### Deliverable
+
+Three iterative UI tasks on the Cite Score page: densified the 3 KPI cards, polished away redundant captions, and made the AI Recommendations "View Pages" buttons functional by wiring them to a filtered WordPress posts list.
+
+**What shipped:**
+
+1. **Cite Score KPI card densification:**
+   - Card 1 (Avg Cite Score): grade badge pill + "X of Y pages scored" sub-line
+   - Card 2 (Posts Optimized): percentage chip + 4px progress bar
+   - Card 3 (Issues Detected): critical (score < 40) / minor (score 40–49) split row
+   - New CSS: `.citewp-aiso-kpi-badge`, `.citewp-aiso-kpi-progress`, `.citewp-aiso-kpi-card__split`
+
+2. **KPI card polish pass:**
+   - Removed grade badge (belongs on dial, not KPI card)
+   - Removed old captions ("site-wide average", "score ≥ 50", "score < 50")
+   - Card 1: sole caption is "X of Y pages scored" + week-over-week delta line (gracefully omitted when < 2 weeks of history)
+   - Card 2: caption is "N% of your content is optimized"
+   - Card 3: caption is "across N posts needing attention"
+   - Delta line uses `$history` (already loaded) split at 7-day boundary — no extra DB query
+
+3. **AI Recommendations filtered posts list:**
+   - New class `RecommendationFilter` registered via Plugin.php
+   - `get_affected_ids(signal_id)`: full meta scan returning exact post IDs where signal is fail/partial; per-request static cache prevents duplicate scans across card rendering + filter hook + notice
+   - `pre_get_posts` hook narrows edit.php query to affected IDs when `?aiso_recommendation={slug}` is present
+   - `admin_notices` hook renders "Showing N posts flagged for: X. × All posts" notice with clear-filter link (no JS-dismiss — the link IS the dismiss)
+   - Menu.php: pre-computes `$displayable_recs` using exact counts; button label "View N post(s)"; cards with zero affected posts hidden; empty state shown if all recs have zero
+   - 4-grep defensive pass: "View Pages" / old caption strings confirmed gone
+
+**Files created:**
+- `includes/Admin/RecommendationFilter.php` — filter class (new)
+
+**Files modified:**
+- `includes/Admin/Menu.php` — KPI card HTML × 3, delta computation, recs loop rewrite
+- `admin/css/citewp-aiso-admin.css` — badge, progress bar, split, rec-empty styles
+- `includes/Plugin.php` — registered RecommendationFilter
+
+**npm build:** Not required (PHP + CSS only).
+
+**Decisions made:** None requiring DECISIONS.md entries.
+
+**Verified:**
+- 4-grep defensive passes: all old strings confirmed absent
+- `debug.log`: not present (no PHP errors)
+- Manual test required: visit Cite Score page, verify KPI cards render correctly; click recommendation button, verify filtered posts list + notice; test × clear link; test empty state
+
+**Carryover into next session:** None from this session. See Next Session Focus.
+
+**Next session focus:** TBD — see master file backlog.
+
+---
+
 ## Session 23 — EditorPanel v3 Polish + Bot Visits Widget ✅
 
 **Date:** 2026-05-05
