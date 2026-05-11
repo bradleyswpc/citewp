@@ -696,9 +696,11 @@ final class Menu {
 		$total_scored = count( $scored_ids );
 
 		// ── Site-wide stats (sample first 50 for signal analysis) ───────
-		$score_sum    = 0;
-		$issue_count  = 0;
-		$cat_sums     = [ 'structure' => 0, 'citability' => 0, 'authority' => 0 ];
+		$score_sum      = 0;
+		$issue_count    = 0;
+		$critical_count = 0;
+		$minor_count    = 0;
+		$cat_sums       = [ 'structure' => 0, 'citability' => 0, 'authority' => 0 ];
 		$signal_fails = [];
 		$sample_cap   = 50;
 
@@ -707,6 +709,11 @@ final class Menu {
 			$score_sum += $total;
 			if ( $total < 50 ) {
 				++$issue_count;
+				if ( $total < 40 ) {
+					++$critical_count;
+				} else {
+					++$minor_count;
+				}
 			}
 			if ( $i < $sample_cap ) {
 				$data = ( new Repository() )->get( (int) $pid );
@@ -728,6 +735,8 @@ final class Menu {
 		}
 
 		$posts_optimized = max( 0, $total_scored - $issue_count );
+		$pct_optimized   = $total_scored > 0 ? (int) round( ( $posts_optimized / $total_scored ) * 100 ) : 0;
+		$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
 
 		$avg_score = $total_scored > 0 ? (int) round( $score_sum / $total_scored ) : null;
 		$avg_grade = 'empty';
@@ -739,6 +748,14 @@ final class Menu {
 				default          => 'red',
 			};
 		}
+
+		$avg_grade_label = match ( $avg_grade ) {
+			'green'  => __( 'Excellent',         'ai-search-optimizer' ),
+			'yellow' => __( 'Good',              'ai-search-optimizer' ),
+			'orange' => __( 'Fair',              'ai-search-optimizer' ),
+			'red'    => __( 'Needs Improvement', 'ai-search-optimizer' ),
+			default  => '',
+		};
 
 		$cs_status_copy = [
 			'red'    => __( 'Your site needs improvement. Fix the issues below to increase your AI citation potential.',       'ai-search-optimizer' ),
@@ -852,8 +869,14 @@ final class Menu {
 						<?php echo IconLibrary::icon( 'gauge', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></div>
+						<div class="citewp-aiso-kpi-card__value-row">
+							<span class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></span>
+							<?php if ( '' !== $avg_grade_label ) : ?>
+							<span class="citewp-aiso-kpi-badge citewp-aiso-kpi-badge--<?php echo esc_attr( $avg_grade ); ?>"><?php echo esc_html( $avg_grade_label ); ?></span>
+							<?php endif; ?>
+						</div>
 						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'site-wide average', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%1$d of %2$d pages scored', 'ai-search-optimizer' ), $total_scored, $published_total ); ?></div>
 					</div>
 				</div>
 			</div>
@@ -868,7 +891,13 @@ final class Menu {
 						<?php echo IconLibrary::icon( 'check-circle', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $posts_optimized ); ?></div>
+						<div class="citewp-aiso-kpi-card__value-row">
+							<span class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $posts_optimized ); ?></span>
+							<span class="citewp-aiso-kpi-card__pct"><?php echo esc_html( $pct_optimized . '%' ); ?></span>
+						</div>
+						<div class="citewp-aiso-kpi-progress">
+							<div class="citewp-aiso-kpi-progress__fill" style="width:<?php echo esc_attr( (string) $pct_optimized ); ?>%"></div>
+						</div>
 						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'score ≥ 50', 'ai-search-optimizer' ); ?></div>
 					</div>
 				</div>
@@ -886,6 +915,11 @@ final class Menu {
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $issue_count ); ?></div>
 						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'score < 50', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-kpi-card__split">
+							<span class="citewp-aiso-kpi-card__split--critical"><?php echo esc_html( (string) $critical_count ); ?> <?php esc_html_e( 'critical', 'ai-search-optimizer' ); ?></span>
+							<span class="citewp-aiso-kpi-card__split--sep">·</span>
+							<span class="citewp-aiso-kpi-card__split--minor"><?php echo esc_html( (string) $minor_count ); ?> <?php esc_html_e( 'minor', 'ai-search-optimizer' ); ?></span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -924,7 +958,6 @@ final class Menu {
 						<?php ScoreDial::render( $avg_score ?? 0, $avg_grade ); ?>
 						<p class="citewp-cite-score-gauge__meta">
 							<?php
-							$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
 							printf(
 								/* translators: %1$d: scored post count, %2$d: total published post count */
 								esc_html__( 'Based on %1$d of %2$d published posts', 'ai-search-optimizer' ),
