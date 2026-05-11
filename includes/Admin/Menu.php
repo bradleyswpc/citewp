@@ -340,31 +340,6 @@ final class Menu {
 			<div class="citewp-aiso-hero__stats">
 				<div class="citewp-aiso-hero__stat">
 					<div class="citewp-aiso-hero__stat-head">
-						<span style="color:var(--citewp-tint-purple)"><?php echo IconLibrary::icon( 'cite-score', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></span>
-						<span class="citewp-aiso-hero__stat-label"><?php esc_html_e( 'Avg Cite Score', 'ai-search-optimizer' ); ?></span>
-					</div>
-					<span class="citewp-aiso-hero__stat-value"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></span>
-					<span class="citewp-aiso-hero__stat-sub"><?php esc_html_e( 'across scored posts', 'ai-search-optimizer' ); ?></span>
-				</div>
-				<div class="citewp-aiso-hero__stat">
-					<div class="citewp-aiso-hero__stat-head">
-						<span style="color:var(--citewp-tint-teal)"><?php echo IconLibrary::icon( 'bot', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></span>
-						<span class="citewp-aiso-hero__stat-label"><?php esc_html_e( 'Bot Visits (7d)', 'ai-search-optimizer' ); ?></span>
-					</div>
-					<span class="citewp-aiso-hero__stat-value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></span>
-					<span class="citewp-aiso-hero__stat-sub">
-						<?php
-						if ( $trend_pct > 5 ) {
-							echo '<span class="citewp-aiso-hero__stat-trend citewp-aiso-hero__stat-trend--up">↑ ' . esc_html( (string) absint( $trend_pct ) ) . '%</span> ';
-						} elseif ( $trend_pct < -5 ) {
-							echo '<span class="citewp-aiso-hero__stat-trend citewp-aiso-hero__stat-trend--down">↓ ' . esc_html( (string) absint( $trend_pct ) ) . '%</span> ';
-						}
-						esc_html_e( 'vs last week', 'ai-search-optimizer' );
-						?>
-					</span>
-				</div>
-				<div class="citewp-aiso-hero__stat">
-					<div class="citewp-aiso-hero__stat-head">
 						<span style="color:var(--citewp-tint-orange)"><?php echo IconLibrary::icon( 'alert-triangle', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></span>
 						<span class="citewp-aiso-hero__stat-label"><?php esc_html_e( 'Needs Attention', 'ai-search-optimizer' ); ?></span>
 					</div>
@@ -377,8 +352,8 @@ final class Menu {
 		<!-- KPI card row -->
 		<div class="citewp-aiso-kpi-row">
 
-			<!-- Card 1: Avg Cite Score -->
-			<div class="citewp-aiso-kpi-card">
+			<!-- Card 1: Avg Cite Score — dial -->
+			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--dial">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Avg Cite Score', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
@@ -386,12 +361,11 @@ final class Menu {
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Average score across all scored posts and pages.', 'ai-search-optimizer' ); ?></span>
 					</span>
 				</div>
-				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-purple-tint);color:var(--citewp-tint-purple)">
-						<?php echo IconLibrary::icon( 'cite-score', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+				<div class="citewp-aiso-kpi-card__body citewp-aiso-kpi-card__body--dial">
+					<div class="citewp-aiso-kpi-card__dial-wrap">
+						<?php ScoreDial::render( $avg_score ?? 0, $avg_grade ?: 'empty' ); ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></div>
 						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Across all scored posts', 'ai-search-optimizer' ); ?></div>
 						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
 					</div>
@@ -939,7 +913,7 @@ final class Menu {
 				</h3>
 				<div class="citewp-aiso-cs-score-wrap">
 					<div>
-						<?php $this->render_gauge_svg( $avg_score ?? 0, $avg_grade ); ?>
+						<?php ScoreDial::render( $avg_score ?? 0, $avg_grade ); ?>
 						<p class="citewp-cite-score-gauge__meta">
 							<?php
 							$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
@@ -1280,43 +1254,6 @@ final class Menu {
 	</div><!-- /.citewp-aiso-cite-score-page__body -->
 
 		<?php endif; // total_scored === 0
-	}
-
-	private function render_gauge_svg( int $score, string $grade ): void {
-		$score        = max( 0, min( 100, $score ) );
-		$grade_labels = [
-			'green'  => __( 'Excellent',         'ai-search-optimizer' ),
-			'yellow' => __( 'Good',              'ai-search-optimizer' ),
-			'orange' => __( 'Fair',              'ai-search-optimizer' ),
-			'red'    => __( 'Needs Improvement', 'ai-search-optimizer' ),
-			'empty'  => __( 'No data',           'ai-search-optimizer' ),
-		];
-		$grade_label = $grade_labels[ $grade ] ?? '';
-		?>
-		<div class="citewp-cite-score-gauge citewp-cite-score-gauge--<?php echo esc_attr( $grade ); ?>"
-		     style="--score:<?php echo esc_attr( (string) $score ); ?>">
-			<svg viewBox="0 0 240 140" role="img"
-			     aria-label="<?php echo esc_attr( sprintf( /* translators: 1: score integer 0-100, 2: grade label e.g. "Excellent" */ __( 'Cite Score %1$d out of 100, %2$s', 'ai-search-optimizer' ), $score, $grade_label ) ); ?>">
-				<defs>
-					<linearGradient id="citewp-gauge-gradient" x1="30" y1="120" x2="210" y2="120" gradientUnits="userSpaceOnUse">
-						<stop offset="0%"   stop-color="#ef4444" />
-						<stop offset="33%"  stop-color="#f97316" />
-						<stop offset="66%"  stop-color="#f7d84a" />
-						<stop offset="100%" stop-color="#16a34a" />
-					</linearGradient>
-				</defs>
-				<path class="gauge-bg" d="M 30 120 A 90 90 0 0 1 210 120" pathLength="100" />
-				<path class="gauge-score" d="M 30 120 A 90 90 0 0 1 210 120" pathLength="100" />
-				<text x="120" y="88" text-anchor="middle" class="gauge-number">
-					<?php echo esc_html( $score > 0 ? (string) $score : '—' ); ?>
-				</text>
-				<text x="120" y="112" text-anchor="middle" class="gauge-total">/100</text>
-				<text x="120" y="132" text-anchor="middle" class="gauge-label">
-					<?php echo esc_html( $grade_label ); ?>
-				</text>
-			</svg>
-		</div>
-		<?php
 	}
 
 	/**
