@@ -533,8 +533,7 @@
 }
 
 .citewp-aiso-kpi-card__footer {
-  border-top: 1px solid var(--citewp-border);
-  padding-top: var(--sp-3);
+  padding-top: var(--sp-2);
   margin-top: auto;
 }
 
@@ -559,7 +558,7 @@
 }
 
 .citewp-aiso-kpi-card--dial .citewp-cite-score-gauge {
-  width: 190px;
+  width: 210px;
 }
 
 /* === SECTION 11: KPI button === */
