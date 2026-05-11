@@ -2823,3 +2823,107 @@
 	line-height: 1.5;
 	max-width: 220px;
 }
+
+/* =========================================================
+   Section 31 — Publishing Controls (EditorPanel row)
+   ========================================================= */
+
+#citewp_aiso_editor_panel .citewp-aiso-pc {
+	border-top: 1px solid var(--citewp-border);
+	margin-top: 16px;
+	padding-top: 16px;
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__header {
+	margin-bottom: 8px;
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__title {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	color: var(--citewp-text-muted);
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__label-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__label {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--citewp-text);
+	cursor: pointer;
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__help {
+	font-size: 12px;
+	color: var(--citewp-text-muted);
+	line-height: 1.5;
+}
+
+/* Toggle — checkbox styled as pill switch */
+#citewp_aiso_editor_panel .citewp-aiso-pc__toggle {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__toggle input[type="checkbox"] {
+	width: 36px;
+	height: 20px;
+	appearance: none;
+	-webkit-appearance: none;
+	background: var(--citewp-border);
+	border-radius: 10px;
+	cursor: pointer;
+	transition: background 0.15s ease;
+	margin: 0;
+	padding: 0;
+	outline: none;
+	position: relative;
+	vertical-align: middle;
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__toggle input[type="checkbox"]::after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	background: #fff;
+	border-radius: 50%;
+	transition: transform 0.15s ease;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__toggle input[type="checkbox"]:checked {
+	background: var(--citewp-citrine);
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__toggle input[type="checkbox"]:checked::after {
+	transform: translateX(16px);
+}
+
+#citewp_aiso_editor_panel .citewp-aiso-pc__toggle input[type="checkbox"]:focus-visible {
+	box-shadow: 0 0 0 2px var(--wp-admin-theme-color, #3858e9);
+}
+
+/* Slider span is present in markup (aria-hidden) but styling is handled by input::after above */
+#citewp_aiso_editor_panel .citewp-aiso-pc__slider {
+	display: none;
+}
