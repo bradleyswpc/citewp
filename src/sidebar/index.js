@@ -10,7 +10,7 @@ import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { useSelect, useDispatch, select } from '@wordpress/data';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { Button, Spinner, PanelBody } from '@wordpress/components';
+import { Button, Spinner, PanelBody, ToggleControl } from '@wordpress/components';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
 import './style.scss';
@@ -422,6 +422,39 @@ registerPlugin( 'citewp-aiso-schema-suggestions', {
 			className="citewp-aiso-schema-panel"
 		>
 			<SchemaSuggestions />
+		</PluginDocumentSettingPanel>
+	),
+} );
+
+// === AI Visibility — Document Settings panel ===
+
+function AiVisibility() {
+	const meta         = useSelect( ( s ) => s( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {}, [] );
+	const { editPost } = useDispatch( 'core/editor' );
+	const isIncluded   = ! meta['_citewp_aiso_exclude_from_llms'];
+
+	return (
+		<div className="citewp-aiso-ai-visibility">
+			<ToggleControl
+				label="Include in llms.txt"
+				help="AI search engines may discover this post via llms.txt. Toggle off to exclude this post from the file."
+				checked={ isIncluded }
+				onChange={ ( newValue ) => {
+					editPost( { meta: { _citewp_aiso_exclude_from_llms: ! newValue } } );
+				} }
+			/>
+		</div>
+	);
+}
+
+registerPlugin( 'citewp-aiso-ai-visibility', {
+	render: () => (
+		<PluginDocumentSettingPanel
+			name="citewp-aiso-ai-visibility"
+			title="AI Visibility"
+			className="citewp-aiso-ai-visibility-panel"
+		>
+			<AiVisibility />
 		</PluginDocumentSettingPanel>
 	),
 } );
