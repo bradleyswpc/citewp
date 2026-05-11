@@ -39,6 +39,9 @@ final class EditorPanel {
 	 * @param \WP_Post $post    Post object.
 	 */
 	public function save_meta( int $post_id, \WP_Post $post ): void {
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
 		// Not a classic-editor form submission.
 		if ( ! isset( $_POST['_citewp_aiso_ep_nonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			return;
@@ -49,14 +52,10 @@ final class EditorPanel {
 		) ) {
 			return;
 		}
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-			return;
-		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
 		// Checkbox present = user wants to include the post; absent = exclude.
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above
 		$include = isset( $_POST['citewp_aiso_llms_include'] );
 		update_post_meta( $post_id, '_citewp_aiso_exclude_from_llms', $include ? '0' : '1' );
 	}
