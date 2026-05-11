@@ -13,6 +13,7 @@ final class EditorPanel {
 	public function register(): void {
 		add_action( 'add_meta_boxes',        [ $this, 'register_meta_box' ], 20 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_styles' ] );
+		add_action( 'save_post',             [ $this, 'save_meta' ], 20, 2 );
 	}
 
 	public function enqueue_styles( string $hook ): void {
@@ -25,6 +26,39 @@ final class EditorPanel {
 			[],
 			CITEWP_AISO_VERSION
 		);
+	}
+
+	/**
+	 * Persist the llms.txt toggle on classic-editor form save.
+	 *
+	 * Gutenberg saves meta via REST: $_POST is empty on those requests,
+	 * so the nonce check returns early — this handler never overwrites
+	 * a Gutenberg-committed meta value.
+	 *
+	 * @param int      $post_id Post being saved.
+	 * @param \WP_Post $post    Post object.
+	 */
+	public function save_meta( int $post_id, \WP_Post $post ): void {
+		// Not a classic-editor form submission.
+		if ( ! isset( $_POST['_citewp_aiso_ep_nonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return;
+		}
+		if ( ! wp_verify_nonce(
+			sanitize_key( wp_unslash( $_POST['_citewp_aiso_ep_nonce'] ) ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			'citewp_aiso_ep_' . $post_id
+		) ) {
+			return;
+		}
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+		// Checkbox present = user wants to include the post; absent = exclude.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above
+		$include = isset( $_POST['citewp_aiso_llms_include'] );
+		update_post_meta( $post_id, '_citewp_aiso_exclude_from_llms', $include ? '0' : '1' );
 	}
 
 	public function register_meta_box( string $post_type = '' ): void {
