@@ -610,8 +610,6 @@ final class EditorPanel {
 		$excluded    = get_post_meta( $post->ID, '_citewp_aiso_exclude_from_llms', true ) === '1';
 		$checkbox_id = 'citewp_aiso_llms_include_' . $post->ID;
 
-		wp_nonce_field( 'citewp_aiso_ep_' . $post->ID, '_citewp_aiso_ep_nonce', false );
-
 		/**
 		 * Register additional Publishing Controls rows.
 		 *
@@ -619,10 +617,12 @@ final class EditorPanel {
 		 *
 		 * @param array<int, array{key: string, render: callable(\WP_Post): void}> $items
 		 * @param \WP_Post $post
+		 * @security Each registered callable is responsible for escaping its own output.
 		 */
-		$extra_items = apply_filters( 'citewp_aiso/publishing_controls/items', [], $post );
+		$extra_items = (array) apply_filters( 'citewp_aiso/publishing_controls/items', [], $post );
 		?>
 		<div class="citewp-aiso-pc">
+			<?php wp_nonce_field( 'citewp_aiso_ep_' . $post->ID, '_citewp_aiso_ep_nonce', false ); ?>
 			<div class="citewp-aiso-pc__header">
 				<span class="citewp-aiso-pc__title">
 					<?php esc_html_e( 'Publishing Controls', 'ai-search-optimizer' ); ?>
