@@ -6,13 +6,17 @@
 
 ---
 
-## Session 25 — llms.txt Per-Post Toggle Widget ✅
+## Session 25 — llms.txt Per-Post Toggle + 100% Zoom Polish ✅
 
 **Date:** 2026-05-11
 
+**Context note:** Between Sessions 24 and 25, a parallel marketing/infrastructure session ran independently: Supabase project setup, Edge Function for waitlist capture, and citewp.com marketing site. Not tracked in this plugin log but part of the overall project timeline.
+
 ### Deliverable
 
-A binary "Include in llms.txt" toggle exposed on every post/page in two surfaces: (A1) Classic Editor "Publishing Controls" meta box section, and (G2) Gutenberg "AI Visibility" `PluginDocumentSettingPanel`. Meta key: `_citewp_aiso_exclude_from_llms` ('1' = exclude, absent/'0' = include). Full X13 pipeline: planning → subagents → spec + quality review → X20 audit → browser verification → smoke test.
+Primary: A binary "Include in llms.txt" toggle exposed on every post/page in two surfaces: (A1) Classic Editor "Publishing Controls" meta box section, and (G2) Gutenberg "AI Visibility" `PluginDocumentSettingPanel`. Meta key: `_citewp_aiso_exclude_from_llms` ('1' = exclude, absent/'0' = include). Full X13 pipeline: planning → subagents → spec + quality review → X20 audit → browser verification → smoke test.
+
+Secondary: 100% browser zoom polish across two surfaces — Cite Score page dial layout and Dashboard KPI row.
 
 **What shipped:**
 
@@ -33,12 +37,23 @@ A binary "Include in llms.txt" toggle exposed on every post/page in two surfaces
    - `AiVisibility` component: reads `_citewp_aiso_exclude_from_llms` via `getEditedPostAttribute('meta')`, drives `ToggleControl` `checked={isIncluded}`, dispatches `editPost({ meta: { ... } })` on change; uses `?? {}` for null-safe meta access
    - Registered via `registerPlugin('citewp-aiso-ai-visibility')` → `PluginDocumentSettingPanel`
 
-5. **Publishing Controls CSS (Section 31, `admin/css/citewp-aiso-admin.css`):**
+5. **Publishing Controls CSS + orange token fix (Section 31, `admin/css/citewp-aiso-admin.css`):**
    - All `.citewp-aiso-pc*` BEM selectors: wrapper, header/title, row, label-wrap, label, help, pill-switch toggle + slider
-   - Also fixed: `--citewp-score-orange: #E86612` (was `#D63638` — wrong red) in both `:root` and scoped `#citewp_aiso_editor_panel` blocks
+   - `--citewp-score-orange: #E86612` (was `#D63638` — wrong red) in both `:root` and scoped `#citewp_aiso_editor_panel` blocks (P46)
 
 6. **SCSS token alignment (`src/sidebar/style.scss`):**
-   - `$citewp-score-orange: #E86612` (matched CSS token fix)
+   - `$citewp-score-orange: #E86612` (matched CSS token fix, P46)
+
+7. **Cite Score page — dial layout polish (`admin/css/citewp-aiso-admin.css`):**
+   - `.citewp-aiso-cs-score-wrap` dial column reduced from 240px to 160px; `@media (max-width: 1280px)` stacks dial/copy/button vertically
+   - Fixes layout collapse at 100% browser zoom on 1440px viewport
+
+8. **Dashboard Site Score Health card — KPI row coherence (`includes/Admin/Menu.php`, `includes/Admin/ScoreDial.php`, `admin/css/citewp-aiso-admin.css`):**
+   - Replaced full-size dial + 2-column layout with standard KPI card pattern matching the 3 row siblings
+   - Card 1 now: gauge icon orb (80px, purple tint) → hero number "45" (JetBrains Mono, grade-colored) → "Needs Improvement" grade label → "→ no recent changes" trend → "View Scores →" footer button
+   - Fixed KPI row grid: `1.5fr 1fr 1fr 1fr` → `repeat(4, 1fr)` — all 4 cards equal 25% width and uniform height
+   - Added `ScoreDial::grade_label()` and `render_mini()` static helpers (grade_label used; render_mini retained for future FB38 use)
+   - Removed dead CSS: `.citewp-aiso-kpi-card--dial`, `__body--dial`, `__dial-wrap`, `.citewp-aiso-btn--dial-inline`
 
 **Files created:** None.
 
@@ -46,25 +61,29 @@ A binary "Include in llms.txt" toggle exposed on every post/page in two surfaces
 - `includes/Plugin.php` — `register_post_meta_fields()` method + `init` hook
 - `includes/Llms/Cache.php` — `on_meta_update()` + two new hook registrations
 - `includes/Admin/EditorPanel.php` — `save_meta()`, `render_publishing_controls()`, updated `register()`
+- `includes/Admin/ScoreDial.php` — added `grade_label()` + `render_mini()` static methods
+- `includes/Admin/Menu.php` — Dashboard Card 1 restructured to KPI pattern; KPI row grid fixed to 4×1fr
 - `src/sidebar/index.js` — `AiVisibility` component + `registerPlugin`
-- `admin/css/citewp-aiso-admin.css` — Section 31 Publishing Controls CSS + orange token fix
+- `admin/css/citewp-aiso-admin.css` — Publishing Controls CSS, orange token fix, Cite Score page dial polish, Dashboard KPI row polish
 - `src/sidebar/style.scss` — orange token fix
 
-**npm build:** ✅ Clean — `webpack compiled successfully` (no new warnings).
+**npm build:** ✅ Clean — `webpack compiled successfully` (no new warnings; 3 pre-existing chartLine icon warnings are known).
 
-**Decisions made:** P45 (see DECISIONS.md) — per-post llms.txt toggle placement locked: Classic EditorPanel "Publishing Controls" + Gutenberg "AI Visibility". P46 — `--citewp-score-orange` corrected `#D63638` → `#E86612` (resolves P44 known cleanup).
+**Decisions made:** P45 (see DECISIONS.md) — per-post llms.txt toggle placement locked: Classic EditorPanel "Publishing Controls" (A1) + Gutenberg "AI Visibility" PluginDocumentSettingPanel (G2); meta key polarity '1'=exclude preserved. P46 — `--citewp-score-orange` corrected `#D63638` → `#E86612` (resolves P44 known S24 cleanup).
 
 **Verified:**
 - Classic Editor: toggle renders, saves meta '1'/'0' correctly, cache flushes, llms.txt excludes post ✓
 - Gutenberg: AI Visibility panel renders in Document Settings, ToggleControl reflects live meta, save round-trip works ✓
 - `ContentSelector::is_excluded()` correctly respects meta '1' ✓
-- Browser HTTP cache (`Cache-Control: public, max-age=3600`) was the red herring in earlier testing — `cache: 'reload'` confirmed correct behavior ✓
+- Browser HTTP cache (`Cache-Control: public, max-age=3600`) was the red herring — `cache: 'reload'` confirmed correct server-side exclusion ✓
 - Smoke test: 9/9 applicable steps pass (Step 10 deferred — `uninstall.php` unchanged) ✓
+- Cite Score page: dial/copy/button stacks cleanly at 100% zoom / 1280px breakpoint ✓
+- Dashboard KPI row: all 4 cards equal width and height at 1440px / 100% zoom ✓
 - `debug.log`: not present (no PHP errors) ✓
 
 **Carryover into next session:** None.
 
-**Next session focus:** TBD — see master file backlog.
+**Next session focus:** FB38 (full Dashboard Cite Score restructure with category bars + Bot Visits) or next priority from master file backlog.
 
 ---
 
