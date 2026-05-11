@@ -2103,13 +2103,20 @@
   text-align: center;
 }
 
-/* Cite Score Health — 2-col grid: gauge left (240px), copy + button right */
+/* Cite Score Health — 2-col grid: gauge left (160px), copy + button right */
 .citewp-aiso-cs-score-wrap {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 160px 1fr;
   align-items: center;
   gap: var(--sp-6);
   margin-top: var(--sp-4);
+}
+
+/* Stack dial above copy below ~1280px viewport */
+@media (max-width: 1280px) {
+  .citewp-aiso-cs-score-wrap {
+    grid-template-columns: 1fr;
+  }
 }
 
 .citewp-aiso-cs-score-copy {
