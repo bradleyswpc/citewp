@@ -355,7 +355,7 @@ final class Menu {
 			<!-- Card 1: Avg Cite Score — dial -->
 			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--dial">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Avg Cite Score', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Site Score Health', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Average score across all scored posts and pages.', 'ai-search-optimizer' ); ?></span>
@@ -432,7 +432,7 @@ final class Menu {
 			<!-- Card 4: llms.txt Status -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'llms.txt', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'llms.txt Status', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-aiso-kpi-tooltip">
 						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Status of the AI-readable content index served at /llms.txt.', 'ai-search-optimizer' ); ?></span>
