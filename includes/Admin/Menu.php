@@ -796,6 +796,19 @@ final class Menu {
 		$hist_avg      = ! empty( $history ) ? (int) round( array_sum( array_column( $history, 'avg' ) ) / count( $history ) ) : null;
 		$hist_peak     = ! empty( $history ) ? (int) round( (float) max( array_column( $history, 'avg' ) ) ) : null;
 
+		// Week-over-week delta for KPI card 1.
+		$hist_delta = null;
+		if ( ! empty( $history ) ) {
+			$seven_ago  = gmdate( 'Y-m-d', (int) strtotime( '-7 days' ) );
+			$this_slice = array_values( array_filter( $history, static fn( $e ) => $e['date'] >= $seven_ago ) );
+			$prev_slice = array_values( array_filter( $history, static fn( $e ) => $e['date'] < $seven_ago ) );
+			if ( ! empty( $this_slice ) && ! empty( $prev_slice ) ) {
+				$this_avg   = array_sum( array_column( $this_slice, 'avg' ) ) / count( $this_slice );
+				$prev_avg   = array_sum( array_column( $prev_slice, 'avg' ) ) / count( $prev_slice );
+				$hist_delta = (int) round( $this_avg - $prev_avg );
+			}
+		}
+
 		// ── Paginated post table ─────────────────────────────────────────
 		$paged     = max( 1, absint( $_GET['csp'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$per_page  = in_array( (int) ( $_GET['cspp'] ?? 5 ), [ 5, 10, 25 ], true ) ? (int) ( $_GET['cspp'] ?? 5 ) : 5; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -869,14 +882,19 @@ final class Menu {
 						<?php echo IconLibrary::icon( 'gauge', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value-row">
-							<span class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></span>
-							<?php if ( '' !== $avg_grade_label ) : ?>
-							<span class="citewp-aiso-kpi-badge citewp-aiso-kpi-badge--<?php echo esc_attr( $avg_grade ); ?>"><?php echo esc_html( $avg_grade_label ); ?></span>
+						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%1$d of %2$d pages scored', 'ai-search-optimizer' ), $total_scored, $published_total ); ?></div>
+						<?php if ( $hist_delta !== null ) : ?>
+						<div class="citewp-aiso-kpi-card__trend <?php echo $hist_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $hist_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' ); ?>">
+							<?php if ( $hist_delta > 0 ) : ?>
+								↑ +<?php echo esc_html( (string) $hist_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. last week', 'ai-search-optimizer' ); ?></span>
+							<?php elseif ( $hist_delta < 0 ) : ?>
+								↓ <?php echo esc_html( (string) $hist_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. last week', 'ai-search-optimizer' ); ?></span>
+							<?php else : ?>
+								→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'no change vs. last week', 'ai-search-optimizer' ); ?></span>
 							<?php endif; ?>
 						</div>
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'site-wide average', 'ai-search-optimizer' ); ?></div>
-						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%1$d of %2$d pages scored', 'ai-search-optimizer' ), $total_scored, $published_total ); ?></div>
+						<?php endif; ?>
 					</div>
 				</div>
 			</div>
@@ -898,7 +916,7 @@ final class Menu {
 						<div class="citewp-aiso-kpi-progress">
 							<div class="citewp-aiso-kpi-progress__fill" style="width:<?php echo esc_attr( (string) $pct_optimized ); ?>%"></div>
 						</div>
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'score ≥ 50', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%d%% of your content is optimized', 'ai-search-optimizer' ), $pct_optimized ); ?></div>
 					</div>
 				</div>
 			</div>
@@ -914,7 +932,7 @@ final class Menu {
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $issue_count ); ?></div>
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'score < 50', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( 'across %d posts needing attention', 'ai-search-optimizer' ), $issue_count ); ?></div>
 						<div class="citewp-aiso-kpi-card__split">
 							<span class="citewp-aiso-kpi-card__split--critical"><?php echo esc_html( (string) $critical_count ); ?> <?php esc_html_e( 'critical', 'ai-search-optimizer' ); ?></span>
 							<span class="citewp-aiso-kpi-card__split--sep">·</span>
