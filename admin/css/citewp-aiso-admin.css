@@ -443,7 +443,7 @@
 
 .citewp-aiso-kpi-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 12px;
   margin-bottom: var(--sp-6);
 }
@@ -544,10 +544,7 @@
 .citewp-aiso-kpi-score--red    { color: var(--citewp-score-red); }
 .citewp-aiso-kpi-score--empty  { color: var(--citewp-text-muted); }
 
-/* KPI card — dial variant (spans 2 cols; dial-left / text-right) */
-.citewp-aiso-kpi-card--dial {
-  grid-column: span 2;
-}
+/* KPI card — dial variant (2fr column; dial-left / text-right) */
 
 .citewp-aiso-kpi-card__body--dial {
   display: flex;
@@ -1322,10 +1319,6 @@
 @media (max-width: 1024px) {
   .citewp-aiso-kpi-row {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .citewp-aiso-kpi-card--dial {
-    grid-column: 1 / -1;
   }
 
   .citewp-aiso-lower {
