@@ -9,6 +9,40 @@ final class ScoreDial {
 
 	private static int $instance = 0;
 
+	public static function grade_label( string $grade ): string {
+		$labels = [
+			'green'  => __( 'Excellent',         'ai-search-optimizer' ),
+			'yellow' => __( 'Good',              'ai-search-optimizer' ),
+			'orange' => __( 'Fair',              'ai-search-optimizer' ),
+			'red'    => __( 'Needs Improvement', 'ai-search-optimizer' ),
+			'empty'  => __( 'No data',           'ai-search-optimizer' ),
+		];
+		return $labels[ $grade ] ?? '';
+	}
+
+	public static function render_mini( int $score, string $grade ): void {
+		self::$instance++;
+		$gradient_id = 'citewp-gauge-gradient-' . self::$instance;
+		$score       = max( 0, min( 100, $score ) );
+		?>
+		<div class="citewp-cite-score-gauge citewp-cite-score-gauge--<?php echo esc_attr( $grade ); ?> citewp-cite-score-gauge--mini"
+		     style="--score:<?php echo esc_attr( (string) $score ); ?>;--gauge-gradient:url(#<?php echo esc_attr( $gradient_id ); ?>)">
+			<svg viewBox="0 0 240 140" role="presentation" aria-hidden="true">
+				<defs>
+					<linearGradient id="<?php echo esc_attr( $gradient_id ); ?>" x1="30" y1="120" x2="210" y2="120" gradientUnits="userSpaceOnUse">
+						<stop offset="0%"   stop-color="#ef4444" />
+						<stop offset="33%"  stop-color="#f97316" />
+						<stop offset="66%"  stop-color="#f7d84a" />
+						<stop offset="100%" stop-color="#16a34a" />
+					</linearGradient>
+				</defs>
+				<path class="gauge-bg"    d="M 30 120 A 90 90 0 0 1 210 120" pathLength="100" />
+				<path class="gauge-score" d="M 30 120 A 90 90 0 0 1 210 120" pathLength="100" />
+			</svg>
+		</div>
+		<?php
+	}
+
 	public static function render( int $score, string $grade ): void {
 		self::$instance++;
 		$gradient_id  = 'citewp-gauge-gradient-' . self::$instance;

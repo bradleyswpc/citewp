@@ -362,8 +362,19 @@ final class Menu {
 		<!-- KPI card row -->
 		<div class="citewp-aiso-kpi-row">
 
-			<!-- Card 1: Avg Cite Score — dial -->
-			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--dial">
+			<!-- Card 1: Site Score Health — mini dial badge -->
+			<?php
+			$kpi_score_color_map = [
+				'green'  => 'var(--citewp-score-green)',
+				'yellow' => 'var(--citewp-score-yellow)',
+				'orange' => 'var(--citewp-score-orange)',
+				'red'    => 'var(--citewp-score-red)',
+				'empty'  => 'var(--citewp-text-muted)',
+			];
+			$kpi_score_grade = $avg_grade ?: 'empty';
+			$kpi_score_color = $kpi_score_color_map[ $kpi_score_grade ] ?? 'var(--citewp-text-muted)';
+			?>
+			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Site Score Health', 'ai-search-optimizer' ); ?></span>
 					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
@@ -371,15 +382,24 @@ final class Menu {
 						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Average score across all scored posts and pages.', 'ai-search-optimizer' ); ?></span>
 					</span>
 				</div>
-				<div class="citewp-aiso-kpi-card__body citewp-aiso-kpi-card__body--dial">
-					<div class="citewp-aiso-kpi-card__dial-wrap">
-						<?php ScoreDial::render( $avg_score ?? 0, $avg_grade ?: 'empty' ); ?>
+				<div class="citewp-aiso-kpi-card__body">
+					<div class="citewp-aiso-kpi-card__visual citewp-aiso-kpi-card__visual--dial-badge"
+					     style="background:color-mix(in srgb, <?php echo esc_attr( $kpi_score_color ); ?> 12%, transparent);color:<?php echo esc_attr( $kpi_score_color ); ?>">
+						<?php ScoreDial::render_mini( $avg_score ?? 0, $kpi_score_grade ); ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Across all scored posts', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
+							<?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?>
+						</div>
+						<div class="citewp-aiso-kpi-card__caption citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
+							<?php echo esc_html( ScoreDial::grade_label( $kpi_score_grade ) ); ?>
+						</div>
+						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat"><?php esc_html_e( 'Across all scored posts', 'ai-search-optimizer' ); ?></div>
 						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
-						<a href="#cite-score" class="citewp-aiso-btn citewp-aiso-btn--dial-inline"><?php esc_html_e( 'View Scores →', 'ai-search-optimizer' ); ?></a>
 					</div>
+				</div>
+				<div class="citewp-aiso-kpi-card__footer">
+					<a href="#cite-score" class="citewp-aiso-btn"><?php esc_html_e( 'View Scores →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
