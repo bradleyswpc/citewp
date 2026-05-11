@@ -62,6 +62,9 @@ final class Plugin {
 		$this->modules['score_history'] = new Scoring\ScoreHistory();
 		$this->modules['score_history']->register();
 
+		// Register post meta with REST API support (needed on all requests, including REST).
+		add_action( 'init', [ $this, 'register_post_meta_fields' ] );
+
 		// Admin-only modules.
 		if ( is_admin() ) {
 			$this->modules['admin_menu'] = new Admin\Menu();
@@ -87,6 +90,31 @@ final class Plugin {
 
 			$this->modules['recommendation_filter'] = new Admin\RecommendationFilter();
 			$this->modules['recommendation_filter']->register();
+		}
+	}
+
+	/**
+	 * Register post meta with REST API support.
+	 *
+	 * Separate register_post_meta() calls per post type (not one call with an array)
+	 * so FB40 (CPT scope) can extend to additional types from its own module
+	 * without modifying this method.
+	 */
+	public function register_post_meta_fields(): void {
+		foreach ( [ 'post', 'page' ] as $post_type ) {
+			register_post_meta(
+				$post_type,
+				'_citewp_aiso_exclude_from_llms',
+				[
+					'type'              => 'boolean',
+					'single'            => true,
+					'show_in_rest'      => true,
+					'sanitize_callback' => 'rest_sanitize_boolean',
+					'auth_callback'     => static function ( bool $allowed, string $meta_key, int $post_id ): bool {
+						return current_user_can( 'edit_post', $post_id );
+					},
+				]
+			);
 		}
 	}
 
