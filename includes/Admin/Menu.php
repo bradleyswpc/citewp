@@ -383,7 +383,6 @@ final class Menu {
 						<div class="citewp-aiso-kpi-card__caption citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
 							<?php echo esc_html( ScoreDial::grade_label( $kpi_score_grade ) ); ?>
 						</div>
-						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat"><?php esc_html_e( 'Across all scored posts', 'ai-search-optimizer' ); ?></div>
 						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
 					</div>
 				</div>
