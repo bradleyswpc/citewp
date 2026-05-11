@@ -256,6 +256,8 @@ final class EditorPanel {
 				</div>
 
 			</div>
+
+			<?php $this->render_publishing_controls( $post ); ?>
 		</div>
 		<script>
 		(function() {
@@ -589,6 +591,70 @@ final class EditorPanel {
 				</div>
 
 			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Publishing Controls — full-width section below the 2-col grid.
+	 *
+	 * Only rendered on non-Gutenberg screens (meta box is suppressed in Gutenberg
+	 * by register_meta_box() returning early for block-editor post types — P24).
+	 *
+	 * The X15 filter allows FB30 (Cite Bridges), FB40 (CPT scope), and future
+	 * per-post controls to register additional rows without modifying this method.
+	 *
+	 * @param \WP_Post $post Post being edited.
+	 */
+	private function render_publishing_controls( \WP_Post $post ): void {
+		$excluded    = get_post_meta( $post->ID, '_citewp_aiso_exclude_from_llms', true ) === '1';
+		$checkbox_id = 'citewp_aiso_llms_include_' . $post->ID;
+
+		wp_nonce_field( 'citewp_aiso_ep_' . $post->ID, '_citewp_aiso_ep_nonce', false );
+
+		/**
+		 * Register additional Publishing Controls rows.
+		 *
+		 * Each item must be an array with a 'render' key holding a callable(\WP_Post): void.
+		 *
+		 * @param array<int, array{key: string, render: callable(\WP_Post): void}> $items
+		 * @param \WP_Post $post
+		 */
+		$extra_items = apply_filters( 'citewp_aiso/publishing_controls/items', [], $post );
+		?>
+		<div class="citewp-aiso-pc">
+			<div class="citewp-aiso-pc__header">
+				<span class="citewp-aiso-pc__title">
+					<?php esc_html_e( 'Publishing Controls', 'ai-search-optimizer' ); ?>
+				</span>
+			</div>
+
+			<div class="citewp-aiso-pc__row">
+				<div class="citewp-aiso-pc__label-wrap">
+					<label class="citewp-aiso-pc__label" for="<?php echo esc_attr( $checkbox_id ); ?>">
+						<?php esc_html_e( 'Include in llms.txt', 'ai-search-optimizer' ); ?>
+					</label>
+					<span class="citewp-aiso-pc__help">
+						<?php esc_html_e( 'AI search engines may discover this post via llms.txt. Toggle off to exclude this post from the file.', 'ai-search-optimizer' ); ?>
+					</span>
+				</div>
+				<label class="citewp-aiso-pc__toggle" aria-label="<?php esc_attr_e( 'Include in llms.txt', 'ai-search-optimizer' ); ?>">
+					<input type="checkbox"
+					       id="<?php echo esc_attr( $checkbox_id ); ?>"
+					       name="citewp_aiso_llms_include"
+					       value="1"
+					       <?php checked( ! $excluded ); ?>>
+					<span class="citewp-aiso-pc__slider" aria-hidden="true"></span>
+				</label>
+			</div>
+
+			<?php foreach ( $extra_items as $item ) : ?>
+				<?php
+				if ( isset( $item['render'] ) && is_callable( $item['render'] ) ) {
+					call_user_func( $item['render'], $post );
+				}
+				?>
+			<?php endforeach; ?>
 		</div>
 		<?php
 	}
