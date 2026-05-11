@@ -92,7 +92,7 @@
   /* Score colors (P38) */
   --citewp-score-green:   #00A32A;
   --citewp-score-yellow:  #DBA617;
-  --citewp-score-orange:  #D63638;
+  --citewp-score-orange:  #E86612;
   --citewp-score-red:     #8C1B1B;
   /* Text */
   --citewp-text-primary:    #1A1A1A;
@@ -2525,7 +2525,7 @@
 	--citewp-text-primary: #111827;
 	--citewp-score-green: #00A32A;
 	--citewp-score-yellow: #DBA617;
-	--citewp-score-orange: #D63638;
+	--citewp-score-orange: #E86612;
 	--citewp-score-red: #8C1B1B;
 }
 
