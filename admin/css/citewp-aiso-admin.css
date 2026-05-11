@@ -544,6 +544,10 @@
 .citewp-aiso-kpi-score--empty  { color: var(--citewp-text-muted); }
 
 /* KPI card — dial variant (2fr column; dial-left / text-right) */
+.citewp-aiso-btn--dial-inline {
+  margin-top: var(--sp-3);
+  align-self: flex-start;
+}
 
 .citewp-aiso-kpi-card__body--dial {
   display: flex;
