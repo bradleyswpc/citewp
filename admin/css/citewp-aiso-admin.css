@@ -2008,7 +2008,7 @@
 
 .citewp-cite-score-gauge .gauge-score {
   fill: none;
-  stroke: url(#citewp-gauge-gradient);
+  stroke: var(--gauge-gradient);
   stroke-width: 14;
   stroke-linecap: round;
   stroke-dasharray: var(--score) 100;
