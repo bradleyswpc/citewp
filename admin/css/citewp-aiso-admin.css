@@ -535,7 +535,7 @@
 .citewp-aiso-kpi-card__footer {
   border-top: 1px solid var(--citewp-border);
   padding-top: var(--sp-3);
-  margin-top: var(--sp-1);
+  margin-top: auto;
 }
 
 .citewp-aiso-kpi-score--green  { color: var(--citewp-score-green); }
@@ -559,7 +559,7 @@
 }
 
 .citewp-aiso-kpi-card--dial .citewp-cite-score-gauge {
-  width: 210px;
+  width: 150px;
 }
 
 /* === SECTION 11: KPI button === */
