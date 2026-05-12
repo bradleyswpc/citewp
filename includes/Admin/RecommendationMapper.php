@@ -90,7 +90,7 @@ final class RecommendationMapper {
 		'schema'             => [
 			'label'    => 'Schema markup',
 			'category' => 'authority',
-			'copy'     => 'Add Article or HowTo schema to your post. Structured data helps AI understand and cite your content.',
+			'copy'     => 'Add JSON-LD schema to your post content via the Schema Suggestions panel, or verify your SEO plugin is configured to output schema for this post type. Structured data helps AI engines understand and cite your content.',
 		],
 		'meta_description'   => [
 			'label'    => 'Meta description',

@@ -553,7 +553,8 @@ final class Engine {
 	}
 
 	private function check_schema( ContentAnalysis $a ): SignalResult {
-		// SEO plugin presence implies output-time schema even if not in post_content.
+		// SEO plugin presence implies potential schema output but cannot be verified
+		// without a render-time scan (deferred to FB42 — render-time schema detection).
 		$has_seo_plugin = defined( 'WPSEO_VERSION' )
 			|| defined( 'RANK_MATH_VERSION' )
 			|| defined( 'AIOSEO_VERSION' )
@@ -561,21 +562,28 @@ final class Engine {
 
 		$inline_count = count( array_unique( $a->schema_types ) );
 
-		if ( $inline_count >= 1 || $has_seo_plugin ) {
-			$msg = $inline_count > 0
-				? sprintf( 'Schema types detected: %s.', implode( ', ', array_unique( $a->schema_types ) ) )
-				: 'Active SEO plugin will output schema.';
+		if ( $inline_count >= 1 ) {
 			return new SignalResult(
 				'schema', 'authority', 'Schema markup',
 				6, 6, 'pass',
-				$msg
+				sprintf( 'Schema types detected: %s.', implode( ', ', array_unique( $a->schema_types ) ) )
 			);
 		}
+
+		if ( $has_seo_plugin ) {
+			return new SignalResult(
+				'schema', 'authority', 'Schema markup',
+				3, 6, 'partial',
+				'Active SEO plugin detected. Verify it is configured to output schema for this post type.',
+				'You have an SEO plugin installed but no schema was found in your post content. Use the Schema Suggestions panel to insert JSON-LD directly, or verify your SEO plugin outputs schema for this post type.'
+			);
+		}
+
 		return new SignalResult(
 			'schema', 'authority', 'Schema markup',
 			0, 6, 'fail',
 			'No schema markup detected.',
-			'Install Yoast, Rank Math, or AIOSEO — or add JSON-LD schema manually.'
+			'Install Yoast, Rank Math, or AIOSEO — or use the Schema Suggestions panel to insert JSON-LD directly.'
 		);
 	}
 
