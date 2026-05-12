@@ -411,6 +411,14 @@ final class Generator {
 				if ( $this->has_ancestor_tag( $btn, 'details' ) ) {
 					continue;
 				}
+				// Skip outer ARIA wrappers — prefer the innermost ARIA element.
+				// Builders like Spectra nest role="button" inside role="tab"/aria-expanded,
+				// causing the outer element's textContent (all descendants) to differ from
+				// the inner question text, defeating the $seen dedup.
+				$inner_aria = $xpath->query( './/*[@role="button" or @aria-expanded]', $btn );
+				if ( $inner_aria && $inner_aria->length > 0 ) {
+					continue;
+				}
 				$q = trim( wp_strip_all_tags( $btn->textContent ) );
 				if ( $q === '' || isset( $seen[ $q ] ) ) {
 					continue;
