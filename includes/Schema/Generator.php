@@ -18,6 +18,9 @@ final class Generator {
 	private int              $cached_post_id  = 0;
 	private ?ContentAnalysis $cached_analysis = null;
 
+	/** @var array<int, ContentAnalysis> Memoization cache — one entry per post ID per request. */
+	private array $analysis_cache = [];
+
 	/**
 	 * Returns a complete Article JSON-LD array for the given post.
 	 *
@@ -107,7 +110,7 @@ final class Generator {
 	 * @return array<string, mixed>
 	 */
 	public function generate_faq_schema( \WP_Post $post ): array {
-		$pairs = $this->extract_faq_pairs( $this->analysis_for( $post ) );
+		$pairs = $this->get_faq_pairs( $post );
 
 		if ( count( $pairs ) < 2 ) {
 			return [];
@@ -130,6 +133,34 @@ final class Generator {
 			'@type'      => 'FAQPage',
 			'mainEntity' => $questions,
 		];
+	}
+
+	/**
+	 * Returns FAQ pairs after applying the X15 extensibility filter.
+	 *
+	 * Filter: citewp_aiso/schema/faq_pairs
+	 * Allows third-party code (e.g. FB29 schema type expansion) to add, remove,
+	 * or modify detected FAQ pairs before schema generation and pair counting.
+	 *
+	 * @param \WP_Post $post
+	 * @return array<int, array{question: string, answer: string}>
+	 */
+	private function get_faq_pairs( \WP_Post $post ): array {
+		$pairs = $this->extract_faq_pairs( $this->analysis_for( $post ) );
+		/** @var array<int, array{question: string, answer: string}> $pairs */
+		return (array) apply_filters( 'citewp_aiso/schema/faq_pairs', $pairs, $post );
+	}
+
+	/**
+	 * Returns the number of FAQ pairs detected in the post content.
+	 * Used by SchemaController to populate the faq_count field in the REST response,
+	 * which drives the 3-state message in the Schema Suggestions panel.
+	 *
+	 * @param \WP_Post $post
+	 * @return int
+	 */
+	public function count_faq_pairs( \WP_Post $post ): int {
+		return count( $this->get_faq_pairs( $post ) );
 	}
 
 	/**
@@ -169,6 +200,95 @@ final class Generator {
 	}
 
 	/**
+	 * Returns the text of the first <p> after $node, stopping at the next heading.
+	 */
+	private function first_p_after( \DOMNode $node ): string {
+		$sib = $node->nextSibling;
+		while ( $sib ) {
+			if ( $sib instanceof \DOMElement ) {
+				if ( $sib->nodeName === 'p' ) {
+					return trim( wp_strip_all_tags( $sib->textContent ) );
+				}
+				if ( preg_match( '/^h[1-6]$/i', $sib->nodeName ) ) {
+					break;
+				}
+				if ( in_array( $sib->nodeName, [ 'div', 'section' ], true ) ) {
+					foreach ( $sib->childNodes as $child ) {
+						if ( $child instanceof \DOMElement && $child->nodeName === 'p' ) {
+							return trim( wp_strip_all_tags( $child->textContent ) );
+						}
+					}
+				}
+			}
+			$sib = $sib->nextSibling;
+		}
+		return '';
+	}
+
+	/**
+	 * Returns the text body of a <details> element, excluding the <summary> text.
+	 */
+	private function details_body( \DOMElement $details, \DOMElement $summary ): string {
+		$parts = [];
+		foreach ( $details->childNodes as $child ) {
+			if ( $child->isSameNode( $summary ) ) {
+				continue;
+			}
+			$text = trim( wp_strip_all_tags( $child->textContent ?? '' ) );
+			if ( $text !== '' ) {
+				$parts[] = $text;
+			}
+		}
+		return implode( ' ', $parts );
+	}
+
+	/**
+	 * Returns the answer text for a WAI-ARIA accordion button element.
+	 * Resolution: aria-controls → ID lookup; next sibling div; parent's next sibling.
+	 */
+	private function aria_answer( \DOMXPath $xpath, \DOMElement $btn ): string {
+		$controls = $btn->getAttribute( 'aria-controls' );
+		if ( $controls !== '' ) {
+			$target = $xpath->query( '//*[@id="' . esc_attr( $controls ) . '"]' )->item( 0 );
+			if ( $target ) {
+				return trim( wp_strip_all_tags( $target->textContent ) );
+			}
+		}
+		$sib = $btn->nextSibling;
+		while ( $sib ) {
+			if ( $sib instanceof \DOMElement ) {
+				return trim( wp_strip_all_tags( $sib->textContent ) );
+			}
+			$sib = $sib->nextSibling;
+		}
+		$parent = $btn->parentNode;
+		if ( $parent instanceof \DOMElement ) {
+			$sib = $parent->nextSibling;
+			while ( $sib ) {
+				if ( $sib instanceof \DOMElement ) {
+					return trim( wp_strip_all_tags( $sib->textContent ) );
+				}
+				$sib = $sib->nextSibling;
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Returns true if $node has an ancestor element with the given tag name.
+	 */
+	private function has_ancestor_tag( \DOMNode $node, string $tag ): bool {
+		$parent = $node->parentNode;
+		while ( $parent instanceof \DOMElement ) {
+			if ( strtolower( $parent->nodeName ) === strtolower( $tag ) ) {
+				return true;
+			}
+			$parent = $parent->parentNode;
+		}
+		return false;
+	}
+
+	/**
 	 * Collects top-level @type values from a decoded JSON-LD object.
 	 * Descends into @graph nodes only — not into arbitrary sub-objects.
 	 *
@@ -197,57 +317,147 @@ final class Generator {
 	}
 
 	/**
-	 * Extract FAQ Q/A pairs from rendered post HTML.
+	 * Extracts FAQ pairs from rendered post HTML using DOMDocument.
 	 *
-	 * A heading (h2/h3) qualifies as a question if its text:
-	 *   - starts with a question word (how, what, why, when, where, can, should, is, does, do, will), OR
-	 *   - ends with '?'
+	 * Detects 4 patterns:
+	 *   1. <h2>/<h3>/<h4> followed by first <p> sibling (existing behaviour preserved)
+	 *   2. <details>/<summary> — HTML5 native + Kadence Blocks
+	 *   3. Elements with role="button" or aria-expanded — WAI-ARIA accordion pattern
+	 *      used by Elementor, Divi, Beaver Builder, Bricks, Spectra
+	 *   4. CSS-class containers (class contains "accordion"/"faq"/"toggle"/"collapse")
+	 *      — fallback for builders without ARIA roles
 	 *
-	 * The first <p> following each qualifying heading is used as the answer.
-	 * Returns an empty array if fewer than 2 pairs are found.
+	 * Note: rendered_html = apply_filters('the_content', post_content). Detects content
+	 * stored in post_content (Gutenberg/block builders). Elementor/Divi Classic content
+	 * stored in post_meta may not appear here depending on the_content filter context.
 	 *
+	 * @param ContentAnalysis $analysis
 	 * @return array<int, array{question: string, answer: string}>
 	 */
 	private function extract_faq_pairs( ContentAnalysis $analysis ): array {
-		$parts = preg_split( '/<h[23][^>]*>/i', $analysis->rendered_html, -1, PREG_SPLIT_NO_EMPTY );
-		if ( $parts === false || count( $parts ) < 2 ) {
+		$html = trim( $analysis->rendered_html );
+		if ( $html === '' ) {
 			return [];
 		}
 
-		$question_re = '/^(how|what|why|when|where|can|should|is|does|do|will)\b/i';
-		$pairs       = [];
+		$prev_errors = libxml_use_internal_errors( true );
+		$dom         = new \DOMDocument( '1.0', 'UTF-8' );
+		$dom->loadHTML(
+			'<?xml encoding="utf-8" ?>' . $html,
+			LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+		);
+		libxml_clear_errors();
+		libxml_use_internal_errors( $prev_errors );
 
-		// $parts[0] is content before the first h2/h3 — skip it.
-		foreach ( array_slice( $parts, 1 ) as $part ) {
-			// Extract heading text (everything before the closing </h2> or </h3>).
-			if ( ! preg_match( '#^(.*?)</h[23]>#is', $part, $heading_m ) ) {
-				continue;
+		$xpath = new \DOMXPath( $dom );
+		$pairs = [];
+		$seen  = [];
+		$q_re  = '/^(how|what|why|when|where|can|should|is|does|do|will)\b/i';
+
+		// ── Pattern 1: h2 / h3 / h4 + first <p> sibling ────────────────────────
+		$headings = $xpath->query( '//h2|//h3|//h4' );
+		if ( $headings ) {
+			foreach ( $headings as $heading ) {
+				$q = trim( wp_strip_all_tags( $heading->textContent ) );
+				if ( $q === '' || isset( $seen[ $q ] ) ) {
+					continue;
+				}
+				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
+					continue;
+				}
+				$a = $this->first_p_after( $heading );
+				if ( $a === '' ) {
+					continue;
+				}
+				$seen[ $q ] = true;
+				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
 			}
-			$heading_text = trim( wp_strip_all_tags( $heading_m[1] ) );
+		}
 
-			// Accept: starts with a question word, OR ends with '?'.
-			if ( ! preg_match( $question_re, $heading_text ) && ! str_ends_with( $heading_text, '?' ) ) {
-				continue;
+		// ── Pattern 2: <details> / <summary> ────────────────────────────────────
+		$details_list = $xpath->query( '//details' );
+		if ( $details_list ) {
+			foreach ( $details_list as $details ) {
+				/** @var \DOMElement $details */
+				$summary_list = $xpath->query( 'summary', $details );
+				$summary      = $summary_list ? $summary_list->item( 0 ) : null;
+				if ( ! $summary instanceof \DOMElement ) {
+					continue;
+				}
+				$q = trim( wp_strip_all_tags( $summary->textContent ) );
+				if ( $q === '' || isset( $seen[ $q ] ) ) {
+					continue;
+				}
+				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
+					continue;
+				}
+				$a = $this->details_body( $details, $summary );
+				if ( $a === '' ) {
+					continue;
+				}
+				$seen[ $q ] = true;
+				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
 			}
+		}
 
-			// Restrict search to content before the next h2/h3 so block-injected markup
-			// between a heading and its prose paragraph doesn't capture the wrong <p>.
-			$after_heading = substr( $part, strlen( $heading_m[0] ) );
-			$segments      = preg_split( '/<h[23][^>]*>/i', $after_heading, 2 );
-			$search_window = ( $segments !== false && isset( $segments[0] ) ) ? $segments[0] : $after_heading;
-
-			if ( ! preg_match( '#<p[^>]*>(.*?)</p>#is', $search_window, $para_m ) ) {
-				continue;
+		// ── Pattern 3: WAI-ARIA accordion buttons ────────────────────────────────
+		$aria_nodes = $xpath->query( '//*[@role="button" or @aria-expanded]' );
+		if ( $aria_nodes ) {
+			foreach ( $aria_nodes as $btn ) {
+				/** @var \DOMElement $btn */
+				if ( $this->has_ancestor_tag( $btn, 'details' ) ) {
+					continue;
+				}
+				$q = trim( wp_strip_all_tags( $btn->textContent ) );
+				if ( $q === '' || isset( $seen[ $q ] ) ) {
+					continue;
+				}
+				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
+					continue;
+				}
+				$a = $this->aria_answer( $xpath, $btn );
+				if ( $a === '' ) {
+					continue;
+				}
+				$seen[ $q ] = true;
+				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
 			}
-			$answer = trim( wp_strip_all_tags( $para_m[1] ) );
-			if ( $answer === '' ) {
-				continue;
-			}
+		}
 
-			$pairs[] = [
-				'question' => $heading_text,
-				'answer'   => $answer,
-			];
+		// ── Pattern 4: CSS-class accordion containers ────────────────────────────
+		$css_query = '//*[contains(@class,"accordion") or contains(@class,"faq")'
+			. ' or contains(@class,"toggle") or contains(@class,"collapse")]'
+			. '[not(@role) and not(@aria-expanded)]';
+		$css_nodes = $xpath->query( $css_query );
+		if ( $css_nodes ) {
+			foreach ( $css_nodes as $container ) {
+				/** @var \DOMElement $container */
+				$q_node = $xpath->query(
+					'.//*[contains(@class,"question") or contains(@class,"title")'
+					. ' or contains(@class,"header") or contains(@class,"heading")]',
+					$container
+				);
+				$a_node = $xpath->query(
+					'.//*[contains(@class,"answer") or contains(@class,"body")'
+					. ' or contains(@class,"content") or contains(@class,"panel")]',
+					$container
+				);
+				$q_el = $q_node ? $q_node->item( 0 ) : null;
+				$a_el = $a_node ? $a_node->item( 0 ) : null;
+				if ( ! $q_el || ! $a_el ) {
+					continue;
+				}
+				$q = trim( wp_strip_all_tags( $q_el->textContent ) );
+				$a = trim( wp_strip_all_tags( $a_el->textContent ) );
+				if ( $q === '' || $a === '' || isset( $seen[ $q ] ) ) {
+					continue;
+				}
+				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
+					continue;
+				}
+				$seen[ $q ] = true;
+				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
+			}
 		}
 
 		return $pairs;
@@ -260,10 +470,9 @@ final class Generator {
 	 * generate_faq_schema(), and detect_existing_types() are all called for the same post.
 	 */
 	private function analysis_for( \WP_Post $post ): ContentAnalysis {
-		if ( null === $this->cached_analysis || $this->cached_post_id !== $post->ID ) {
-			$this->cached_analysis = new ContentAnalysis( $post );
-			$this->cached_post_id  = $post->ID;
+		if ( ! isset( $this->analysis_cache[ $post->ID ] ) ) {
+			$this->analysis_cache[ $post->ID ] = new ContentAnalysis( $post );
 		}
-		return $this->cached_analysis;
+		return $this->analysis_cache[ $post->ID ];
 	}
 }
