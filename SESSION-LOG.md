@@ -6,6 +6,98 @@
 
 ---
 
+## Session 26 — FAQ Detection v2 + Schema Signal Grading + 3-State Panel Message ✅
+
+**Date:** 2026-05-12
+
+### Deliverable
+
+Primary: Rewrote `extract_faq_pairs()` in `includes/Schema/Generator.php` using DOMDocument to detect FAQ content across 6 page-builder accordion patterns (Kadence, Elementor, Divi, Beaver Builder, Bricks, Spectra) plus HTML5 `<details>/<summary>` and standard h2/h3 headings. X15 extensibility filter `citewp_aiso/schema/faq_pairs` registered. A new public `count_faq_pairs()` method feeds a new `faq_count` field in the schema REST response. The `SchemaSuggestions` panel now renders one of 3 messages: "No FAQ content detected" (0 pairs), "Only 1 question/answer pair detected. FAQPage schema requires at least 2 pairs." (1 pair), or "FAQ detected: N question/answer pairs." with Insert button (≥2 pairs).
+
+Secondary: Bug B fix — `Engine::check_schema()` graded 6/3/0 instead of binary 6/0. Inline JSON-LD=6pts, active SEO plugin with no inline schema=3pts (partial), no schema at all=0pts. SEO plugins covered: Yoast (`WPSEO_VERSION`), Rank Math (`RANK_MATH_VERSION`), AIOSEO (`AIOSEO_VERSION`/`AIOSEO_VERSION_LITE`), SEOPress (`SEOPRESS_VERSION`/`SEOPRESS_PRO_VERSION`). `RecommendationMapper` schema copy updated to cover partial state.
+
+Version bump: 0.7.0 → 0.7.1. Full X13 pipeline: fixtures → plan → subagent-driven execution (6 tasks, 8 commits) → spec + quality review per task → push.
+
+**What shipped:**
+
+1. **10 FAQ detection fixtures (`tests/fixtures/faq-detection/`):**
+   - `01-heading-basic.html` — h2/h3+p pattern (3 pairs)
+   - `02-details-summary.html` — HTML5 `<details>/<summary>` (2 pairs)
+   - `03-kadence-accordion.html` — Kadence Blocks (2 pairs)
+   - `04-elementor-accordion.html` — Elementor WAI-ARIA (2 pairs)
+   - `05-divi-accordion.html` — Divi h5 role=button (2 pairs)
+   - `06-beaver-accordion.html` — Beaver Builder aria-controls (2 pairs)
+   - `07-bricks-accordion.html` — Bricks role=button wrapper (2 pairs)
+   - `08-spectra-faq.html` — Spectra UAGB FAQ block (2 pairs)
+   - `09-one-pair-only.html` — edge case: 1 pair, no FAQPage schema generated
+   - `10-no-faq-false-positive-guard.html` — topic headings, no question phrasing (0 pairs)
+
+2. **`includes/Schema/Generator.php` — DOMDocument rewrite:**
+   - `extract_faq_pairs()` replaced with 4-pattern DOMDocument implementation (h2/h3/h4+p, `<details>/<summary>`, WAI-ARIA `role="button"`, CSS-class fallback)
+   - New private `get_faq_pairs(\WP_Post)` — calls extract + applies `citewp_aiso/schema/faq_pairs` filter (X15)
+   - New public `count_faq_pairs(\WP_Post)` — returns pair count for REST response
+   - `$analysis_cache` instance memoization (prevents double content-parse per request)
+   - `$pairs_cache` instance memoization (perf fix caught at T2→T3 review hook — count + generate were double-running DOMDocument)
+   - Dead properties `$cached_post_id`, `$cached_analysis` removed (superseded by `$analysis_cache`)
+   - 4 new private helpers: `first_p_after()`, `details_body()`, `aria_answer()`, `has_ancestor_tag()`
+
+3. **`includes/Rest/SchemaController.php`:**
+   - `faq_count` field added to schema REST response (from `$this->generator->count_faq_pairs($post)`)
+
+4. **`src/sidebar/index.js` — 3-state FAQ message:**
+   - `SchemaSuggestions` computes dynamic `emptyMsg` and `statusText` from `schema.faq_count ?? 0`
+   - 0 pairs: "No FAQ content detected on this page."
+   - 1 pair: "Only 1 question/answer pair detected. FAQPage schema requires at least 2 pairs."
+   - ≥2 pairs: `statusText` = "FAQ detected: N question/answer pairs." (alongside Insert button)
+   - `SchemaTypeRow` updated with `statusText` prop + `__label-group` wrapper div
+
+5. **`src/sidebar/style.scss`:**
+   - `.citewp-aiso-sidebar-schema-row__label-group` (flex column)
+   - `.citewp-aiso-sidebar-schema-row__status-text` (11px, `#757575`)
+
+6. **`includes/Scoring/Engine.php`:**
+   - `check_schema()` rewritten: 3-state graded signal 6/3/0 (P47)
+   - `$has_seo_plugin` covers: `WPSEO_VERSION`, `RANK_MATH_VERSION`, `AIOSEO_VERSION`, `AIOSEO_VERSION_LITE`, `SEOPRESS_VERSION`, `SEOPRESS_PRO_VERSION`
+
+7. **`includes/Admin/RecommendationMapper.php`:**
+   - `schema` copy updated to cover partial state ("verify your SEO plugin is configured to output schema for this post type")
+
+8. **`ai-search-optimizer.php` + `readme.txt`:**
+   - Version bumped 0.7.0 → 0.7.1
+   - `= 0.7.1 =` changelog entry added to readme.txt
+
+**Files created:**
+- `tests/fixtures/faq-detection/` (10 HTML fixture files)
+
+**Files modified:**
+- `includes/Schema/Generator.php` — DOMDocument rewrite, memoization, new public/private methods
+- `includes/Rest/SchemaController.php` — `faq_count` REST field
+- `src/sidebar/index.js` — 3-state FAQ message, `statusText` prop, `label-group` wrapper
+- `src/sidebar/style.scss` — `.citewp-aiso-sidebar-schema-row__status-text` rule
+- `includes/Scoring/Engine.php` — 6/3/0 graded `check_schema()` + SEOPress constants
+- `includes/Admin/RecommendationMapper.php` — schema partial-state copy
+- `ai-search-optimizer.php` — version 0.7.1
+- `readme.txt` — 0.7.1 changelog entry
+
+**npm build:** ✅ Clean — `webpack compiled successfully` (no new warnings; 3 pre-existing chartLine icon warnings are known).
+
+**Decisions made:** P47 (schema signal graded 6/3/0 — see DECISIONS.md). P48 (lazy migration: no bulk recalculate script — see DECISIONS.md).
+
+**Verified:**
+- `npm run build`: ✅ Clean
+- `debug.log`: not found (no PHP errors) ✅
+- All 8 commits pushed to origin/main ✅
+- Manual fixture verification: pending (paste 10 HTML fixtures into test post, verify `faq_count` + panel state per plan checklist)
+- Bug B live verification on citewp.com: pending (package updated plugin, upload, verify schema signal = 3/6 partial on Rank Math page with no inline JSON-LD)
+
+**Carryover into next session:**
+- Manual fixture verification against plan Post-Task Verification Checklist (10 fixtures × expected `faq_count` + panel state)
+- Bug B live verification: `.\package.ps1` → upload to citewp.com → confirm schema signal = 3/6 partial on page with Rank Math active + no inline schema; insert Article JSON-LD → recalculate → confirm jumps to 6/6
+
+**Next session focus:** Complete S26 live verification (fixture test + Bug B), then FB38 (full Dashboard Cite Score restructure with category bars + Bot Visits) or next backlog priority per master file.
+
+---
+
 ## Session 25 — llms.txt Per-Post Toggle + 100% Zoom Polish ✅
 
 **Date:** 2026-05-11
