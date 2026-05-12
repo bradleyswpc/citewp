@@ -35,3 +35,9 @@ wp-cli.local.yml
 !.claude/commands/
 !.claude/settings.json
 !.claude/README.md
+
+# Playwright MCP test artifacts (session snapshots, not source)
+.playwright-mcp/
+
+# Superpowers framework runtime state
+.superpowers/
