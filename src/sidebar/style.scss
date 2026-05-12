@@ -235,3 +235,16 @@ $citewp-bg-subtle:    #f9fafb;
   border-top: 1px solid $citewp-border-faint;
   color: $citewp-text-muted;
 }
+
+.citewp-aiso-sidebar-schema-row__label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.citewp-aiso-sidebar-schema-row__status-text {
+  font-size: 11px;
+  color: #757575;
+  line-height: 1.4;
+}

@@ -263,7 +263,7 @@ const SCHEMA_TYPES = [
 		key: 'faqpage',
 		label: 'FAQPage',
 		variants: [ 'FAQPage' ],
-		emptyMessage: 'No FAQ content detected (need ≥ 2 Q&A pairs)',
+		emptyMessage: null,  // computed dynamically in SchemaSuggestions render from schema.faq_count
 	},
 ];
 
@@ -352,17 +352,31 @@ function SchemaSuggestions() {
 	return (
 		<div className="citewp-aiso-sidebar-schema">
 			{ SCHEMA_TYPES.map( ( type ) => {
-				const isDetected = detected.some( ( t ) => type.variants.includes( t ) );
+				const faqCount = schema.faq_count ?? 0;
+
+				// Dynamic empty message for FAQPage: 0-pair vs 1-pair state.
+				const emptyMsg = ( type.key === 'faqpage' && ! schema[ type.key ] )
+					? ( faqCount === 0
+						? 'No FAQ content detected on this page.'
+						: 'Only 1 question/answer pair detected. FAQPage schema requires at least 2 pairs.' )
+					: type.emptyMessage;
+
+				// Status text shown alongside Insert button when FAQPage is generated.
+				const statusText = ( type.key === 'faqpage' && !! schema[ type.key ] )
+					? `FAQ detected: ${ faqCount } question/answer ${ faqCount === 1 ? 'pair' : 'pairs' }.`
+					: null;
+
 				return (
 					<SchemaTypeRow
 						key={ type.key }
 						label={ type.label }
-						detected={ isDetected }
+						detected={ detected.some( ( d ) => type.variants.includes( d ) ) }
 						generated={ !! schema[ type.key ] }
 						inserted={ !! inserted[ type.key ] }
 						inserting={ !! inserting[ type.key ] }
 						onInsert={ () => insertSchemaBlock( type.key ) }
-						emptyMessage={ type.emptyMessage }
+						emptyMessage={ emptyMsg }
+						statusText={ statusText }
 					/>
 				);
 			} ) }
@@ -375,7 +389,7 @@ function SchemaSuggestions() {
 	);
 }
 
-function SchemaTypeRow( { label, detected, generated, inserted, inserting, onInsert, emptyMessage } ) {
+function SchemaTypeRow( { label, detected, generated, inserted, inserting, onInsert, emptyMessage, statusText } ) {
 	if ( ! generated && ! detected ) {
 		return emptyMessage ? (
 			<div className="citewp-aiso-sidebar-schema-row__empty">
@@ -408,7 +422,12 @@ function SchemaTypeRow( { label, detected, generated, inserted, inserting, onIns
 
 	return (
 		<div className="citewp-aiso-sidebar-schema-row">
-			<span className="citewp-aiso-sidebar-schema-row__label">{ label }</span>
+			<div className="citewp-aiso-sidebar-schema-row__label-group">
+				<span className="citewp-aiso-sidebar-schema-row__label">{ label }</span>
+				{ statusText && (
+					<span className="citewp-aiso-sidebar-schema-row__status-text">{ statusText }</span>
+				) }
+			</div>
 			{ action }
 		</div>
 	);
