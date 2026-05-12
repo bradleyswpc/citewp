@@ -68,15 +68,17 @@ final class SchemaController {
 			return new \WP_REST_Response( [ 'error' => 'post_not_found' ], 404 );
 		}
 
-		$article  = $this->generator->generate_article_schema( $post );
-		$faqpage  = $this->generator->generate_faq_schema( $post );
-		$detected = $this->generator->detect_existing_types( $post );
+		$article   = $this->generator->generate_article_schema( $post );
+		$faqpage   = $this->generator->generate_faq_schema( $post );
+		$detected  = $this->generator->detect_existing_types( $post );
+		$faq_count = $this->generator->count_faq_pairs( $post );
 
 		return new \WP_REST_Response(
 			[
-				'article'  => $article,
-				'faqpage'  => $faqpage ?: null,
-				'detected' => array_values( $detected ),
+				'article'   => $article,
+				'faqpage'   => $faqpage ?: null,
+				'detected'  => array_values( $detected ),
+				'faq_count' => $faq_count,
 			],
 			200
 		);
