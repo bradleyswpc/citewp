@@ -558,7 +558,9 @@ final class Engine {
 		$has_seo_plugin = defined( 'WPSEO_VERSION' )
 			|| defined( 'RANK_MATH_VERSION' )
 			|| defined( 'AIOSEO_VERSION' )
-			|| defined( 'AIOSEO_VERSION_LITE' );
+			|| defined( 'AIOSEO_VERSION_LITE' )
+			|| defined( 'SEOPRESS_VERSION' )
+			|| defined( 'SEOPRESS_PRO_VERSION' );
 
 		$inline_count = count( array_unique( $a->schema_types ) );
 
