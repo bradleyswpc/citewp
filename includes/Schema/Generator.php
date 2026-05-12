@@ -15,11 +15,11 @@ defined( 'ABSPATH' ) || exit;
 
 final class Generator {
 
-	private int              $cached_post_id  = 0;
-	private ?ContentAnalysis $cached_analysis = null;
-
 	/** @var array<int, ContentAnalysis> Memoization cache — one entry per post ID per request. */
 	private array $analysis_cache = [];
+
+	/** @var array<int, array<int, array{question: string, answer: string}>> Memoized FAQ pairs — keyed by post ID. */
+	private array $pairs_cache = [];
 
 	/**
 	 * Returns a complete Article JSON-LD array for the given post.
@@ -146,9 +146,12 @@ final class Generator {
 	 * @return array<int, array{question: string, answer: string}>
 	 */
 	private function get_faq_pairs( \WP_Post $post ): array {
-		$pairs = $this->extract_faq_pairs( $this->analysis_for( $post ) );
-		/** @var array<int, array{question: string, answer: string}> $pairs */
-		return (array) apply_filters( 'citewp_aiso/schema/faq_pairs', $pairs, $post );
+		if ( ! isset( $this->pairs_cache[ $post->ID ] ) ) {
+			$pairs = $this->extract_faq_pairs( $this->analysis_for( $post ) );
+			/** @var array<int, array{question: string, answer: string}> $pairs */
+			$this->pairs_cache[ $post->ID ] = (array) apply_filters( 'citewp_aiso/schema/faq_pairs', $pairs, $post );
+		}
+		return $this->pairs_cache[ $post->ID ];
 	}
 
 	/**
