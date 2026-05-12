@@ -4,7 +4,7 @@ Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.6.0
+Stable tag: 0.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,11 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. llms.txt Settings — configure which content appears in your llms.txt and llms-full.txt files.
 
 == Changelog ==
+
+= 0.7.1 =
+* Improvement: FAQ detection now recognises accordions built with Kadence, Elementor, Divi, Beaver Builder, Bricks, Spectra, and HTML5 details/summary — in addition to standard headings.
+* Improvement: Schema Suggestions panel shows accurate FAQ pair count (0, 1, or N pairs found) instead of a generic "need ≥ 2" message.
+* Fix: Schema signal now awards incremental points — 6 pts for inline JSON-LD, 3 pts when an SEO plugin is active, 0 pts with no schema detected. Previously an active SEO plugin always awarded full points regardless of whether schema was actually configured.
 
 = 0.6.0 =
 * Initial WordPress.org release.
