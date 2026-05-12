@@ -1,10 +1,17 @@
 .claude/
 .git/
+.gitattributes
 .gitignore
+.distignore
+.playwright-mcp/
+.superpowers/
 assets/
 CLAUDE.md
 SESSION-LOG.md
+docs/
 node_modules/
 package.json
 package-lock.json
+package.ps1
 src/
+tests/
