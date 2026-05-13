@@ -709,7 +709,7 @@ final class Menu {
 		// ── All scored post IDs (excluding posts opted out of llms.txt) ─
 		$scored_ids   = get_posts( [
 			'post_type'      => [ 'post', 'page' ],
-			'post_status'    => [ 'publish', 'draft' ],
+			'post_status'    => 'publish',
 			'posts_per_page' => 1000,
 			'no_found_rows'  => true,
 			'fields'         => 'ids',
