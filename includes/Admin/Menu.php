@@ -696,14 +696,19 @@ final class Menu {
 			'post_type'      => [ 'post', 'page' ],
 			'post_status'    => [ 'publish', 'draft' ],
 			'posts_per_page' => 1000,
-			'meta_key'       => Repository::META_KEY_TOTAL,
-			'meta_compare'   => 'EXISTS',
 			'no_found_rows'  => true,
 			'fields'         => 'ids',
 			'meta_query'     => [
-				'relation' => 'OR',
-				[ 'key' => '_citewp_aiso_exclude_from_llms', 'compare' => 'NOT EXISTS' ],
-				[ 'key' => '_citewp_aiso_exclude_from_llms', 'value' => '1', 'compare' => '!=' ],
+				'relation' => 'AND',
+				[
+					'key'     => Repository::META_KEY_TOTAL,
+					'compare' => 'EXISTS',
+				],
+				[
+					'relation' => 'OR',
+					[ 'key' => '_citewp_aiso_exclude_from_llms', 'compare' => 'NOT EXISTS' ],
+					[ 'key' => '_citewp_aiso_exclude_from_llms', 'value' => '1', 'compare' => '!=' ],
+				],
 			],
 		] );
 		$total_scored   = count( $scored_ids );
