@@ -6,6 +6,68 @@
 
 ---
 
+## Session 28 (Polish Fix 2) — Chart Height + Table Visibility + Title Clamp ✅
+
+**Date:** 2026-05-13
+
+### Deliverable
+
+Follow-up CSS bug fixes after Polish Pass introduced a regression: the chart panel inherited `height: 100%` from the `.citewp-aiso-cs-panel` base rule, causing it to consume the entire left column height and visually crush the Post & Page Cite Scores table. No version bump — all fixes are part of the in-progress v0.7.4 polish pass. No PHP logic or scoring changes.
+
+### What shipped
+
+1. **Chart panel height fix (`admin/css/citewp-aiso-admin.css`):**
+   - Root cause: `.citewp-aiso-cs-panel { height: 100% }` applied to the chart wrapper div, which resolved to full left-column height in a flex column context
+   - First attempt (`90e03e4`): added `height: auto` to `.citewp-aiso-cite-score-page__left-chart` — failed because `.citewp-aiso-cs-panel` comes later in the sheet at equal specificity
+   - Fix (`e989c8a`): scoped rule `.citewp-aiso-cite-score-page__left > .citewp-aiso-cite-score-page__left-chart { height: auto }` added alongside the existing right-column override — wins on specificity (0,2,0 vs 0,1,0)
+   - `min-height: 280px` also removed from `.citewp-aiso-history-panel` (was wrong target from original brief, harmless but clean to remove)
+
+2. **Chart-to-table gap (`admin/css/citewp-aiso-admin.css`):**
+   - Removed `margin-top: var(--sp-6)` from `.citewp-aiso-cite-score-page__left-chart` — flex `gap: 18px` on the left column is sufficient; extra margin was making the gap visually taller than other element gaps
+
+3. **Post/Page title clamp (`admin/css/citewp-aiso-admin.css`, `includes/Admin/Menu.php`):**
+   - Title link in Post & Page table clamped to 2 lines with `-webkit-line-clamp: 2`
+   - `title` attribute added to the link so full title shows on hover (using `esc_attr( get_the_title() )`)
+
+### Files modified
+
+- `admin/css/citewp-aiso-admin.css`
+- `includes/Admin/Menu.php`
+
+### Commits
+
+- `4a663df` fix: contain chart panel + table panel heights; nudge Top Crawler value font
+- `90e03e4` fix: override height:100% on chart panel — restores table visibility (first attempt)
+- `e989c8a` fix: scoped height:auto on left-chart panel — wins over base cs-panel rule
+- `9545753` style: remove extra margin-top from chart panel — matches flex gap above
+- `223d537` style: clamp post/page title to 3 lines with ellipsis in Cite Score table
+- `823bc66` fix: truncate post titles to 2 lines + add full-title hover
+
+All commits pushed to origin/main ✅
+
+### Decisions made
+
+None — pure CSS bug-fix and polish pass.
+
+### Verified
+
+- debug.log: clean (no file present)
+- npm build: not required (CSS + PHP attribute only)
+- Manual browser test: pending (see carryover)
+
+### Carryover into S29
+
+- **Manual smoke test** (citewp-dev.local): verify table shows all rows, chart sizes to content, Pro Tip below chart, title clamp + hover working, Top Crawler card balanced
+- **S26 Bug B live verification**: upload v0.7.4 to citewp.com, verify schema signal 3/6 on Rank Math page, 6/6 after Article JSON-LD insert
+- **S27 smoke test**: toggle post on/off, verify Dashboard + Cite Score KPI values update
+- **WP.org approval check** (hello@citewp.com)
+
+### Next session focus
+
+S29 — run carryover smoke tests, then next backlog priority (FB38 Dashboard Cite Score restructure, FB30 Cite Bridges, or FB39 Publish block injection per master file)
+
+---
+
 ## Session 28 (Polish Pass) — Post-Review Polish: Chart Layout + Pill Alignment + Long Bot Name + v0.7.4 ✅
 
 **Date:** 2026-05-13
