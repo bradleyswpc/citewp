@@ -691,7 +691,7 @@ final class Menu {
 			return;
 		}
 
-		// ── All scored post IDs ─────────────────────────────────────────
+		// ── All scored post IDs (excluding posts opted out of llms.txt) ─
 		$scored_ids   = get_posts( [
 			'post_type'      => [ 'post', 'page' ],
 			'post_status'    => [ 'publish', 'draft' ],
@@ -700,8 +700,14 @@ final class Menu {
 			'meta_compare'   => 'EXISTS',
 			'no_found_rows'  => true,
 			'fields'         => 'ids',
+			'meta_query'     => [
+				'relation' => 'OR',
+				[ 'key' => '_citewp_aiso_exclude_from_llms', 'compare' => 'NOT EXISTS' ],
+				[ 'key' => '_citewp_aiso_exclude_from_llms', 'value' => '1', 'compare' => '!=' ],
+			],
 		] );
-		$total_scored = count( $scored_ids );
+		$total_scored   = count( $scored_ids );
+		$excluded_count = ( new DashboardData() )->get_excluded_count();
 
 		// ── Site-wide stats (sample first 50 for signal analysis) ───────
 		$score_sum      = 0;
@@ -744,7 +750,7 @@ final class Menu {
 
 		$posts_optimized = max( 0, $total_scored - $issue_count );
 		$pct_optimized   = $total_scored > 0 ? (int) round( ( $posts_optimized / $total_scored ) * 100 ) : 0;
-		$published_total = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
+		$published_total_all = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
 
 		$avg_score = $total_scored > 0 ? (int) round( $score_sum / $total_scored ) : null;
 		$avg_grade = 'empty';
@@ -891,7 +897,7 @@ final class Menu {
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></div>
-						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%1$d of %2$d pages scored', 'ai-search-optimizer' ), $total_scored, $published_total ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%1$d of %2$d pages scored', 'ai-search-optimizer' ), $total_scored, $published_total_all ); ?></div>
 						<?php if ( $hist_delta !== null ) : ?>
 						<div class="citewp-aiso-kpi-card__trend <?php echo $hist_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $hist_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' ); ?>">
 							<?php if ( $hist_delta > 0 ) : ?>
@@ -988,7 +994,7 @@ final class Menu {
 								/* translators: %1$d: scored post count, %2$d: total published post count */
 								esc_html__( 'Based on %1$d of %2$d published posts', 'ai-search-optimizer' ),
 								(int) $total_scored,
-								(int) $published_total
+								(int) $published_total_all
 							);
 							?>
 						</p>
