@@ -2022,7 +2022,6 @@
 /* Cite Score Over Time chart — inside left column, below Post & Page table */
 .citewp-aiso-cite-score-page__left-chart {
   width: 100%;
-  margin-top: var(--sp-6);
   flex: 0 0 auto;
   height: auto;
 }
