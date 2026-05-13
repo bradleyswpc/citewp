@@ -6,6 +6,56 @@
 
 ---
 
+## Session 28 (Polish Pass) — Post-Review Polish: Chart Layout + Pill Alignment + Long Bot Name + v0.7.4 ✅
+
+**Date:** 2026-05-13
+
+### Deliverable
+
+Four targeted fixes discovered during post-session review of S28's output. Light-touch pipeline (plan → single subagent → code review → push). No new features; no Engine.php changes. Version bump 0.7.3 → 0.7.4.
+
+### What shipped
+
+1. **Fix A — Top Crawler card long-name containment (`Menu.php`, admin CSS):**
+   - Scoped `.citewp-aiso-kpi-card--top-crawler` modifier: value text at 22px, `-webkit-line-clamp: 2`, `word-break: break-word`
+   - KPI row flex parity: `min-height: 160px; display: flex; flex-direction: column` on all KPI cards in row so varying bot name lengths don't break height alignment
+
+2. **Fix B — Chart into left column; Pro Tip to true footer (`Menu.php`, admin CSS):**
+   - Removed `citewp-aiso-cite-score-page__chart-fullwidth` full-width wrapper (S28 T5 error)
+   - Chart now lives inside `.citewp-aiso-cite-score-page__left`, after Post table, in new wrapper `.citewp-aiso-cite-score-page__left-chart`
+   - Pro Tip card moved outside `.citewp-aiso-cite-score-page__body` entirely (true footer, full-width)
+
+3. **Fix C — Post-type pill right-justified in Title column (`Menu.php`, admin CSS):**
+   - Removed inner `<span>` wrapper from `citewp-aiso-cs-post-cell` TD
+   - TD gets `display: flex; justify-content: space-between; gap: var(--sp-3)`; title link `flex: 1 1 auto; min-width: 0`; pill `flex: 0 0 auto`
+   - Pill no longer floats inline with title text — always pinned to right edge of cell
+
+4. **Fix D — Version bump:**
+   - `0.7.3` → `0.7.4` in plugin header, `CITEWP_AISO_VERSION`, readme.txt Stable tag
+   - `= 0.7.4 =` changelog entry added
+
+### Files modified
+
+- `includes/Admin/Menu.php`
+- `admin/css/citewp-aiso-admin.css`
+- `ai-search-optimizer.php`
+- `readme.txt`
+
+### Commits
+
+- `e3c1573` fix: contain Top Crawler card value text + align KPI card icons
+- `7d4cbb7` fix: move Cite Score Over Time chart into left column + Pro Tip to true footer
+- `4d504b2` fix: right-justify post-type pill in Post & Page table
+- `50351e0` chore: version bump 0.7.3 → 0.7.4 + readme changelog
+
+All 4 commits pushed to origin/main ✅
+
+### Carryover into S29
+
+- Same carryover as S28 main (smoke tests, S26 Bug B live verify, WP.org check) — unchanged
+
+---
+
 ## Session 28 — Cite Score Page Polish + AI Recommendations Routing Fix + Rail Densification ✅
 
 **Date:** 2026-05-13
@@ -84,7 +134,7 @@ Seven UX polish items discovered from a full day of dogfooding citewp.com. No sc
 - **S26 Bug B live verification** (still outstanding): upload v0.7.3 to citewp.com, verify schema signal = 3/6 on Rank Math page, 6/6 after Article JSON-LD insert
 - **S27 manual smoke test** (still outstanding): toggle a post on/off, verify Dashboard + Cite Score KPI values update
 - **WP.org approval check** (hello@citewp.com)
-- **P49 DECISIONS.md entry** — was referenced in S27 SESSION-LOG but row was never written; needs to be added before next session
+- **P49 DECISIONS.md entry** — ✅ resolved during S28 close (Brain repo commit `16f23ae`)
 
 ### Next session focus
 
