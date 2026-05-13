@@ -393,7 +393,7 @@ final class Menu {
 							<?php if ( $excluded_count > 0 ) : ?>
 							<span
 								class="citewp-aiso-kpi-card__exclusion-note"
-								title="<?php esc_attr_e( 'Posts toggled off from llms.txt are excluded from this average.', 'ai-search-optimizer' ); ?>"
+								title="<?php esc_attr_e( 'Posts toggled off from llms.txt are excluded from this average. They still appear in the post-level table below.', 'ai-search-optimizer' ); ?>"
 							>
 								<?php echo esc_html( "({$excluded_count} excluded from llms.txt)" ); ?>
 							</span>
