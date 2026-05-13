@@ -166,6 +166,28 @@ final class DashboardData {
 		return (int) ( $result ?? 0 );
 	}
 
+	public function get_scored_count(): int {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Admin stat; real-time data, intentionally uncached.
+		$result = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(DISTINCT pm.post_id)
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 LEFT JOIN {$wpdb->postmeta} excl
+				        ON excl.post_id = pm.post_id
+				       AND excl.meta_key = '_citewp_aiso_exclude_from_llms'
+				 WHERE pm.meta_key = %s
+				   AND p.post_status = 'publish'
+				   AND p.post_type IN ('post','page')
+				   AND ( excl.meta_value IS NULL OR excl.meta_value != '1' )",
+				Repository::META_KEY_TOTAL
+			)
+		);
+		return (int) ( $result ?? 0 );
+	}
+
 	public function get_excluded_count(): int {
 		global $wpdb;
 

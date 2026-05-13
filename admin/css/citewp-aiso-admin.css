@@ -1875,6 +1875,14 @@
   margin-top: 5px;
 }
 
+.citewp-aiso-kpi-card__exclusion-note {
+  display: block;
+  font-size: 11px;
+  color: var(--citewp-text-muted);
+  margin-top: 2px;
+  cursor: help;
+}
+
 .citewp-aiso-kpi-card__pct {
   font: 700 14px/1 'Inter', system-ui, sans-serif;
   color: var(--citewp-text-muted);

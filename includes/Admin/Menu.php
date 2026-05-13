@@ -280,13 +280,15 @@ final class Menu {
 	}
 
 	private function render_dashboard_panel(): void {
-		$data         = new DashboardData();
-		$avg_score    = $data->get_average_score();
-		$trend        = $data->get_visit_trend();
-		$lowest_posts = $data->get_lowest_scoring_posts();
-		$issue_count  = $data->get_issue_count();
-		$top_crawlers = $data->get_top_crawlers( 5 );
-		$unique_bots  = $data->get_unique_bot_count();
+		$data           = new DashboardData();
+		$avg_score      = $data->get_average_score();
+		$trend          = $data->get_visit_trend();
+		$lowest_posts   = $data->get_lowest_scoring_posts();
+		$issue_count    = $data->get_issue_count();
+		$top_crawlers   = $data->get_top_crawlers( 5 );
+		$unique_bots    = $data->get_unique_bot_count();
+		$scored_count   = $data->get_scored_count();
+		$excluded_count = $data->get_excluded_count();
 
 		$avg_grade = 'empty';
 		if ( $avg_score !== null ) {
@@ -384,6 +386,19 @@ final class Menu {
 							<?php echo esc_html( ScoreDial::grade_label( $kpi_score_grade ) ); ?>
 						</div>
 						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub">
+							<span class="citewp-aiso-kpi-card__pages-scored">
+								<?php echo esc_html( "{$scored_count} of {$indexed_total} pages included" ); ?>
+							</span>
+							<?php if ( $excluded_count > 0 ) : ?>
+							<span
+								class="citewp-aiso-kpi-card__exclusion-note"
+								title="<?php esc_attr_e( 'Posts toggled off from llms.txt are excluded from this average.', 'ai-search-optimizer' ); ?>"
+							>
+								<?php echo esc_html( "({$excluded_count} excluded from llms.txt)" ); ?>
+							</span>
+							<?php endif; ?>
+						</div>
 					</div>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
@@ -902,7 +917,19 @@ final class Menu {
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></div>
-						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%1$d of %2$d pages scored', 'ai-search-optimizer' ), $total_scored, $published_total_all ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub">
+							<span class="citewp-aiso-kpi-card__pages-scored">
+								<?php echo esc_html( "{$total_scored} of {$published_total_all} pages included" ); ?>
+							</span>
+							<?php if ( $excluded_count > 0 ) : ?>
+							<span
+								class="citewp-aiso-kpi-card__exclusion-note"
+								title="<?php esc_attr_e( 'Posts toggled off from llms.txt are excluded from this average. They still appear in the post-level table below.', 'ai-search-optimizer' ); ?>"
+							>
+								<?php echo esc_html( "({$excluded_count} excluded from llms.txt)" ); ?>
+							</span>
+							<?php endif; ?>
+						</div>
 						<?php if ( $hist_delta !== null ) : ?>
 						<div class="citewp-aiso-kpi-card__trend <?php echo $hist_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $hist_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' ); ?>">
 							<?php if ( $hist_delta > 0 ) : ?>
