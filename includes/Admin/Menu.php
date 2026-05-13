@@ -1105,7 +1105,7 @@ final class Menu {
 				<!-- Panel head: title + tooltip + search -->
 				<div class="citewp-aiso-cs-table-head">
 					<span class="citewp-aiso-cs-table-head__title">
-						<?php esc_html_e( 'Post-Level Cite Scores', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'Post & Page Cite Scores', 'ai-search-optimizer' ); ?>
 						<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'All scored posts on your site, sorted by lowest Cite Score first. Click Optimize to open the post and improve its score.', 'ai-search-optimizer' ); ?></span>
@@ -1128,7 +1128,7 @@ final class Menu {
 				<table class="citewp-aiso-cs-table">
 					<thead>
 						<tr>
-							<th style="width:36%"><?php esc_html_e( 'Post',         'ai-search-optimizer' ); ?></th>
+							<th style="width:36%"><?php esc_html_e( 'Title',        'ai-search-optimizer' ); ?></th>
 							<th style="width:10%"><?php esc_html_e( 'Cite Score',   'ai-search-optimizer' ); ?></th>
 							<th style="width:8%"><?php esc_html_e( 'Trend',        'ai-search-optimizer' ); ?></th>
 							<th style="width:14%"><?php esc_html_e( 'Last Updated', 'ai-search-optimizer' ); ?></th>
@@ -1166,7 +1166,7 @@ final class Menu {
 							$t_trend_html = '<span class="citewp-aiso-cs-table__trend--flat">—</span>';
 						?>
 						<tr>
-							<td>
+							<td class="citewp-aiso-cs-post-cell">
 								<span style="display:inline-flex;align-items:flex-start;gap:8px">
 									<span style="color:var(--citewp-text-muted);display:inline-flex;flex-shrink:0;margin-top:2px"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 									<?php if ( $t_edit_url ) : ?>
@@ -1174,6 +1174,9 @@ final class Menu {
 									<?php else : ?>
 									<?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?>
 									<?php endif; ?>
+									<span class="citewp-aiso-cs-post-type-pill citewp-aiso-cs-post-type-pill--<?php echo esc_attr( $t_post_type ); ?>">
+										<?php echo esc_html( $t_post_type === 'page' ? __( 'Page', 'ai-search-optimizer' ) : __( 'Post', 'ai-search-optimizer' ) ); ?>
+									</span>
 								</span>
 							</td>
 							<td><span class="citewp-aiso-score-pill citewp-aiso-score-pill--<?php echo esc_attr( $t_grade ); ?>"><?php echo esc_html( (string) $t_score ); ?></span></td>

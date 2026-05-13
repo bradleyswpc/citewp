@@ -2497,6 +2497,30 @@
   color: var(--citewp-text-primary);
 }
 
+/* Post-type pill — appears inline after post title in the Title column */
+.citewp-aiso-cs-post-cell {
+  vertical-align: middle;
+}
+.citewp-aiso-cs-post-type-pill {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+.citewp-aiso-cs-post-type-pill--post {
+  background: var(--citewp-blue-tint);
+  color: var(--citewp-tint-blue);
+}
+.citewp-aiso-cs-post-type-pill--page {
+  background: var(--citewp-purple-tint);
+  color: var(--citewp-tint-purple);
+}
+
 .citewp-aiso-cs-recs-btn {
   display: block;
   text-align: center;
