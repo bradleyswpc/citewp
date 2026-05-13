@@ -727,7 +727,8 @@ final class Menu {
 			],
 		] );
 		$total_scored   = count( $scored_ids );
-		$excluded_count = ( new DashboardData() )->get_excluded_count();
+		$data           = new DashboardData();
+		$excluded_count = $data->get_excluded_count();
 
 		// ── Site-wide stats (sample first 50 for signal analysis) ───────
 		$score_sum      = 0;
