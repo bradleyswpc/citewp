@@ -6,6 +6,71 @@
 
 ---
 
+## Session 27 — Exclude Opted-Out Posts from Aggregate Cite Score Metrics ✅
+
+**Date:** 2026-05-13
+
+### Deliverable
+
+Exclude posts where `_citewp_aiso_exclude_from_llms = '1'` from every aggregate Cite Score metric on the admin UI. Per-post surfaces (post list column, Cite Score page per-post table, Gutenberg sidebar, EditorPanel meta box) are unchanged. Version bump 0.7.1 → 0.7.2. Full X13 pipeline: plan → subagent-driven execution (5 tasks, 8 commits) → spec + quality review per task → final overall review → push.
+
+**What shipped:**
+
+1. **`includes/Admin/DashboardData.php` (T1):**
+   - `get_average_score()`: LEFT JOIN exclusion wrapped in subquery alias to prevent AVG fanout
+   - `get_issue_count()`: LEFT JOIN exclusion
+   - `get_lowest_scoring_posts()`: nested AND/OR `meta_query` exclusion
+   - `get_excluded_count()` (new): COUNT of published posts/pages opted out
+   - `get_scored_count()` (new): COUNT(DISTINCT pm.post_id) of scored non-opted-out published posts
+
+2. **`includes/Admin/Menu.php` (T2, T4):**
+   - `render_cite_score_panel()`: `$scored_ids` WP_Query now uses nested AND/OR `meta_query` (EXISTS + NOT EXISTS / != '1') with `post_status => 'publish'`; sub-line replaced with two-span pattern (pages included + conditional exclusion note with tooltip)
+   - `render_dashboard_panel()`: Dashboard KPI Card 1 gets same two-span sub-line
+   - `$excluded_count` sourced from named `$data = new DashboardData()` instance (not inline anonymous instantiation)
+
+3. **`includes/Scoring/ScoreHistory.php` (T3):**
+   - `compute_current_average()`: same LEFT JOIN + subquery pattern as `DashboardData::get_average_score()`
+
+4. **`admin/css/citewp-aiso-admin.css` (T4):**
+   - `.citewp-aiso-kpi-card__exclusion-note`: `display: block`, `color: var(--citewp-text-muted)`, `margin-top: 2px`, `cursor: help` (font-size inherits from parent `.citewp-aiso-kpi-card__sub`)
+
+5. **`ai-search-optimizer.php` + `readme.txt` (T5):**
+   - Version bumped 0.7.1 → 0.7.2
+   - `= 0.7.2 =` changelog entry in readme.txt
+
+**Key bugs caught and fixed during review:**
+- AVG fanout risk (two postmeta JOINs) → subquery wrapper on all AVG queries
+- `meta_key` + OR `meta_query` short-circuit → nested AND/OR `meta_query` only
+- Dashboard KPI tooltip missing second sentence → fixed
+- `post_status` mismatch (draft included in `$scored_ids`, excluded from SQL) → restricted to `publish`
+- Redundant `font-size` on exclusion-note CSS child → removed
+
+**Files modified:**
+- `includes/Admin/DashboardData.php`
+- `includes/Admin/Menu.php`
+- `includes/Scoring/ScoreHistory.php`
+- `admin/css/citewp-aiso-admin.css`
+- `ai-search-optimizer.php`
+- `readme.txt`
+
+**npm build:** ✅ Clean (not rebuilt — no JS changes this session)
+
+**Decisions made:** P49 (aggregate metrics exclude opted-out posts — see DECISIONS.md)
+
+**Verified:**
+- All 8 commits pushed to origin/main ✅
+- `debug.log`: pending manual check
+- Manual smoke test: pending (5-step toggle test + SQL spot-check + cron verification)
+
+**Carryover into next session:**
+- Manual smoke test on citewp-dev.local: toggle a post on/off, verify Dashboard + Cite Score KPI values update, check SQL spot-check query, run WP cron manually, check debug.log
+- S26 live verification: 10 FAQ fixture test + Bug B on citewp.com (upload v0.7.2, verify schema signal = 3/6 partial on Rank Math page)
+- WP.org approval check (hello@citewp.com)
+
+**Next session focus:** S26 + S27 live verification, then next backlog priority per master file.
+
+---
+
 ## Session 26 — FAQ Detection v2 + Schema Signal Grading + 3-State Panel Message ✅
 
 **Date:** 2026-05-12
