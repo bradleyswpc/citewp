@@ -1851,9 +1851,10 @@
 
 /* Top Crawler card — constrain value text for long bot names */
 .citewp-aiso-kpi-card--top-crawler .citewp-aiso-kpi-card__value {
-  font-size: 22px;
-  line-height: 1.15;
-  max-height: 2.3em;
+  font-size: 20px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  max-height: 2.2em;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -2021,6 +2022,7 @@
 .citewp-aiso-cite-score-page__left-chart {
   width: 100%;
   margin-top: var(--sp-6);
+  flex: 0 0 auto;
 }
 
 /* Post-Level table: post title links — Obsidian, no underline */
@@ -2212,7 +2214,6 @@
   border: 1px solid var(--citewp-border);
   border-radius: var(--radius-lg);
   padding: var(--sp-5);
-  min-height: 280px;
 }
 
 .citewp-aiso-cs-history-head {
