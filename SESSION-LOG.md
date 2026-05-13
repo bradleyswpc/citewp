@@ -6,6 +6,92 @@
 
 ---
 
+## Session 28 — Cite Score Page Polish + AI Recommendations Routing Fix + Rail Densification ✅
+
+**Date:** 2026-05-13
+
+### Deliverable
+
+Seven UX polish items discovered from a full day of dogfooding citewp.com. No scoring math touched (Engine.php untouched, RecommendationMapper extended with label/copy/anchor only). Full X13 pipeline: subagent-driven execution (7 tasks, 10 commits) → spec + quality review per task → final overall review → push. Version bump 0.7.2 → 0.7.3.
+
+### What shipped
+
+1. **T1 — Top Crawler KPI card (`Menu.php`, `DashboardData.php`):**
+   - Replaced duplicative Avg Cite Score Card 1 (same number as the gauge directly below) with a Top Crawler card
+   - Shows bot display name, visit count "N visits in last 7 days", trend (↑ ↓ →), empty state
+   - Data from `DashboardData::get_top_crawlers(1)`; footer links to `#crawler-logs`
+   - Decision: P50
+
+2. **T2 — Label fix (`Menu.php`):**
+   - "Posts Optimized" → "Posts/Pages Optimized" (KPI Card 2 title)
+   - "across N posts needing attention" → "across N items needing attention" (Card 3 caption)
+
+3. **T3 — Post & Page Cite Scores table (`Menu.php`, `admin/css/citewp-aiso-admin.css`):**
+   - Section renamed "Post & Page Cite Scores" (was "Post-Level Cite Scores")
+   - Column header "Post" → "Title"
+   - Post-type pill added to each row (Post=blue/citewp-blue-tint, Page=purple/citewp-purple-tint)
+
+4. **T4 — AI Recommendations affordances + routing fix (`Menu.php`, `RecommendationMapper.php`, `RecommendationFilter.php`, admin CSS):**
+   - Bug fix: `$view_url` hardcoded `post_type=post` → now uses `RecommendationFilter::dominant_post_type($signal_id)` — routes to Pages list when affected content is pages-dominant
+   - New `dominant_post_type()` method: counts post/page among affected IDs, ties default to 'post'
+   - "Learn More →" inline link added to each rec card sub-copy, linking to `citewp.com/cite-score#anchor`
+   - All 17 MAP entries in `RecommendationMapper` got `'anchor'` keys (full rubric anchor map)
+   - Admin Dashboard rec button renamed "View AI Recommendations →"
+   - Decision: P51
+
+5. **T5 — Chart relocation (`Menu.php`, admin CSS):**
+   - Cite Score Over Time chart cut from right column, placed full-width after two-column body, before Pro Tip
+   - New wrapper: `citewp-aiso-cite-score-page__chart-fullwidth` with `grid-column: 1 / -1`
+
+6. **T6 — Left rail densification (admin CSS):**
+   - `.citewp-aiso-rail__item` padding: 10px → 8px vertical
+   - `.citewp-aiso-rail__item-desc` line-height: 1.3 → 1.25
+   - Improves usability at 100% browser zoom
+
+7. **T7 — Version bump + readme:**
+   - `0.7.2` → `0.7.3` in plugin header + constant + readme.txt Stable tag
+   - `= 0.7.3 =` changelog entry added
+
+### Files modified
+
+- `includes/Admin/Menu.php`
+- `includes/Admin/RecommendationMapper.php`
+- `includes/Admin/RecommendationFilter.php`
+- `admin/css/citewp-aiso-admin.css`
+- `ai-search-optimizer.php`
+- `readme.txt`
+
+### npm build
+
+✅ Clean (`webpack 5.x compiled successfully`)
+
+### Decisions made
+
+- P49 (carried from S27 — was missing from DECISIONS.md): aggregate metrics exclude opted-out posts
+- P50: Cite Score page Card 1 surfaces Top Crawler instead of duplicating gauge
+- P51: AI Recommendations card affordances pattern + post-type-aware routing
+
+### Verified
+
+- All 10 commits pushed to origin/main ✅
+- npm build clean ✅
+- `debug.log`: pending manual check on citewp-dev.local
+- Manual smoke test: pending (see carryover)
+
+### Carryover into S29
+
+- **Manual smoke test** (citewp-dev.local): open Cite Score page, verify T1–T6 render correctly at 100% zoom; click a rec "View N posts" for a pages-only signal, verify `post_type=page` in URL; click "Learn More →", verify opens `citewp.com/cite-score#anchor` in new tab
+- **S26 Bug B live verification** (still outstanding): upload v0.7.3 to citewp.com, verify schema signal = 3/6 on Rank Math page, 6/6 after Article JSON-LD insert
+- **S27 manual smoke test** (still outstanding): toggle a post on/off, verify Dashboard + Cite Score KPI values update
+- **WP.org approval check** (hello@citewp.com)
+- **P49 DECISIONS.md entry** — was referenced in S27 SESSION-LOG but row was never written; needs to be added before next session
+
+### Next session focus
+
+S29 — run carryover smoke tests, then next backlog priority (FB38 Dashboard restructure, FB30 Cite Bridges, or FB39 Publish block injection per master file)
+
+---
+
 ## Session 27 — Exclude Opted-Out Posts from Aggregate Cite Score Metrics ✅
 
 **Date:** 2026-05-13
