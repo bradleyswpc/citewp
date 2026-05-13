@@ -929,11 +929,11 @@ final class Menu {
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( $top_crawler['display_name'] ); ?></div>
 						<div class="citewp-aiso-kpi-card__sub">
 							<?php
-							printf(
-								/* translators: %d: number of visits */
-								esc_html__( '%d visits in last 7 days', 'ai-search-optimizer' ),
+							echo esc_html( sprintf(
+								/* translators: %d: number of bot visits in last 7 days */
+								__( '%d visits in last 7 days', 'ai-search-optimizer' ),
 								(int) $top_crawler['visits']
-							);
+							) );
 							?>
 						</div>
 						<?php
