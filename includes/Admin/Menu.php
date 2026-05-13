@@ -969,7 +969,7 @@ final class Menu {
 			<!-- Card 2: Posts Optimized -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Posts Optimized', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Posts/Pages Optimized', 'ai-search-optimizer' ); ?></span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
 					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-green-tint);color:var(--citewp-tint-green)">
@@ -999,7 +999,7 @@ final class Menu {
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $issue_count ); ?></div>
-						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( 'across %d posts needing attention', 'ai-search-optimizer' ), $issue_count ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( 'across %d items needing attention', 'ai-search-optimizer' ), $issue_count ); ?></div>
 						<div class="citewp-aiso-kpi-card__split">
 							<span class="citewp-aiso-kpi-card__split--critical"><?php echo esc_html( (string) $critical_count ); ?> <?php esc_html_e( 'critical', 'ai-search-optimizer' ); ?></span>
 							<span class="citewp-aiso-kpi-card__split--sep">·</span>
