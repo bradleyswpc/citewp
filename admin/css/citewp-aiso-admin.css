@@ -1849,6 +1849,29 @@
   margin-top: var(--sp-5);
 }
 
+/* Top Crawler card — constrain value text for long bot names */
+.citewp-aiso-kpi-card--top-crawler .citewp-aiso-kpi-card__value {
+  font-size: 22px;
+  line-height: 1.15;
+  max-height: 2.3em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+}
+
+/* KPI card row — consistent min-height so Top Crawler card matches siblings */
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+}
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__body {
+  flex: 1 1 auto;
+  align-items: center;
+}
+
 /* ── Cite Score KPI card densification (S24) ───────────────────── */
 
 .citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__value-row {

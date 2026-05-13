@@ -910,7 +910,7 @@ final class Menu {
 		<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--3col citewp-aiso-cs-kpi-row">
 
 			<!-- Card 1: Top Crawler -->
-			<div class="citewp-aiso-kpi-card">
+			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--top-crawler">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Top Crawler', 'ai-search-optimizer' ); ?></span>
 					<span
