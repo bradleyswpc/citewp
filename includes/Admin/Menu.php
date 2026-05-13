@@ -519,7 +519,7 @@ final class Menu {
 								<p class="citewp-aiso-insights__opp-body"><?php esc_html_e( 'Add structured schema markup to your highest-traffic posts to improve citation potential.', 'ai-search-optimizer' ); ?></p>
 								<p class="citewp-aiso-insights__opp-muted"><?php esc_html_e( 'Posts with schema are 3× more likely to be cited in AI responses.', 'ai-search-optimizer' ); ?></p>
 								<div class="citewp-aiso-insights__opp-actions">
-									<a href="#cite-score" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'View Recommendations →', 'ai-search-optimizer' ); ?></a>
+									<a href="#cite-score" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'View AI Recommendations →', 'ai-search-optimizer' ); ?></a>
 								</div>
 							</div>
 						</div>
@@ -1268,6 +1268,7 @@ final class Menu {
 		<div class="citewp-aiso-cite-score-page__right">
 
 			<?php
+			$cite_score_rubric_url = 'https://citewp.com/cite-score';
 			// Category → orb tint + icon mapping for rec rows
 			$rec_cat_meta = [
 				'structure'  => [ 'bg' => 'rgba(124,58,237,0.12)', 'color' => 'var(--citewp-tint-purple)', 'icon' => 'layout'   ],
@@ -1336,9 +1337,10 @@ final class Menu {
 								$affected_cnt  = $item['count'];
 								$cat_key       = $rec['category'] ?? '';
 								$cat_orb       = $rec_cat_meta[ $cat_key ] ?? $rec_cat_meta[''];
+								$dominant_type = RecommendationFilter::dominant_post_type( $rec_signal_id );
 								$view_url      = add_query_arg(
 									[
-										'post_type'           => 'post',
+										'post_type'           => $dominant_type,
 										'aiso_recommendation' => $rec_signal_id,
 									],
 									admin_url( 'edit.php' )
@@ -1357,7 +1359,17 @@ final class Menu {
 									<div class="citewp-aiso-cs-rec-row__title">
 										<?php echo esc_html( $rec['label'] . ' (' . $affected_cnt . ' ' . _n( 'page', 'pages', $affected_cnt, 'ai-search-optimizer' ) . ')' ); ?>
 									</div>
-									<div class="citewp-aiso-cs-rec-row__sub"><?php echo esc_html( $rec['copy'] ); ?></div>
+									<div class="citewp-aiso-cs-rec-row__sub">
+										<?php echo esc_html( $rec['copy'] ); ?>
+										<?php if ( ! empty( $rec['anchor'] ) ) : ?>
+											<a href="<?php echo esc_url( $cite_score_rubric_url . '#' . $rec['anchor'] ); ?>"
+											   class="citewp-aiso-cs-rec-row__learn-more"
+											   target="_blank"
+											   rel="noopener">
+												<?php esc_html_e( 'Learn More →', 'ai-search-optimizer' ); ?>
+											</a>
+										<?php endif; ?>
+									</div>
 								</div>
 								<a href="<?php echo esc_url( $view_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php echo esc_html( $btn_label ); ?></a>
 							</div>
