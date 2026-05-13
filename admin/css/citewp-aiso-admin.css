@@ -1994,6 +1994,12 @@
   height: auto;
 }
 
+.citewp-aiso-cite-score-page__chart-fullwidth {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: var(--sp-6);
+}
+
 /* Post-Level table: post title links — Obsidian, no underline */
 .citewp-aiso-cs-table td a {
   color: var(--citewp-obsidian);
