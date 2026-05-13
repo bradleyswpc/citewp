@@ -2014,7 +2014,8 @@
   align-self: start;
 }
 
-.citewp-aiso-cite-score-page__right .citewp-aiso-cs-panel {
+.citewp-aiso-cite-score-page__right .citewp-aiso-cs-panel,
+.citewp-aiso-cite-score-page__left > .citewp-aiso-cite-score-page__left-chart {
   height: auto;
 }
 
