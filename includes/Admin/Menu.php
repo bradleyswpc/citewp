@@ -932,24 +932,25 @@ final class Menu {
 							echo esc_html( sprintf(
 								/* translators: %d: number of bot visits in last 7 days */
 								__( '%d visits in last 7 days', 'ai-search-optimizer' ),
-								(int) $top_crawler['visits']
+								(int) ( $top_crawler['visits'] ?? 0 )
 							) );
 							?>
 						</div>
 						<?php
-						$tc_current = (int) $top_crawler['visits'];
-						$tc_prior   = (int) $top_crawler['prior_visits'];
+						$tc_current = (int) ( $top_crawler['visits'] ?? 0 );
+						$tc_prior   = (int) ( $top_crawler['prior_visits'] ?? 0 );
 						$tc_delta   = $tc_current - $tc_prior;
+						$tc_trend_class = 'citewp-aiso-kpi-card__trend--flat';
 						if ( $tc_current > 0 || $tc_prior > 0 ) :
 							$tc_trend_class = $tc_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $tc_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' );
 						?>
 						<div class="citewp-aiso-kpi-card__trend <?php echo esc_attr( $tc_trend_class ); ?>">
 							<?php if ( $tc_delta > 0 ) : ?>
-								↑ +<?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
+								<?php echo esc_html( '↑' ); ?> +<?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
 							<?php elseif ( $tc_delta < 0 ) : ?>
-								↓ <?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
+								<?php echo esc_html( '↓' ); ?> <?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
 							<?php else : ?>
-								→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'no change vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
+								<?php echo esc_html( '→' ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'no change vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
 							<?php endif; ?>
 						</div>
 						<?php endif; ?>
