@@ -25,16 +25,19 @@ final class DashboardData {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Admin stat; real-time data, intentionally uncached.
 		$result = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT ROUND( AVG( CAST( pm.meta_value AS UNSIGNED ) ) )
-				 FROM {$wpdb->postmeta} pm
-				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-				 LEFT JOIN {$wpdb->postmeta} excl
-				        ON excl.post_id = pm.post_id
-				       AND excl.meta_key = '_citewp_aiso_exclude_from_llms'
-				 WHERE pm.meta_key = %s
-				   AND p.post_status = 'publish'
-				   AND p.post_type IN ('post', 'page')
-				   AND ( excl.meta_value IS NULL OR excl.meta_value != '1' )",
+				"SELECT ROUND( AVG( score ) )
+				 FROM (
+				     SELECT CAST( pm.meta_value AS UNSIGNED ) AS score
+				     FROM {$wpdb->postmeta} pm
+				     INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				     LEFT JOIN {$wpdb->postmeta} excl
+				            ON excl.post_id = pm.post_id
+				           AND excl.meta_key = '_citewp_aiso_exclude_from_llms'
+				     WHERE pm.meta_key = %s
+				       AND p.post_status = 'publish'
+				       AND p.post_type IN ('post', 'page')
+				       AND ( excl.meta_value IS NULL OR excl.meta_value != '1' )
+				 ) AS included_scores",
 				Repository::META_KEY_TOTAL
 			)
 		);
