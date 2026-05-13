@@ -4,7 +4,7 @@ Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.7.1
+Stable tag: 0.7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,9 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. llms.txt Settings — configure which content appears in your llms.txt and llms-full.txt files.
 
 == Changelog ==
+
+= 0.7.2 =
+* Improvement: Exclude posts toggled off from llms.txt from aggregate Cite Score metrics (Dashboard and Cite Score page KPI cards, daily cron average).
 
 = 0.7.1 =
 * Improvement: FAQ detection now recognises accordions built with Kadence, Elementor, Divi, Beaver Builder, Bricks, Spectra, and HTML5 details/summary — in addition to standard headings.
