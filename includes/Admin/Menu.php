@@ -1169,7 +1169,7 @@ final class Menu {
 							<td class="citewp-aiso-cs-post-cell">
 								<span style="color:var(--citewp-text-muted);display:inline-flex;flex-shrink:0;margin-top:2px"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 								<?php if ( $t_edit_url ) : ?>
-								<a href="<?php echo esc_url( $t_edit_url ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
+								<a href="<?php echo esc_url( $t_edit_url ); ?>" title="<?php echo esc_attr( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
 								<?php else : ?>
 								<span><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></span>
 								<?php endif; ?>
