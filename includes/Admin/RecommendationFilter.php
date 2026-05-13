@@ -77,6 +77,25 @@ final class RecommendationFilter {
 	}
 
 	/**
+	 * Returns the dominant post type ('post' or 'page') among the affected IDs
+	 * for a given signal, so recommendation links route to the correct list screen.
+	 */
+	public static function dominant_post_type( string $signal_id ): string {
+		$ids = self::get_affected_ids( $signal_id );
+		if ( empty( $ids ) ) {
+			return 'post';
+		}
+		$counts = [ 'post' => 0, 'page' => 0 ];
+		foreach ( $ids as $pid ) {
+			$type = get_post_type( $pid );
+			if ( isset( $counts[ $type ] ) ) {
+				$counts[ $type ]++;
+			}
+		}
+		return $counts['page'] > $counts['post'] ? 'page' : 'post';
+	}
+
+	/**
 	 * Narrows the main posts-list query when ?aiso_recommendation= is set.
 	 */
 	public function apply_filter( \WP_Query $query ): void {

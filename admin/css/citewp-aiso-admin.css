@@ -2308,6 +2308,19 @@
   margin-top: 2px;
 }
 
+.citewp-aiso-cs-rec-row__learn-more {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--citewp-tint-blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.citewp-aiso-cs-rec-row__learn-more:hover {
+  text-decoration: underline;
+}
+
 /* Empty state inside AI Recommendations nested-bottom */
 .citewp-aiso-cs-rec-empty {
   font: 400 13px/1.5 'Inter', system-ui, sans-serif;
