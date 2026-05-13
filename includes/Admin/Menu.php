@@ -1241,30 +1241,46 @@ final class Menu {
 
 			</div><!-- /.citewp-aiso-cs-table-wrap -->
 
-			<!-- Pro Tip — last child in left column -->
-			<?php
-			$cs_protip = apply_filters(
-				'citewp_aiso/protip',
-				__( 'Connect Google Search Console to get more insights and improve your Cite Score faster.', 'ai-search-optimizer' ),
-				'cite-score'
-			);
-			?>
-			<div class="citewp-aiso-protip">
-				<div class="citewp-aiso-protip__left">
-					<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'zap', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-					<div class="citewp-aiso-protip__content">
-						<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
-						<p class="citewp-aiso-protip__body"><?php echo esc_html( $cs_protip ); ?></p>
+			<!-- Cite Score Over Time — inside left column, below Post & Page table -->
+			<div class="citewp-aiso-cs-panel citewp-aiso-cite-score-page__left-chart">
+				<div class="citewp-aiso-cs-history-head">
+					<h3 class="citewp-aiso-cs-panel__title">
+						<?php esc_html_e( 'Cite Score Over Time', 'ai-search-optimizer' ); ?>
+						<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
+							<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is recorded daily. The chart shows your average across the selected timeframe.', 'ai-search-optimizer' ); ?></span>
+						</span>
+					</h3>
+					<form method="get" action="<?php echo esc_url( $base_url ); ?>" style="margin:0">
+						<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
+						<input type="hidden" name="csp"  value="<?php echo esc_attr( (string) $paged ); ?>">
+						<input type="hidden" name="cspp" value="<?php echo esc_attr( (string) $per_page ); ?>">
+						<input type="hidden" name="css"  value="<?php echo esc_attr( $search_q ); ?>">
+						<select name="cs_range" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
+							<?php foreach ( [ 7 => __( 'Last 7 Days', 'ai-search-optimizer' ), 30 => __( 'Last 30 Days', 'ai-search-optimizer' ), 90 => __( 'Last 90 Days', 'ai-search-optimizer' ) ] as $days => $label ) : ?>
+							<option value="<?php echo esc_attr( (string) $days ); ?>"<?php selected( $days, $history_range ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</form>
+				</div>
+				<?php $this->render_history_svg( $history ); ?>
+				<?php if ( $hist_avg !== null ) : ?>
+				<div class="citewp-aiso-history-panel__stats">
+					<div>
+						<div class="citewp-aiso-history-panel__stat-label"><?php esc_html_e( 'Avg Score', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-history-panel__stat-value"><?php echo esc_html( (string) $hist_avg ); ?></div>
+					</div>
+					<div>
+						<div class="citewp-aiso-history-panel__stat-label"><?php esc_html_e( 'Peak', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-history-panel__stat-value"><?php echo esc_html( (string) $hist_peak ); ?></div>
 					</div>
 				</div>
-				<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
-					<?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?>
-				</a>
+				<?php endif; ?>
 			</div>
 
 		</div><!-- /.citewp-aiso-cite-score-page__left -->
 
-		<!-- Right column: 1fr — AI Recommendations + Cite Score Over Time -->
+		<!-- Right column: 1fr — AI Recommendations only -->
 		<div class="citewp-aiso-cite-score-page__right">
 
 			<?php
@@ -1389,46 +1405,28 @@ final class Menu {
 
 	</div><!-- /.citewp-aiso-cite-score-page__body -->
 
-	<!-- Cite Score Over Time — full-width row below the two-column body -->
-	<div class="citewp-aiso-cite-score-page__chart-fullwidth">
-		<div class="citewp-aiso-cs-panel">
-			<div class="citewp-aiso-cs-history-head">
-				<h3 class="citewp-aiso-cs-panel__title">
-					<?php esc_html_e( 'Cite Score Over Time', 'ai-search-optimizer' ); ?>
-					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
-						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Site-wide Cite Score is recorded daily. The chart shows your average across the selected timeframe.', 'ai-search-optimizer' ); ?></span>
-					</span>
-				</h3>
-				<form method="get" action="<?php echo esc_url( $base_url ); ?>" style="margin:0">
-					<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
-					<input type="hidden" name="csp"  value="<?php echo esc_attr( (string) $paged ); ?>">
-					<input type="hidden" name="cspp" value="<?php echo esc_attr( (string) $per_page ); ?>">
-					<input type="hidden" name="css"  value="<?php echo esc_attr( $search_q ); ?>">
-					<select name="cs_range" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
-						<?php foreach ( [ 7 => __( 'Last 7 Days', 'ai-search-optimizer' ), 30 => __( 'Last 30 Days', 'ai-search-optimizer' ), 90 => __( 'Last 90 Days', 'ai-search-optimizer' ) ] as $days => $label ) : ?>
-						<option value="<?php echo esc_attr( (string) $days ); ?>"<?php selected( $days, $history_range ); ?>><?php echo esc_html( $label ); ?></option>
-						<?php endforeach; ?>
-					</select>
-				</form>
+	<!-- Pro Tip — full width, outside two-column body -->
+	<?php
+	$cs_protip = apply_filters(
+		'citewp_aiso/protip',
+		__( 'Connect Google Search Console to get more insights and improve your Cite Score faster.', 'ai-search-optimizer' ),
+		'cite-score'
+	);
+	?>
+	<div class="citewp-aiso-protip">
+		<div class="citewp-aiso-protip__left">
+			<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'zap', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+			<div class="citewp-aiso-protip__content">
+				<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
+				<p class="citewp-aiso-protip__body"><?php echo esc_html( $cs_protip ); ?></p>
 			</div>
-			<?php $this->render_history_svg( $history ); ?>
-			<?php if ( $hist_avg !== null ) : ?>
-			<div class="citewp-aiso-history-panel__stats">
-				<div>
-					<div class="citewp-aiso-history-panel__stat-label"><?php esc_html_e( 'Avg Score', 'ai-search-optimizer' ); ?></div>
-					<div class="citewp-aiso-history-panel__stat-value"><?php echo esc_html( (string) $hist_avg ); ?></div>
-				</div>
-				<div>
-					<div class="citewp-aiso-history-panel__stat-label"><?php esc_html_e( 'Peak', 'ai-search-optimizer' ); ?></div>
-					<div class="citewp-aiso-history-panel__stat-value"><?php echo esc_html( (string) $hist_peak ); ?></div>
-				</div>
-			</div>
-			<?php endif; ?>
 		</div>
-	</div><!-- /.citewp-aiso-cite-score-page__chart-fullwidth -->
+		<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
+			<?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?>
+		</a>
+	</div>
 
-		<?php endif; // total_scored === 0
+	<?php endif; // total_scored === 0
 	}
 
 	/**

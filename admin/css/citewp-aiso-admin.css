@@ -2017,8 +2017,8 @@
   height: auto;
 }
 
-.citewp-aiso-cite-score-page__chart-fullwidth {
-  grid-column: 1 / -1;
+/* Cite Score Over Time chart — inside left column, below Post & Page table */
+.citewp-aiso-cite-score-page__left-chart {
   width: 100%;
   margin-top: var(--sp-6);
 }
