@@ -1167,16 +1167,14 @@ final class Menu {
 						?>
 						<tr>
 							<td class="citewp-aiso-cs-post-cell">
-								<span style="display:inline-flex;align-items:flex-start;gap:8px">
-									<span style="color:var(--citewp-text-muted);display:inline-flex;flex-shrink:0;margin-top:2px"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-									<?php if ( $t_edit_url ) : ?>
-									<a href="<?php echo esc_url( $t_edit_url ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
-									<?php else : ?>
-									<?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?>
-									<?php endif; ?>
-									<span class="citewp-aiso-cs-post-type-pill citewp-aiso-cs-post-type-pill--<?php echo esc_attr( $t_post_type ); ?>">
-										<?php echo esc_html( $t_post_type === 'page' ? __( 'Page', 'ai-search-optimizer' ) : __( 'Post', 'ai-search-optimizer' ) ); ?>
-									</span>
+								<span style="color:var(--citewp-text-muted);display:inline-flex;flex-shrink:0;margin-top:2px"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+								<?php if ( $t_edit_url ) : ?>
+								<a href="<?php echo esc_url( $t_edit_url ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></a>
+								<?php else : ?>
+								<span><?php echo esc_html( get_the_title() ?: __( '(no title)', 'ai-search-optimizer' ) ); ?></span>
+								<?php endif; ?>
+								<span class="citewp-aiso-cs-post-type-pill citewp-aiso-cs-post-type-pill--<?php echo esc_attr( $t_post_type ); ?>">
+									<?php echo esc_html( $t_post_type === 'page' ? __( 'Page', 'ai-search-optimizer' ) : __( 'Post', 'ai-search-optimizer' ) ); ?>
 								</span>
 							</td>
 							<td><span class="citewp-aiso-score-pill citewp-aiso-score-pill--<?php echo esc_attr( $t_grade ); ?>"><?php echo esc_html( (string) $t_score ); ?></span></td>
