@@ -726,9 +726,11 @@ final class Menu {
 				],
 			],
 		] );
-		$total_scored   = count( $scored_ids );
-		$data           = new DashboardData();
-		$excluded_count = $data->get_excluded_count();
+		$total_scored    = count( $scored_ids );
+		$dashboard_data  = new DashboardData();
+		$excluded_count  = $dashboard_data->get_excluded_count();
+		$top_crawlers    = $dashboard_data->get_top_crawlers( 1 );
+		$top_crawler     = ! empty( $top_crawlers ) ? $top_crawlers[0] : null;
 
 		// ── Site-wide stats (sample first 50 for signal analysis) ───────
 		$score_sum      = 0;
@@ -907,42 +909,59 @@ final class Menu {
 		<!-- KPI card row — separate row below page header -->
 		<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--3col citewp-aiso-cs-kpi-row">
 
-			<!-- Card 1: Average Cite Score -->
+			<!-- Card 1: Top Crawler -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Average Cite Score', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Top Crawler', 'ai-search-optimizer' ); ?></span>
+					<span
+						class="citewp-aiso-kpi-card__info"
+						data-tooltip="<?php esc_attr_e( 'The AI bot that\'s visited your site most often in the last 7 days. A signal that your optimization work is being noticed.', 'ai-search-optimizer' ); ?>"
+					>
+						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
 					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-purple-tint);color:var(--citewp-tint-purple)">
-						<?php echo IconLibrary::icon( 'gauge', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo IconLibrary::icon( 'bot', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $avg_grade ); ?>"><?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?></div>
+						<?php if ( $top_crawler !== null ) : ?>
+						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( $top_crawler['display_name'] ); ?></div>
 						<div class="citewp-aiso-kpi-card__sub">
-							<span class="citewp-aiso-kpi-card__pages-scored">
-								<?php echo esc_html( "{$total_scored} of {$published_total_all} pages included" ); ?>
-							</span>
-							<?php if ( $excluded_count > 0 ) : ?>
-							<span
-								class="citewp-aiso-kpi-card__exclusion-note"
-								title="<?php esc_attr_e( 'Posts toggled off from llms.txt are excluded from this average. They still appear in the post-level table below.', 'ai-search-optimizer' ); ?>"
-							>
-								<?php echo esc_html( "({$excluded_count} excluded from llms.txt)" ); ?>
-							</span>
-							<?php endif; ?>
+							<?php
+							printf(
+								/* translators: %d: number of visits */
+								esc_html__( '%d visits in last 7 days', 'ai-search-optimizer' ),
+								(int) $top_crawler['visits']
+							);
+							?>
 						</div>
-						<?php if ( $hist_delta !== null ) : ?>
-						<div class="citewp-aiso-kpi-card__trend <?php echo $hist_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $hist_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' ); ?>">
-							<?php if ( $hist_delta > 0 ) : ?>
-								↑ +<?php echo esc_html( (string) $hist_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. last week', 'ai-search-optimizer' ); ?></span>
-							<?php elseif ( $hist_delta < 0 ) : ?>
-								↓ <?php echo esc_html( (string) $hist_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. last week', 'ai-search-optimizer' ); ?></span>
+						<?php
+						$tc_current = (int) $top_crawler['visits'];
+						$tc_prior   = (int) $top_crawler['prior_visits'];
+						$tc_delta   = $tc_current - $tc_prior;
+						if ( $tc_current > 0 || $tc_prior > 0 ) :
+							$tc_trend_class = $tc_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $tc_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' );
+						?>
+						<div class="citewp-aiso-kpi-card__trend <?php echo esc_attr( $tc_trend_class ); ?>">
+							<?php if ( $tc_delta > 0 ) : ?>
+								↑ +<?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
+							<?php elseif ( $tc_delta < 0 ) : ?>
+								↓ <?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
 							<?php else : ?>
-								→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'no change vs. last week', 'ai-search-optimizer' ); ?></span>
+								→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'no change vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
 							<?php endif; ?>
 						</div>
 						<?php endif; ?>
+						<?php else : ?>
+						<div class="citewp-aiso-kpi-card__value">—</div>
+						<div class="citewp-aiso-kpi-card__sub"><?php esc_html_e( 'No AI crawler visits yet', 'ai-search-optimizer' ); ?></div>
+						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Visits typically begin within 24–72 hours of publishing.', 'ai-search-optimizer' ); ?></div>
+						<?php endif; ?>
 					</div>
+				</div>
+				<div class="citewp-aiso-kpi-card__footer">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=citewp#crawler-logs' ) ); ?>"><?php esc_html_e( 'View Crawler Logs →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
