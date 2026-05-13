@@ -4,7 +4,7 @@ Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.7.3
+Stable tag: 0.7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,11 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. llms.txt Settings — configure which content appears in your llms.txt and llms-full.txt files.
 
 == Changelog ==
+
+= 0.7.4 =
+* Cite Score page: Top Crawler card value text constrained for long bot names; KPI card row height equalized
+* Cite Score page: Cite Score Over Time chart moved into left column (under Post & Page table); Pro Tip footer corrected to full-width position
+* Cite Score page: Post-type pill right-justified in Title column for consistent row alignment
 
 = 0.7.3 =
 * Cite Score page: replaced duplicate Avg Cite Score KPI card with Top Crawler card showing most active AI bot + 7-day trend
