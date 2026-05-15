@@ -6,6 +6,70 @@
 
 ---
 
+## Session 29 — WP.org Round 2 Compliance Fix (v0.6.1 → v0.6.2, parallel branch) ✅
+
+**Date:** 2026-05-15
+
+### Deliverable
+
+WP.org review round 2 returned 4 issues against v0.6.1. Fixed 2 real code issues (Detector.php `$_SERVER` sanitization, LogsTable.php `prepare()` refactor) and sharpened the readme Development section. Prepared context for the 2 false-positive replies. Built v0.6.2 zip and GitHub tag. All work happened against the v0.6.1 extracted source in the working folder — v0.7.4 in LocalWP was not touched.
+
+Working folder: `C:\Users\KingpinBWP\Desktop\CiteWP\ai-search-optimizer-v0.6.2-work\citewp-v0.6.1-resubmission\`
+
+### What shipped
+
+1. **Detector.php `$_SERVER` sanitization** — three `wp_unslash($_SERVER[...])` calls in `client_ip()`, `request_uri()`, `referer()` wrapped with `sanitize_text_field()`. Three `phpcs:ignore ValidatedSanitizedInput` comments removed.
+2. **LogsTable.php `prepare()` refactor** — `$where` fragments now built individually via `$wpdb->prepare()` at construction time. `$filter_args` and `$data_args` arrays deleted. Belt-and-suspenders inline allowlists for `$orderby`/`$order` added before queries. phpcs:disable comment updated to describe the new pattern accurately.
+3. **readme.txt** — Stable tag bumped 0.6.1 → 0.6.2. `== Development ==` section rewritten with `tree/v0.6.2` release-tagged source link, explicit unminified source path, build tooling note. `= 0.6.2 =` changelog entry prepended.
+4. **ai-search-optimizer.php** — Plugin Name: removed accidental `"0.6.1 "` prefix. `Version:` bumped to `0.6.2`. `CITEWP_AISO_VERSION` constant bumped to `'0.6.2'`.
+5. **`.distignore`** — Created. Documents all files excluded from WP.org distribution zips, including `SESSION-STATUS.md` and `SESSION-*.md` siblings.
+6. **Distribution zip** — `ai-search-optimizer-v0.6.2.zip` built at `C:\Users\KingpinBWP\Desktop\CiteWP\` (49.5 KB, 32 entries). `SESSION-STATUS.md` excluded. All presence/absence checks passed.
+7. **GitHub `v0.6.2` tag** — `release/v0.6.2` branch created from commit `c637240` (v0.6.0 WP.org submission). v0.6.2 changes committed as single release commit `02d2217`. Tag pushed. `https://github.com/bradleyswpc/citewp/tree/v0.6.2` returns HTTP 200.
+
+### Files modified (in working folder — not in v0.7.4)
+
+- `includes/Crawler/Detector.php` — `$_SERVER` sanitization (3 locations)
+- `includes/Admin/LogsTable.php` — `prepare()` refactor, `$filter_args` removed, inline allowlists added
+- `ai-search-optimizer.php` — Plugin Name fix, Version bump, constant bump
+- `readme.txt` — Stable tag, Development section, changelog
+- `.distignore` — new file
+
+### Commits
+
+- `02d2217` release: v0.6.2 (WP.org Round 2 compliance — Detector sanitize, LogsTable prepare refactor, readme expansion) — on `release/v0.6.2` branch, tagged `v0.6.2`, pushed to `origin`
+- `main` untouched at `fd51157` (v0.7.4)
+
+### Decisions made
+
+None — no new architecture or process decisions. DECISIONS.md append not required.
+
+### Verified
+
+- X13 code-reviewer pass: all 4 checks PASS (Detector sanitization, LogsTable `$where` pattern, allowlists, version consistency)
+- Defensive grep: zero un-sanitized `wp_unslash($_SERVER[...])` in Detector.php; zero `phpcs:ignore ValidatedSanitizedInput` remaining
+- Version consistency: 5 × `0.6.2` refs, 1 × `0.6.1` (changelog entry only — correct)
+- Zip: 32 entries, root `ai-search-optimizer/` correct, `build/index.js` present, `SESSION-STATUS.md`/`src/`/dev files absent
+- `https://github.com/bradleyswpc/citewp/tree/v0.6.2` → HTTP 200 ✅
+- debug.log: not checked — v0.7.4 LocalWP not touched this session; no PHP executed in dev env
+- npm build: not required — no JS changes in v0.7.4
+- Manual browser test: pending — v0.6.2 is a WP.org submission artifact; functional smoke test of v0.7.4 is S30 carryover
+
+### Carryover into S30
+
+- **WP.org Round 3 watch** — v0.6.2 reply sent, awaiting next reviewer response (check hello@citewp.com at session start)
+- **Forward-port v0.6.2 fixes into v0.7.4** — Detector.php `sanitize_text_field()` wraps + LogsTable.php `prepare()` refactor; small targeted edits; do before any new feature work touches those files
+- **v0.7.4 manual smoke tests** (carried from S28): open Cite Score page on citewp-dev.local, verify table rows visible, chart sizes to content, title 2-line clamp + hover, Pro Tip position; click "View N posts" for pages-only signal; click "Learn More →"
+- **S26 Bug B live verify** (carried): upload v0.7.4 to citewp.com, verify schema signal = 3/6 on Rank Math page, 6/6 after Article JSON-LD insert
+- **S27 toggle smoke test** (carried): toggle a post off/on, verify Dashboard + Cite Score KPI values update
+- **P52 messaging audit** (carried): replace "AI-powered SEO" / "Connect to Claude" copy patterns across plugin surfaces
+- **Backlog priorities** (deferred from S29): FB38 (Dashboard Cite Score widget restructure), FB30 (Cite Bridges), FB39 (Publish block Cite Score injection)
+
+### Next session focus
+
+S30 — forward-port v0.6.2 fixes into v0.7.4 (first, small), then run S28 carryover smoke tests, then pick next backlog priority per master file.
+
+---
+
 ## Session 28 (Polish Fix 2) — Chart Height + Table Visibility + Title Clamp ✅
 
 **Date:** 2026-05-13
