@@ -19,7 +19,7 @@ final class LogsPage {
 
 	public function register(): void {
 		add_action( 'admin_init',                    [ $this, 'maybe_init_table' ] );
-		add_action( 'admin_head',                    [ $this, 'inline_styles' ] );
+		add_action( 'admin_enqueue_scripts',          [ $this, 'enqueue_assets' ] );
 		add_action( 'admin_post_citewp_aiso_export_logs', [ $this, 'handle_csv_export' ] );
 	}
 
@@ -215,19 +215,15 @@ final class LogsPage {
 		return implode( ',', $escaped ) . "\r\n";
 	}
 
-	public function inline_styles(): void {
-		$screen = get_current_screen();
-		if ( ! $screen || strpos( $screen->id, Menu::SLUG_LOGS ) === false ) {
+	public function enqueue_assets( string $hook_suffix ): void {
+		if ( $hook_suffix !== 'citewp_page_' . Menu::SLUG_LOGS ) {
 			return;
 		}
-		?>
-		<style>
-			.citewp-aiso-logs-banner { display: flex; align-items: center; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
-			.citewp-aiso-logs-stat { background: #f9f9f9; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px 16px; min-width: 110px; }
-			.citewp-aiso-logs-stat__label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #6b7280; margin-bottom: 2px; }
-			.citewp-aiso-logs-stat__value { display: block; font-size: 22px; font-weight: 700; color: #111827; line-height: 1; }
-			.citewp-aiso-logs-banner__export { margin-left: auto; }
-		</style>
-		<?php
+		wp_enqueue_style(
+			'citewp-aiso-logs',
+			CITEWP_AISO_PLUGIN_URL . 'admin/css/citewp-aiso-logs.css',
+			[],
+			CITEWP_AISO_VERSION
+		);
 	}
 }

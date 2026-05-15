@@ -24,7 +24,7 @@ final class Page {
 		add_action( 'admin_menu', [ $this, 'add_submenu' ], 20 );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_post_citewp_aiso_regenerate_llms', [ $this, 'handle_regenerate' ] );
-		add_action( 'admin_head', [ $this, 'inline_styles' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 	}
 
 	public function add_submenu(): void {
@@ -118,16 +118,16 @@ final class Page {
 		exit;
 	}
 
-	public function inline_styles(): void {
-		$screen = get_current_screen();
-		if ( ! $screen || $screen->id !== 'citewp_page_' . self::SLUG ) {
+	public function enqueue_assets( string $hook_suffix ): void {
+		if ( $hook_suffix !== 'citewp_page_' . self::SLUG ) {
 			return;
 		}
-		?>
-		<style>
-			.citewp-aiso-cpt-label { display: block; margin-bottom: 4px; }
-		</style>
-		<?php
+		wp_enqueue_style(
+			'citewp-aiso-settings',
+			CITEWP_AISO_PLUGIN_URL . 'admin/css/citewp-aiso-settings.css',
+			[],
+			CITEWP_AISO_VERSION
+		);
 	}
 
 	public function render(): void {

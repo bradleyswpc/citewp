@@ -1,10 +1,10 @@
-=== AI Search Optimizer – Optimize Content for AI Engines ===
+=== CiteWP AI Search Optimizer – Optimize Content for AI Engines ===
 Contributors: bradleyswpc
 Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.6.0
+Stable tag: 0.6.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,7 +75,28 @@ It's an emerging standard that helps AI engines understand your site's most impo
 4. Crawler Logs — AI bot visit log with bot type filter, date range filter, 24h/7d/30d summary stats, and CSV export.
 5. llms.txt Settings — configure which content appears in your llms.txt and llms-full.txt files.
 
+== Development ==
+
+CiteWP AI Search Optimizer is open source under GPL v2 or later.
+
+* Source code repository: https://github.com/bradleyswpc/citewp
+* Source for this release: https://github.com/bradleyswpc/citewp/tree/v0.6.2
+* Un-minified JavaScript source: src/sidebar/index.js
+* Build tooling: webpack via @wordpress/scripts
+* The compiled build/index.js in this plugin is generated from src/sidebar/index.js
+* To build from source: `npm install && npm run build`
+* Contributions welcome via pull requests at the repository above.
+
 == Changelog ==
+
+= 0.6.2 =
+* Fix: Inline sanitize_text_field() on $_SERVER inputs in crawler detection (REMOTE_ADDR, REQUEST_URI, HTTP_REFERER).
+* Fix: WHERE clause fragments in admin crawler logs query now built via $wpdb->prepare() instead of raw concatenation.
+* Docs: Development section in readme expanded with release-tagged source links for easier review verification.
+
+= 0.6.1 =
+* Fix: Inline CSS converted to properly enqueued assets per WordPress.org guidelines
+* Fix: Added Development section to readme with source code repository reference
 
 = 0.6.0 =
 * Initial WordPress.org release.

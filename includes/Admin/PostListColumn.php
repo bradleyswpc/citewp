@@ -32,7 +32,7 @@ final class PostListColumn {
 		add_filter( 'manage_edit-page_sortable_columns',   [ $this, 'mark_sortable' ] );
 
 		add_action( 'pre_get_posts',                       [ $this, 'handle_sorting' ] );
-		add_action( 'admin_head',                          [ $this, 'inline_styles' ] );
+		add_action( 'admin_enqueue_scripts',               [ $this, 'enqueue_assets' ] );
 	}
 
 	/**
@@ -98,22 +98,19 @@ final class PostListColumn {
 		$query->set( 'orderby', 'meta_value_num' );
 	}
 
-	public function inline_styles(): void {
-		$screen = get_current_screen();
-		if ( ! $screen || ! in_array( $screen->base, [ 'edit' ], true ) ) {
+	public function enqueue_assets( string $hook_suffix ): void {
+		if ( $hook_suffix !== 'edit.php' ) {
 			return;
 		}
-		?>
-		<style>
-			.column-citewp_aiso_geo_score { width: 110px; }
-			.citewp-aiso-score { display:inline-flex; align-items:center; gap:6px; font-weight:600; font-variant-numeric: tabular-nums; }
-			.citewp-aiso-score__dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
-			.citewp-aiso-score--green  .citewp-aiso-score__dot { background:#16a34a; }
-			.citewp-aiso-score--yellow .citewp-aiso-score__dot { background:#ca8a04; }
-			.citewp-aiso-score--orange .citewp-aiso-score__dot { background:#ea580c; }
-			.citewp-aiso-score--red    .citewp-aiso-score__dot { background:#dc2626; }
-			.citewp-aiso-score--none   { color:#9ca3af; font-weight:400; }
-		</style>
-		<?php
+		$screen = get_current_screen();
+		if ( ! $screen || ! in_array( $screen->post_type, [ 'post', 'page' ], true ) ) {
+			return;
+		}
+		wp_enqueue_style(
+			'citewp-aiso-post-list-column',
+			CITEWP_AISO_PLUGIN_URL . 'admin/css/citewp-aiso-post-list-column.css',
+			[],
+			CITEWP_AISO_VERSION
+		);
 	}
 }

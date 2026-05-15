@@ -70,34 +70,35 @@ final class LogsTable extends \WP_List_Table {
 		$bot_filter = $this->validated_bot_filter();
 		$since      = $this->range_to_since( $this->validated_range_filter() );
 
-		$where       = '';
-		$filter_args = [];
-
+		$where = '';
 		if ( $bot_filter !== '' ) {
-			$where        .= ' AND bot_name = %s';
-			$filter_args[] = $bot_filter;
+			$where .= $wpdb->prepare( ' AND bot_name = %s', $bot_filter );
 		}
 		if ( $since !== null ) {
-			$where        .= ' AND detected_at >= %s';
-			$filter_args[] = $since;
+			$where .= $wpdb->prepare( ' AND detected_at >= %s', $since );
 		}
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table queries; $table is esc_sql() of a hardcoded constant, $where/$orderby/$order built from whitelisted values. Real-time admin data.
-		if ( ! empty( $filter_args ) ) {
+		// Belt-and-suspenders allowlist enforcement (validated_orderby/validated_order already enforce these).
+		$allowed_orderby = [ 'detected_at', 'bot_name', 'bot_vendor' ];
+		$orderby         = in_array( $orderby, $allowed_orderby, true ) ? $orderby : 'detected_at';
+		$order           = ( 'ASC' === strtoupper( $order ) ) ? 'ASC' : 'DESC';
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table queries; $table is esc_sql() of a hardcoded constant; $where fragments are built via $wpdb->prepare() and are already safe to interpolate; $orderby/$order validated against strict allowlists above.
+		if ( $where !== '' ) {
 			$total = (int) $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE 1=1 {$where}", ...$filter_args )
+				"SELECT COUNT(*) FROM {$table} WHERE 1=1 {$where}"
 			);
 		} else {
 			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
 		}
 
-		$offset    = ( $current - 1 ) * $per_page;
-		$data_args = array_merge( $filter_args, [ $per_page, $offset ] );
+		$offset = ( $current - 1 ) * $per_page;
 
-		if ( ! empty( $filter_args ) ) {
+		if ( $where !== '' ) {
 			$query = $wpdb->prepare(
 				"SELECT * FROM {$table} WHERE 1=1 {$where} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
-				...$data_args
+				$per_page,
+				$offset
 			);
 		} else {
 			$query = $wpdb->prepare(

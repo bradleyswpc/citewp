@@ -1,10 +1,23 @@
-.claude/
-.git/
+# Files excluded from WP.org distribution zip
+# Not committed to SVN; for local build scripts and documentation only.
+
+# Development tooling
+.git
 .gitignore
-assets/
-CLAUDE.md
-SESSION-LOG.md
+.gitattributes
+.distignore
 node_modules/
+src/
 package.json
 package-lock.json
-src/
+composer.json
+composer.lock
+.claude/
+.superpowers/
+
+# Internal project management files
+CLAUDE.md
+SESSION-LOG.md
+SESSION-STATUS.md
+SESSION-*.md
+*.local.md
