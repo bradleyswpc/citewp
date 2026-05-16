@@ -332,7 +332,10 @@ final class Menu {
 		<!-- Hero card -->
 		<div class="citewp-aiso-hero">
 			<div class="citewp-aiso-hero__left">
-				<h2 class="citewp-aiso-hero__title"><?php echo esc_html( sprintf( __( 'Welcome back, %s 👋', 'ai-search-optimizer' ), $greeting_name ) ); ?></h2>
+				<h2 class="citewp-aiso-hero__title"><?php
+				/* translators: %s: user's first name or display name */
+				echo esc_html( sprintf( __( 'Welcome back, %s 👋', 'ai-search-optimizer' ), $greeting_name ) );
+				?></h2>
 				<p class="citewp-aiso-hero__sub"><?php esc_html_e( "Here's how your site is performing in AI search.", 'ai-search-optimizer' ); ?></p>
 				<div class="citewp-aiso-hero__filters">
 					<span class="citewp-aiso-hero__filter is-active">
@@ -983,7 +986,10 @@ final class Menu {
 						<div class="citewp-aiso-kpi-progress">
 							<div class="citewp-aiso-kpi-progress__fill" style="width:<?php echo esc_attr( (string) $pct_optimized ); ?>%"></div>
 						</div>
-						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( '%d%% of your content is optimized', 'ai-search-optimizer' ), $pct_optimized ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php
+						/* translators: %d: percentage of posts and pages that have a Cite Score */
+						echo esc_html( sprintf( __( '%d%% of your content is optimized', 'ai-search-optimizer' ), absint( $pct_optimized ) ) );
+						?></div>
 					</div>
 				</div>
 			</div>
@@ -999,7 +1005,10 @@ final class Menu {
 					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $issue_count ); ?></div>
-						<div class="citewp-aiso-kpi-card__sub"><?php printf( esc_html__( 'across %d items needing attention', 'ai-search-optimizer' ), $issue_count ); ?></div>
+						<div class="citewp-aiso-kpi-card__sub"><?php
+						/* translators: %d: number of posts or pages with unresolved Cite Score issues */
+						echo esc_html( sprintf( __( 'across %d items needing attention', 'ai-search-optimizer' ), absint( $issue_count ) ) );
+						?></div>
 						<div class="citewp-aiso-kpi-card__split">
 							<span class="citewp-aiso-kpi-card__split--critical"><?php echo esc_html( (string) $critical_count ); ?> <?php esc_html_e( 'critical', 'ai-search-optimizer' ); ?></span>
 							<span class="citewp-aiso-kpi-card__split--sep">·</span>
