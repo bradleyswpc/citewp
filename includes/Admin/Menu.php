@@ -850,9 +850,10 @@ final class Menu {
 		}
 
 		// ── Paginated post table ─────────────────────────────────────────
-		$paged     = max( 1, absint( $_GET['csp'] ?? 1 ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$per_page  = in_array( (int) ( $_GET['cspp'] ?? 5 ), [ 5, 10, 25 ], true ) ? (int) ( $_GET['cspp'] ?? 5 ) : 5; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$search_q  = sanitize_text_field( wp_unslash( $_GET['css'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$paged    = max( 1, isset( $_GET['csp'] ) ? absint( wp_unslash( $_GET['csp'] ) ) : 1 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only pagination param; absint() sanitizes.
+		$cspp     = isset( $_GET['cspp'] ) ? absint( wp_unslash( $_GET['cspp'] ) ) : 5; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only per-page param; value validated against allowlist below.
+		$per_page = in_array( $cspp, [ 5, 10, 25 ], true ) ? $cspp : 5;
+		$search_q = sanitize_text_field( wp_unslash( $_GET['css'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$tbl_args  = [
 			'post_type'      => [ 'post', 'page' ],
 			'post_status'    => [ 'publish', 'draft' ],
