@@ -716,7 +716,7 @@ final class Menu {
 			'posts_per_page' => 1000,
 			'no_found_rows'  => true,
 			'fields'         => 'ids',
-			'meta_query'     => [
+			'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required: filters to posts with a Cite Score while excluding llms.txt opt-outs; no alternative without a join on a custom table. Admin-only, called once per page load.
 				'relation' => 'AND',
 				[
 					'key'     => Repository::META_KEY_TOTAL,
@@ -860,9 +860,9 @@ final class Menu {
 			'posts_per_page' => $per_page,
 			'paged'          => $paged,
 			'orderby'        => 'meta_value_num',
-			'meta_key'       => Repository::META_KEY_TOTAL,
+			'meta_key'       => Repository::META_KEY_TOTAL, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Required for score-sorted post list; META_KEY_TOTAL is a dedicated queryable integer meta, stored separately for this purpose. Admin-only.
 			'order'          => 'ASC',
-			'meta_query'     => [ [ 'key' => Repository::META_KEY_TOTAL, 'compare' => 'EXISTS' ] ],
+			'meta_query'     => [ [ 'key' => Repository::META_KEY_TOTAL, 'compare' => 'EXISTS' ] ], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required to exclude unscored posts from the Cite Score table; same meta key as orderby above. Admin-only.
 		];
 		if ( $search_q !== '' ) {
 			$tbl_args['s'] = $search_q;
