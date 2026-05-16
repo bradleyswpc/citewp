@@ -448,9 +448,9 @@ final class EditorPanel {
 	private function query_bot_visits( int $post_id ): array {
 		global $wpdb;
 
-		$table = Schema::table( 'citewp_aiso_crawler_logs' );
+		$table = esc_sql( Schema::table( 'citewp_aiso_crawler_logs' ) );
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; no WP API equivalent; $table is esc_sql() of a hardcoded constant; real-time admin display, intentionally uncached.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT bot_signature, COUNT(*) AS visits, MAX(created_at) AS last_seen
@@ -470,7 +470,7 @@ final class EditorPanel {
 
 		$n_more = 0;
 		if ( count( $rows ) === 6 ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; no WP API equivalent; $table is esc_sql() of a hardcoded constant; real-time admin display, intentionally uncached.
 			$total  = (int) $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT COUNT(DISTINCT bot_signature)
