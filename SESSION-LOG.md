@@ -6,6 +6,76 @@
 
 ---
 
+## Session 31 — Plugin Check v0.7.4 Cleanup ✅
+
+**Date:** 2026-05-16
+
+### Deliverable
+
+Resolved all 5 real code errors and all 7 actionable warnings from the S30 Plugin Check triage report. Re-ran Plugin Check v1.9.0 after fixes — confirmed zero `EscapeOutput`, `MissingTranslatorsComment`, `ValidatedSanitizedInput`, `InterpolatedNotPrepared`, `DirectDatabaseQuery`, and `SlowDBQuery` findings remaining.
+
+### What shipped
+
+1. **Menu.php line 335 — MissingTranslatorsComment** — added `/* translators: %s: user's first name or display name */` above the "Welcome back" hero heading `sprintf()`.
+2. **Menu.php lines 986 + 1002 — EscapeOutput + MissingTranslatorsComment** — changed `printf( esc_html__(...), $variable )` pattern to `echo esc_html( sprintf( __(...), absint( $variable ) ) )` and added accurate `/* translators: %d: ... */` comments above each.
+3. **Menu.php line 851 — ValidatedSanitizedInput** — replaced `(int)( $_GET['cspp'] ?? 5 )` with two-step `$cspp = isset(...) ? absint( wp_unslash(...) ) : 5` + allowlist check. Also fixed adjacent `$paged` line to use `absint( wp_unslash() )` for consistency.
+4. **EditorPanel.php lines 454–484 — DirectDatabaseQuery + InterpolatedNotPrepared** — added `esc_sql()` to `$table` assignment. Switched from `phpcs:ignore` (single-line, didn't reach `{$table}` inside `$wpdb->prepare()`) to `phpcs:disable`/`phpcs:enable` block covering both queries. Justification: custom table; `$table` is `esc_sql()` of a hardcoded constant; `$post_id` via `$wpdb->prepare()`; real-time admin display, intentionally uncached.
+5. **Menu.php lines 716, 859, 861 — SlowDBQuery** — added `// phpcs:ignore WordPress.DB.SlowDBQuery.*` with specific justifications: line 716 requires `meta_query` for two-meta-key AND/OR filter (Cite Score + llms.txt opt-out), no alternative without custom join; lines 859/861 require `meta_key`/`meta_query` for score-sorted post list using indexed `META_KEY_TOTAL`. Admin-only, one call per page load.
+
+### Files modified
+
+- `includes/Admin/Menu.php` — Tasks 1–3 + 5
+- `includes/Admin/EditorPanel.php` — Task 4 (iteration 2: ignore→disable/enable)
+
+### Commits
+
+- `7cf2e3b` fix: escape output of absint() calls + add translators comments in Menu.php (EscapeOutput + MissingTranslatorsComment)
+- `9f5847c` fix: inline sanitize on $_GET in Menu.php; sweep all input access (ValidatedSanitizedInput)
+- `02434ce` refactor: bot-visits queries in EditorPanel use esc_sql() + full phpcs:ignore justification — **superseded by next commit**
+- `16fe34a` fix: switch EditorPanel bot-visits phpcs:ignore to phpcs:disable block — ignore only covers one line, disable/enable covers the full multi-line prepare()
+- `eaa4191` perf/docs: tighten SlowDBQuery suppressions in Menu.php with precise justifications
+
+### Decisions made
+
+- `phpcs:ignore` does not suppress multi-line `$wpdb->prepare()` calls — the sniff fires on the line with the interpolation, which is inside the string literal 3+ lines after the ignore comment. Use `phpcs:disable`/`phpcs:enable` blocks for any query whose SQL string spans multiple lines. Documented in S31 log; apply in future DB annotation work.
+
+### Verified
+
+- Defensive greps: zero `echo absint(` / `echo intval(`; all `wp_unslash( $_GET[...]` accesses have inline sanitizers
+- Code-reviewer agent: all 5 checklist items PASS
+- Plugin Check v1.9.0 re-run: `EscapeOutput`=absent, `MissingTranslatorsComment`=absent, `ValidatedSanitizedInput`=absent, `InterpolatedNotPrepared`=absent, `SlowDB`=absent. `trademarked_term` remains (known brand, expected).
+- debug.log: not checked — no functional PHP logic changed
+- npm build: not required — no JS changes
+
+### Plugin Check before/after
+
+| Category | S30 baseline | S31 result |
+|----------|-------------|-----------|
+| Real code errors | 5 | **0** |
+| Dev-only errors | 5 | 5 (unchanged) |
+| Actionable warnings | 7 | **0** |
+| SlowDBQuery warnings | 3 | **0** (phpcs:ignore) |
+| Dev-only warnings | 7 | 8 (+1: `plugin-check-results.md` S30 dev artifact) |
+| Trademark warnings | 2 | 2 (unchanged) |
+| Pre-existing nonce | 1 | 0 (phpcs:ignore already in place) |
+| **Total** | **30** | **~15** |
+
+### Carryover into S32
+
+- **`plugin-check-results.md` in plugin root** — S30 Plugin Check audit markdown file is being flagged as `unexpected_markdown_file`. Add to `.distignore` (one line) or delete; trivially addressable next session.
+- **v0.7.4 manual smoke tests** (from S28): Cite Score page — table rows, chart size, title 2-line clamp + hover, Pro Tip position; click "View N posts"; "Learn More →"
+- **Crawler Logs manual verify**: confirm Logs page renders with and without filter; spot-check bot row
+- **S26 Bug B live verify** (carried): upload v0.7.4 to citewp.com, verify schema signal = 3/6 on Rank Math page
+- **S27 toggle smoke test** (carried): toggle a post, verify Dashboard + Cite Score KPI values update
+- **P52 messaging audit** (carried): replace "AI-powered SEO" / "Connect to Claude" copy patterns
+- **Backlog priorities**: FB38 (Dashboard Cite Score widget restructure), FB30 (Cite Bridges), FB39 (Publish block Cite Score injection)
+
+### Next session focus
+
+S32 — pivot to feature work (FB38 / FB30 / FB39) or P52 messaging audit, depending on WP.org Round 3 status. Optionally: one-line `.distignore` fix to clear `plugin-check-results.md` warning as a warm-up.
+
+---
+
 ## Session 30 — Forward-port v0.6.2 Fixes + Plugin Check Audit (v0.7.4) ✅
 
 **Date:** 2026-05-16
