@@ -101,14 +101,14 @@ final class Detector {
 	 */
 	private function client_ip(): string {
 		$ip = isset( $_SERVER['REMOTE_ADDR'] )
-			? (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- filter_var( FILTER_VALIDATE_IP ) on the return line validates and sanitizes.
+			? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) )
 			: '';
 		return filter_var( $ip, FILTER_VALIDATE_IP ) ? $ip : '';
 	}
 
 	private function request_uri(): string {
 		$uri = isset( $_SERVER['REQUEST_URI'] )
-			? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes on the return line.
+			? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
 			: '';
 		return mb_substr( esc_url_raw( $uri ), 0, 512 );
 	}
@@ -117,7 +117,7 @@ final class Detector {
 		if ( empty( $_SERVER['HTTP_REFERER'] ) ) {
 			return null;
 		}
-		$ref = (string) wp_unslash( $_SERVER['HTTP_REFERER'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- esc_url_raw() sanitizes on the return line.
+		$ref = sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) );
 		return mb_substr( esc_url_raw( $ref ), 0, 512 );
 	}
 
