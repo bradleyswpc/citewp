@@ -6,6 +6,81 @@
 
 ---
 
+## Session 30 — Forward-port v0.6.2 Fixes + Plugin Check Audit (v0.7.4) ✅
+
+**Date:** 2026-05-16
+
+### Deliverable
+
+Forward-ported the two WP.org Round 2 compliance fixes from v0.6.2 into the v0.7.4 dev branch (Phase A), then ran Plugin Check v1.9.0 against citewp-dev.local and wrote a full triage report (Phase B). No feature work. No scoring changes.
+
+### What shipped
+
+**Phase A — Forward-port**
+
+1. **Detector.php `$_SERVER` sanitization** — three `$_SERVER` accesses in `client_ip()`, `request_uri()`, `referer()` updated from `(string) wp_unslash(...)` to `sanitize_text_field( wp_unslash(...) )`. Three `phpcs:ignore ValidatedSanitizedInput` comments removed. (`HTTP_USER_AGENT` in `maybe_log_request()` was already correct — untouched.)
+2. **LogsTable.php `prepare()` refactor** — `$where` now built via per-fragment `$wpdb->prepare()` calls at construction time. `$filter_args` and `$data_args` arrays deleted. Belt-and-suspenders inline allowlists for `$orderby`/`$order` added inside `prepare_items()`. phpcs:disable comment updated: removed obsolete `PreparedSQLPlaceholders.UnfinishedPrepare` + `PreparedSQLPlaceholders.ReplacementsWrongNumber` sniffs; updated justification to describe the new pattern.
+3. **Fix 3 broader audit** — Explore subagent confirmed NO additional `$_SERVER` or `$wpdb` sites needed fixing beyond the two known files.
+
+**Phase B — Plugin Check v1.9.0 audit**
+
+Triage report written to `C:\Users\KingpinBWP\Desktop\CiteWP\Brain\design-reference\S30-plugin-check-v0.7.4.md`.
+
+**Findings summary (30 total):**
+- 5 real code errors (all in Menu.php): `EscapeOutput` ×2 (unescaped `$pct_optimized`, `$issue_count`) + `MissingTranslatorsComment` ×3
+- 5 dev-only errors (`.gitattributes`, `.claude/hooks/*.sh` ×4) — excluded by `.distignore`, no action
+- 7 actionable warnings: Menu.php:851 `$_GET['cspp']` unsanitized ×2; EditorPanel.php bot-visits DB queries missing phpcs:ignore ×6
+- 3 slow-query warnings (expected — meta_query on indexed column, review-only)
+- 7 dev-only file warnings — covered by `.distignore`, no action
+- 2 trademark warnings — "CiteWP" brand name, WP.org already accepted slug; monitor only
+- 1 pre-existing nonce warning (EditorPanel.php:50 — already has phpcs:ignore, pre-existing)
+- **Round 2 carryovers: ZERO** — Phase A was complete; no `ValidatedSanitizedInput` on `$_SERVER`, no `PreparedSQLPlaceholders` errors
+
+### Files modified
+
+- `includes/Crawler/Detector.php` — `$_SERVER` sanitization (3 locations)
+- `includes/Admin/LogsTable.php` — `prepare()` refactor, `$filter_args` removed, inline allowlists added, phpcs:disable updated
+
+### Commits
+
+- `e1c365e` fix: forward-port v0.6.2 Detector.php `$_SERVER` sanitization into v0.7.4 — pushed to `origin/main`
+- `29575a8` fix: forward-port v0.6.2 LogsTable.php prepare() fragment pattern into v0.7.4 — pushed to `origin/main`
+
+### Decisions made
+
+None — no new architecture or process decisions. DECISIONS.md append not required.
+
+### Verified
+
+- Phase A code-reviewer pass: zero un-sanitized `$_SERVER` accesses, zero `phpcs:ignore ValidatedSanitizedInput` in modified files
+- Broader audit: no additional files required fixing
+- Plugin Check: all 30 findings triaged; 5 real errors documented with proposed fixes for S31
+- debug.log: not checked (no functional PHP logic changed)
+- npm build: not required (no JS changes)
+- Manual browser smoke tests: pending (carried from S28/S29)
+
+### Carryover into S31
+
+**Priority — S31 Plugin Check fixes (all in Menu.php + EditorPanel.php, low risk):**
+1. Menu.php:986 + 1002 — wrap `$pct_optimized` / `$issue_count` with `absint()` (EscapeOutput errors)
+2. Menu.php:335, 986, 1002 — add `/* translators: */` comments (MissingTranslatorsComment errors)
+3. Menu.php:851 — `sanitize_text_field( wp_unslash( $_GET['cspp'] ) )` (2 warnings)
+4. EditorPanel.php:454–477 — add phpcs:ignore block for bot-visits direct DB queries (6 warnings)
+5. Menu.php:716, 859, 861 — review SlowDBQuery meta_query; add phpcs:ignore if Cite Score query on indexed column
+
+**Ongoing carryover:**
+- **v0.7.4 manual smoke tests** (from S28): Cite Score page — table rows, chart size, title 2-line clamp + hover, Pro Tip position; click "View N posts"; "Learn More →"
+- **Crawler Logs manual verify**: confirm prepare_items() both branches render (with and without filter), spot-check GPTBot row
+- **S26 Bug B live verify** (carried): upload v0.7.4 to citewp.com, verify schema signal = 3/6 on Rank Math page
+- **S27 toggle smoke test** (carried): toggle a post, verify Dashboard + Cite Score KPI values update
+- **P52 messaging audit** (carried): replace "AI-powered SEO" / "Connect to Claude" copy patterns
+
+### Next session focus
+
+S31 — fix the 5 real Plugin Check errors + 3 prioritised warnings in Menu.php and EditorPanel.php. Estimated 1 session; escaping, comments, phpcs annotations only.
+
+---
+
 ## Session 29 — WP.org Round 2 Compliance Fix (v0.6.1 → v0.6.2, parallel branch) ✅
 
 **Date:** 2026-05-15
