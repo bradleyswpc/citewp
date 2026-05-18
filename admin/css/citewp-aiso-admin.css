@@ -516,13 +516,29 @@
 }
 
 .citewp-aiso-kpi-card__trend {
-  font: 700 12px/1 'Inter', system-ui, -apple-system, sans-serif;
-  margin-top: var(--sp-1);
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+  line-height: 1.4;
 }
 
-.citewp-aiso-kpi-card__trend--up   { color: var(--citewp-score-green); }
-.citewp-aiso-kpi-card__trend--down { color: var(--citewp-score-orange); }
-.citewp-aiso-kpi-card__trend--flat { color: var(--citewp-text-muted); }
+.citewp-aiso-kpi-card__trend--up {
+  color: var(--citewp-score-green);
+  background: rgba(22, 163, 74, 0.10);
+}
+.citewp-aiso-kpi-card__trend--down {
+  color: var(--citewp-score-red);
+  background: rgba(220, 38, 38, 0.08);
+}
+.citewp-aiso-kpi-card__trend--flat {
+  color: var(--citewp-text-muted);
+  background: var(--citewp-border);
+}
 
 .citewp-aiso-kpi-card__trend-suffix {
   font-weight: 400;

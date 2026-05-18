@@ -50,21 +50,54 @@ final class LogsPage {
 		global $wpdb;
 		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Admin stats page; $table_name is esc_sql() of a hardcoded constant. Real-time data, intentionally uncached.
-		$total         = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$unique_bots   = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT bot_name) FROM {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$pages_crawled = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT request_uri) FROM {$table_name}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$count_30d     = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE detected_at >= %s", gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		// phpcs:enable
-
-		$avg_freq = $count_30d > 0 ? round( $count_30d / 30, 1 ) : 0.0;
-
+		// Read filters before KPI queries so the WHERE clause is available.
 		$bot_filter   = isset( $_GET['citewp_aiso_bot'] )   ? sanitize_text_field( wp_unslash( $_GET['citewp_aiso_bot'] ) )   : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
 		$range_filter = isset( $_GET['citewp_aiso_range'] ) ? sanitize_key( wp_unslash( $_GET['citewp_aiso_range'] ) )         : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
-
-		// Whitelist range filter value.
 		if ( ! in_array( $range_filter, [ '24h', '7d', '30d' ], true ) ) {
 			$range_filter = '';
+		}
+
+		$range = $this->range_clause( $range_filter );
+		$where = $range['where'];
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Admin stats; $table_name is esc_sql() of a hardcoded constant; $where is output of $wpdb->prepare(). Real-time data, intentionally uncached.
+		$total         = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE 1=1{$where}" );                      // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$unique_bots   = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT bot_name) FROM {$table_name} WHERE 1=1{$where}" );     // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$pages_crawled = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT request_uri) FROM {$table_name} WHERE 1=1{$where}" );  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:enable
+
+		$trend_total = null;
+		$trend_bots  = null;
+		$trend_pages = null;
+
+		if ( $range['days'] !== null ) {
+			$period_start = gmdate( 'Y-m-d H:i:s', strtotime( '-' . $range['days'] . ' days' ) );
+			$prior_start  = $range['cutoff'];
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Prior-period trend stats; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
+			$prior_total  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$table_name} WHERE detected_at >= %s AND detected_at < %s", $prior_start, $period_start ) );                      // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$prior_bots   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT bot_name) FROM {$table_name} WHERE detected_at >= %s AND detected_at < %s", $prior_start, $period_start ) );     // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$prior_pages  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT request_uri) FROM {$table_name} WHERE detected_at >= %s AND detected_at < %s", $prior_start, $period_start ) );  // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:enable
+
+			$trend_total = $this->compute_trend( $total, $prior_total );
+			$trend_bots  = $this->compute_trend( $unique_bots, $prior_bots );
+			$trend_pages = $this->compute_trend( $pages_crawled, $prior_pages );
+		}
+
+		if ( $range['days'] === null ) {
+			// All-time: divide by elapsed days since earliest visit.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Admin stats; $table_name is esc_sql() of a hardcoded constant.
+			$earliest     = (string) $wpdb->get_var( "SELECT MIN(detected_at) FROM {$table_name}" );
+			$days_elapsed = $earliest ? max( 1, (int) ceil( ( time() - strtotime( $earliest ) ) / DAY_IN_SECONDS ) ) : 1;
+			$avg_freq     = $total > 0 ? round( $total / $days_elapsed, 1 ) : 0.0;
+			$freq_unit    = __( 'per day', 'ai-search-optimizer' );
+		} elseif ( $range['days'] === 1 ) {
+			$avg_freq  = $total > 0 ? round( $total / 24, 1 ) : 0.0;
+			$freq_unit = __( 'per hour', 'ai-search-optimizer' );
+		} else {
+			$avg_freq  = $total > 0 ? round( $total / $range['days'], 1 ) : 0.0;
+			$freq_unit = __( 'per day', 'ai-search-optimizer' );
 		}
 
 		// Base URL for date range filter pills.
@@ -131,8 +164,13 @@ final class LogsPage {
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--blue"><?php echo IconLibrary::icon( 'search', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
 						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Total Crawls', 'ai-search-optimizer' ); ?></span>
 					</div>
-					<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $total ) ); ?></p>
-					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'All-time AI crawler visits', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-kpi-card__value">
+						<?php echo esc_html( number_format_i18n( $total ) ); ?>
+						<?php echo wp_kses( $this->render_trend_badge( $trend_total ), [ 'span' => [ 'class' => [] ] ] ); ?>
+					</p>
+					<p class="citewp-aiso-kpi-card__caption">
+						<?php echo esc_html( sprintf( /* translators: %s: date range label e.g. "All time", "Last 24h" */ __( '%s AI crawler visits', 'ai-search-optimizer' ), $range['label'] ) ); ?>
+					</p>
 				</div>
 
 				<div class="citewp-aiso-kpi-card">
@@ -140,7 +178,10 @@ final class LogsPage {
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--purple"><?php echo IconLibrary::icon( 'bot', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
 						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Unique Bots', 'ai-search-optimizer' ); ?></span>
 					</div>
-					<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $unique_bots ) ); ?></p>
+					<p class="citewp-aiso-kpi-card__value">
+						<?php echo esc_html( number_format_i18n( $unique_bots ) ); ?>
+						<?php echo wp_kses( $this->render_trend_badge( $trend_bots ), [ 'span' => [ 'class' => [] ] ] ); ?>
+					</p>
 					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Distinct AI engines detected', 'ai-search-optimizer' ); ?></p>
 				</div>
 
@@ -149,7 +190,10 @@ final class LogsPage {
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--teal"><?php echo IconLibrary::icon( 'eye', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
 						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Pages Crawled', 'ai-search-optimizer' ); ?></span>
 					</div>
-					<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $pages_crawled ) ); ?></p>
+					<p class="citewp-aiso-kpi-card__value">
+						<?php echo esc_html( number_format_i18n( $pages_crawled ) ); ?>
+						<?php echo wp_kses( $this->render_trend_badge( $trend_pages ), [ 'span' => [ 'class' => [] ] ] ); ?>
+					</p>
 					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Unique URLs visited', 'ai-search-optimizer' ); ?></p>
 				</div>
 
@@ -158,16 +202,23 @@ final class LogsPage {
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--citrine"><?php echo IconLibrary::icon( 'calendar', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
 						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Avg Frequency', 'ai-search-optimizer' ); ?></span>
 					</div>
-					<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( $avg_freq . '/day' ); ?></p>
-					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( '30-day average', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( $avg_freq . ' ' . $freq_unit ); ?></p>
+					<p class="citewp-aiso-kpi-card__caption">
+						<?php echo esc_html( sprintf( /* translators: %s: date range label e.g. "All time", "7 days" */ __( '%s average', 'ai-search-optimizer' ), $range['label'] ) ); ?>
+					</p>
 				</div>
 
 			</div>
 
-			<?php if ( $total === 0 ) : ?>
+			<?php if ( $total === 0 && $range_filter === '' ) : ?>
 				<div class="citewp-aiso-empty">
 					<?php echo IconLibrary::icon( 'calendar', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
 					<p><?php esc_html_e( 'No AI crawler activity yet. Once GPTBot, ClaudeBot, PerplexityBot, or another AI crawler visits your site, you\'ll see it here.', 'ai-search-optimizer' ); ?></p>
+				</div>
+			<?php elseif ( $total === 0 && $range_filter !== '' ) : ?>
+				<div class="citewp-aiso-empty">
+					<?php echo IconLibrary::icon( 'calendar', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
+					<p><?php esc_html_e( 'No crawler activity in this period.', 'ai-search-optimizer' ); ?></p>
 				</div>
 			<?php elseif ( $this->table ) : ?>
 				<div class="citewp-aiso-logs-table-card citewp-aiso-table-wrap">
@@ -290,6 +341,67 @@ final class LogsPage {
 			array_map( 'strval', $fields )
 		);
 		return implode( ',', $escaped ) . "\r\n";
+	}
+
+	private function range_clause( string $range_filter ): array {
+		global $wpdb;
+		return match ( $range_filter ) {
+			'24h' => [
+				'where'  => $wpdb->prepare( ' AND detected_at >= %s', gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ) ),
+				'label'  => __( 'Last 24h', 'ai-search-optimizer' ),
+				'days'   => 1,
+				'cutoff' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
+			],
+			'7d' => [
+				'where'  => $wpdb->prepare( ' AND detected_at >= %s', gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) ) ),
+				'label'  => __( '7 days', 'ai-search-optimizer' ),
+				'days'   => 7,
+				'cutoff' => gmdate( 'Y-m-d H:i:s', strtotime( '-14 days' ) ),
+			],
+			'30d' => [
+				'where'  => $wpdb->prepare( ' AND detected_at >= %s', gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) ) ),
+				'label'  => __( '30 days', 'ai-search-optimizer' ),
+				'days'   => 30,
+				'cutoff' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
+			],
+			default => [
+				'where'  => '',
+				'label'  => __( 'All time', 'ai-search-optimizer' ),
+				'days'   => null,
+				'cutoff' => null,
+			],
+		};
+	}
+
+	private function compute_trend( int $current, int $prior ): ?array {
+		if ( $prior === 0 && $current > 0 ) {
+			return null; // New activity with no prior-period baseline — suppress percentage.
+		}
+		if ( $prior === 0 ) {
+			return [ 'pct' => 0, 'direction' => 'flat' ];
+		}
+		$pct = (int) round( ( ( $current - $prior ) / $prior ) * 100 );
+		return [
+			'pct'       => abs( $pct ),
+			'direction' => $pct > 0 ? 'up' : ( $pct < 0 ? 'down' : 'flat' ),
+		];
+	}
+
+	private function render_trend_badge( ?array $trend ): string {
+		if ( $trend === null ) {
+			return '';
+		}
+		if ( $trend['direction'] === 'flat' ) {
+			return '<span class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ 0%</span>';
+		}
+		$arrow = $trend['direction'] === 'up' ? '↑' : '↓';
+		$cls   = $trend['direction'] === 'up' ? 'up' : 'down';
+		return sprintf(
+			'<span class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--%s">%s %d%%</span>',
+			esc_attr( $cls ),
+			$arrow,
+			$trend['pct']
+		);
 	}
 
 }
