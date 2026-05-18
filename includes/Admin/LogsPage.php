@@ -89,7 +89,8 @@ final class LogsPage {
 			// All-time: divide by elapsed days since earliest visit.
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Admin stats; $table_name is esc_sql() of a hardcoded constant.
 			$earliest     = (string) $wpdb->get_var( "SELECT MIN(detected_at) FROM {$table_name}" );
-			$days_elapsed = $earliest ? max( 1, (int) ceil( ( time() - strtotime( $earliest ) ) / DAY_IN_SECONDS ) ) : 1;
+			$ts           = $earliest ? strtotime( $earliest ) : false;
+			$days_elapsed = ( $ts !== false ) ? max( 1, (int) ceil( ( time() - $ts ) / DAY_IN_SECONDS ) ) : 1;
 			$avg_freq     = $total > 0 ? round( $total / $days_elapsed, 1 ) : 0.0;
 			$freq_unit    = __( 'per day', 'ai-search-optimizer' );
 		} elseif ( $range['days'] === 1 ) {
@@ -375,7 +376,8 @@ final class LogsPage {
 
 	private function compute_trend( int $current, int $prior ): ?array {
 		if ( $prior === 0 && $current > 0 ) {
-			return null; // New activity with no prior-period baseline — suppress percentage.
+			// Intentional: blank badge, not a bug. No prior-period baseline means a % would be meaningless (∞).
+			return null;
 		}
 		if ( $prior === 0 ) {
 			return [ 'pct' => 0, 'direction' => 'flat' ];
