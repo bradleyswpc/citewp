@@ -101,6 +101,112 @@ final class LogsPage {
 			$freq_unit = __( 'per day', 'ai-search-optimizer' );
 		}
 
+		// Chart data: use the same $range window; cap all-time to 30 days (chart needs a bounded window).
+		$chart_days = $range['days'] ?? 30;
+		$chart_data = ( new DashboardData() )->get_visits_by_day( $chart_days, 5 );
+
+		// Resolve canonical bot slot order: sum visits per bot across the window, sort desc.
+		$bot_sums = [];
+		foreach ( $chart_data as $day ) {
+			if ( isset( $day['totals'] ) ) {
+				foreach ( $day['totals'] as $bot => $v ) {
+					$bot_sums[ $bot ] = ( $bot_sums[ $bot ] ?? 0 ) + (int) $v;
+				}
+			}
+		}
+		arsort( $bot_sums );
+		$ordered_bots = array_keys( $bot_sums );
+
+		// Max y value across all days.
+		$chart_max = 0;
+		foreach ( $chart_data as $day ) {
+			$chart_max = max( $chart_max, $day['sum'] );
+		}
+		$chart_is_empty = ( $chart_max === 0 );
+
+		// SVG coordinate helpers (fixed viewBox 600×180).
+		$vw      = 600;
+		$vh      = 180;
+		$pad_top = 12;
+		$pad_bot = 4;
+		$chart_h = $vh - $pad_top - $pad_bot; // 164
+		$n_days  = count( $chart_data );
+
+		$x_pos = function ( int $i ) use ( $n_days, $vw ): float {
+			return $n_days > 1 ? round( $i / ( $n_days - 1 ) * $vw, 2 ) : $vw / 2.0;
+		};
+		$y_pos = function ( int $v ) use ( $chart_max, $pad_top, $chart_h ): float {
+			if ( $chart_max === 0 ) {
+				return (float) ( $pad_top + $chart_h );
+			}
+			return round( $pad_top + ( 1.0 - $v / $chart_max ) * $chart_h, 2 );
+		};
+
+		// Build stacked layer paths — bottom→top: slot 1 (highest visits) at bottom.
+		$chart_layers = [];
+		$cum          = array_fill( 0, $n_days, 0 );
+
+		foreach ( array_values( $ordered_bots ) as $slot_idx => $bot_name ) {
+			$lower = $cum;
+			foreach ( $chart_data as $day_idx => $day ) {
+				$cum[ $day_idx ] += (int) ( $day['totals'][ $bot_name ] ?? 0 );
+			}
+			$upper = $cum;
+
+			$fwd = [];
+			for ( $i = 0; $i < $n_days; $i++ ) {
+				$fwd[] = $x_pos( $i ) . ',' . $y_pos( $upper[ $i ] );
+			}
+			$bwd = [];
+			for ( $i = $n_days - 1; $i >= 0; $i-- ) {
+				$bwd[] = $x_pos( $i ) . ',' . $y_pos( $lower[ $i ] );
+			}
+			$chart_layers[] = [
+				'color_var' => '--citewp-bot-' . ( $slot_idx + 1 ),
+				'bot_name'  => $bot_name,
+				'path'      => 'M ' . implode( ' L ', $fwd ) . ' L ' . implode( ' L ', $bwd ) . ' Z',
+			];
+		}
+
+		// 'other' layer — only if any day has other > 0.
+		$has_other = false;
+		foreach ( $chart_data as $day ) {
+			if ( ( $day['other'] ?? 0 ) > 0 ) {
+				$has_other = true;
+				break;
+			}
+		}
+		if ( $has_other ) {
+			$other_lower = $cum;
+			foreach ( $chart_data as $day_idx => $day ) {
+				$cum[ $day_idx ] += (int) ( $day['other'] ?? 0 );
+			}
+			$other_upper = $cum;
+
+			$fwd = [];
+			for ( $i = 0; $i < $n_days; $i++ ) {
+				$fwd[] = $x_pos( $i ) . ',' . $y_pos( $other_upper[ $i ] );
+			}
+			$bwd = [];
+			for ( $i = $n_days - 1; $i >= 0; $i-- ) {
+				$bwd[] = $x_pos( $i ) . ',' . $y_pos( $other_lower[ $i ] );
+			}
+			$chart_layers[] = [
+				'color_var' => '--citewp-bot-other',
+				'bot_name'  => 'other',
+				'path'      => 'M ' . implode( ' L ', $fwd ) . ' L ' . implode( ' L ', $bwd ) . ' Z',
+			];
+		}
+
+		// X-axis label density.
+		if ( $n_days <= 7 ) {
+			$label_step = 1;
+		} elseif ( $n_days <= 30 ) {
+			$label_step = 5;
+		} else {
+			$label_step = 15;
+		}
+
 		// Base URL for date range filter pills.
 		$base_url = add_query_arg(
 			[ 'page' => Menu::SLUG_PARENT, 'citewp_section' => 'crawler-logs' ],
@@ -210,6 +316,76 @@ final class LogsPage {
 				</div>
 
 			</div>
+
+				<div class="citewp-aiso-crawler-row-2col">
+
+					<!-- Left: Bot Visits Over Time chart -->
+					<div class="citewp-aiso-cs-panel citewp-aiso-bot-visits-panel">
+						<div class="citewp-aiso-cs-panel__head">
+							<span class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Bot Visits Over Time', 'ai-search-optimizer' ); ?></span>
+							<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
+								<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
+								<span class="citewp-aiso-kpi-tooltip__text">
+									<?php esc_html_e( 'AI crawler visits per day, stacked by bot. Responds to the date filter above.', 'ai-search-optimizer' ); ?>
+								</span>
+							</span>
+						</div>
+
+						<?php if ( $chart_is_empty ) : ?>
+							<div class="citewp-aiso-bvot__empty">
+								<svg viewBox="0 0 600 180" style="position:absolute;inset:0;width:100%;height:100%;opacity:.2" preserveAspectRatio="none" aria-hidden="true">
+									<line x1="0" y1="90" x2="600" y2="90" stroke="var(--citewp-border)" stroke-width="1" stroke-dasharray="8 4"/>
+								</svg>
+								<p style="position:relative;z-index:1;"><?php esc_html_e( 'No crawler activity in this period.', 'ai-search-optimizer' ); ?></p>
+							</div>
+						<?php else : ?>
+							<div class="citewp-aiso-bvot">
+								<svg class="citewp-aiso-bvot__svg" viewBox="0 0 600 180" preserveAspectRatio="none" aria-hidden="true">
+									<?php foreach ( $chart_layers as $layer ) : ?>
+										<path d="<?php echo esc_attr( $layer['path'] ); ?>" fill="var(<?php echo esc_attr( $layer['color_var'] ); ?>)" opacity="0.85"/>
+									<?php endforeach; ?>
+								</svg>
+								<div class="citewp-aiso-chart-xlabels">
+									<?php foreach ( $chart_data as $i => $day ) :
+										if ( $n_days > 1 && $i % $label_step !== 0 && $i !== $n_days - 1 ) {
+											continue;
+										}
+										$left_pct  = $n_days > 1 ? round( $i / ( $n_days - 1 ) * 100, 2 ) : 50.0;
+										$parts     = explode( '-', $day['date'] );
+										$label_str = ltrim( $parts[1] ?? '', '0' ) . '/' . ltrim( $parts[2] ?? '', '0' );
+									?>
+										<span class="citewp-aiso-chart-xlabels__label" style="left:<?php echo esc_attr( $left_pct . '%' ); ?>">
+											<?php echo esc_html( $label_str ); ?>
+										</span>
+									<?php endforeach; ?>
+								</div>
+							</div>
+
+							<div class="citewp-aiso-bvot__legend">
+								<?php foreach ( $chart_layers as $layer ) :
+									if ( $layer['bot_name'] === 'other' ) {
+										continue;
+									}
+								?>
+									<span class="citewp-aiso-bvot__legend-item">
+										<span class="citewp-aiso-bvot__legend-swatch" style="background:var(<?php echo esc_attr( $layer['color_var'] ); ?>)"></span>
+										<?php echo esc_html( $layer['bot_name'] ); ?>
+									</span>
+								<?php endforeach; ?>
+								<?php if ( $has_other ) : ?>
+									<span class="citewp-aiso-bvot__legend-item">
+										<span class="citewp-aiso-bvot__legend-swatch" style="background:var(--citewp-bot-other)"></span>
+										<?php esc_html_e( 'Other', 'ai-search-optimizer' ); ?>
+									</span>
+								<?php endif; ?>
+							</div>
+						<?php endif; ?>
+					</div>
+
+					<!-- Right: empty placeholder — T2c (Top Crawled Pages) fills this cell -->
+					<div></div>
+
+				</div><!-- .citewp-aiso-crawler-row-2col -->
 
 			<?php if ( $total === 0 && $range_filter === '' ) : ?>
 				<div class="citewp-aiso-empty">
