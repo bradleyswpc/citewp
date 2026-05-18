@@ -57,37 +57,22 @@ final class DashboardData {
 
 		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 
+		$sql  = "SELECT request_uri, COUNT(*) AS visits, COUNT(DISTINCT bot_name) AS bot_count
+         FROM {$table_name}";
+		$args = [];
+
 		if ( $cutoff !== null ) {
-			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
-			$rows = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT request_uri, COUNT(*) AS visits, COUNT(DISTINCT bot_name) AS bot_count
-					 FROM {$table_name}
-					 WHERE detected_at >= %s
-					 GROUP BY request_uri
-					 ORDER BY visits DESC
-					 LIMIT %d",
-					$cutoff,
-					$limit
-				),
-				ARRAY_A
-			);
-			// phpcs:enable
-		} else {
-			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
-			$rows = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT request_uri, COUNT(*) AS visits, COUNT(DISTINCT bot_name) AS bot_count
-					 FROM {$table_name}
-					 GROUP BY request_uri
-					 ORDER BY visits DESC
-					 LIMIT %d",
-					$limit
-				),
-				ARRAY_A
-			);
-			// phpcs:enable
+			$sql   .= ' WHERE detected_at >= %s';
+			$args[] = $cutoff;
 		}
+
+		$sql   .= ' GROUP BY request_uri ORDER BY visits DESC LIMIT %d';
+		$args[] = $limit;
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		// Reason: Custom table not queryable via WP_Query. No-cache acceptable for admin analytics. $table_name is esc_sql() of a hardcoded constant; $sql uses only prepare() placeholders.
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, ...$args ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- variadic args match placeholders exactly.
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( ! is_array( $rows ) || empty( $rows ) ) {
 			return [];
@@ -96,14 +81,15 @@ final class DashboardData {
 		// Resolve each URI to a post title in PHP (small N, no SQL join needed).
 		$results = [];
 		foreach ( $rows as $row ) {
-			$post_id = url_to_postid( home_url( $row['request_uri'] ) );
+			$uri     = ltrim( $row['request_uri'], '/' );
+			$post_id = url_to_postid( home_url( $uri ) );
 			$title   = $post_id > 0 ? get_the_title( $post_id ) : $row['request_uri'];
 
 			$results[] = [
 				'request_uri' => $row['request_uri'],
 				'visits'      => (int) $row['visits'],
 				'bot_count'   => (int) $row['bot_count'],
-				'post_id'     => (int) $post_id,
+				'post_id'     => $post_id,
 				'title'       => $title,
 			];
 		}
