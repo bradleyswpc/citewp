@@ -436,4 +436,66 @@ final class DashboardData {
 
 		return $output;
 	}
+
+	/**
+	 * Renders a minimal sparkline SVG for a daily-totals array (output of get_visits_by_day with $top_n = null).
+	 *
+	 * Callers must echo the return value directly with a phpcs:ignore EscapeOutput comment,
+	 * since all dynamic SVG path data is escaped via esc_attr() internally.
+	 *
+	 * @param array<int, array<string, mixed>> $daily_totals Output of get_visits_by_day( $days, null ).
+	 * @param string                           $variant      CSS modifier class suffix (e.g. 'bot-visits').
+	 * @return string SVG markup string.
+	 */
+	public function render_sparkline_svg( array $daily_totals, string $variant = 'bot-visits' ): string {
+		$n = count( $daily_totals );
+
+		// Faint dashed baseline: keeps card height stable whether populated or empty.
+		$empty_svg = '<svg class="citewp-aiso-kpi-card__sparkline citewp-aiso-kpi-card__sparkline--'
+			. esc_attr( $variant )
+			. '" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">'
+			. '<line x1="0" y1="15" x2="100" y2="15" stroke="var(--citewp-border)" stroke-width="1" stroke-dasharray="4 2"/>'
+			. '</svg>';
+
+		if ( $n === 0 ) {
+			return $empty_svg;
+		}
+
+		$sums = array_map(
+			static function ( array $d ): int { return (int) ( $d['sum'] ?? 0 ); },
+			$daily_totals
+		);
+		$max = max( $sums );
+
+		if ( $max === 0 ) {
+			return $empty_svg;
+		}
+
+		// Fixed coordinate space: 100 × 30.
+		$vw      = 100.0;
+		$vh      = 30.0;
+		$pad     = 2.0;
+		$chart_h = $vh - $pad * 2; // 26
+
+		$pts = [];
+		foreach ( $sums as $i => $v ) {
+			$x     = $n > 1 ? round( $i / ( $n - 1 ) * $vw, 2 ) : $vw / 2.0;
+			$y     = round( $pad + ( 1.0 - $v / $max ) * $chart_h, 2 );
+			$pts[] = "$x,$y";
+		}
+
+		$first_x = 0.0;
+		$last_x  = $n > 1 ? $vw : $vw / 2.0;
+		$bot_y   = round( $vh - $pad, 2 );
+
+		$line_d = 'M ' . implode( ' L ', $pts );
+		$fill_d = $line_d . " L $last_x,$bot_y L $first_x,$bot_y Z";
+
+		$cls = 'citewp-aiso-kpi-card__sparkline citewp-aiso-kpi-card__sparkline--' . esc_attr( $variant );
+
+		return '<svg class="' . esc_attr( $cls ) . '" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">'
+			. '<path class="fill" d="' . esc_attr( $fill_d ) . '"/>'
+			. '<path class="line" d="' . esc_attr( $line_d ) . '"/>'
+			. '</svg>';
+	}
 }
