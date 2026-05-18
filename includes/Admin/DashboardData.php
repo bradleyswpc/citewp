@@ -315,8 +315,9 @@ final class DashboardData {
 		$days  = max( 1, $days );
 		$top_n = ( $top_n !== null ) ? max( 0, $top_n ) : null;
 
+		$now        = time();
 		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
-		$cutoff     = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
+		$cutoff     = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days", $now ) );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
 		$rows = $wpdb->get_results(
@@ -333,14 +334,14 @@ final class DashboardData {
 		// phpcs:enable
 
 		// Build the zero-fill date range: oldest day first, up to and including today.
-		$today      = wp_date( 'Y-m-d' );
-		$start_date = gmdate( 'Y-m-d', strtotime( $today . ' -' . ( $days - 1 ) . ' days' ) );
+		$today      = gmdate( 'Y-m-d', $now );
+		$start_date = gmdate( 'Y-m-d', $now - ( ( $days - 1 ) * DAY_IN_SECONDS ) );
 
 		$date_range = [];
 		$cursor     = $start_date;
 		while ( $cursor <= $today ) {
 			$date_range[] = $cursor;
-			$cursor       = gmdate( 'Y-m-d', strtotime( $cursor . ' +1 day' ) );
+			$cursor       = gmdate( 'Y-m-d', strtotime( $cursor ) + DAY_IN_SECONDS );
 		}
 
 		// ── Sparkline path ($top_n === null) ────────────────────────────────────
@@ -392,11 +393,7 @@ final class DashboardData {
 		uksort(
 			$bot_totals,
 			function ( string $a, string $b ) use ( $bot_totals ): int {
-				$diff = $bot_totals[ $b ] - $bot_totals[ $a ];
-				if ( $diff !== 0 ) {
-					return $diff;
-				}
-				return strcmp( $a, $b );
+				return ( $bot_totals[ $b ] <=> $bot_totals[ $a ] ) ?: strcmp( $a, $b );
 			}
 		);
 
