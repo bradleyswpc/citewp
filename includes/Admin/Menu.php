@@ -429,13 +429,6 @@ final class Menu {
 						<?php echo $sparkline_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render_sparkline_svg() returns safe SVG; all dynamic path data is escaped via esc_attr() internally. ?>
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></div>
 						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'AI crawler visits this week', 'ai-search-optimizer' ); ?></div>
-						<?php if ( $trend_pct > 5 ) : ?>
-							<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--up">↑ <?php echo esc_html( (string) absint( $trend_pct ) ); ?>% <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs last week', 'ai-search-optimizer' ); ?></span></div>
-						<?php elseif ( $trend_pct < -5 ) : ?>
-							<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--down">↓ <?php echo esc_html( (string) absint( $trend_pct ) ); ?>% <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs last week', 'ai-search-optimizer' ); ?></span></div>
-						<?php else : ?>
-							<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
-						<?php endif; ?>
 					</div>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
