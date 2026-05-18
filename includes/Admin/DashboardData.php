@@ -294,4 +294,149 @@ final class DashboardData {
 		}
 		return $out;
 	}
+
+	/**
+	 * Returns per-day visit counts, optionally broken down by top-N bots.
+	 *
+	 * When $top_n is null (sparkline mode) each entry contains only:
+	 *   [ 'date' => 'YYYY-MM-DD', 'sum' => N ]
+	 *
+	 * When $top_n is an integer each entry contains:
+	 *   [ 'date' => 'YYYY-MM-DD', 'totals' => [ 'BotName' => N, ... ], 'other' => N, 'sum' => N ]
+	 *
+	 * @param int      $days  Number of days to look back (clamped to >= 1).
+	 * @param int|null $top_n Number of top bots to break out; null = sparkline mode.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public function get_visits_by_day( int $days, ?int $top_n = 5 ): array {
+		global $wpdb;
+
+		// Defensive clamping.
+		$days  = max( 1, $days );
+		$top_n = ( $top_n !== null ) ? max( 0, $top_n ) : null;
+
+		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
+		$cutoff     = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days" ) );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT DATE(detected_at) AS day, bot_name, COUNT(*) AS visits
+				 FROM {$table_name}
+				 WHERE detected_at >= %s
+				 GROUP BY day, bot_name
+				 ORDER BY day ASC",
+				$cutoff
+			),
+			ARRAY_A
+		);
+		// phpcs:enable
+
+		// Build the zero-fill date range: oldest day first, up to and including today.
+		$today      = wp_date( 'Y-m-d' );
+		$start_date = gmdate( 'Y-m-d', strtotime( $today . ' -' . ( $days - 1 ) . ' days' ) );
+
+		$date_range = [];
+		$cursor     = $start_date;
+		while ( $cursor <= $today ) {
+			$date_range[] = $cursor;
+			$cursor       = gmdate( 'Y-m-d', strtotime( $cursor . ' +1 day' ) );
+		}
+
+		// ── Sparkline path ($top_n === null) ────────────────────────────────────
+		if ( $top_n === null ) {
+			// Aggregate: total visits per day.
+			$day_sums = [];
+			if ( is_array( $rows ) ) {
+				foreach ( $rows as $row ) {
+					$day                 = $row['day'];
+					$day_sums[ $day ]    = ( $day_sums[ $day ] ?? 0 ) + (int) $row['visits'];
+				}
+			}
+
+			$output = [];
+			foreach ( $date_range as $date ) {
+				$output[] = [
+					'date' => $date,
+					'sum'  => $day_sums[ $date ] ?? 0,
+				];
+			}
+			return $output;
+		}
+
+		// ── Top-N breakdown path ─────────────────────────────────────────────────
+
+		// Build intermediate map: $map[day][bot_name] = visits.
+		$map = [];
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$day      = $row['day'];
+				$bot      = $row['bot_name'];
+				$visits   = (int) $row['visits'];
+				if ( ! isset( $map[ $day ] ) ) {
+					$map[ $day ] = [];
+				}
+				$map[ $day ][ $bot ] = ( $map[ $day ][ $bot ] ?? 0 ) + $visits;
+			}
+		}
+
+		// Compute total visits per bot across ALL days.
+		$bot_totals = [];
+		foreach ( $map as $day_bots ) {
+			foreach ( $day_bots as $bot => $visits ) {
+				$bot_totals[ $bot ] = ( $bot_totals[ $bot ] ?? 0 ) + $visits;
+			}
+		}
+
+		// Sort descending by total visits; tiebreaker: alpha ascending by bot_name.
+		uksort(
+			$bot_totals,
+			function ( string $a, string $b ) use ( $bot_totals ): int {
+				$diff = $bot_totals[ $b ] - $bot_totals[ $a ];
+				if ( $diff !== 0 ) {
+					return $diff;
+				}
+				return strcmp( $a, $b );
+			}
+		);
+
+		// Select top-N bots.
+		$top_bots = array_slice( array_keys( $bot_totals ), 0, $top_n );
+
+		// Build output with zero-filling.
+		$output = [];
+		foreach ( $date_range as $date ) {
+			$day_bots = $map[ $date ] ?? [];
+
+			$totals = [];
+			$other  = 0;
+			$sum    = 0;
+
+			// Tally top bots and others.
+			foreach ( $day_bots as $bot => $visits ) {
+				if ( in_array( $bot, $top_bots, true ) ) {
+					$totals[ $bot ] = ( $totals[ $bot ] ?? 0 ) + $visits;
+				} else {
+					$other += $visits;
+				}
+				$sum += $visits;
+			}
+
+			// Zero-fill every top-bot key so the shape is consistent across all days.
+			foreach ( $top_bots as $bot ) {
+				if ( ! isset( $totals[ $bot ] ) ) {
+					$totals[ $bot ] = 0;
+				}
+			}
+
+			$output[] = [
+				'date'   => $date,
+				'totals' => $totals,
+				'other'  => $other,
+				'sum'    => $sum,
+			];
+		}
+
+		return $output;
+	}
 }
