@@ -307,8 +307,8 @@ final class Menu {
 		$trend_diff = $this_week - $last_week;
 		$trend_pct  = $last_week > 0 ? (int) round( ( $trend_diff / $last_week ) * 100 ) : 0;
 
-		$sparkline_data = ( new DashboardData() )->get_visits_by_day( 30, null );
-		$sparkline_svg  = ( new DashboardData() )->render_sparkline_svg( $sparkline_data, 'bot-visits' );
+		$sparkline_data = $data->get_visits_by_day( 30, null );
+		$sparkline_svg  = $data->render_sparkline_svg( $sparkline_data, 'bot-visits' );
 
 		$llms_settings = get_option( 'citewp_aiso_llms_settings', [] );
 		$llms_enabled  = ! empty( $llms_settings['enabled'] );
