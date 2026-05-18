@@ -46,29 +46,69 @@ final class DashboardData {
 	}
 
 	/**
-	 * @return array<int, object>
+	 * Returns the most-crawled URLs in the given window, with title resolution.
+	 *
+	 * @param string|null $cutoff MySQL datetime string (detected_at >= cutoff); null = all-time.
+	 * @param int         $limit  Number of rows to return.
+	 * @return array<int, array<string, mixed>>
 	 */
-	public function get_top_crawled_pages(): array {
+	public function get_top_crawled_pages( ?string $cutoff = null, int $limit = 5 ): array {
 		global $wpdb;
 
-		$table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
-		$since = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table is esc_sql() of a hardcoded constant. Real-time widget data.
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT request_uri, COUNT(*) AS visit_count
-				 FROM {$table}
-				 WHERE detected_at >= %s
-				 GROUP BY request_uri
-				 ORDER BY visit_count DESC
-				 LIMIT 5",
-				$since
-			)
-		);
-		// phpcs:enable
+		if ( $cutoff !== null ) {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT request_uri, COUNT(*) AS visits, COUNT(DISTINCT bot_name) AS bot_count
+					 FROM {$table_name}
+					 WHERE detected_at >= %s
+					 GROUP BY request_uri
+					 ORDER BY visits DESC
+					 LIMIT %d",
+					$cutoff,
+					$limit
+				),
+				ARRAY_A
+			);
+			// phpcs:enable
+		} else {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT request_uri, COUNT(*) AS visits, COUNT(DISTINCT bot_name) AS bot_count
+					 FROM {$table_name}
+					 GROUP BY request_uri
+					 ORDER BY visits DESC
+					 LIMIT %d",
+					$limit
+				),
+				ARRAY_A
+			);
+			// phpcs:enable
+		}
 
-		return is_array( $rows ) ? $rows : [];
+		if ( ! is_array( $rows ) || empty( $rows ) ) {
+			return [];
+		}
+
+		// Resolve each URI to a post title in PHP (small N, no SQL join needed).
+		$results = [];
+		foreach ( $rows as $row ) {
+			$post_id = url_to_postid( home_url( $row['request_uri'] ) );
+			$title   = $post_id > 0 ? get_the_title( $post_id ) : $row['request_uri'];
+
+			$results[] = [
+				'request_uri' => $row['request_uri'],
+				'visits'      => (int) $row['visits'],
+				'bot_count'   => (int) $row['bot_count'],
+				'post_id'     => (int) $post_id,
+				'title'       => $title,
+			];
+		}
+
+		return $results;
 	}
 
 	/**
