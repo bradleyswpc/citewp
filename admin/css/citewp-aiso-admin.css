@@ -2655,6 +2655,10 @@
   max-height: 180px;
 }
 
+.citewp-aiso-bvot__svg path {
+  fill-opacity: 0.6;
+}
+
 /* X-axis label overlay (shared pattern, also used by T3) */
 .citewp-aiso-chart-xlabels {
   display: flex;

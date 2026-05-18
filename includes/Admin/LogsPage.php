@@ -342,7 +342,7 @@ final class LogsPage {
 							<div class="citewp-aiso-bvot">
 								<svg class="citewp-aiso-bvot__svg" viewBox="0 0 600 180" preserveAspectRatio="none" aria-hidden="true">
 									<?php foreach ( $chart_layers as $layer ) : ?>
-										<path d="<?php echo esc_attr( $layer['path'] ); ?>" fill="var(<?php echo esc_attr( $layer['color_var'] ); ?>)" opacity="0.85"/>
+										<path d="<?php echo esc_attr( $layer['path'] ); ?>" fill="var(<?php echo esc_attr( $layer['color_var'] ); ?>)"/>
 									<?php endforeach; ?>
 								</svg>
 								<div class="citewp-aiso-chart-xlabels">
