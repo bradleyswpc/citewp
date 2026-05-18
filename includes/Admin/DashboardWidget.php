@@ -32,7 +32,7 @@ final class DashboardWidget {
 		}
 		wp_add_dashboard_widget(
 			self::WIDGET_ID,
-			__( 'CiteWP — GEO Overview', 'ai-search-optimizer' ),
+			__( 'CiteWP — GEO Overview', 'citewp-ai-search-optimizer' ),
 			[ $this, 'render' ]
 		);
 	}
@@ -83,31 +83,31 @@ final class DashboardWidget {
 
 			<div class="citewp-aiso-widget__stats">
 				<div class="citewp-aiso-stat">
-					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Avg GEO Score', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Avg GEO Score', 'citewp-ai-search-optimizer' ); ?></span>
 					<?php if ( $avg_score !== null ) : ?>
 						<span class="citewp-aiso-stat__value citewp-aiso-stat__value--<?php echo esc_attr( $avg_grade ); ?>"><?php echo esc_html( (string) $avg_score ); ?></span>
-						<span class="citewp-aiso-stat__sub"><?php esc_html_e( 'across scored posts', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-stat__sub"><?php esc_html_e( 'across scored posts', 'citewp-ai-search-optimizer' ); ?></span>
 					<?php else : ?>
 						<span class="citewp-aiso-stat__value citewp-aiso-stat__value--none">—</span>
-						<span class="citewp-aiso-stat__sub"><?php esc_html_e( 'No posts scored yet', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-stat__sub"><?php esc_html_e( 'No posts scored yet', 'citewp-ai-search-optimizer' ); ?></span>
 					<?php endif; ?>
 				</div>
 
 				<div class="citewp-aiso-stat">
-					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Bot Visits (7d)', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-stat__label"><?php esc_html_e( 'Bot Visits (7d)', 'citewp-ai-search-optimizer' ); ?></span>
 					<span class="citewp-aiso-stat__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></span>
 					<span class="citewp-aiso-stat__sub">
 						<?php if ( $trend_icon ) : ?>
 							<span class="citewp-aiso-trend <?php echo esc_attr( $trend_class ); ?>"><?php echo esc_html( $trend_icon . ' ' . number_format_i18n( abs( $diff ) ) ); ?></span>
 						<?php endif; ?>
-						<?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'vs. prior 7 days', 'citewp-ai-search-optimizer' ); ?>
 					</span>
 				</div>
 			</div>
 
 			<?php if ( ! empty( $top_crawled ) ) : ?>
 			<div class="citewp-aiso-widget__section">
-				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Most Crawled Pages (Last 7 Days)', 'ai-search-optimizer' ); ?></h4>
+				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Most Crawled Pages (Last 7 Days)', 'citewp-ai-search-optimizer' ); ?></h4>
 				<ul class="citewp-aiso-list">
 					<?php foreach ( $top_crawled as $row ) : ?>
 					<li class="citewp-aiso-list__item">
@@ -116,18 +116,18 @@ final class DashboardWidget {
 					</li>
 					<?php endforeach; ?>
 				</ul>
-				<a href="<?php echo esc_url( $logs_url ); ?>" class="citewp-aiso-widget__link"><?php esc_html_e( 'View all crawler logs →', 'ai-search-optimizer' ); ?></a>
+				<a href="<?php echo esc_url( $logs_url ); ?>" class="citewp-aiso-widget__link"><?php esc_html_e( 'View all crawler logs →', 'citewp-ai-search-optimizer' ); ?></a>
 			</div>
 			<?php else : ?>
 			<p class="citewp-aiso-widget__empty">
-				<?php esc_html_e( 'No bot visits logged yet.', 'ai-search-optimizer' ); ?>
-				<a href="<?php echo esc_url( $logs_url ); ?>"><?php esc_html_e( 'View logs →', 'ai-search-optimizer' ); ?></a>
+				<?php esc_html_e( 'No bot visits logged yet.', 'citewp-ai-search-optimizer' ); ?>
+				<a href="<?php echo esc_url( $logs_url ); ?>"><?php esc_html_e( 'View logs →', 'citewp-ai-search-optimizer' ); ?></a>
 			</p>
 			<?php endif; ?>
 
 			<?php if ( ! empty( $lowest_posts ) ) : ?>
 			<div class="citewp-aiso-widget__section">
-				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Lowest GEO Scores — Needs Attention', 'ai-search-optimizer' ); ?></h4>
+				<h4 class="citewp-aiso-widget__heading"><?php esc_html_e( 'Lowest GEO Scores — Needs Attention', 'citewp-ai-search-optimizer' ); ?></h4>
 				<ul class="citewp-aiso-list">
 					<?php foreach ( $lowest_posts as $post ) : ?>
 					<?php
@@ -147,7 +147,7 @@ final class DashboardWidget {
 					</li>
 					<?php endforeach; ?>
 				</ul>
-				<a href="<?php echo esc_url( $all_posts_url ); ?>" class="citewp-aiso-widget__link"><?php esc_html_e( 'See all post scores →', 'ai-search-optimizer' ); ?></a>
+				<a href="<?php echo esc_url( $all_posts_url ); ?>" class="citewp-aiso-widget__link"><?php esc_html_e( 'See all post scores →', 'citewp-ai-search-optimizer' ); ?></a>
 			</div>
 			<?php endif; ?>
 

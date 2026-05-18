@@ -1,16 +1,16 @@
 <?php
 /**
- * Plugin Name:       CiteWP AI Search Optimizer – Optimize Content for AI Engines
+ * Plugin Name:       CiteWP AI Search Optimizer
  * Plugin URI:        https://citewp.com/ai-search-optimizer
- * Description:       Optimize WordPress content for AI search engines like ChatGPT, Claude, Perplexity, and Gemini. Includes AI crawler detection, llms.txt generation, and the Cite Score — a transparent 100-point GEO score for content citability.
- * Version:           0.6.2
+ * Description:       Optimize WordPress content for AI search engines like ChatGPT, Claude, Perplexity, and Gemini. Includes AI crawler detection, llms.txt generation, and the Cite Score — a transparent 100-point measure for content citability.
+ * Version:           0.6.3
  * Requires at least: 6.5
  * Requires PHP:      8.0
  * Author:            CiteWP
  * Author URI:        https://citewp.com
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       ai-search-optimizer
+ * Text Domain:       citewp-ai-search-optimizer
  *
  * @package CiteWP\Aiso
  */
@@ -22,7 +22,7 @@ defined( 'ABSPATH' ) || exit;
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-define( 'CITEWP_AISO_VERSION', '0.6.2' );
+define( 'CITEWP_AISO_VERSION', '0.6.3' );
 define( 'CITEWP_AISO_PLUGIN_FILE', __FILE__ );
 define( 'CITEWP_AISO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CITEWP_AISO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

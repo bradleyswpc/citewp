@@ -1,10 +1,10 @@
-=== CiteWP AI Search Optimizer – Optimize Content for AI Engines ===
+=== CiteWP AI Search Optimizer ===
 Contributors: bradleyswpc
 Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.6.2
+Stable tag: 0.6.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,7 +80,7 @@ It's an emerging standard that helps AI engines understand your site's most impo
 CiteWP AI Search Optimizer is open source under GPL v2 or later.
 
 * Source code repository: https://github.com/bradleyswpc/citewp
-* Source for this release: https://github.com/bradleyswpc/citewp/tree/v0.6.2
+* Source for this release: https://github.com/bradleyswpc/citewp/tree/v0.6.3
 * Un-minified JavaScript source: src/sidebar/index.js
 * Build tooling: webpack via @wordpress/scripts
 * The compiled build/index.js in this plugin is generated from src/sidebar/index.js
@@ -88,6 +88,11 @@ CiteWP AI Search Optimizer is open source under GPL v2 or later.
 * Contributions welcome via pull requests at the repository above.
 
 == Changelog ==
+
+= 0.6.3 =
+* Renamed plugin slug to citewp-ai-search-optimizer per WordPress.org plugin naming guidance (Round 3 review).
+* Plugin display name shortened to "CiteWP AI Search Optimizer" — brand-first naming pattern.
+* No functional changes from 0.6.2.
 
 = 0.6.2 =
 * Fix: Inline sanitize_text_field() on $_SERVER inputs in crawler detection (REMOTE_ADDR, REQUEST_URI, HTTP_REFERER).
