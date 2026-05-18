@@ -6,6 +6,50 @@
 
 ---
 
+## Session 32 — WP.org Round 3 Rename (v0.6.3) ✅
+
+**Date:** 2026-05-18
+
+### Deliverable
+
+WP.org Round 3 compliance: renamed plugin slug from `ai-search-optimizer` to `citewp-ai-search-optimizer`. Plugin display name shortened to "CiteWP AI Search Optimizer". v0.6.3 zip submitted to WP.org. Submission accepted (no automated check failures after cleanup).
+
+### What shipped
+
+- **Working folder:** `Desktop\CiteWP\citewp-ai-search-optimizer-v0.6.3-work\citewp-ai-search-optimizer\`
+- Main PHP file renamed: `ai-search-optimizer.php` → `citewp-ai-search-optimizer.php`
+- Plugin header updated: display name trimmed, Description "GEO score" → "measure" (P52 messaging), Version 0.6.3, Text Domain `citewp-ai-search-optimizer`
+- `CITEWP_AISO_VERSION` constant bumped to `'0.6.3'` (name unchanged)
+- PHP text domain sweep: 69 instances of `'ai-search-optimizer'` replaced across all PHP files
+- `readme.txt`: title trimmed, Stable tag 0.6.3, Development source link updated, `= 0.6.3 =` changelog entry added
+- LocalWP smoke test: activation clean, existing data preserved, debug.log clean
+- Zip cleanup: removed `.distignore`, `SESSION-STATUS.md`, `.claude/` (hidden) before final build — all three caused WP.org automated checker failures on first submission attempt
+- `release/v0.6.3` branch pushed to GitHub as reviewer snapshot (single commit)
+- v0.6.3 zip submitted to WP.org via "Add your plugin" — accepted
+
+### Files modified (working folder only — NOT main/v0.7.x)
+
+- `citewp-ai-search-optimizer.php` (renamed from `ai-search-optimizer.php`)
+- `includes/Admin/DashboardWidget.php`, `LogsPage.php`, `LogsTable.php`, `Menu.php`, `PostListColumn.php`
+- `includes/Rest/ScoreController.php`, `includes/Settings/Page.php`
+- `readme.txt`
+
+### Internal prefix status
+
+`citewp_aiso_` prefix preserved across options, post meta, hooks, constants, DB tables, CSS classes, PHP namespace. Existing user data safe on update.
+
+### Decisions
+
+- P53 logged: WP.org slug rename rationale and brand-first pattern for future plugins
+
+### Carryover into Session 33
+
+- **WP.org Round 4 watch** — check hello@citewp.com at session start
+- **Forward-port rename to `main`** — AFTER WP.org approves v0.6.3. Apply same text domain swap to v0.7.x. v0.7.4 → v0.7.5.
+- All prior S32 carryover items unchanged (see master file Next Session — Session 33)
+
+---
+
 ## Session 31 — Plugin Check v0.7.4 Cleanup ✅
 
 **Date:** 2026-05-16
