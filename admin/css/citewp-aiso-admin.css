@@ -2751,6 +2751,9 @@
 
 .citewp-aiso-top-pages-row__title {
   width: 50%;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
 }
 
 .citewp-aiso-top-pages-row__title a,
@@ -2759,7 +2762,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.citewp-aiso-top-pages-row__title .citewp-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--citewp-text-muted);
 }
 
 .citewp-aiso-top-pages-row__uri {

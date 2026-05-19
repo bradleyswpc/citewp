@@ -397,13 +397,23 @@ final class LogsPage {
 							<p class="citewp-aiso-top-pages-empty"><?php esc_html_e( 'No crawler activity in this period.', 'ai-search-optimizer' ); ?></p>
 						<?php else : ?>
 							<table class="citewp-aiso-cs-table">
+								<thead>
+									<tr>
+										<th style="width:50%"><?php esc_html_e( 'Title',  'ai-search-optimizer' ); ?></th>
+										<th style="width:25%;text-align:right"><?php esc_html_e( 'Visits', 'ai-search-optimizer' ); ?></th>
+										<th style="width:25%;text-align:right"><?php esc_html_e( 'Bots',   'ai-search-optimizer' ); ?></th>
+									</tr>
+								</thead>
 								<tbody>
 									<?php foreach ( $top_pages as $row ) : ?>
 										<tr>
 											<td class="citewp-aiso-top-pages-row__title">
 												<?php if ( $row['post_id'] > 0 ) : ?>
+													<?php $t_icon = ( (string) get_post_type( $row['post_id'] ) === 'page' ) ? 'file-text' : 'file'; ?>
+													<?php echo IconLibrary::icon( $t_icon, 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
 													<a href="<?php echo esc_url( (string) get_edit_post_link( $row['post_id'] ) ); ?>" title="<?php echo esc_attr( $row['title'] ); ?>"><?php echo esc_html( $row['title'] ); ?></a>
 												<?php else : ?>
+													<?php echo IconLibrary::icon( 'link', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
 													<span class="citewp-aiso-top-pages-row__uri"><?php echo esc_html( $row['request_uri'] ); ?></span>
 												<?php endif; ?>
 											</td>
