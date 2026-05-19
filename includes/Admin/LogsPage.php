@@ -412,13 +412,16 @@ final class LogsPage {
 													<?php $t_icon = ( (string) get_post_type( $row['post_id'] ) === 'page' ) ? 'file-text' : 'file'; ?>
 													<?php echo IconLibrary::icon( $t_icon, 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
 													<a href="<?php echo esc_url( (string) get_edit_post_link( $row['post_id'] ) ); ?>" title="<?php echo esc_attr( $row['title'] ); ?>"><?php echo esc_html( $row['title'] ); ?></a>
+												<?php elseif ( $row['request_uri'] === '/' ) : ?>
+													<?php echo IconLibrary::icon( 'file', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
+													<a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( $row['title'] ); ?>"><?php echo esc_html( $row['title'] ); ?></a>
 												<?php else : ?>
 													<?php echo IconLibrary::icon( 'link', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
 													<span class="citewp-aiso-top-pages-row__uri"><?php echo esc_html( $row['request_uri'] ); ?></span>
 												<?php endif; ?>
 											</td>
 											<td class="citewp-aiso-top-pages-row__visits"><?php echo esc_html( number_format_i18n( $row['visits'] ) ); ?></td>
-											<td class="citewp-aiso-top-pages-row__bots"><?php echo esc_html( sprintf( _n( '%d bot', '%d bots', $row['bot_count'], 'ai-search-optimizer' ), $row['bot_count'] ) ); ?></td>
+											<td class="citewp-aiso-top-pages-row__bots"><?php echo esc_html( (string) $row['bot_count'] ); ?></td>
 										</tr>
 									<?php endforeach; ?>
 								</tbody>

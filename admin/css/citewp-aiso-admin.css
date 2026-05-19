@@ -2775,6 +2775,7 @@
 
 .citewp-aiso-top-pages-row__uri {
   font-style: italic;
+  font-weight: 700;
   color: var(--citewp-text-muted);
 }
 
@@ -2788,6 +2789,7 @@
 .citewp-aiso-top-pages-row__bots {
   width: 25%;
   text-align: right;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-size: 12px;
   color: var(--citewp-text-muted);
 }

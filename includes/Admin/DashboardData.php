@@ -81,9 +81,20 @@ final class DashboardData {
 		// Resolve each URI to a post title in PHP (small N, no SQL join needed).
 		$results = [];
 		foreach ( $rows as $row ) {
-			$uri     = ltrim( $row['request_uri'], '/' );
-			$post_id = url_to_postid( home_url( $uri ) );
-			$title   = $post_id > 0 ? get_the_title( $post_id ) : $row['request_uri'];
+			if ( $row['request_uri'] === '/' ) {
+				$front_page_id = (int) get_option( 'page_on_front' );
+				if ( $front_page_id > 0 ) {
+					$post_id = $front_page_id;
+					$title   = get_the_title( $front_page_id );
+				} else {
+					$post_id = 0;
+					$title   = __( 'Homepage', 'ai-search-optimizer' );
+				}
+			} else {
+				$uri     = ltrim( $row['request_uri'], '/' );
+				$post_id = url_to_postid( home_url( $uri ) );
+				$title   = $post_id > 0 ? get_the_title( $post_id ) : $row['request_uri'];
+			}
 
 			$results[] = [
 				'request_uri' => $row['request_uri'],
