@@ -328,39 +328,34 @@ final class Menu {
 		$all_issues_url = admin_url( 'edit.php?orderby=citewp_aiso_geo_score&order=asc' );
 
 		$current_user  = wp_get_current_user();
-		$greeting_name = ! empty( $current_user->first_name ) ? $current_user->first_name : $current_user->display_name;
+		$greeting_name   = ! empty( $current_user->first_name ) ? $current_user->first_name : $current_user->display_name;
+		$dashboard_range = absint( $_GET['db_range'] ?? 7 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$dashboard_range = in_array( $dashboard_range, [ 7, 30, 90 ], true ) ? $dashboard_range : 7;
+		$dashboard_url   = menu_page_url( 'ai-search-optimizer', false );
 		?>
-		<!-- Hero card -->
-		<div class="citewp-aiso-hero">
-			<div class="citewp-aiso-hero__left">
-				<h2 class="citewp-aiso-hero__title"><?php
+		<!-- Dashboard page header -->
+		<div class="citewp-aiso-page-header">
+			<div class="citewp-aiso-page-header__left">
+				<h2 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Dashboard', 'ai-search-optimizer' ); ?></h2>
+				<p class="citewp-aiso-page-header__desc"><?php
 				/* translators: %s: user's first name or display name */
 				echo esc_html( sprintf( __( 'Welcome back, %s 👋', 'ai-search-optimizer' ), $greeting_name ) );
-				?></h2>
-				<p class="citewp-aiso-hero__sub"><?php esc_html_e( "Here's how your site is performing in AI search.", 'ai-search-optimizer' ); ?></p>
-				<div class="citewp-aiso-hero__filters">
-					<span class="citewp-aiso-hero__filter is-active">
-						<?php echo IconLibrary::icon( 'calendar', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<?php esc_html_e( 'Last 7 Days', 'ai-search-optimizer' ); ?>
-					</span>
-					<span class="citewp-aiso-hero__filter">
-						<?php echo IconLibrary::icon( 'bot', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<?php echo esc_html( number_format_i18n( $unique_bots ) . ' ' . __( 'Bots', 'ai-search-optimizer' ) ); ?>
-					</span>
-					<span class="citewp-aiso-hero__filter">
-						<?php echo IconLibrary::icon( 'eye', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<?php echo esc_html( number_format_i18n( $this_week ) . ' ' . __( 'Visits', 'ai-search-optimizer' ) ); ?>
-					</span>
-				</div>
+				?></p>
 			</div>
-			<div class="citewp-aiso-hero__stats">
-				<div class="citewp-aiso-hero__stat">
-					<div class="citewp-aiso-hero__stat-head">
-						<span style="color:var(--citewp-tint-orange)"><?php echo IconLibrary::icon( 'alert-triangle', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></span>
-						<span class="citewp-aiso-hero__stat-label"><?php esc_html_e( 'Needs Attention', 'ai-search-optimizer' ); ?></span>
-					</div>
-					<span class="citewp-aiso-hero__stat-value"><?php echo esc_html( number_format_i18n( $issue_count ) ); ?></span>
-					<span class="citewp-aiso-hero__stat-sub"><?php esc_html_e( 'red or orange score', 'ai-search-optimizer' ); ?></span>
+			<div class="citewp-aiso-page-header__right">
+				<div class="citewp-aiso-filter-pills">
+					<a href="<?php echo esc_url( add_query_arg( 'db_range', 7, $dashboard_url ) ); ?>"
+					   class="citewp-aiso-filter-pill <?php echo 7 === $dashboard_range ? 'citewp-aiso-filter-pill--active' : 'citewp-aiso-filter-pill--inactive'; ?>">
+						<?php esc_html_e( 'Last 7 Days', 'ai-search-optimizer' ); ?>
+					</a>
+					<a href="<?php echo esc_url( add_query_arg( 'db_range', 30, $dashboard_url ) ); ?>"
+					   class="citewp-aiso-filter-pill <?php echo 30 === $dashboard_range ? 'citewp-aiso-filter-pill--active' : 'citewp-aiso-filter-pill--inactive'; ?>">
+						<?php esc_html_e( 'Last 30 Days', 'ai-search-optimizer' ); ?>
+					</a>
+					<a href="<?php echo esc_url( add_query_arg( 'db_range', 90, $dashboard_url ) ); ?>"
+					   class="citewp-aiso-filter-pill <?php echo 90 === $dashboard_range ? 'citewp-aiso-filter-pill--active' : 'citewp-aiso-filter-pill--inactive'; ?>">
+						<?php esc_html_e( 'Last 90 Days', 'ai-search-optimizer' ); ?>
+					</a>
 				</div>
 			</div>
 		</div>
@@ -657,17 +652,6 @@ final class Menu {
 
 		</div><!-- .citewp-aiso-lower -->
 
-		<script>
-		(function () {
-			var filters = document.querySelectorAll( '.citewp-aiso-hero__filter' );
-			filters.forEach( function ( btn ) {
-				btn.addEventListener( 'click', function () {
-					filters.forEach( function ( b ) { b.classList.remove( 'is-active' ); } );
-					btn.classList.add( 'is-active' );
-				} );
-			} );
-		}() );
-		</script>
 		<?php
 	}
 
