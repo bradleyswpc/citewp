@@ -1486,7 +1486,7 @@ final class Menu {
 				<span class="citewp-aiso-cs-history-yaxis__label" style="top:90%">0</span>
 			</div>
 			<svg viewBox="0 0 <?php echo esc_attr( (string) $w ); ?> <?php echo esc_attr( (string) $h ); ?>"
-				width="100%" height="<?php echo esc_attr( (string) $h ); ?>" aria-hidden="true">
+				width="100%" height="<?php echo esc_attr( (string) $h ); ?>" preserveAspectRatio="none" aria-hidden="true">
 				<line x1="0" y1="8"  x2="340" y2="8"  stroke="var(--citewp-border)" stroke-width="0.5"/>
 				<line x1="0" y1="24" x2="340" y2="24" stroke="var(--citewp-border)" stroke-width="0.5"/>
 				<line x1="0" y1="40" x2="340" y2="40" stroke="var(--citewp-border)" stroke-width="0.5"/>
