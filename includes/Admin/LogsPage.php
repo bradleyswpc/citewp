@@ -396,10 +396,10 @@ final class LogsPage {
 						<?php if ( empty( $top_pages ) ) : ?>
 							<p class="citewp-aiso-top-pages-empty"><?php esc_html_e( 'No crawler activity in this period.', 'ai-search-optimizer' ); ?></p>
 						<?php else : ?>
-							<table class="citewp-aiso-top-pages-table">
+							<table class="citewp-aiso-cs-table">
 								<tbody>
 									<?php foreach ( $top_pages as $row ) : ?>
-										<tr class="citewp-aiso-top-pages-row">
+										<tr>
 											<td class="citewp-aiso-top-pages-row__title">
 												<?php if ( $row['post_id'] > 0 ) : ?>
 													<a href="<?php echo esc_url( (string) get_edit_post_link( $row['post_id'] ) ); ?>" title="<?php echo esc_attr( $row['title'] ); ?>"><?php echo esc_html( $row['title'] ); ?></a>

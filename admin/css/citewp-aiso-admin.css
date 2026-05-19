@@ -2741,21 +2741,12 @@
   margin: 16px 0 0;
 }
 
-.citewp-aiso-top-pages-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
+.citewp-aiso-top-pages-panel .citewp-aiso-cs-table {
   margin-top: 8px;
 }
 
-.citewp-aiso-top-pages-row td {
+.citewp-aiso-top-pages-panel .citewp-aiso-cs-table td {
   padding: 8px 12px;
-  border-bottom: 1px solid var(--citewp-border);
-  vertical-align: middle;
-}
-
-.citewp-aiso-top-pages-row:last-child td {
-  border-bottom: none;
 }
 
 .citewp-aiso-top-pages-row__title {
