@@ -463,39 +463,6 @@ final class Menu {
 
 			<div class="citewp-aiso-col-a">
 
-				<!-- AI Insights two-tone -->
-				<div class="citewp-aiso-insights">
-					<div class="citewp-aiso-insights__header">
-						<?php echo IconLibrary::icon( 'sparkles', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-						<span class="citewp-aiso-insights__title"><?php esc_html_e( 'AI Insights', 'ai-search-optimizer' ); ?></span>
-						<span class="citewp-aiso-insights__badge">BETA</span>
-					</div>
-					<div class="citewp-aiso-insights__body">
-						<div class="citewp-aiso-insights__nested">
-							<div class="citewp-aiso-insights__nested-top">
-								<div class="citewp-aiso-insights__orb">
-									<?php echo IconLibrary::icon( 'bot', 28 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-								</div>
-								<div class="citewp-aiso-insights__headline-wrap">
-									<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content is being discovered', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-insights__sub"><?php esc_html_e( 'AI crawlers are visiting your site. Optimise to increase citation likelihood.', 'ai-search-optimizer' ); ?></p>
-								</div>
-							</div>
-							<div class="citewp-aiso-insights__nested-bottom">
-								<p class="citewp-aiso-insights__opp-label">
-									<?php echo IconLibrary::icon( 'sparkles', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-									<?php esc_html_e( 'Top opportunity', 'ai-search-optimizer' ); ?>
-								</p>
-								<p class="citewp-aiso-insights__opp-body"><?php esc_html_e( 'Add structured schema markup to your highest-traffic posts to improve citation potential.', 'ai-search-optimizer' ); ?></p>
-								<p class="citewp-aiso-insights__opp-muted"><?php esc_html_e( 'Posts with schema are 3× more likely to be cited in AI responses.', 'ai-search-optimizer' ); ?></p>
-								<div class="citewp-aiso-insights__opp-actions">
-									<a href="#cite-score" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'View AI Recommendations →', 'ai-search-optimizer' ); ?></a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
 				<!-- Top Crawlers — 4-column table, top 3 rows -->
 				<div class="citewp-aiso-crawlers">
 					<div class="citewp-aiso-crawlers__head">
@@ -558,6 +525,39 @@ final class Menu {
 							<p class="citewp-aiso-empty__title"><?php esc_html_e( 'No crawler visits recorded yet.', 'ai-search-optimizer' ); ?></p>
 						</div>
 					<?php endif; ?>
+				</div>
+
+				<!-- AI Insights two-tone -->
+				<div class="citewp-aiso-insights">
+					<div class="citewp-aiso-insights__header">
+						<?php echo IconLibrary::icon( 'sparkles', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+						<span class="citewp-aiso-insights__title"><?php esc_html_e( 'AI Insights', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-insights__badge">BETA</span>
+					</div>
+					<div class="citewp-aiso-insights__body">
+						<div class="citewp-aiso-insights__nested">
+							<div class="citewp-aiso-insights__nested-top">
+								<div class="citewp-aiso-insights__orb">
+									<?php echo IconLibrary::icon( 'bot', 28 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+								</div>
+								<div class="citewp-aiso-insights__headline-wrap">
+									<p class="citewp-aiso-insights__headline"><?php esc_html_e( 'Your content is being discovered', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-insights__sub"><?php esc_html_e( 'AI crawlers are visiting your site. Optimise to increase citation likelihood.', 'ai-search-optimizer' ); ?></p>
+								</div>
+							</div>
+							<div class="citewp-aiso-insights__nested-bottom">
+								<p class="citewp-aiso-insights__opp-label">
+									<?php echo IconLibrary::icon( 'sparkles', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+									<?php esc_html_e( 'Top opportunity', 'ai-search-optimizer' ); ?>
+								</p>
+								<p class="citewp-aiso-insights__opp-body"><?php esc_html_e( 'Add structured schema markup to your highest-traffic posts to improve citation potential.', 'ai-search-optimizer' ); ?></p>
+								<p class="citewp-aiso-insights__opp-muted"><?php esc_html_e( 'Posts with schema are 3× more likely to be cited in AI responses.', 'ai-search-optimizer' ); ?></p>
+								<div class="citewp-aiso-insights__opp-actions">
+									<a href="#cite-score" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'View AI Recommendations →', 'ai-search-optimizer' ); ?></a>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 
 			</div><!-- .citewp-aiso-col-a -->
