@@ -312,6 +312,8 @@ final class Menu {
 		$severity        = $data->get_issue_severity_counts();
 		$cat_scores      = $data->get_average_category_scores();
 		$score_trend     = $data->get_avg_score_trend();
+		$cat_breakdown   = $data->get_issue_counts_by_category();
+		$cat_colors      = [ 'structure' => 'citrine', 'citability' => 'orange', 'authority' => 'red' ];
 
 		/**
 		 * Filters the Quick Actions grid items on the Dashboard.
@@ -438,8 +440,10 @@ final class Menu {
 					<div class="citewp-aiso-kpi-card__bot-list">
 						<?php foreach ( array_slice( $top_crawlers, 0, 3 ) as $bot_slot => $bot ) : ?>
 						<div class="citewp-aiso-kpi-card__bot-row">
-							<span class="citewp-aiso-kpi-card__bot-dot citewp-aiso-kpi-card__bot-dot--<?php echo esc_attr( (string) ( $bot_slot + 1 ) ); ?>"></span>
-							<span class="citewp-aiso-kpi-card__bot-name"><?php echo esc_html( $bot['bot_name'] ); ?></span>
+							<span class="citewp-aiso-kpi-card__bot-name">
+								<span class="citewp-aiso-kpi-card__bot-dot citewp-aiso-kpi-card__bot-dot--<?php echo esc_attr( (string) ( $bot_slot + 1 ) ); ?>"></span>
+								<?php echo esc_html( $bot['bot_name'] ); ?>
+							</span>
 							<span class="citewp-aiso-kpi-card__bot-count"><?php echo esc_html( number_format_i18n( $bot['visits'] ) ); ?></span>
 						</div>
 						<?php endforeach; ?>
@@ -490,6 +494,20 @@ final class Menu {
 							<span class="citewp-aiso-kpi-card__severity-label"><?php esc_html_e( 'Minor', 'ai-search-optimizer' ); ?></span>
 						</div>
 					</div>
+					<?php if ( array_sum( $cat_breakdown ) > 0 ) : ?>
+					<div class="citewp-aiso-kpi-card__cat-breakdown">
+						<?php foreach ( $cat_breakdown as $cat => $count ) :
+							if ( $count === 0 ) { continue; }
+							$color = $cat_colors[ $cat ] ?? 'citrine';
+						?>
+						<span class="citewp-aiso-kpi-card__cat-breakdown-item">
+							<span class="citewp-aiso-kpi-card__cat-breakdown-dot citewp-aiso-kpi-card__cat-breakdown-dot--<?php echo esc_attr( $color ); ?>"></span>
+							<span class="citewp-aiso-kpi-card__cat-breakdown-count"><?php echo esc_html( (string) $count ); ?></span>
+							<?php echo esc_html( ucfirst( $cat ) ); ?>
+						</span>
+						<?php endforeach; ?>
+					</div>
+					<?php endif; ?>
 				</div>
 			</div>
 
@@ -684,7 +702,7 @@ final class Menu {
 					</div>
 					<div class="citewp-aiso-protip__content">
 						<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
-						<p class="citewp-aiso-protip__body"><?php esc_html_e( 'Connect Google Search Console to see which pages get discovered before being crawled.', 'ai-search-optimizer' ); ?></p>
+						<p class="citewp-aiso-protip__body"><strong><?php esc_html_e( 'Authority is your fastest win.', 'ai-search-optimizer' ); ?></strong> <?php esc_html_e( 'Adding author bios with credentials to your published posts is the single highest-impact change for AI citation frequency — posts with clear authorship signals are cited significantly more often by large language models.', 'ai-search-optimizer' ); ?></p>
 					</div>
 				</div>
 				<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?></a>

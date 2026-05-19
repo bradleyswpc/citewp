@@ -666,4 +666,62 @@ final class DashboardData {
 		$delta = ( $this_week_sum / $this_week_cnt ) - ( $last_week_sum / $last_week_cnt );
 		return [ 'delta' => (int) round( $delta ) ];
 	}
+
+	/**
+	 * For each red/orange-grade post, counts which category is weakest (lowest % of max).
+	 * P49 exclusion applies.
+	 *
+	 * @return array{structure: int, citability: int, authority: int}
+	 */
+	public function get_issue_counts_by_category(): array {
+		global $wpdb;
+
+		$counts = [ 'structure' => 0, 'citability' => 0, 'authority' => 0 ];
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Admin stat; real-time data, intentionally uncached.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT full_pm.meta_value
+				 FROM {$wpdb->postmeta} full_pm
+				 INNER JOIN {$wpdb->postmeta} grade_pm ON grade_pm.post_id = full_pm.post_id AND grade_pm.meta_key = %s
+				 INNER JOIN {$wpdb->posts} p ON p.ID = full_pm.post_id
+				 LEFT JOIN {$wpdb->postmeta} excl
+				        ON excl.post_id = full_pm.post_id
+				       AND excl.meta_key = '_citewp_aiso_exclude_from_llms'
+				 WHERE full_pm.meta_key = %s
+				   AND grade_pm.meta_value IN ('red', 'orange')
+				   AND p.post_status = 'publish'
+				   AND p.post_type IN ('post', 'page')
+				   AND ( excl.meta_value IS NULL OR excl.meta_value != '1' )",
+				Repository::META_KEY_GRADE,
+				Repository::META_KEY_FULL
+			),
+			ARRAY_A
+		);
+
+		if ( ! is_array( $rows ) ) {
+			return $counts;
+		}
+
+		$maxes = [ 'structure' => 35, 'citability' => 40, 'authority' => 25 ];
+
+		foreach ( $rows as $row ) {
+			$data = maybe_unserialize( $row['meta_value'] );
+			if ( ! is_array( $data ) || ! isset( $data['categories'] ) ) {
+				continue;
+			}
+			$pcts = [];
+			foreach ( [ 'structure', 'citability', 'authority' ] as $cat ) {
+				$score        = (int) ( $data['categories'][ $cat ]['score'] ?? 0 );
+				$pcts[ $cat ] = $maxes[ $cat ] > 0 ? ( $score / $maxes[ $cat ] ) : 0.0;
+			}
+			asort( $pcts );
+			$weakest = (string) array_key_first( $pcts );
+			if ( isset( $counts[ $weakest ] ) ) {
+				++$counts[ $weakest ];
+			}
+		}
+
+		return $counts;
+	}
 }

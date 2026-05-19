@@ -3186,6 +3186,102 @@
   flex: 1;
 }
 
+/* === SECTION 34: D1.5d-revised polish pass (Session 34) === */
+
+/* Change 1: Lower section alignment — display:contents makes items share grid rows */
+.citewp-aiso-col-a > :first-child,
+.citewp-aiso-col-b > :first-child { flex: none; }
+.citewp-aiso-col-a,
+.citewp-aiso-col-b { display: contents; }
+.citewp-aiso-lower { row-gap: var(--sp-4); }
+.citewp-aiso-crawlers { grid-column: 1; grid-row: 1; }
+.citewp-aiso-insights { grid-column: 1; grid-row: 2; }
+.citewp-aiso-needs    { grid-column: 2; grid-row: 1; }
+.citewp-aiso-actions  { grid-column: 2; grid-row: 2; }
+.citewp-aiso-protip   { grid-column: 2; grid-row: 3; margin: 0; }
+
+@media (max-width: 1024px) {
+  .citewp-aiso-col-a,
+  .citewp-aiso-col-b { display: flex; flex-direction: column; gap: var(--sp-4); }
+  .citewp-aiso-crawlers,
+  .citewp-aiso-insights,
+  .citewp-aiso-needs,
+  .citewp-aiso-actions,
+  .citewp-aiso-protip { grid-column: auto; grid-row: auto; }
+}
+
+/* Change 2: Breathing room below page header and on all panels */
+.citewp-aiso-page-header { margin-bottom: var(--sp-8); }
+.citewp-aiso-panel.is-active { padding-top: var(--sp-8); }
+
+/* Change 3: Dot inside __bot-name span (PHP change) — flex alignment support */
+.citewp-aiso-kpi-card__bot-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Change 4: Bigger section headings */
+.citewp-aiso-crawlers__heading { font-size: 15px; }
+.citewp-aiso-needs__heading    { font-size: 15px; }
+
+/* Change 5: Tighter KPI card padding */
+.citewp-aiso-kpi-card { padding: var(--sp-4); }
+
+/* Change 6: llms.txt ACTIVE pill — push to bottom, bigger */
+.citewp-aiso-kpi-card__status-pill {
+  margin-top: auto;
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+/* Change 7: Bigger head links */
+.citewp-aiso-kpi-card__head-link { font-size: 13px; }
+
+/* Change 8: Subtle drop shadows on all cards */
+.citewp-aiso-kpi-card,
+.citewp-aiso-crawlers,
+.citewp-aiso-needs,
+.citewp-aiso-insights,
+.citewp-aiso-actions {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07), 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+/* Change 10: Thicker bars + bigger bot dots */
+.citewp-aiso-kpi-card__category-bar-track { height: 8px; }
+.citewp-aiso-kpi-card__progress           { height: 8px; }
+.citewp-aiso-kpi-card__bot-dot            { width: 10px; height: 10px; }
+
+/* Change 11: Bump small text one tier */
+.citewp-aiso-kpi-card__bot-name  { font-size: 12px; }
+.citewp-aiso-kpi-card__bot-count { font-size: 12px; }
+.citewp-aiso-kpi-card__severity-label { font-size: 11px; }
+
+/* Change 12: Category breakdown line (Needs Attention card) */
+.citewp-aiso-kpi-card__cat-breakdown {
+  display: flex;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+  flex-wrap: wrap;
+}
+.citewp-aiso-kpi-card__cat-breakdown-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 400 11px/1.2 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+}
+.citewp-aiso-kpi-card__cat-breakdown-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.citewp-aiso-kpi-card__cat-breakdown-dot--citrine { background: var(--citewp-citrine); }
+.citewp-aiso-kpi-card__cat-breakdown-dot--orange  { background: var(--citewp-score-orange); }
+.citewp-aiso-kpi-card__cat-breakdown-dot--red     { background: var(--citewp-score-red); }
+.citewp-aiso-kpi-card__cat-breakdown-count { font-weight: 700; }
+
 /* --- 2-column General tab grid --------------------------------------------- */
 #citewp_aiso_editor_panel .citewp-aiso-ep-columns {
 	display: grid;
