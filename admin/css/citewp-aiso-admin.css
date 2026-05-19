@@ -2740,6 +2740,33 @@
   white-space: nowrap;
 }
 
+.citewp-aiso-cs-history-yaxis--right .citewp-aiso-cs-history-yaxis__label {
+  right: auto;
+  left: 4px;
+}
+
+.citewp-aiso-chart-legend {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+  font-size: var(--font-xs);
+  color: var(--citewp-text-muted);
+}
+.citewp-aiso-chart-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.citewp-aiso-chart-legend__item::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 2px;
+}
+.citewp-aiso-chart-legend__item--score::before { background: var(--citewp-citrine); }
+.citewp-aiso-chart-legend__item--bv::before    { background: var(--citewp-tint-blue); }
+
 .citewp-aiso-bvot__chart-area {
   display: flex;
   align-items: stretch;
