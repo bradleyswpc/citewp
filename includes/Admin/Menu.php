@@ -1462,15 +1462,12 @@ final class Menu {
 		$w      = 340;
 		$h      = 80;
 		$n      = count( $history );
-		$scores = array_column( $history, 'avg' );
-		$min_s  = (float) min( $scores );
-		$max_s  = (float) max( $scores );
-		$rng    = max( 1.0, $max_s - $min_s );
+		$y_zero = (int) round( $h * 0.9 ); // fixed 0-100 scale: score 0 → y = 72
 
 		$pts = [];
 		foreach ( $history as $i => $entry ) {
 			$x     = $n > 1 ? (int) round( ( $i / ( $n - 1 ) ) * $w ) : (int) ( $w / 2 );
-			$y     = (int) round( $h - ( ( (float) $entry['avg'] - $min_s ) / $rng ) * ( $h * 0.8 ) - $h * 0.1 );
+			$y     = (int) round( $h - ( (float) $entry['avg'] / 100.0 ) * ( $h * 0.8 ) - $h * 0.1 );
 			$pts[] = [ 'x' => $x, 'y' => $y ];
 		}
 
@@ -1478,19 +1475,33 @@ final class Menu {
 		$last = end( $pts );
 		$frst = reset( $pts );
 		$area = 'M ' . implode( ' L ', array_map( static fn( $p ) => "{$p['x']} {$p['y']}", $pts ) )
-		        . " L {$last['x']} {$h} L {$frst['x']} {$h} Z";
+		        . " L {$last['x']} {$y_zero} L {$frst['x']} {$y_zero} Z";
 		?>
-		<svg viewBox="0 0 <?php echo esc_attr( (string) $w ); ?> <?php echo esc_attr( (string) $h ); ?>"
-			width="100%" height="<?php echo esc_attr( (string) $h ); ?>" aria-hidden="true">
-			<path d="<?php echo esc_attr( $area ); ?>" fill="rgba(232,212,0,0.08)"/>
-			<polyline points="<?php echo esc_attr( $poly ); ?>" fill="none"
-				stroke="var(--citewp-citrine)" stroke-width="2"
-				stroke-linejoin="round" stroke-linecap="round"/>
-			<?php foreach ( $pts as $pt ) : ?>
-			<circle cx="<?php echo esc_attr( (string) $pt['x'] ); ?>" cy="<?php echo esc_attr( (string) $pt['y'] ); ?>"
-				r="3" fill="var(--citewp-citrine)"/>
-			<?php endforeach; ?>
-		</svg>
+		<div class="citewp-aiso-cs-history-wrap">
+			<div class="citewp-aiso-cs-history-yaxis" aria-hidden="true">
+				<span class="citewp-aiso-cs-history-yaxis__label" style="top:10%">100</span>
+				<span class="citewp-aiso-cs-history-yaxis__label" style="top:30%">75</span>
+				<span class="citewp-aiso-cs-history-yaxis__label" style="top:50%">50</span>
+				<span class="citewp-aiso-cs-history-yaxis__label" style="top:70%">25</span>
+				<span class="citewp-aiso-cs-history-yaxis__label" style="top:90%">0</span>
+			</div>
+			<svg viewBox="0 0 <?php echo esc_attr( (string) $w ); ?> <?php echo esc_attr( (string) $h ); ?>"
+				width="100%" height="<?php echo esc_attr( (string) $h ); ?>" aria-hidden="true">
+				<line x1="0" y1="8"  x2="340" y2="8"  stroke="var(--citewp-border)" stroke-width="0.5"/>
+				<line x1="0" y1="24" x2="340" y2="24" stroke="var(--citewp-border)" stroke-width="0.5"/>
+				<line x1="0" y1="40" x2="340" y2="40" stroke="var(--citewp-border)" stroke-width="0.5"/>
+				<line x1="0" y1="56" x2="340" y2="56" stroke="var(--citewp-border)" stroke-width="0.5"/>
+				<line x1="0" y1="72" x2="340" y2="72" stroke="var(--citewp-border)" stroke-width="0.5"/>
+				<path d="<?php echo esc_attr( $area ); ?>" fill="rgba(232,212,0,0.08)"/>
+				<polyline points="<?php echo esc_attr( $poly ); ?>" fill="none"
+					stroke="var(--citewp-citrine)" stroke-width="2"
+					stroke-linejoin="round" stroke-linecap="round"/>
+				<?php foreach ( $pts as $pt ) : ?>
+				<circle cx="<?php echo esc_attr( (string) $pt['x'] ); ?>" cy="<?php echo esc_attr( (string) $pt['y'] ); ?>"
+					r="3" fill="var(--citewp-citrine)"/>
+				<?php endforeach; ?>
+			</svg>
+		</div>
 		<?php
 	}
 }

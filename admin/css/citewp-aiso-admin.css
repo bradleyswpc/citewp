@@ -2324,6 +2324,19 @@
   margin-top: 4px;
 }
 
+/* === PF4: Cite Score history chart Y-axis flex layout === */
+.citewp-aiso-cs-history-wrap {
+  display: flex;
+  align-items: stretch;
+  height: 80px;
+}
+
+.citewp-aiso-cs-history-wrap > svg {
+  flex: 1 1 0;
+  min-width: 0;
+  display: block;
+}
+
 /* AI Recommendations rec rows (Cite Score-specific, inside citewp-aiso-insights) */
 .citewp-aiso-cs-rec-row {
   display: flex;
