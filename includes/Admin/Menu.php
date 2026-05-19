@@ -333,7 +333,7 @@ final class Menu {
 		$greeting_name   = ! empty( $current_user->first_name ) ? $current_user->first_name : $current_user->display_name;
 		$dashboard_range = absint( $_GET['db_range'] ?? 7 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$dashboard_range = in_array( $dashboard_range, [ 7, 30, 90 ], true ) ? $dashboard_range : 7;
-		$dashboard_url   = menu_page_url( 'ai-search-optimizer', false );
+		$dashboard_url   = menu_page_url( self::SLUG_PARENT, false );
 		?>
 		<!-- Dashboard page header -->
 		<div class="citewp-aiso-page-header">
