@@ -103,7 +103,8 @@ final class LogsPage {
 
 		// Chart data: use the same $range window; cap all-time to 30 days (chart needs a bounded window).
 		$chart_days = $range['days'] ?? 30;
-		$chart_data = ( new DashboardData() )->get_visits_by_day( $chart_days, 5 );
+		$data       = new DashboardData();
+		$chart_data = $data->get_visits_by_day( $chart_days, 5 );
 
 		// Resolve canonical bot slot order: sum visits per bot across the window, sort desc.
 		$bot_sums = [];
@@ -384,7 +385,7 @@ final class LogsPage {
 
 					<!-- Right: Top Crawled Pages panel (T2c) -->
 					<?php
-					$top_pages = ( new DashboardData() )->get_top_crawled_pages( $range['cutoff'] ?? null, 5 );
+					$top_pages = $data->get_top_crawled_pages( $range['cutoff'] ?? null, 5 );
 					?>
 					<div class="citewp-aiso-cs-panel citewp-aiso-top-pages-panel">
 						<div class="citewp-aiso-cs-panel__head">
