@@ -379,9 +379,6 @@ final class Menu {
 					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-purple-tint);color:var(--citewp-tint-purple)">
-						<?php echo IconLibrary::icon( 'gauge', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
 							<?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?>
@@ -420,9 +417,6 @@ final class Menu {
 					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-teal-tint);color:var(--citewp-tint-teal)">
-						<?php echo IconLibrary::icon( 'bot', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<?php echo $sparkline_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render_sparkline_svg() returns safe SVG; all dynamic path data is escaped via esc_attr() internally. ?>
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></div>
@@ -451,9 +445,6 @@ final class Menu {
 					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-green-tint);color:var(--citewp-tint-green)">
-						<?php echo IconLibrary::icon( 'check-circle', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-					</div>
 					<div class="citewp-aiso-kpi-card__data">
 						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $indexed_total ) ); ?></div>
 						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Published posts &amp; pages', 'ai-search-optimizer' ); ?></div>
