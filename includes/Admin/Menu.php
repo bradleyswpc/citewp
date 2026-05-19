@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Admin menu registration.
  *
@@ -1501,6 +1501,28 @@ final class Menu {
 					r="3" fill="var(--citewp-citrine)"/>
 				<?php endforeach; ?>
 			</svg>
+		</div>
+		<div class="citewp-aiso-chart-xlabels">
+			<?php
+			if ( $n <= 7 ) {
+				$label_step = 1;
+			} elseif ( $n <= 30 ) {
+				$label_step = 5;
+			} else {
+				$label_step = 15;
+			}
+			foreach ( $history as $i => $entry ) :
+				if ( $n > 1 && $i % $label_step !== 0 && $i !== $n - 1 ) {
+					continue;
+				}
+				$left_pct  = $n > 1 ? round( $i / ( $n - 1 ) * 100, 2 ) : 50.0;
+				$parts     = explode( '-', $entry['date'] );
+				$label_str = ltrim( $parts[1] ?? '', '0' ) . '/' . ltrim( $parts[2] ?? '', '0' );
+			?>
+				<span class="citewp-aiso-chart-xlabels__label" style="left:<?php echo esc_attr( $left_pct . '%' ); ?>">
+					<?php echo esc_html( $label_str ); ?>
+				</span>
+			<?php endforeach; ?>
 		</div>
 		<?php
 	}

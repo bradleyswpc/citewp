@@ -2337,6 +2337,10 @@
   display: block;
 }
 
+.citewp-aiso-cite-score-page__left-chart .citewp-aiso-chart-xlabels {
+  margin-left: 32px;
+}
+
 /* AI Recommendations rec rows (Cite Score-specific, inside citewp-aiso-insights) */
 .citewp-aiso-cs-rec-row {
   display: flex;
