@@ -314,6 +314,7 @@ final class Menu {
 		$score_trend     = $data->get_avg_score_trend();
 		$cat_breakdown   = $data->get_issue_counts_by_category();
 		$cat_colors      = [ 'structure' => 'citrine', 'citability' => 'orange', 'authority' => 'red' ];
+		$recent_activity = $data->get_recent_activity();
 
 		/**
 		 * Filters the Quick Actions grid items on the Dashboard.
@@ -692,25 +693,42 @@ final class Menu {
 						</a>
 						<?php endforeach; ?>
 					</div>
-				</div>
-
-			<!-- Pro Tip — inside col-b, below Quick Actions -->
-			<div class="citewp-aiso-protip">
-				<div class="citewp-aiso-protip__left">
-					<div class="citewp-aiso-protip__orb">
-						<?php echo IconLibrary::icon( 'lightbulb', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+					<div class="citewp-aiso-activity">
+						<div class="citewp-aiso-activity__head">
+							<span class="citewp-aiso-activity__heading"><?php esc_html_e( 'Recent Activity', 'ai-search-optimizer' ); ?></span>
+						</div>
+						<?php if ( ! empty( $recent_activity ) ) : ?>
+						<div class="citewp-aiso-activity__list">
+							<?php foreach ( $recent_activity as $event ) : ?>
+							<div class="citewp-aiso-activity__row">
+								<span class="citewp-aiso-activity__icon"><?php echo IconLibrary::icon( $event['icon'], 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></span>
+								<span class="citewp-aiso-activity__text"><?php echo esc_html( $event['text'] ); ?></span>
+								<span class="citewp-aiso-activity__time"><?php echo esc_html( human_time_diff( $event['timestamp'] ) . ' ' . __( 'ago', 'ai-search-optimizer' ) ); ?></span>
+							</div>
+							<?php endforeach; ?>
+						</div>
+						<?php else : ?>
+						<p class="citewp-aiso-activity__empty"><?php esc_html_e( 'No recent activity', 'ai-search-optimizer' ); ?></p>
+						<?php endif; ?>
 					</div>
-					<div class="citewp-aiso-protip__content">
-						<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
-						<p class="citewp-aiso-protip__body"><strong><?php esc_html_e( 'Authority is your fastest win.', 'ai-search-optimizer' ); ?></strong> <?php esc_html_e( 'Adding author bios with credentials to your published posts is the single highest-impact change for AI citation frequency — posts with clear authorship signals are cited significantly more often by large language models.', 'ai-search-optimizer' ); ?></p>
-					</div>
 				</div>
-				<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper"><?php esc_html_e( 'Connect Now →', 'ai-search-optimizer' ); ?></a>
-			</div>
 
 		</div><!-- .citewp-aiso-col-b -->
 
 		</div><!-- .citewp-aiso-lower -->
+
+		<!-- Pro Tip — full-width bar below lower section -->
+		<div class="citewp-aiso-protip">
+			<div class="citewp-aiso-protip__left">
+				<div class="citewp-aiso-protip__orb">
+					<?php echo IconLibrary::icon( 'lightbulb', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
+				</div>
+				<div class="citewp-aiso-protip__content">
+					<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-protip__body"><strong><?php esc_html_e( 'Authority is your fastest win.', 'ai-search-optimizer' ); ?></strong> <?php esc_html_e( 'Adding author bios with credentials to your published posts is the single highest-impact change for AI citation frequency — posts with clear authorship signals are cited significantly more often by large language models.', 'ai-search-optimizer' ); ?></p>
+				</div>
+			</div>
+		</div>
 
 		<?php
 	}

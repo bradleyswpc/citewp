@@ -3210,9 +3210,9 @@
   .citewp-aiso-protip { grid-column: auto; grid-row: auto; }
 }
 
-/* Change 2: Breathing room below page header and on all panels */
-.citewp-aiso-page-header { margin-bottom: var(--sp-8); }
-.citewp-aiso-panel.is-active { padding-top: var(--sp-8); }
+/* Change 2: Breathing room below page header and on all panels (dialled back 25% in D1.5e) */
+.citewp-aiso-page-header { margin-bottom: var(--sp-6); }
+.citewp-aiso-panel.is-active { padding-top: var(--sp-6); }
 
 /* Change 3: Dot inside __bot-name span (PHP change) — flex alignment support */
 .citewp-aiso-kpi-card__bot-name {
@@ -3281,6 +3281,70 @@
 .citewp-aiso-kpi-card__cat-breakdown-dot--orange  { background: var(--citewp-score-orange); }
 .citewp-aiso-kpi-card__cat-breakdown-dot--red     { background: var(--citewp-score-red); }
 .citewp-aiso-kpi-card__cat-breakdown-count { font-weight: 700; }
+
+/* === SECTION 35: D1.5e — Pro Tip full-width + Recent Activity (Session 34) === */
+
+/* Change 2: Pro Tip full-width bar — outside grid, below lower section */
+.citewp-aiso-protip {
+  grid-column: auto;
+  grid-row: auto;
+  margin-top: var(--sp-5);
+  margin-bottom: 0;
+}
+
+/* Change 3: Recent Activity section inside Quick Actions card */
+.citewp-aiso-activity {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--citewp-border);
+}
+.citewp-aiso-activity__head {
+  margin-bottom: var(--sp-2);
+}
+.citewp-aiso-activity__heading {
+  font: 600 11px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.citewp-aiso-activity__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.citewp-aiso-activity__row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.citewp-aiso-activity__icon {
+  flex-shrink: 0;
+  color: var(--citewp-text-muted);
+  display: flex;
+  align-items: center;
+}
+.citewp-aiso-activity__text {
+  font: 400 12px/1.3 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.citewp-aiso-activity__time {
+  font: 400 11px/1 'JetBrains Mono', 'Courier New', monospace;
+  color: var(--citewp-text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.citewp-aiso-activity__empty {
+  font: 400 12px/1.3 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  font-style: italic;
+  margin-top: var(--sp-2);
+}
 
 /* --- 2-column General tab grid --------------------------------------------- */
 #citewp_aiso_editor_panel .citewp-aiso-ep-columns {

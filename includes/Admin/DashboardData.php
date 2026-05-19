@@ -724,4 +724,101 @@ final class DashboardData {
 
 		return $counts;
 	}
+
+	/**
+	 * Returns up to $limit recent plugin activity events, merged from multiple sources.
+	 * P49: excludes opted-out posts from score-related events.
+	 *
+	 * @return array<int, array{type: string, text: string, timestamp: int, icon: string}>
+	 */
+	public function get_recent_activity( int $limit = 3 ): array {
+		global $wpdb;
+
+		$events   = [];
+		$thirty_d = strtotime( '-30 days' );
+
+		// 1. Latest score history entry.
+		$history = get_option( ScoreHistory::OPTION_KEY, [] );
+		if ( is_array( $history ) && ! empty( $history ) ) {
+			$latest = end( $history );
+			$ts     = (int) strtotime( $latest['date'] . ' 23:59:59' );
+			if ( $ts >= $thirty_d ) {
+				$events[] = [
+					'type'      => 'score-update',
+					'text'      => __( 'Site score recalculated', 'ai-search-optimizer' ),
+					'timestamp' => $ts,
+					'icon'      => 'cite-score',
+				];
+			}
+		}
+
+		// 2. llms.txt last regenerated.
+		$llms_regen = get_option( 'citewp_aiso_llms_last_regenerated' );
+		if ( $llms_regen && is_numeric( $llms_regen ) && (int) $llms_regen >= $thirty_d ) {
+			$events[] = [
+				'type'      => 'llms-regenerated',
+				'text'      => __( 'llms.txt regenerated', 'ai-search-optimizer' ),
+				'timestamp' => (int) $llms_regen,
+				'icon'      => 'llms-txt',
+			];
+		}
+
+		// 3. Most recent AI crawler visit.
+		$table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$visit = $wpdb->get_row( "SELECT bot_name, detected_at FROM {$table} ORDER BY detected_at DESC LIMIT 1", ARRAY_A );
+		if ( is_array( $visit ) && ! empty( $visit['detected_at'] ) ) {
+			$ts = (int) strtotime( $visit['detected_at'] );
+			if ( $ts >= $thirty_d ) {
+				$events[] = [
+					'type'      => 'top-bot-visit',
+					/* translators: %s: bot name */
+					'text'      => sprintf( __( '%s visited', 'ai-search-optimizer' ), $visit['bot_name'] ),
+					'timestamp' => $ts,
+					'icon'      => 'bot',
+				];
+			}
+		}
+
+		// 4. Most recently scored post (P49-aware).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$scored = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT p.post_title, p.post_modified_gmt
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 LEFT JOIN {$wpdb->postmeta} excl
+				        ON excl.post_id = pm.post_id
+				       AND excl.meta_key = '_citewp_aiso_exclude_from_llms'
+				 WHERE pm.meta_key = %s
+				   AND p.post_status = 'publish'
+				   AND p.post_type IN ('post', 'page')
+				   AND ( excl.meta_value IS NULL OR excl.meta_value != '1' )
+				 ORDER BY p.post_modified_gmt DESC
+				 LIMIT 1",
+				Repository::META_KEY_TOTAL
+			),
+			ARRAY_A
+		);
+		if ( is_array( $scored ) && ! empty( $scored['post_modified_gmt'] ) ) {
+			$ts = (int) strtotime( $scored['post_modified_gmt'] );
+			if ( $ts >= $thirty_d ) {
+				$title    = wp_trim_words( $scored['post_title'], 5, '…' );
+				$events[] = [
+					'type'      => 'high-impact-issue',
+					/* translators: %s: post title */
+					'text'      => sprintf( __( '%s scored', 'ai-search-optimizer' ), $title ),
+					'timestamp' => $ts,
+					'icon'      => 'alert-triangle',
+				];
+			}
+		}
+
+		if ( empty( $events ) ) {
+			return [];
+		}
+
+		usort( $events, static fn( $a, $b ) => $b['timestamp'] - $a['timestamp'] );
+		return array_slice( $events, 0, $limit );
+	}
 }
