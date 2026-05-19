@@ -6,6 +6,87 @@
 
 ---
 
+## Session 33 — Crawler Logs Charts & Polish (v0.7.5) ✅
+
+**Date:** 2026-05-18 – 2026-05-19
+
+### Deliverable
+
+Crawler Logs page fully featured: date-range KPI filter (T1/P54), Bot Visits Over Time stacked-area chart (T2b/P55), Top Crawled Pages card with post-type icons and homepage resolution (T2c/P56). Cite Score chart polish: Y-axis labels, X-axis date labels, fixed horizontal squish. Version bumped to 0.7.5. 26 commits.
+
+### What shipped
+
+**T1 / P54 — KPI Date Filter (Crawler Logs)**
+- KPI cards respond to existing date-range filter UI
+- `get_visits_by_day()` data layer method, UTC gmdate throughout
+
+**T2b / P55 — Bot Visits Over Time Chart (Crawler Logs)**
+- Stacked-area SVG chart, bot-type breakdown by day
+- Bot Visits sparkline added to Dashboard KPI card
+- Y-axis labels + gridlines (PF4)
+
+**T2c / P56 — Top Crawled Pages Card (Crawler Logs)**
+- `get_top_crawled_pages()` data layer method
+- Table card: top 5 URIs with visit + bot counts, column headers, post-type icons (page/post/link), homepage title resolution via `get_option('page_on_front')`, bold titles, numeric-only bot counts
+
+**Cite Score Chart Polish (PF4 / PF4b / T3)**
+- Y-axis labels + gridlines on Cite Score Over Time chart
+- Fixed horizontal squish (`preserveAspectRatio="none"`)
+- X-axis date labels (m/d format, step-sampled for density)
+
+### Files modified
+
+- `includes/Admin/LogsPage.php` — Bot Visits chart, Top Crawled Pages card
+- `includes/Admin/DashboardData.php` — `get_visits_by_day()`, `get_top_crawled_pages()`
+- `includes/Admin/Menu.php` — Cite Score chart Y-axis, X-axis labels, squish fix
+- `includes/Admin/IconLibrary.php` — post-type icons for Top Crawled Pages
+- `admin/css/citewp-aiso-admin.css` — Y-axis/X-axis layout rules for both charts
+- `ai-search-optimizer.php` — version 0.7.5
+- `readme.txt` — stable tag + changelog
+
+### Commits
+
+- `d7cb890` feat: KPI cards respond to Crawler Logs date filter (P54)
+- `0d027a2` fix: guard strtotime() against false in avg-freq (P54)
+- `ccc23d5` feat: add get_visits_by_day data layer method
+- `9046989` fix: use UTC gmdate throughout get_visits_by_day
+- `53f4b8f` feat: Bot Visits Over Time chart on Crawler Logs page (P55)
+- `70a6d81` feat: Bot Visits sparkline in Dashboard KPI card (P55)
+- `34985e4` refactor: reuse $data instance for sparkline calls
+- `c9393fe` style: remove vs-last-week caption from Bot Visits card
+- `9e8a352` fix: restore trend indicator on Bot Visits card
+- `a1c2db3` style: reduce Bot Visits chart fill opacity
+- `a778e0d` style: trim 'this week' from Bot Visits card caption
+- `786f1e8` feat: add get_top_crawled_pages data layer method
+- `41a523a` refactor: collapse get_top_crawled_pages SQL branches
+- `31cc10e` feat: Top Crawled Pages card on Crawler Logs page (P56)
+- `4f8ef8c` refactor: hoist DashboardData instance in LogsPage::render()
+- `24d456d` style: align Top Crawled Pages row formatting
+- `acb1bcb` style: reduce Top Crawled Pages row padding
+- `269e76a` style: adopt Cite Score table styling on Top Crawled Pages rows
+- `7dc9cb5` feat: add column headers and post-type icons to Top Crawled Pages
+- `08eefde` feat: homepage title resolution + uniform bold titles + numeric-only bot count
+- `d7e6452` fix: bold Top Crawled Pages card heading
+- `2a900f2` feat: add Y-axis labels and gridlines to Bot Visits chart (PF4)
+- `385f779` feat: add Y-axis labels to Cite Score Over Time chart (PF4)
+- `762766d` fix: Cite Score Over Time chart horizontal squish (PF4b)
+- `d069fe6` feat: X-axis date labels on Cite Score Over Time chart (T3)
+- `e1b4ebf` chore: bump version to 0.7.5
+
+### Decisions
+
+- P54: date-range filter applies to KPI cards on Crawler Logs page
+- P55: Bot Visits Over Time as stacked-area chart; sparkline in Dashboard KPI card
+- P56: Top Crawled Pages card on Crawler Logs page with post-type icons and homepage resolution
+
+### Carryover into Session 34
+
+- **Forward-port WP.org slug rename to `main`** — text domain `ai-search-optimizer` → `citewp-ai-search-optimizer` across all PHP + readme; v0.7.5 → v0.7.6. Do AFTER WP.org approves v0.6.3.
+- **WP.org Round 4 watch** — check hello@citewp.com at session start
+- **UI/UX audit queue** — 5 queued fixes from S33 audit memory (aria labels, grade visibility, skeleton states, motion prefs)
+
+---
+
 ## Session 32 — WP.org Round 3 Rename (v0.6.3) ✅
 
 **Date:** 2026-05-18
