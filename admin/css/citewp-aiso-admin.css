@@ -198,6 +198,7 @@
 
 .citewp-aiso-panel.is-active {
   display: block;
+  padding-top: var(--sp-5);
 }
 
 /* === SECTION 5: Rail brand area === */
@@ -3086,6 +3087,104 @@
 }
 #citewp_aiso_editor_panel .citewp-aiso-ep__panel { display: none; }
 #citewp_aiso_editor_panel .citewp-aiso-ep__panel.is-active { display: block; }
+
+/* === SECTION 33: Dashboard KPI v2 — D1.5d polish pass (Session 34) === */
+
+/* Change 2: Equal card heights */
+.citewp-aiso-kpi-row--dashboard {
+  align-items: stretch;
+}
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__body {
+  flex: 1;
+  gap: 3px;
+}
+
+/* Change 3: Smaller primary value */
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value {
+  font-size: 42px;
+}
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value-main { font-size: 42px; }
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value-denom { font-size: 17px; }
+
+/* Change 4: Bump secondary text one tier */
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__sub {
+  font-size: var(--fs-xs);
+}
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__caption {
+  font-size: var(--fs-sm);
+}
+
+/* Change 6: Colored bot dots */
+.citewp-aiso-kpi-card__bot-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.citewp-aiso-kpi-card__bot-dot--1 { background: var(--citewp-bot-1); }
+.citewp-aiso-kpi-card__bot-dot--2 { background: var(--citewp-bot-2); }
+.citewp-aiso-kpi-card__bot-dot--3 { background: var(--citewp-bot-3); }
+
+/* Change 7: Head pill size bump */
+.citewp-aiso-kpi-card__head-pill {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+/* Change 8: Status pill size bump */
+.citewp-aiso-kpi-card__status-pill {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+/* Change 10: Severity tiles (replace chips) */
+.citewp-aiso-kpi-card__severity-tiles {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  width: 100%;
+}
+.citewp-aiso-kpi-card__severity-tile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--citewp-border);
+  background: var(--citewp-paper-mid);
+}
+.citewp-aiso-kpi-card__severity-tile--critical:not(.is-zero) {
+  border-color: rgba(140, 27, 27, 0.25);
+  background: rgba(140, 27, 27, 0.04);
+}
+.citewp-aiso-kpi-card__severity-tile--minor:not(.is-zero) {
+  border-color: rgba(232, 102, 18, 0.25);
+  background: rgba(232, 102, 18, 0.04);
+}
+.citewp-aiso-kpi-card__severity-count {
+  font: 700 18px/1 'JetBrains Mono', 'Courier New', monospace;
+  color: var(--citewp-text-muted);
+}
+.citewp-aiso-kpi-card__severity-tile--critical:not(.is-zero) .citewp-aiso-kpi-card__severity-count {
+  color: var(--citewp-score-red);
+}
+.citewp-aiso-kpi-card__severity-tile--minor:not(.is-zero) .citewp-aiso-kpi-card__severity-count {
+  color: var(--citewp-score-orange);
+}
+.citewp-aiso-kpi-card__severity-label {
+  font: 600 10px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 3px;
+}
+
+/* Change 11: Lower section vertical match */
+.citewp-aiso-col-a > :first-child,
+.citewp-aiso-col-b > :first-child {
+  flex: 1;
+}
 
 /* --- 2-column General tab grid --------------------------------------------- */
 #citewp_aiso_editor_panel .citewp-aiso-ep-columns {
