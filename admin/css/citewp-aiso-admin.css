@@ -2749,8 +2749,13 @@
 }
 
 .citewp-aiso-top-pages-row td {
-  padding: 4px 0;
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--citewp-border);
   vertical-align: middle;
+}
+
+.citewp-aiso-top-pages-row:last-child td {
+  border-bottom: none;
 }
 
 .citewp-aiso-top-pages-row__title {
