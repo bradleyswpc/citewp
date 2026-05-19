@@ -310,8 +310,6 @@ final class Menu {
 		$sparkline_data = $data->get_visits_by_day( 30, null );
 		$sparkline_svg  = $data->render_sparkline_svg( $sparkline_data, 'bot-visits' );
 
-		$llms_settings = get_option( 'citewp_aiso_llms_settings', [] );
-		$llms_enabled  = ! empty( $llms_settings['enabled'] );
 
 		/**
 		 * Filters the Quick Actions grid items on the Dashboard.
@@ -368,7 +366,7 @@ final class Menu {
 		</div>
 
 		<!-- KPI card row -->
-		<div class="citewp-aiso-kpi-row">
+		<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--3col">
 
 			<!-- Card 1: Site Score Health -->
 			<?php $kpi_score_grade = $avg_grade ?: 'empty'; ?>
@@ -464,32 +462,6 @@ final class Menu {
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
 					<a href="<?php echo esc_url( admin_url( 'edit.php' ) ); ?>" class="citewp-aiso-btn"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
-				</div>
-			</div>
-
-			<!-- Card 4: llms.txt Status -->
-			<div class="citewp-aiso-kpi-card">
-				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'llms.txt Status', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-kpi-tooltip">
-						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Status of the AI-readable content index served at /llms.txt.', 'ai-search-optimizer' ); ?></span>
-					</span>
-				</div>
-				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-blue-tint);color:var(--citewp-tint-blue)">
-						<?php echo IconLibrary::icon( 'llms-txt', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-					</div>
-					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value" style="color:<?php echo $llms_enabled ? 'var(--citewp-tint-green)' : 'var(--citewp-text-muted)'; ?>">
-							<?php echo $llms_enabled ? esc_html__( 'Active', 'ai-search-optimizer' ) : esc_html__( 'Off', 'ai-search-optimizer' ); ?>
-						</div>
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'AI-readable content index', 'ai-search-optimizer' ); ?></div>
-						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
-					</div>
-				</div>
-				<div class="citewp-aiso-kpi-card__footer">
-					<a href="#settings" class="citewp-aiso-btn"><?php esc_html_e( 'Configure →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
