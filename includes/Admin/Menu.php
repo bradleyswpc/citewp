@@ -385,7 +385,7 @@ final class Menu {
 						<?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__caption">
-						<?php echo esc_html( 'out of 100 · ' . $scored_count . ' pages' ); ?>
+						<?php echo esc_html( sprintf( __( 'out of 100 · %d scored', 'ai-search-optimizer' ), $scored_count ) ); ?>
 					</div>
 					<?php if ( $score_delta > 0 ) : ?>
 						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--up">↑ +<?php echo esc_html( (string) $score_delta ); ?> pts this week</div>
@@ -436,8 +436,9 @@ final class Menu {
 					<div class="citewp-aiso-kpi-card__sub"><?php echo esc_html( number_format_i18n( $unique_bots ) . ' ' . __( 'unique bot types', 'ai-search-optimizer' ) ); ?></div>
 					<?php if ( ! empty( $top_crawlers ) ) : ?>
 					<div class="citewp-aiso-kpi-card__bot-list">
-						<?php foreach ( array_slice( $top_crawlers, 0, 3 ) as $bot ) : ?>
+						<?php foreach ( array_slice( $top_crawlers, 0, 3 ) as $bot_slot => $bot ) : ?>
 						<div class="citewp-aiso-kpi-card__bot-row">
+							<span class="citewp-aiso-kpi-card__bot-dot citewp-aiso-kpi-card__bot-dot--<?php echo esc_attr( (string) ( $bot_slot + 1 ) ); ?>"></span>
 							<span class="citewp-aiso-kpi-card__bot-name"><?php echo esc_html( $bot['bot_name'] ); ?></span>
 							<span class="citewp-aiso-kpi-card__bot-count"><?php echo esc_html( number_format_i18n( $bot['visits'] ) ); ?></span>
 						</div>
@@ -479,13 +480,15 @@ final class Menu {
 				<div class="citewp-aiso-kpi-card__body">
 					<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $issue_grade ); ?>"><?php echo esc_html( number_format_i18n( $issue_count ) ); ?></div>
 					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'posts need work', 'ai-search-optimizer' ); ?></div>
-					<div class="citewp-aiso-kpi-card__severity-chips">
-						<span class="citewp-aiso-kpi-card__severity-chip citewp-aiso-kpi-card__severity-chip--critical">
-							<?php echo esc_html( $severity['critical'] . ' ' . __( 'Critical', 'ai-search-optimizer' ) ); ?>
-						</span>
-						<span class="citewp-aiso-kpi-card__severity-chip citewp-aiso-kpi-card__severity-chip--minor">
-							<?php echo esc_html( $severity['minor'] . ' ' . __( 'Minor', 'ai-search-optimizer' ) ); ?>
-						</span>
+					<div class="citewp-aiso-kpi-card__severity-tiles">
+						<div class="citewp-aiso-kpi-card__severity-tile citewp-aiso-kpi-card__severity-tile--critical<?php echo $severity['critical'] === 0 ? ' is-zero' : ''; ?>">
+							<span class="citewp-aiso-kpi-card__severity-count"><?php echo esc_html( (string) $severity['critical'] ); ?></span>
+							<span class="citewp-aiso-kpi-card__severity-label"><?php esc_html_e( 'Critical', 'ai-search-optimizer' ); ?></span>
+						</div>
+						<div class="citewp-aiso-kpi-card__severity-tile citewp-aiso-kpi-card__severity-tile--minor<?php echo $severity['minor'] === 0 ? ' is-zero' : ''; ?>">
+							<span class="citewp-aiso-kpi-card__severity-count"><?php echo esc_html( (string) $severity['minor'] ); ?></span>
+							<span class="citewp-aiso-kpi-card__severity-label"><?php esc_html_e( 'Minor', 'ai-search-optimizer' ); ?></span>
+						</div>
 					</div>
 				</div>
 			</div>
