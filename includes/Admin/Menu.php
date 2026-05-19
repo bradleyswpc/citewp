@@ -307,9 +307,11 @@ final class Menu {
 		$trend_diff = $this_week - $last_week;
 		$trend_pct  = $last_week > 0 ? (int) round( ( $trend_diff / $last_week ) * 100 ) : 0;
 
-		$sparkline_data = $data->get_visits_by_day( 30, null );
-		$sparkline_svg  = $data->render_sparkline_svg( $sparkline_data, 'bot-visits' );
-
+		$llms_settings   = get_option( 'citewp_aiso_llms_settings', [] );
+		$llms_enabled    = ! empty( $llms_settings['enabled'] );
+		$severity        = $data->get_issue_severity_counts();
+		$cat_scores      = $data->get_average_category_scores();
+		$score_trend     = $data->get_avg_score_trend();
 
 		/**
 		 * Filters the Quick Actions grid items on the Dashboard.
@@ -360,45 +362,59 @@ final class Menu {
 			</div>
 		</div>
 
-		<!-- KPI card row -->
-		<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--3col">
+		<!-- KPI card row — 4 cards, top-aligned -->
+		<?php
+		$kpi_score_grade = $avg_grade ?: 'empty';
+		$grade_labels    = [ 'green' => 'EXCELLENT', 'yellow' => 'GOOD', 'orange' => 'FAIR', 'red' => 'POOR', 'empty' => 'N/A' ];
+		$score_delta     = $score_trend['delta'];
+		$indexed_pct     = $indexed_total > 0 ? (int) round( $scored_count / $indexed_total * 100 ) : 0;
+		$issue_grade     = $severity['critical'] > 0 ? 'red' : ( $severity['minor'] > 0 ? 'orange' : 'green' );
+		?>
+		<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--dashboard">
 
 			<!-- Card 1: Site Score Health -->
-			<?php $kpi_score_grade = $avg_grade ?: 'empty'; ?>
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Site Score Health', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
-						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Average score across all scored posts and pages.', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__head-pill citewp-aiso-kpi-card__head-pill--<?php echo esc_attr( $kpi_score_grade ); ?>">
+						<?php echo esc_html( $grade_labels[ $kpi_score_grade ] ?? 'N/A' ); ?>
 					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
-							<?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?>
-						</div>
-						<div class="citewp-aiso-kpi-card__caption citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
-							<?php echo esc_html( ScoreDial::grade_label( $kpi_score_grade ) ); ?>
-						</div>
-						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
-						<div class="citewp-aiso-kpi-card__sub">
-							<span class="citewp-aiso-kpi-card__pages-scored">
-								<?php echo esc_html( "{$scored_count} of {$indexed_total} pages included" ); ?>
-							</span>
-							<?php if ( $excluded_count > 0 ) : ?>
-							<span
-								class="citewp-aiso-kpi-card__exclusion-note"
-								title="<?php esc_attr_e( 'Posts toggled off from llms.txt are excluded from this average. They still appear in the post-level table below.', 'ai-search-optimizer' ); ?>"
-							>
-								<?php echo esc_html( "({$excluded_count} excluded from llms.txt)" ); ?>
-							</span>
-							<?php endif; ?>
-						</div>
+					<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $kpi_score_grade ); ?>">
+						<?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?>
 					</div>
-				</div>
-				<div class="citewp-aiso-kpi-card__footer">
-					<a href="#cite-score" class="citewp-aiso-btn"><?php esc_html_e( 'View Scores →', 'ai-search-optimizer' ); ?></a>
+					<div class="citewp-aiso-kpi-card__caption">
+						<?php echo esc_html( 'out of 100 · ' . $scored_count . ' pages' ); ?>
+					</div>
+					<?php if ( $score_delta > 0 ) : ?>
+						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--up">↑ +<?php echo esc_html( (string) $score_delta ); ?> pts this week</div>
+					<?php elseif ( $score_delta < 0 ) : ?>
+						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--down">↓ <?php echo esc_html( (string) $score_delta ); ?> pts this week</div>
+					<?php else : ?>
+						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
+					<?php endif; ?>
+					<div class="citewp-aiso-kpi-card__category-bars">
+						<?php
+						$cat_bar_rows = [
+							[ 'label' => __( 'Structure',  'ai-search-optimizer' ), 'pct' => $cat_scores['structure'] ],
+							[ 'label' => __( 'Citability', 'ai-search-optimizer' ), 'pct' => $cat_scores['citability'] ],
+							[ 'label' => __( 'Authority',  'ai-search-optimizer' ), 'pct' => $cat_scores['authority'] ],
+						];
+						foreach ( $cat_bar_rows as $cat_row ) :
+							$bar_pct   = $cat_row['pct'];
+							$bar_color = $bar_pct >= 80 ? 'green' : ( $bar_pct >= 60 ? 'citrine' : ( $bar_pct >= 40 ? 'orange' : 'red' ) );
+						?>
+						<div class="citewp-aiso-kpi-card__category-bar">
+							<span class="citewp-aiso-kpi-card__category-bar-label"><?php echo esc_html( $cat_row['label'] ); ?></span>
+							<div class="citewp-aiso-kpi-card__category-bar-track">
+								<div class="citewp-aiso-kpi-card__category-bar-fill citewp-aiso-bar--<?php echo esc_attr( $bar_color ); ?>"
+								     style="width:<?php echo esc_attr( (string) $bar_pct ); ?>%"></div>
+							</div>
+							<span class="citewp-aiso-kpi-card__category-bar-pct"><?php echo esc_html( "{$bar_pct}%" ); ?></span>
+						</div>
+						<?php endforeach; ?>
+					</div>
 				</div>
 			</div>
 
@@ -406,27 +422,28 @@ final class Menu {
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Bot Visits (7d)', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
-						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'AI crawler visits to your site over the last 7 days.', 'ai-search-optimizer' ); ?></span>
-					</span>
+					<?php if ( $trend_pct > 5 ) : ?>
+						<span class="citewp-aiso-kpi-card__head-pill citewp-aiso-kpi-card__head-pill--up">↑ <?php echo esc_html( (string) absint( $trend_pct ) ); ?>%</span>
+					<?php elseif ( $trend_pct < -5 ) : ?>
+						<span class="citewp-aiso-kpi-card__head-pill citewp-aiso-kpi-card__head-pill--down">↓ <?php echo esc_html( (string) absint( $trend_pct ) ); ?>%</span>
+					<?php else : ?>
+						<span class="citewp-aiso-kpi-card__head-pill citewp-aiso-kpi-card__head-pill--flat">→ Stable</span>
+					<?php endif; ?>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__data">
-						<?php echo $sparkline_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render_sparkline_svg() returns safe SVG; all dynamic path data is escaped via esc_attr() internally. ?>
-						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></div>
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'AI crawler visits', 'ai-search-optimizer' ); ?></div>
-						<?php if ( $trend_pct > 5 ) : ?>
-							<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--up">↑ <?php echo esc_html( (string) absint( $trend_pct ) ); ?>%</div>
-						<?php elseif ( $trend_pct < -5 ) : ?>
-							<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--down">↓ <?php echo esc_html( (string) absint( $trend_pct ) ); ?>%</div>
-						<?php else : ?>
-							<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
-						<?php endif; ?>
+					<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $this_week ) ); ?></div>
+					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'visits this week', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-kpi-card__sub"><?php echo esc_html( number_format_i18n( $unique_bots ) . ' ' . __( 'unique bot types', 'ai-search-optimizer' ) ); ?></div>
+					<?php if ( ! empty( $top_crawlers ) ) : ?>
+					<div class="citewp-aiso-kpi-card__bot-list">
+						<?php foreach ( array_slice( $top_crawlers, 0, 3 ) as $bot ) : ?>
+						<div class="citewp-aiso-kpi-card__bot-row">
+							<span class="citewp-aiso-kpi-card__bot-name"><?php echo esc_html( $bot['bot_name'] ); ?></span>
+							<span class="citewp-aiso-kpi-card__bot-count"><?php echo esc_html( number_format_i18n( $bot['visits'] ) ); ?></span>
+						</div>
+						<?php endforeach; ?>
 					</div>
-				</div>
-				<div class="citewp-aiso-kpi-card__footer">
-					<a href="#crawler-logs" class="citewp-aiso-btn"><?php esc_html_e( 'View Logs →', 'ai-search-optimizer' ); ?></a>
+					<?php endif; ?>
 				</div>
 			</div>
 
@@ -434,20 +451,42 @@ final class Menu {
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Indexed Pages', 'ai-search-optimizer' ); ?></span>
-					<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
-						<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?>
-						<span class="citewp-aiso-kpi-tooltip__text"><?php esc_html_e( 'Posts and pages currently published and scoreable.', 'ai-search-optimizer' ); ?></span>
-					</span>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-search-optimizer#settings' ) ); ?>" class="citewp-aiso-kpi-card__head-link">llms.txt</a>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( number_format_i18n( $indexed_total ) ); ?></div>
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Published posts &amp; pages', 'ai-search-optimizer' ); ?></div>
-						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <?php esc_html_e( 'no recent changes', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-kpi-card__value">
+						<span class="citewp-aiso-kpi-card__value-main"><?php echo esc_html( number_format_i18n( $scored_count ) ); ?></span><span class="citewp-aiso-kpi-card__value-denom"><?php echo esc_html( ' / ' . number_format_i18n( $indexed_total ) ); ?></span>
 					</div>
+					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'published posts &amp; pages', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-kpi-card__progress">
+						<div class="citewp-aiso-kpi-card__progress-fill" style="width:<?php echo esc_attr( (string) $indexed_pct ); ?>%"></div>
+					</div>
+					<div class="citewp-aiso-kpi-card__sub">
+						<?php echo esc_html( "{$indexed_pct}% " . __( 'indexed', 'ai-search-optimizer' ) . ' · ' . $excluded_count . ' ' . __( 'excluded', 'ai-search-optimizer' ) ); ?>
+					</div>
+					<span class="citewp-aiso-kpi-card__status-pill citewp-aiso-kpi-card__status-pill--<?php echo $llms_enabled ? 'active' : 'inactive'; ?>">
+						<?php echo $llms_enabled ? esc_html__( 'llms.txt ACTIVE', 'ai-search-optimizer' ) : esc_html__( 'llms.txt INACTIVE', 'ai-search-optimizer' ); ?>
+					</span>
 				</div>
-				<div class="citewp-aiso-kpi-card__footer">
-					<a href="<?php echo esc_url( admin_url( 'edit.php' ) ); ?>" class="citewp-aiso-btn"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
+			</div>
+
+			<!-- Card 4: Needs Attention -->
+			<div class="citewp-aiso-kpi-card">
+				<div class="citewp-aiso-kpi-card__head">
+					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Needs Attention', 'ai-search-optimizer' ); ?></span>
+					<a href="<?php echo esc_url( $all_issues_url ); ?>" class="citewp-aiso-kpi-card__head-link"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
+				</div>
+				<div class="citewp-aiso-kpi-card__body">
+					<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $issue_grade ); ?>"><?php echo esc_html( number_format_i18n( $issue_count ) ); ?></div>
+					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'posts need work', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-kpi-card__severity-chips">
+						<span class="citewp-aiso-kpi-card__severity-chip citewp-aiso-kpi-card__severity-chip--critical">
+							<?php echo esc_html( $severity['critical'] . ' ' . __( 'Critical', 'ai-search-optimizer' ) ); ?>
+						</span>
+						<span class="citewp-aiso-kpi-card__severity-chip citewp-aiso-kpi-card__severity-chip--minor">
+							<?php echo esc_html( $severity['minor'] . ' ' . __( 'Minor', 'ai-search-optimizer' ) ); ?>
+						</span>
+					</div>
 				</div>
 			</div>
 

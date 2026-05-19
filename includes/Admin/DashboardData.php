@@ -14,6 +14,7 @@ namespace CiteWP\Aiso\Admin;
 
 use CiteWP\Aiso\Database\Schema;
 use CiteWP\Aiso\Scoring\Repository;
+use CiteWP\Aiso\Scoring\ScoreHistory;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -534,5 +535,135 @@ final class DashboardData {
 			. '<path class="fill" d="' . esc_attr( $fill_d ) . '"/>'
 			. '<path class="line" d="' . esc_attr( $line_d ) . '"/>'
 			. '</svg>';
+	}
+
+	/**
+	 * Counts posts with red (critical) and orange (minor) score grades,
+	 * excluding posts opted out of llms.txt per P49.
+	 *
+	 * @return array{critical: int, minor: int}
+	 */
+	public function get_issue_severity_counts(): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Admin stat; real-time data, intentionally uncached.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT pm.meta_value AS grade, COUNT(DISTINCT pm.post_id) AS cnt
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 LEFT JOIN {$wpdb->postmeta} excl
+				        ON excl.post_id = pm.post_id
+				       AND excl.meta_key = '_citewp_aiso_exclude_from_llms'
+				 WHERE pm.meta_key = %s
+				   AND pm.meta_value IN ('red', 'orange')
+				   AND p.post_status = 'publish'
+				   AND p.post_type IN ('post', 'page')
+				   AND ( excl.meta_value IS NULL OR excl.meta_value != '1' )
+				 GROUP BY pm.meta_value",
+				Repository::META_KEY_GRADE
+			),
+			ARRAY_A
+		);
+
+		$counts = [ 'critical' => 0, 'minor' => 0 ];
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				if ( 'red' === $row['grade'] ) {
+					$counts['critical'] = (int) $row['cnt'];
+				} elseif ( 'orange' === $row['grade'] ) {
+					$counts['minor'] = (int) $row['cnt'];
+				}
+			}
+		}
+		return $counts;
+	}
+
+	/**
+	 * Averages per-category scores across all scored, non-excluded posts
+	 * and returns each as a percentage of its maximum.
+	 * (structure/35, citability/40, authority/25)
+	 *
+	 * @return array{structure: int, citability: int, authority: int}
+	 */
+	public function get_average_category_scores(): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Admin stat; real-time data, intentionally uncached.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT pm.meta_value
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				 LEFT JOIN {$wpdb->postmeta} excl
+				        ON excl.post_id = pm.post_id
+				       AND excl.meta_key = '_citewp_aiso_exclude_from_llms'
+				 WHERE pm.meta_key = %s
+				   AND p.post_status = 'publish'
+				   AND p.post_type IN ('post', 'page')
+				   AND ( excl.meta_value IS NULL OR excl.meta_value != '1' )",
+				Repository::META_KEY_FULL
+			),
+			ARRAY_A
+		);
+
+		$structure_sum  = 0;
+		$citability_sum = 0;
+		$authority_sum  = 0;
+		$count          = 0;
+
+		if ( is_array( $rows ) ) {
+			foreach ( $rows as $row ) {
+				$data = maybe_unserialize( $row['meta_value'] );
+				if ( ! is_array( $data ) || ! isset( $data['categories'] ) ) {
+					continue;
+				}
+				$structure_sum  += (int) ( $data['categories']['structure']['score']  ?? 0 );
+				$citability_sum += (int) ( $data['categories']['citability']['score'] ?? 0 );
+				$authority_sum  += (int) ( $data['categories']['authority']['score']  ?? 0 );
+				++$count;
+			}
+		}
+
+		if ( $count === 0 ) {
+			return [ 'structure' => 0, 'citability' => 0, 'authority' => 0 ];
+		}
+
+		return [
+			'structure'  => (int) round( ( $structure_sum  / $count ) / 35 * 100 ),
+			'citability' => (int) round( ( $citability_sum / $count ) / 40 * 100 ),
+			'authority'  => (int) round( ( $authority_sum  / $count ) / 25 * 100 ),
+		];
+	}
+
+	/**
+	 * Computes this-week vs last-week average score delta using ScoreHistory.
+	 *
+	 * @return array{delta: int}
+	 */
+	public function get_avg_score_trend(): array {
+		$history       = ( new ScoreHistory() )->get_history( 14 );
+		$seven_ago     = gmdate( 'Y-m-d', strtotime( '-7 days' ) );
+		$this_week_sum = 0.0;
+		$this_week_cnt = 0;
+		$last_week_sum = 0.0;
+		$last_week_cnt = 0;
+
+		foreach ( $history as $entry ) {
+			if ( $entry['date'] > $seven_ago ) {
+				$this_week_sum += (float) $entry['avg'];
+				++$this_week_cnt;
+			} else {
+				$last_week_sum += (float) $entry['avg'];
+				++$last_week_cnt;
+			}
+		}
+
+		if ( $this_week_cnt === 0 || $last_week_cnt === 0 ) {
+			return [ 'delta' => 0 ];
+		}
+
+		$delta = ( $this_week_sum / $this_week_cnt ) - ( $last_week_sum / $last_week_cnt );
+		return [ 'delta' => (int) round( $delta ) ];
 	}
 }

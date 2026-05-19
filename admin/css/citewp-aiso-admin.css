@@ -1838,6 +1838,181 @@
   margin-top: var(--sp-4);
 }
 
+/* === SECTION 32: Dashboard KPI v2 — densified 4-card row (D1.5b) === */
+
+/* Top-align so the taller Site Score Health card doesn't stretch siblings */
+.citewp-aiso-kpi-row--dashboard {
+  align-items: start;
+}
+
+/* Body: stack content vertically, left-aligned */
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__body {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
+}
+
+/* Head: push right-slot (pill / link) to far end */
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__head {
+  justify-content: space-between;
+}
+
+/* Bigger primary value — scoped to dashboard row only */
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value {
+  font-size: 48px;
+  line-height: 1;
+}
+
+/* Head pill (grade badge, trend indicator) */
+.citewp-aiso-kpi-card__head-pill {
+  font: 600 10px/1 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.citewp-aiso-kpi-card__head-pill--green  { background: rgba(22, 163, 74, 0.10);   color: var(--citewp-score-green); }
+.citewp-aiso-kpi-card__head-pill--yellow { background: rgba(219, 166, 23, 0.12);  color: var(--citewp-score-yellow); }
+.citewp-aiso-kpi-card__head-pill--orange { background: rgba(232, 102, 18, 0.10);  color: var(--citewp-score-orange); }
+.citewp-aiso-kpi-card__head-pill--red    { background: rgba(140, 27, 27, 0.08);   color: var(--citewp-score-red); }
+.citewp-aiso-kpi-card__head-pill--empty  { background: var(--citewp-border);      color: var(--citewp-text-muted); }
+.citewp-aiso-kpi-card__head-pill--up     { background: rgba(22, 163, 74, 0.10);   color: var(--citewp-score-green); }
+.citewp-aiso-kpi-card__head-pill--down   { background: rgba(140, 27, 27, 0.08);   color: var(--citewp-score-red); }
+.citewp-aiso-kpi-card__head-pill--flat   { background: var(--citewp-border);      color: var(--citewp-text-muted); }
+
+/* Head link (llms.txt, View All →) */
+.citewp-aiso-kpi-card__head-link {
+  font: 500 11px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-tint-blue);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.citewp-aiso-kpi-card__head-link:hover { text-decoration: underline; }
+
+/* Sub-stat line */
+.citewp-aiso-kpi-card__sub {
+  font: 400 11px/1.4 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  margin-top: var(--sp-1);
+}
+
+/* Category bars (Site Score Health card) */
+.citewp-aiso-kpi-card__category-bars {
+  margin-top: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  width: 100%;
+}
+.citewp-aiso-kpi-card__category-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.citewp-aiso-kpi-card__category-bar-label {
+  font: 500 11px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+  width: 58px;
+  flex-shrink: 0;
+}
+.citewp-aiso-kpi-card__category-bar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--citewp-paper-mid);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.citewp-aiso-kpi-card__category-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.citewp-aiso-bar--green   { background: var(--citewp-score-green); }
+.citewp-aiso-bar--citrine { background: var(--citewp-citrine); }
+.citewp-aiso-bar--orange  { background: var(--citewp-score-orange); }
+.citewp-aiso-bar--red     { background: var(--citewp-score-red); }
+.citewp-aiso-kpi-card__category-bar-pct {
+  font: 600 11px/1 'JetBrains Mono', 'Courier New', monospace;
+  color: var(--citewp-text-secondary);
+  width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Bot list (Bot Visits card) */
+.citewp-aiso-kpi-card__bot-list {
+  margin-top: var(--sp-2);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+.citewp-aiso-kpi-card__bot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.citewp-aiso-kpi-card__bot-name {
+  font: 400 11px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-secondary);
+}
+.citewp-aiso-kpi-card__bot-count {
+  font: 600 11px/1 'JetBrains Mono', 'Courier New', monospace;
+  color: var(--citewp-text-primary);
+}
+
+/* Indexed Pages value: large scored + muted denominator */
+.citewp-aiso-kpi-card__value-main {
+  font: 800 48px/1 'JetBrains Mono', 'Courier New', monospace;
+}
+.citewp-aiso-kpi-card__value-denom {
+  font: 600 20px/1 'JetBrains Mono', 'Courier New', monospace;
+  color: var(--citewp-text-muted);
+}
+
+/* Progress bar (Indexed Pages card) */
+.citewp-aiso-kpi-card__progress {
+  height: 6px;
+  width: 100%;
+  background: var(--citewp-paper-mid);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: var(--sp-2);
+  margin-bottom: var(--sp-1);
+}
+.citewp-aiso-kpi-card__progress-fill {
+  height: 100%;
+  background: var(--citewp-citrine);
+  border-radius: 999px;
+}
+
+/* llms.txt status pill (Indexed Pages card) */
+.citewp-aiso-kpi-card__status-pill {
+  display: inline-flex;
+  font: 600 10px/1 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 3px 7px;
+  border-radius: 999px;
+  margin-top: var(--sp-1);
+}
+.citewp-aiso-kpi-card__status-pill--active   { background: rgba(22, 163, 74, 0.10); color: var(--citewp-score-green); }
+.citewp-aiso-kpi-card__status-pill--inactive { background: var(--citewp-border);    color: var(--citewp-text-muted); }
+
+/* Severity chips (Needs Attention card) */
+.citewp-aiso-kpi-card__severity-chips {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  flex-wrap: wrap;
+}
+.citewp-aiso-kpi-card__severity-chip {
+  font: 600 10px/1 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.citewp-aiso-kpi-card__severity-chip--critical { background: rgba(140, 27, 27, 0.08);  color: var(--citewp-score-red); }
+.citewp-aiso-kpi-card__severity-chip--minor    { background: rgba(232, 102, 18, 0.10); color: var(--citewp-score-orange); }
+
 /* === SECTION 30: Hero alignment — top-justify + breathing room (Session 19) === */
 
 .citewp-aiso-hero {
