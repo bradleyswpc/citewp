@@ -4,7 +4,7 @@ Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 0.7.4
+Stable tag: 0.7.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,11 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. llms.txt Settings — configure which content appears in your llms.txt and llms-full.txt files.
 
 == Changelog ==
+
+= 0.7.5 =
+* Crawler Logs: Top Crawled Pages card — column headers, post-type icons, homepage title resolution, bold titles, numeric bot counts
+* Crawler Logs: Bot Visits Over Time chart — Y-axis labels and gridlines
+* Cite Score page: Cite Score Over Time chart — Y-axis labels, gridlines, X-axis date labels, fixed horizontal squish
 
 = 0.7.4 =
 * Cite Score page: Top Crawler card value text constrained for long bot names; KPI card row height equalized
