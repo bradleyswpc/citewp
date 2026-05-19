@@ -1053,8 +1053,8 @@
 /* === SECTION 17: Pro Tip footer === */
 
 .citewp-aiso-protip {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.18) 0%, rgba(20, 184, 166, 0.10) 100%);
-  border: 1px solid rgba(124, 58, 237, 0.45);
+  background: var(--citewp-navy);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
   padding: var(--sp-5) var(--sp-6);
   display: flex;
@@ -1077,8 +1077,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(124, 58, 237, 0.15);
-  color: var(--citewp-tint-purple);
+  background: rgba(232, 212, 0, 0.12);
+  color: var(--citewp-citrine);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1091,13 +1091,13 @@
 
 .citewp-aiso-protip__heading {
   font: 700 13px/1 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--citewp-tint-purple);
+  color: var(--citewp-citrine);
   margin-bottom: var(--sp-1);
 }
 
 .citewp-aiso-protip__body {
   font: 400 13px/1.5 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--citewp-text-secondary);
+  color: var(--citewp-paper);
 }
 
 /* === SECTION 18: Score badges (legacy inline use) === */
@@ -1803,9 +1803,9 @@
 
 /* === SECTION 28: Group D/E/F polish pass (Session 18) === */
 
-/* D4: Pro Tip heading — primary text, not tint-purple */
+/* D4: Pro Tip heading — citrine on navy */
 .citewp-aiso-protip__heading {
-  color: var(--citewp-text-primary);
+  color: var(--citewp-citrine);
 }
 
 /* E2: section icon tint colours */
