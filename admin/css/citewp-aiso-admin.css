@@ -2707,6 +2707,37 @@
   color: var(--citewp-text-muted);
 }
 
+/* === PF4: Y-axis labels (shared: bot visits + cite score charts) === */
+.citewp-aiso-cs-history-yaxis {
+  position: relative;
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.citewp-aiso-cs-history-yaxis__label {
+  position: absolute;
+  right: 4px;
+  transform: translateY(-50%);
+  font: 400 10px/1 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-muted);
+  white-space: nowrap;
+}
+
+.citewp-aiso-bvot__chart-area {
+  display: flex;
+  align-items: stretch;
+}
+
+.citewp-aiso-bvot__chart-area > .citewp-aiso-bvot__svg {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+}
+
+.citewp-aiso-bvot > .citewp-aiso-chart-xlabels {
+  margin-left: 32px;
+}
+
 /* === T2b: KPI card sparkline (Dashboard Bot Visits) === */
 
 .citewp-aiso-kpi-card__sparkline {

@@ -341,11 +341,21 @@ final class LogsPage {
 							</div>
 						<?php else : ?>
 							<div class="citewp-aiso-bvot">
-								<svg class="citewp-aiso-bvot__svg" viewBox="0 0 600 180" preserveAspectRatio="none" aria-hidden="true">
-									<?php foreach ( $chart_layers as $layer ) : ?>
-										<path d="<?php echo esc_attr( $layer['path'] ); ?>" fill="var(<?php echo esc_attr( $layer['color_var'] ); ?>)"/>
-									<?php endforeach; ?>
-								</svg>
+								<div class="citewp-aiso-bvot__chart-area">
+									<div class="citewp-aiso-cs-history-yaxis" aria-hidden="true">
+										<span class="citewp-aiso-cs-history-yaxis__label" style="top:6.67%"><?php echo esc_html( (string) $chart_max ); ?></span>
+										<span class="citewp-aiso-cs-history-yaxis__label" style="top:52.22%"><?php echo esc_html( (string) (int) round( $chart_max / 2 ) ); ?></span>
+										<span class="citewp-aiso-cs-history-yaxis__label" style="top:97.78%">0</span>
+									</div>
+									<svg class="citewp-aiso-bvot__svg" viewBox="0 0 600 180" preserveAspectRatio="none" aria-hidden="true">
+										<line x1="0" y1="12" x2="600" y2="12" stroke="var(--citewp-border)" stroke-width="1" stroke-opacity="0.5"/>
+										<line x1="0" y1="94" x2="600" y2="94" stroke="var(--citewp-border)" stroke-width="1" stroke-opacity="0.5"/>
+										<line x1="0" y1="176" x2="600" y2="176" stroke="var(--citewp-border)" stroke-width="1" stroke-opacity="0.5"/>
+										<?php foreach ( $chart_layers as $layer ) : ?>
+											<path d="<?php echo esc_attr( $layer['path'] ); ?>" fill="var(<?php echo esc_attr( $layer['color_var'] ); ?>)"/>
+										<?php endforeach; ?>
+									</svg>
+								</div>
 								<div class="citewp-aiso-chart-xlabels">
 									<?php foreach ( $chart_data as $i => $day ) :
 										if ( $n_days > 1 && $i % $label_step !== 0 && $i !== $n_days - 1 ) {
