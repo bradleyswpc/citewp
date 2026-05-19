@@ -382,8 +382,38 @@ final class LogsPage {
 						<?php endif; ?>
 					</div>
 
-					<!-- Right: empty placeholder — T2c (Top Crawled Pages) fills this cell -->
-					<div></div>
+					<!-- Right: Top Crawled Pages panel (T2c) -->
+					<?php
+					$top_pages = ( new DashboardData() )->get_top_crawled_pages( $range['cutoff'] ?? null, 5 );
+					?>
+					<div class="citewp-aiso-cs-panel citewp-aiso-top-pages-panel">
+						<div class="citewp-aiso-cs-panel__head">
+							<span><?php esc_html_e( 'Top Crawled Pages', 'ai-search-optimizer' ); ?></span>
+							<span class="citewp-aiso-kpi-tooltip" title="<?php esc_attr_e( 'Pages most frequently visited by AI crawlers in the selected period.', 'ai-search-optimizer' ); ?>">?</span>
+						</div>
+						<div class="citewp-aiso-cs-panel__subhead"><?php echo esc_html( $range['label'] ); ?></div>
+						<?php if ( empty( $top_pages ) ) : ?>
+							<p class="citewp-aiso-top-pages-empty"><?php esc_html_e( 'No crawler activity in this period.', 'ai-search-optimizer' ); ?></p>
+						<?php else : ?>
+							<table class="citewp-aiso-top-pages-table">
+								<tbody>
+									<?php foreach ( $top_pages as $row ) : ?>
+										<tr class="citewp-aiso-top-pages-row">
+											<td class="citewp-aiso-top-pages-row__title">
+												<?php if ( $row['post_id'] > 0 ) : ?>
+													<a href="<?php echo esc_url( (string) get_edit_post_link( $row['post_id'] ) ); ?>" title="<?php echo esc_attr( $row['title'] ); ?>"><?php echo esc_html( $row['title'] ); ?></a>
+												<?php else : ?>
+													<span class="citewp-aiso-top-pages-row__uri"><?php echo esc_html( $row['request_uri'] ); ?></span>
+												<?php endif; ?>
+											</td>
+											<td class="citewp-aiso-top-pages-row__visits"><?php echo esc_html( number_format_i18n( $row['visits'] ) ); ?></td>
+											<td class="citewp-aiso-top-pages-row__bots"><?php echo esc_html( sprintf( _n( '%d bot', '%d bots', $row['bot_count'], 'ai-search-optimizer' ), $row['bot_count'] ) ); ?></td>
+										</tr>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+						<?php endif; ?>
+					</div>
 
 				</div><!-- .citewp-aiso-crawler-row-2col -->
 
