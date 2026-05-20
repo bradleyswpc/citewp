@@ -7,7 +7,9 @@ set -u
 INPUT_JSON="$(cat)"
 
 FILE_PATH=""
-if command -v python3 >/dev/null 2>&1; then
+if command -v py >/dev/null 2>&1; then
+    FILE_PATH="$(printf '%s' "$INPUT_JSON" | py -c 'import json,sys; d=json.load(sys.stdin); print(d.get("tool_input",{}).get("file_path",""))' 2>/dev/null || true)"
+elif command -v python3 >/dev/null 2>&1; then
     FILE_PATH="$(printf '%s' "$INPUT_JSON" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("tool_input",{}).get("file_path",""))' 2>/dev/null || true)"
 elif command -v python >/dev/null 2>&1; then
     FILE_PATH="$(printf '%s' "$INPUT_JSON" | python -c 'import json,sys; d=json.load(sys.stdin); print(d.get("tool_input",{}).get("file_path",""))' 2>/dev/null || true)"
