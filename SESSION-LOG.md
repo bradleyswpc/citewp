@@ -6,6 +6,42 @@
 
 ---
 
+## Session 36 — PostToolUse Hook Git Bash Fix ✅
+
+**Date:** 2026-05-20
+
+### Deliverable
+
+Fixed PostToolUse hooks (`php-syntax-check.sh`, `js-build-reminder.sh`) failing in Git Bash due to `python3`/`python` not being on Git Bash's PATH. Added `py` (Windows Python launcher, `/c/WINDOWS/py`) as first candidate in the JSON parser binary discovery chain in both scripts. Existing `python3` → `python` → `grep/sed` fallback chain preserved. 1 commit.
+
+### What shipped
+
+- `.claude/hooks/php-syntax-check.sh` — `py` added as first `command -v` candidate before `python3`
+- `.claude/hooks/js-build-reminder.sh` — same change
+
+### Verified
+
+- `py --version` → Python 3.13.13 ✓
+- `php-syntax-check.sh` manual trigger → exit 0, no errors ✓
+- `js-build-reminder.sh` manual trigger with `src/sidebar/index.js` path → build reminder fires correctly ✓
+
+### Commits
+
+- `3bb56e2` fix: use py launcher first in PostToolUse hook JSON parser (Git Bash compat)
+
+### Carryover into Session 36 (continued)
+
+1. **WP.org Round 4 watch** — check hello@citewp.com
+2. **UI-DESIGN-SYSTEM.md Line Chart Panel entry** — update to reflect single-series D4 architecture
+3. **Scroll-to-top on rail nav clicks**
+4. **Cite Score page top-row brainstorm** — options A/B/C decision needed
+5. **Dynamic Pro Tip content engine** — deferred
+6. **Forward-port slug rename to main** — after WP.org approval only
+7. **UI/UX audit queue** — FB46 (skeleton, prefers-reduced-motion, ARIA verify, grade label verify)
+8. **P52 messaging audit** — replace "AI-powered SEO" / "Connect to Claude" patterns
+
+---
+
 ## Session 35 — D3/D4 Chart Refactor + Chart Reorder ✅
 
 **Date:** 2026-05-20
