@@ -450,7 +450,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-bottom: var(--sp-6);
+  margin-bottom: var(--sp-4);
 }
 
 .citewp-aiso-kpi-row--3col {
@@ -793,7 +793,7 @@
 }
 
 .citewp-aiso-crawlers__view-all {
-  font: 700 12px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 600 12px/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-tint-blue);
   text-decoration: none;
 }
@@ -909,7 +909,7 @@
 }
 
 .citewp-aiso-needs__view-all {
-  font: 500 12px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 600 12px/1 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--citewp-tint-blue);
   text-decoration: none;
 }
@@ -3210,9 +3210,9 @@
   .citewp-aiso-protip { grid-column: auto; grid-row: auto; }
 }
 
-/* Change 2: Breathing room below page header and on all panels (dialled back 25% in D1.5e) */
-.citewp-aiso-page-header { margin-bottom: var(--sp-6); }
-.citewp-aiso-panel.is-active { padding-top: var(--sp-6); }
+/* Change 2: Breathing room below page header and on all panels (standardised to sp-4 in D1.5f) */
+.citewp-aiso-page-header { margin-bottom: var(--sp-4); }
+.citewp-aiso-panel.is-active { padding-top: var(--sp-4); }
 
 /* Change 3: Dot inside __bot-name span (PHP change) — flex alignment support */
 .citewp-aiso-kpi-card__bot-name {
@@ -3288,7 +3288,7 @@
 .citewp-aiso-protip {
   grid-column: auto;
   grid-row: auto;
-  margin-top: var(--sp-5);
+  margin-top: var(--sp-4);
   margin-bottom: 0;
 }
 
@@ -3303,7 +3303,7 @@
 }
 .citewp-aiso-activity__heading {
   font: 600 11px/1 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--citewp-text-muted);
+  color: var(--citewp-text-primary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -3315,18 +3315,21 @@
 .citewp-aiso-activity__row {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
   min-width: 0;
 }
 .citewp-aiso-activity__icon {
   flex-shrink: 0;
+  width: 14px;
+  height: 14px;
   color: var(--citewp-text-muted);
   display: flex;
   align-items: center;
 }
 .citewp-aiso-activity__text {
-  font: 400 12px/1.3 'Inter', system-ui, -apple-system, sans-serif;
-  color: var(--citewp-text-secondary);
+  font: 400 13px/1.3 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--citewp-text-primary);
   flex: 1;
   min-width: 0;
   overflow: hidden;

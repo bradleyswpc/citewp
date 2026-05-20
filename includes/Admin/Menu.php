@@ -430,7 +430,7 @@ final class Menu {
 					<?php elseif ( $trend_pct < -5 ) : ?>
 						<span class="citewp-aiso-kpi-card__head-pill citewp-aiso-kpi-card__head-pill--down">↓ <?php echo esc_html( (string) absint( $trend_pct ) ); ?>%</span>
 					<?php else : ?>
-						<span class="citewp-aiso-kpi-card__head-pill citewp-aiso-kpi-card__head-pill--flat">→ Stable</span>
+						<span class="citewp-aiso-kpi-card__head-pill citewp-aiso-kpi-card__head-pill--flat"><?php esc_html_e( 'Stable', 'ai-search-optimizer' ); ?></span>
 					<?php endif; ?>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
@@ -457,7 +457,7 @@ final class Menu {
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Indexed Pages', 'ai-search-optimizer' ); ?></span>
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ai-search-optimizer#settings' ) ); ?>" class="citewp-aiso-kpi-card__head-link">llms.txt</a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=' . self::SLUG_PARENT . '#settings' ) ); ?>" class="citewp-aiso-kpi-card__head-link">llms.txt</a>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
 					<div class="citewp-aiso-kpi-card__value">
