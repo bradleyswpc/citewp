@@ -889,7 +889,7 @@ final class Menu {
 				'width'   => 2.0,
 				'opacity' => 1.0,
 				'data'    => array_map(
-					fn( $bv ) => [ 'date' => $bv['date'], 'value' => $score_lookup[ $bv['date'] ] ?? null ],
+					fn( $bv ) => [ 'date' => $bv['date'], 'value' => isset( $score_lookup[ $bv['date'] ] ) ? (float) $score_lookup[ $bv['date'] ] : null ],
 					$bot_visits_by_day
 				),
 			],
@@ -1519,6 +1519,14 @@ final class Menu {
 	 * @param int $days Chart window in days.
 	 */
 	private function render_history_svg( array $datasets, int $days ): void {
+		// Validate dataset color fields against CSS custom property name format (third-party filter safety).
+		$datasets = array_values(
+			array_filter(
+				$datasets,
+				static fn( array $d ): bool => isset( $d['color'] ) && (bool) preg_match( '/^--[\w-]+$/', $d['color'] )
+			)
+		);
+
 		// ── 1. Build UTC spine (same algorithm as get_visits_by_day — both must stay in sync). ──
 		$now       = time();
 		$cutoff_ts = strtotime( "-{$days} days", $now );
