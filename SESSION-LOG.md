@@ -6,6 +6,86 @@
 
 ---
 
+## Session 35 — D3/D4 Chart Refactor + Chart Reorder ✅
+
+**Date:** 2026-05-20
+
+### Deliverable
+
+Completed S34 carryover items 1–5. D4 shipped as single-series filter-extensible chart (scope-reduced mid-session: Bot Visits overlay dropped — redundant with Crawler Logs chart; bounded-vs-unbounded axis tension). Chart block moved above Post & Page table. 13 commits.
+
+### What shipped
+
+**Item 1 — Top Crawlers title weight**
+- CSS Section 34: `font: 800` → `font: 600` for Top Crawlers + Needs Attention card titles
+
+**D3 — Column order swap**
+- Cite Score page left column col-a: AI Insights now first, Top Crawlers second
+
+**D4 — Filter-based Cite Score Over Time chart**
+- Registered `citewp_aiso/dashboard/score_chart_datasets` filter (X15 extensibility)
+- Fixed `get_visits_by_day()` 24h/T3 off-by-one: shared `$cutoff_ts` aligns SQL cutoff with zero-fill spine start; fix is load-bearing for Crawler Logs Bot Visits chart
+- Refactored `render_history_svg()`: dataset array drives rendering; UTC spine; date-keyed lookup maps; color validation (`preg_match /^--[\w-]+$/`) for filter-callback safety
+- Score-axis carry-forward: leading nulls = no point; post-measurement nulls plateau to next reading; continuous citrine `<path>`
+- Scope reduction (mid-session): default datasets array trimmed to one entry (Avg Score only); count-axis rendering + right-axis labels removed; legend dropped (single series, redundant)
+- Chart block moved above Post & Page table (left-row → chart → table); `cs_range` form hidden inputs round-trip correctly in new position
+
+**D5 — Pro Tip navy**
+- Verified already `background: var(--citewp-navy)` from D1.5e/g — no code change
+
+### Files modified
+
+- `includes/Admin/Menu.php` — D3 column swap, D4 dataset construction + filter + render refactor, chart block reorder
+- `includes/Admin/DashboardData.php` — `get_visits_by_day()` 24h/T3 fix
+- `admin/css/citewp-aiso-admin.css` — Item 1 title weight fix; `--citewp-legend-color` CSS custom property for legend swatches
+- `docs/superpowers/specs/2026-05-20-d4-score-chart-design.md` — created + updated to reflect single-series final scope
+- `docs/superpowers/plans/2026-05-20-d4-score-chart.md` — created
+
+### Commits
+
+- `506676e` fix: Top Crawlers card title weight 800→600 (CSS Section 34)
+- `11d80e3` feat: D3 — swap col-a order: AI Insights first, Top Crawlers second
+- `22ae666` docs: D4 design spec — filter-based score chart dataset architecture
+- `cc48bdd` docs: D4 implementation plan — filter-based score chart
+- `43c626c` fix: get_visits_by_day align start_date with SQL cutoff (24h/T3 bug)
+- `aa01197` refactor: legend swatch color via --citewp-legend-color custom property
+- `12a114f` feat: D4 — dataset-driven score chart, register citewp_aiso/dashboard/score_chart_datasets filter
+- `a2df3a7` fix: validate dataset color as CSS custom property, cast avg score to float
+- `39e82cd` fix: score path carry-forward between measurements; update D4 spec
+- `90a43ca` docs: fix stale score-axis null comment in filter docblock
+- `a25e80c` refactor: D4 scope reduction — single-series Avg Score chart, remove Bot Visits overlay
+- `7500707` docs: D4 spec — scope-reduced to single-series, dual-line overlay dropped
+- `ffbbc62` feat: move Cite Score Over Time chart above Post & Page table in left column
+
+### Decisions made
+
+- **Bot Visits overlay dropped** from Cite Score Over Time chart: redundant with Crawler Logs Bot Visits chart; bounded score (0–100) vs. unbounded count made shared Y-geometry the wrong call. Filter hook remains registered — can be extended without touching Menu.php.
+- **Carry-forward replaces null-gaps** for score-axis rendering: line is continuous from first measurement, plateaus to next reading.
+- **Chart moved above table** in left column: gauge+breakdown → chart → table.
+- **FB46(b)** N/A this session — chart is static SVG, no animation added. Backlog not silently skipped.
+- **Spine duplication** (render + get_visits_by_day both compute date-walk) — known; fix one, fix both.
+
+### Verified
+
+- 7d / 30d / 90d ranges all render single citrine carry-forward line, left 0–100 axis, no right axis
+- Chart block in new position above Post & Page table; cs_range filter pill still working; right column unchanged
+- get_visits_by_day() 24h fix intact and wired to Crawler Logs chart (LogsPage.php:107)
+- No PHP errors; no JS changes; npm build not required
+- All 13 commits pushed to `main` (HEAD: `ffbbc62`)
+
+### Carryover into Session 36
+
+1. **UI-DESIGN-SYSTEM.md Line Chart Panel entry** — stale (pre-D4: 120px height, area fill, hover tooltips, single-series spec); update to document current 80px static SVG, score-only series, no legend
+2. **Scroll-to-top on rail nav clicks** (deferred from D1.5e)
+3. **Cite Score page top-row brainstorm** — options A/B/C decision needed before any build
+4. **Dynamic Pro Tip content engine** — static placeholder shipped; dynamic logic deferred
+5. **WP.org Round 4 watch** — no response as of S35; check hello@citewp.com at S36 start
+6. **Forward-port slug rename to main** — separate session after WP.org approval
+7. **UI/UX audit queue** — 5 queued fixes from S33 audit
+8. **P52 messaging audit** — replace "AI-powered SEO" / "Connect to Claude" copy patterns
+
+---
+
 ## Session 34 — Dashboard KPI Polish D1→D1.5g ✅
 
 **Date:** 2026-05-19
