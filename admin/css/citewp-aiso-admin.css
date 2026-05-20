@@ -3221,10 +3221,6 @@
   gap: 6px;
 }
 
-/* Change 4: Bigger section headings */
-.citewp-aiso-crawlers__heading { font-size: 15px; }
-.citewp-aiso-needs__heading    { font-size: 15px; }
-
 /* Change 5: Tighter KPI card padding */
 .citewp-aiso-kpi-card { padding: var(--sp-4); }
 
@@ -3289,13 +3285,13 @@
   grid-column: auto;
   grid-row: auto;
   margin-top: var(--sp-4);
-  margin-bottom: 0;
+  margin-bottom: var(--sp-6);
 }
 
 /* Change 3: Recent Activity section inside Quick Actions card */
 .citewp-aiso-activity {
-  margin-top: var(--sp-4);
-  padding-top: var(--sp-4);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
   border-top: 1px solid var(--citewp-border);
 }
 .citewp-aiso-activity__head {
@@ -3316,7 +3312,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-2) 0;
+  padding: var(--sp-1) 0;
   min-width: 0;
 }
 .citewp-aiso-activity__icon {
