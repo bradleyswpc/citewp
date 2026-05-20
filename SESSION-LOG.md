@@ -6,39 +6,49 @@
 
 ---
 
-## Session 36 — PostToolUse Hook Git Bash Fix ✅
+## Session 36 — Typography Tier Migration + Hook Fix ✅
 
 **Date:** 2026-05-20
 
 ### Deliverable
 
-Fixed PostToolUse hooks (`php-syntax-check.sh`, `js-build-reminder.sh`) failing in Git Bash due to `python3`/`python` not being on Git Bash's PATH. Added `py` (Windows Python launcher, `/c/WINDOWS/py`) as first candidate in the JSON parser binary discovery chain in both scripts. Existing `python3` → `python` → `grep/sed` fallback chain preserved. 1 commit.
+**Main:** Typography tier migration across all 5 admin surfaces (Dashboard, Crawler Logs, Cite Score, Settings, EditorPanel). Single shared T2 and T3 multi-selector blocks replace 13 per-surface font declarations. Nine wrong declarations fixed (CiteScore panel titles were 700/15px/obsidian; needs/actions headings were 13px; activity__heading had primary color instead of muted; kpi-card__head-title had weight 700). T1, hero, protip, and subtitle outliers untouched.
+
+**Detour:** Fixed PostToolUse hooks (`php-syntax-check.sh`, `js-build-reminder.sh`) failing in Git Bash due to `python3`/`python` not being on Git Bash's PATH. Added `py` (Windows Python launcher) as first candidate.
 
 ### What shipped
 
+- `admin/css/citewp-aiso-admin.css` — shared T2 + T3 tier blocks (multi-selector, one font/color definition per tier); 13 individual blocks stripped; 9 wrong spec values corrected
 - `.claude/hooks/php-syntax-check.sh` — `py` added as first `command -v` candidate before `python3`
 - `.claude/hooks/js-build-reminder.sh` — same change
 
 ### Verified
 
+- Shared T2 block at L339: `600 14px/1 'Inter'` primary ✓
+- Shared T3 block: `600 11px/1 'Inter'` muted uppercase 0.05em ✓
+- No residual font/color on any tier selector ✓
+- Outliers intact: hero 800/22px/white, protip 700/13px/citrine, panel subtitle 400/14px/secondary ✓
+- X20 spec audit: all 3 tiers match UI-DESIGN-SYSTEM.md Typography Tiers spec ✓
+- Browser verify (5 surfaces): **pending — needs manual check in LocalWP**
 - `py --version` → Python 3.13.13 ✓
-- `php-syntax-check.sh` manual trigger → exit 0, no errors ✓
-- `js-build-reminder.sh` manual trigger with `src/sidebar/index.js` path → build reminder fires correctly ✓
 
 ### Commits
 
+- `2938102` refactor: typography tier migration — single T2/T3 source blocks
+- `3cd16f1` docs: S36 session log — hook fix entry + carryover list
 - `3bb56e2` fix: use py launcher first in PostToolUse hook JSON parser (Git Bash compat)
 
-### Carryover into Session 36 (continued)
+### Carryover into Session 37
 
-1. **WP.org Round 4 watch** — check hello@citewp.com
-2. **UI-DESIGN-SYSTEM.md Line Chart Panel entry** — update to reflect single-series D4 architecture
-3. **Scroll-to-top on rail nav clicks**
-4. **Cite Score page top-row brainstorm** — options A/B/C decision needed
-5. **Dynamic Pro Tip content engine** — deferred
-6. **Forward-port slug rename to main** — after WP.org approval only
-7. **UI/UX audit queue** — FB46 (skeleton, prefers-reduced-motion, ARIA verify, grade label verify)
-8. **P52 messaging audit** — replace "AI-powered SEO" / "Connect to Claude" patterns
+1. **Browser verify typography** — open LocalWP and visually confirm all 5 surfaces: Dashboard, Crawler Logs, Cite Score, Settings, EditorPanel (Gutenberg sidebar)
+2. **WP.org Round 4 watch** — check hello@citewp.com
+3. **UI-DESIGN-SYSTEM.md Line Chart Panel entry** — update to reflect single-series D4 architecture (Desktop Commander)
+4. **Scroll-to-top on rail nav clicks**
+5. **Cite Score page top-row brainstorm** — options A/B/C decision needed
+6. **Dynamic Pro Tip content engine** — deferred
+7. **Forward-port slug rename to main** — after WP.org approval only
+8. **UI/UX audit queue** — FB46 (skeleton, prefers-reduced-motion, ARIA verify, grade label verify)
+9. **P52 messaging audit** — replace "AI-powered SEO" / "Connect to Claude" patterns
 
 ---
 
