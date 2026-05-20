@@ -6,6 +6,104 @@
 
 ---
 
+## Session 34 — Dashboard KPI Polish D1→D1.5g ✅
+
+**Date:** 2026-05-19
+
+### Deliverable
+
+Full Dashboard polish chain: dropped llms.txt Status KPI card, stripped 4 KPI orb icons, replaced hero strip with skinny page header (D1/D2/D1.5a), densified 4 KPI cards with secondary data (D1.5b), 12-change polish pass (D1.5d-revised), hotfix for 30/90-day blank screen, Pro Tip full-width + Recent Activity mini-list (D1.5e), vertical rhythm standardisation + activity styling (D1.5f), final height/title/gap polish (D1.5g). 9 commits.
+
+### What shipped
+
+**D1/D2/D1.5a — Structural reset**
+- Dropped llms.txt Status as separate KPI card; function absorbed into Indexed Pages card head-right link
+- Stripped 4 KPI orb icons ("professional data" tone over "CRM mascot")
+- Removed Dashboard hero strip; replaced with skinny page header matching other admin pages
+
+**D1.5b — KPI row densification**
+- 4-card row: Avg Cite Score / Bot Visits / Indexed Pages / Needs Attention
+- Secondary data per card: category bars, bot list (top 3), progress bar, severity tiles (Critical/Minor split), cat breakdown line
+- `get_issue_counts_by_category()` added to `DashboardData`
+
+**Hotfix — blank screen on 30/90-day filter**
+- Guard in `DashboardData::get_kpi_stats()` against invalid date-range parameter
+
+**D1.5d-revised — 12-change polish pass**
+- `display:contents` grid alignment for equal-height cards in 2-column lower section
+- Bot dot inside bot name span; bigger dots + bars; bump small text
+- Subtle drop shadows; tighter KPI card padding
+- llms.txt ACTIVE pill pushed to card bottom; cat breakdown CSS
+
+**D1.5e — Pro Tip + Recent Activity**
+- Pro Tip moved outside grid as full-width bar below 2-column lower section
+- Recent Activity mini-list added to Quick Actions card (`get_recent_activity()`)
+- Top gap dialled back (sp-8 → sp-6)
+
+**D1.5f — Vertical rhythm standardisation**
+- All major gaps standardised to `var(--sp-4)`: page-header margin-bottom, panel padding-top, kpi-row, protip margin-top
+- Recent Activity: 13px primary text, sp-3 row gap, row padding, 14×14px icon
+- Stable trend pill: removed `→` arrow; uses `esc_html_e()`
+- llms.txt KPI link fixed (`page=citewp` via `self::SLUG_PARENT`)
+- View-all link weights normalised to 600 (was 700 / 500 split)
+
+**D1.5g — Height, card titles, bottom gap**
+- Recent Activity: margin-top/padding-top sp-4→sp-3, row padding sp-2→sp-1
+- 15px font-size bump removed from Top Crawlers + Needs Attention headings (back to 14/13px baseline)
+- Pro Tip `margin-bottom` restored to `var(--sp-6)`
+
+### Files modified
+
+- `admin/css/citewp-aiso-admin.css` — Sections 33–35 appended; kpi-row, view-all, crawlers/needs heading base rules updated
+- `includes/Admin/Menu.php` — KPI row restructure, llms.txt link fix, Stable pill, Pro Tip placement, Recent Activity HTML
+- `includes/Admin/DashboardData.php` — `get_issue_counts_by_category()`, `get_recent_activity()`, filter guard
+
+### Commits
+
+- `ce34282` refactor: remove Dashboard hero strip, replace with skinny page header
+- `c760560` feat: densify Dashboard KPI row — 4 cards with severity split (D1.5b)
+- `d144c07` style: D1.5d dashboard KPI polish — Section 33 CSS overrides
+- `e23d141` feat: D1.5d dashboard KPI polish — PHP markup updates
+- `971ef65` fix: blank screen on Dashboard Last 30 / 90 Days filter
+- `41028aa` feat: D1.5d-revised — 12-change dashboard polish pass
+- `56211eb` feat: Pro Tip full-width, Recent Activity mini-list, dial back top gap (D1.5e)
+- `7362c0c` polish: D1.5f — vertical rhythm, activity styles, Stable pill, llms link fix
+- `dd996c9` fix: D1.5g — tighten Recent Activity height, normalize card titles, Pro Tip bottom gap
+
+### Decisions made
+
+- P57 — Dashboard KPI card pattern (codifies D1.5b densification approach)
+- P58 — Standardized vertical rhythm (`var(--sp-4)` governs all section boundaries)
+- P59 — Recent Activity / list sub-section pattern (border-top + uppercase heading + icon+text+timestamp rows)
+
+### Verified
+
+- `debug.log` absent — no PHP errors this session
+- No JS changes — npm build not required
+- All 9 commits pushed to `main` (HEAD: `dd996c9`)
+- Trend arrows on Top Crawlers card confirmed working-as-designed (test data is flat, not a regression)
+
+### Carryover into Session 35
+
+1. **Top Crawlers card title weight** — base CSS `font: 800` heavier than peer cards (13–14px/600); within 1px size tolerance but weight visible
+2. **24h view bug — Bot Visits Over Time chart** — shows "No crawler activity" despite fresh seeded data; investigate during D4 work
+3. **D3 — AI Insights ↔ Top Crawlers column swap** (spec unchanged from S34 prompts)
+4. **D4 — Cite Score Over Time dual-line overlay** — status-colored Avg Score line, blue Bot Visits line; fold T3 zero-fill fix; resolve 24h bug
+5. **D5 — Pro Tip restyle** — verify whether still needed; D1.5e/g shipped dark navy background, D5 may already be complete
+6. **Scroll-to-top on rail nav clicks** (deferred D1.5e)
+7. **Cite Score page top-row brainstorm** — options A/B/C decision needed before any build
+8. **Dynamic Pro Tip content engine** — static placeholder shipped; dynamic logic deferred
+9. **WP.org Round 4 watch** — check hello@citewp.com at S35 start
+10. **Forward-port slug rename to main** — separate session AFTER v0.6.3 WP.org approval
+11. **UI/UX audit queue** — 5 queued fixes from S33 audit
+12. **P52 messaging audit** — replace "AI-powered SEO" / "Connect to Claude" copy patterns
+
+### Next session focus
+
+Session 35: Resolve carryover items 1–5 in order (title weight fix → 24h chart bug → D3 → D4 → D5 verify).
+
+---
+
 ## Session 33 — Crawler Logs Charts & Polish (v0.7.5) ✅
 
 **Date:** 2026-05-18 – 2026-05-19
