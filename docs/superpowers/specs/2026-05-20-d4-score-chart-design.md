@@ -47,7 +47,7 @@ $datasets = apply_filters(
 
 | `axis` | Y-scale | SVG element | Null handling |
 |--------|---------|-------------|---------------|
-| `'score'` | Left axis, fixed 0–100 | `<path>` with M/L (gap on null) | Preserved → line gap |
+| `'score'` | Left axis, fixed 0–100 | `<path>` with M/L (carry-forward) | Leading nulls = no point; post-measurement nulls carry forward last known value (plateau to next reading) |
 | `'count'` | Right axis, auto-scale 0–max | `<polyline>` (continuous) | Coerced to 0 at render |
 
 ### Right-axis max (load-bearing)
@@ -56,7 +56,9 @@ The right Y-axis max is computed from the maximum `value` across **all** count-a
 
 ### Null coercion (defensive)
 
-The render coerces any null `value` to `0` for every count-axis dataset at render time. Count datasets SHOULD arrive zero-filled, but correctness does not depend on it. Score-axis nulls are preserved (→ line gap).
+The render coerces any null `value` to `0` for every count-axis dataset at render time. Count datasets SHOULD arrive zero-filled, but correctness does not depend on it.
+
+**Score-axis carry-forward:** Score-axis datasets use carry-forward instead of gaps. Leading nulls (before the first non-null value) produce no point — the line begins at the first measured date. After the first measurement, any null date carries the last known value forward (plateau) until the next real reading. Result: one continuous `<path>` from the first measurement to the end of the spine, flat between measurements. Score axis only — count-axis zero-coercion is unchanged.
 
 ### Default datasets
 
@@ -149,7 +151,7 @@ private function render_history_svg( array $datasets, int $days ): void
 7. **Render SVG elements** (paint order):
    - Grid lines (5 horizontal rules, unchanged)
    - Count-axis `<polyline>` elements first (underneath) — one per count dataset, styled by dataset metadata
-   - Score-axis `<path>` elements second (on top) — one per score dataset; before emitting, check whether any point in the dataset is non-null; if none, skip the `<path>` element entirely (no element emitted, not `<path d="">`)
+   - Score-axis `<path>` elements second (on top) — one per score dataset; uses carry-forward: walk the spine in date order tracking `$last_known`; leading nulls (before first measurement) are skipped; once a non-null value is seen, every subsequent spine date emits a point using `$last_known` (actual or carried). Result: one continuous plateau-stepped `<path>` from the first measurement to the end of the spine. All-null dataset: no element emitted (not `<path d="">`)
 
 8. **Legend** — one `<span>` per dataset in **dataset array order** (explicitly decoupled from paint order). Default: "Avg Score → Bot Visits." Filter-appended datasets appear in append order.
 

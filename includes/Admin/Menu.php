@@ -1668,20 +1668,24 @@ final class Menu {
 				// ── Score-axis paths: paint-order second (on top). ───────────────────
 				// All-null dataset → skip element entirely (no <path d="">).
 				foreach ( $score_datasets as $idx => $ds ) :
-					$path      = '';
-					$prev_null = true;
-					$any_point = false;
+					$path         = '';
+					$any_point    = false;
+					$path_started = false;
+					$last_known   = null;
 					foreach ( $spine as $si => $date ) {
 						$v = $score_maps[ $idx ][ $date ] ?? null;
-						if ( $v === null ) {
-							$prev_null = true;
+						if ( $v !== null ) {
+							$last_known = (float) $v;
+						}
+						// Leading nulls: no prior value to carry — line begins at first measurement.
+						if ( $last_known === null ) {
 							continue;
 						}
-						$any_point = true;
-						$x         = $n > 1 ? (int) round( ( $si / ( $n - 1 ) ) * $w ) : (int) ( $w / 2 );
-						$y         = (int) round( $h - ( (float) $v / 100.0 ) * ( $h * 0.8 ) - $h * 0.1 );
-						$path     .= ( $prev_null ? "M {$x} {$y}" : " L {$x} {$y}" );
-						$prev_null  = false;
+						$any_point    = true;
+						$x            = $n > 1 ? (int) round( ( $si / ( $n - 1 ) ) * $w ) : (int) ( $w / 2 );
+						$y            = (int) round( $h - ( $last_known / 100.0 ) * ( $h * 0.8 ) - $h * 0.1 );
+						$path        .= ( $path_started ? " L {$x} {$y}" : "M {$x} {$y}" );
+						$path_started = true;
 					}
 					if ( $any_point ) :
 				?>
