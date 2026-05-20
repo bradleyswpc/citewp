@@ -893,25 +893,14 @@ final class Menu {
 					$bot_visits_by_day
 				),
 			],
-			[
-				'label'   => __( 'Bot Visits', 'ai-search-optimizer' ),
-				'axis'    => 'count',
-				'color'   => '--citewp-tint-blue',
-				'width'   => 1.5,
-				'opacity' => 0.7,
-				'data'    => array_map(
-					fn( $bv ) => [ 'date' => $bv['date'], 'value' => $bv['sum'] ],
-					$bot_visits_by_day
-				),
-			],
 		];
 		/**
 		 * Filters the datasets rendered in the Cite Score Over Time chart.
 		 *
 		 * Each dataset must provide: label (string), axis ('score'|'count'), color (CSS custom property name),
 		 * width (float stroke-width), opacity (float), data (array of {date: Y-m-d, value: float|int|null}).
-		 * Count-axis nulls are coerced to 0 at render. Score-axis leading nulls skip; subsequent nulls carry the last known value forward (plateau).
-		 * Right Y-axis max = max across ALL count-axis datasets combined.
+		 * Score-axis leading nulls skip (line begins at first measurement); subsequent nulls carry the last
+		 * known value forward (plateau). Default: one Avg Score dataset (axis='score'). Add datasets via filter.
 		 *
 		 * @param array<int, array{label: string, axis: string, color: string, width: float, opacity: float, data: array<int, array{date: string, value: float|int|null}>}> $datasets
 		 * @param int $days Chart window in days.
@@ -1539,33 +1528,14 @@ final class Menu {
 		}
 		$n = count( $spine );
 
-		// ── 2. Partition datasets by axis. ──────────────────────────────────────────────
+		// ── 2. Score-axis datasets + per-dataset date→value lookup maps. ───────────────
 		$score_datasets = array_values( array_filter( $datasets, fn( $d ) => ( $d['axis'] ?? '' ) === 'score' ) );
-		$count_datasets = array_values( array_filter( $datasets, fn( $d ) => ( $d['axis'] ?? '' ) === 'count' ) );
-
-		// ── 3. Build per-dataset date→value lookup maps. ────────────────────────────────
-		$score_maps = [];
+		$score_maps     = [];
 		foreach ( $score_datasets as $i => $ds ) {
 			$score_maps[ $i ] = array_column( $ds['data'], 'value', 'date' );
 		}
-		$count_maps = [];
-		foreach ( $count_datasets as $i => $ds ) {
-			$count_maps[ $i ] = array_column( $ds['data'], 'value', 'date' );
-		}
 
-		// ── 4. Compute right-axis max across ALL count datasets (post-coercion). ────────
-		$max_bv = 1;
-		foreach ( $count_datasets as $i => $ds ) {
-			foreach ( $spine as $date ) {
-				$v = $count_maps[ $i ][ $date ] ?? 0;
-				$v = ( $v === null ) ? 0 : (int) $v;
-				if ( $v > $max_bv ) {
-					$max_bv = $v;
-				}
-			}
-		}
-
-		// ── 5. Empty-state: fires only when nothing to draw on either axis. ─────────────
+		// ── 3. Empty-state: fires when no score dataset has any non-null point. ─────────
 		$has_score_data = false;
 		foreach ( $score_datasets as $i => $ds ) {
 			foreach ( $spine as $date ) {
@@ -1575,19 +1545,7 @@ final class Menu {
 				}
 			}
 		}
-		$has_count_data = false;
-		foreach ( $count_datasets as $i => $ds ) {
-			foreach ( $spine as $date ) {
-				$v = $count_maps[ $i ][ $date ] ?? 0;
-				$v = ( $v === null ) ? 0 : (int) $v;
-				if ( $v > 0 ) {
-					$has_count_data = true;
-					break 2;
-				}
-			}
-		}
-
-		if ( ! $has_score_data && ! $has_count_data ) {
+		if ( ! $has_score_data ) {
 			?>
 			<div class="citewp-aiso-history-panel__empty">
 				<svg viewBox="0 0 340 60" width="100%" height="60" aria-hidden="true">
@@ -1604,14 +1562,6 @@ final class Menu {
 		$w = 340;
 		$h = 80;
 
-		// ── Right Y-axis labels: compact K suffix for ≥ 1000. ──────────────────────────
-		$fmt = static function ( int $v ): string {
-			return $v >= 1000 ? round( $v / 1000, 1 ) . 'k' : (string) $v;
-		};
-		$bv_mid_val = (int) round( $max_bv / 2 );
-		$bv_max_lbl = $fmt( $max_bv );
-		$bv_mid_lbl = $fmt( $bv_mid_val );
-
 		// ── X-axis label step. ──────────────────────────────────────────────────────────
 		if ( $n <= 7 ) {
 			$label_step = 1;
@@ -1621,14 +1571,6 @@ final class Menu {
 			$label_step = 15;
 		}
 		?>
-		<div class="citewp-aiso-chart-legend" aria-hidden="true">
-			<?php foreach ( $datasets as $ds ) : ?>
-				<span class="citewp-aiso-chart-legend__item"
-					style="--citewp-legend-color: var(<?php echo esc_attr( $ds['color'] ); ?>)">
-					<?php echo esc_html( $ds['label'] ); ?>
-				</span>
-			<?php endforeach; ?>
-		</div>
 		<div class="citewp-aiso-cs-history-wrap">
 			<div class="citewp-aiso-cs-history-yaxis" aria-hidden="true">
 				<span class="citewp-aiso-cs-history-yaxis__label" style="top:10%">100</span>
@@ -1645,27 +1587,6 @@ final class Menu {
 				<line x1="0" y1="56" x2="340" y2="56" stroke="var(--citewp-border)" stroke-width="0.5"/>
 				<line x1="0" y1="72" x2="340" y2="72" stroke="var(--citewp-border)" stroke-width="0.5"/>
 				<?php
-				// ── Count-axis polylines: paint-order first (underneath). ─────────────
-				foreach ( $count_datasets as $idx => $ds ) :
-					$pts = [];
-					foreach ( $spine as $si => $date ) {
-						$v     = $count_maps[ $idx ][ $date ] ?? 0;
-						$v     = ( $v === null ) ? 0 : (int) $v;
-						$x     = $n > 1 ? (int) round( ( $si / ( $n - 1 ) ) * $w ) : (int) ( $w / 2 );
-						$y     = (int) round( $h - ( (float) $v / (float) $max_bv ) * ( $h * 0.8 ) - $h * 0.1 );
-						$pts[] = "{$x},{$y}";
-					}
-					$poly = implode( ' ', $pts );
-					if ( ! empty( $poly ) ) :
-				?>
-				<polyline points="<?php echo esc_attr( $poly ); ?>" fill="none"
-					stroke="var(<?php echo esc_attr( $ds['color'] ); ?>)"
-					stroke-width="<?php echo esc_attr( (string) $ds['width'] ); ?>"
-					stroke-opacity="<?php echo esc_attr( (string) $ds['opacity'] ); ?>"
-					stroke-linejoin="round" stroke-linecap="round"/>
-				<?php endif; endforeach; ?>
-				<?php
-				// ── Score-axis paths: paint-order second (on top). ───────────────────
 				// All-null dataset → skip element entirely (no <path d="">).
 				foreach ( $score_datasets as $idx => $ds ) :
 					$path         = '';
@@ -1696,11 +1617,6 @@ final class Menu {
 					stroke-linejoin="round" stroke-linecap="round"/>
 				<?php endif; endforeach; ?>
 			</svg>
-			<div class="citewp-aiso-cs-history-yaxis citewp-aiso-cs-history-yaxis--right" aria-hidden="true">
-				<span class="citewp-aiso-cs-history-yaxis__label" style="top:10%"><?php echo esc_html( $bv_max_lbl ); ?></span>
-				<span class="citewp-aiso-cs-history-yaxis__label" style="top:50%"><?php echo esc_html( $bv_mid_lbl ); ?></span>
-				<span class="citewp-aiso-cs-history-yaxis__label" style="top:90%">0</span>
-			</div>
 		</div>
 		<div class="citewp-aiso-chart-xlabels">
 			<?php
