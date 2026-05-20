@@ -355,7 +355,8 @@ final class DashboardData {
 
 		$now        = time();
 		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
-		$cutoff     = gmdate( 'Y-m-d H:i:s', strtotime( "-{$days} days", $now ) );
+		$cutoff_ts  = strtotime( "-{$days} days", $now );
+		$cutoff     = gmdate( 'Y-m-d H:i:s', $cutoff_ts );
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table; $table_name is esc_sql() of a hardcoded constant. Admin-only, real-time data.
 		$rows = $wpdb->get_results(
@@ -373,7 +374,7 @@ final class DashboardData {
 
 		// Build the zero-fill date range: oldest day first, up to and including today.
 		$today      = gmdate( 'Y-m-d', $now );
-		$start_date = gmdate( 'Y-m-d', $now - ( ( $days - 1 ) * DAY_IN_SECONDS ) );
+		$start_date = gmdate( 'Y-m-d', $cutoff_ts );
 
 		$date_range = [];
 		$cursor     = $start_date;
