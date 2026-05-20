@@ -910,7 +910,7 @@ final class Menu {
 		 *
 		 * Each dataset must provide: label (string), axis ('score'|'count'), color (CSS custom property name),
 		 * width (float stroke-width), opacity (float), data (array of {date: Y-m-d, value: float|int|null}).
-		 * Count-axis nulls are coerced to 0 at render. Score-axis nulls produce line gaps.
+		 * Count-axis nulls are coerced to 0 at render. Score-axis leading nulls skip; subsequent nulls carry the last known value forward (plateau).
 		 * Right Y-axis max = max across ALL count-axis datasets combined.
 		 *
 		 * @param array<int, array{label: string, axis: string, color: string, width: float, opacity: float, data: array<int, array{date: string, value: float|int|null}>}> $datasets
