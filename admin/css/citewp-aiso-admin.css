@@ -2939,9 +2939,8 @@
   display: inline-block;
   width: 12px;
   height: 2px;
+  background: var(--citewp-legend-color, var(--citewp-border));
 }
-.citewp-aiso-chart-legend__item--score::before { background: var(--citewp-citrine); }
-.citewp-aiso-chart-legend__item--bv::before    { background: var(--citewp-tint-blue); }
 
 .citewp-aiso-bvot__chart-area {
   display: flex;
