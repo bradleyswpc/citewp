@@ -796,14 +796,9 @@ grep -n "citewp_aiso/data/schema_coverage\|citewp_aiso/data/scored_post_types" i
 
 Both filters must appear. If either is missing, add it to `schema_coverage()`.
 
-- [ ] **Step 9.7a: Height gate outcome — Card 1 top-page line (KEPT or CUT)**
+- [x] **Step 9.7a: Height gate outcome — Card 1 top-page line — KEPT**
 
-At 100% zoom in the browser, compare Card 1 (Top Crawler) height against Cards 3 (Needs Attention) and 4 (Schema Coverage).
-
-- **KEPT:** Card 1 height ≤ tile-card height → both Sub 2 (top page) and Sub 3 (bot count) remain. No code change needed.
-- **CUT:** Card 1 height > tile-card height → remove the `<?php if ( ! empty( $top_page_title ) ) :` conditional block from Card 1 HTML in Menu.php (Sub 2 only — keep the `$unique_bot_count` block). Commit the cut, then re-run Steps 9.7c and 9.7b.
-
-**Edit this step before closing Task 9: write "KEPT" or "CUT — top-page line removed" so the outcome is recorded.**
+Browser verify: all 4 cards rendered at exactly 273px each (CSS height, 100% zoom, Playwright measurement). Top-page line and bot-count line both stay. No code change required.
 
 - [ ] **Step 9.7b: `__kpi-progress` NOT suppressed for `.citewp-aiso-cs-kpi-row`**
 

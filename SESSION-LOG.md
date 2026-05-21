@@ -79,6 +79,19 @@ P65 (activity__heading muted, P59 amendment) logged before build. No new decisio
 - No JS changes — npm build not required ✅
 - All 13 commits pushed to `origin/main` ✅
 
+### Amendment pass (same session, second context window)
+
+Post-browser-verify amendments — spec and plan updated, then implemented:
+
+- **Card 1:** Added two stacked secondary stats below "N visits in last 7 days": top-page (height-gated, ellipsis-clamped) from `get_top_crawled_pages()` and bot count from `get_unique_bot_count()`. Data prep vars `$top_page_rows`, `$top_page_title`, `$unique_bot_count` added.
+- **Card 2:** Reinstated `__kpi-progress` bar (50% width at verify time). Removed erroneous `display: none` CSS suppression that blocked the bar. Removed flat "→ based on current scores" trend row.
+- **Cards 3 + 4:** Removed flat trend rows.
+- **CSS:** Added `margin-top: auto` on `.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer`; full-width button rule (`display: block; width: 100%; text-align: center; box-sizing: border-box`); `.citewp-aiso-kpi-card__sub--top-page` ellipsis rule.
+- **Height gate (Step 9.7a):** All 4 cards measured at exactly 273px each at 100% zoom. **KEPT** — both top-page and bot-count lines stay.
+- **X20 re-audit:** All assertions 9.1–9.7d passed clean.
+
+Amendment commits: `b4b8bca` (spec+plan docs), `cef0a20` (implementation), `eea85df` (X20 re-audit).
+
 ### Carryover into Session 38
 
 **Priority (deferred this session per spec):**
