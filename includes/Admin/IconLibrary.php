@@ -107,6 +107,9 @@ final class IconLibrary {
 
 		// shield (Lucide: shield)
 		'shield'         => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+
+		// layers (Lucide: layers)
+		'layers'         => '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12.5-8.56 3.89a2 2 0 0 1-1.66 0L3 12.5"/><path d="m22 17.5-8.56 3.89a2 2 0 0 1-1.66 0L3 17.5"/>',
 	];
 
 	/**
