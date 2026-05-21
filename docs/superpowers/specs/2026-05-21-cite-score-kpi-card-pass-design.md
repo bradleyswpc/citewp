@@ -1,0 +1,198 @@
+# Cite Score KPI Card Pass — Design Spec
+**Session 37 | Date: 2026-05-21**
+
+## Scope
+
+Restyle the 4 KPI cards on the Cite Score page to the Dashboard KPI Card pattern (P57). Shrink existing 36px `__visual` orbs to small inline icons (P62). Add a new 4th card — Schema Coverage — backed by a new `DashboardData::schema_coverage()` aggregate method. Grid expands from 3-column to 4-column.
+
+**Files changed:**
+- `includes/Admin/Menu.php` — `render_cite_score_panel()`: restyle HTML for cards 1–3, add card 4 HTML
+- `includes/Admin/DashboardData.php` — add `schema_coverage()` method
+- `admin/css/citewp-aiso-admin.css` — add `--4col` grid modifier, remove/restyle Cite Score `__visual` orb rules
+
+**No-touch:** `includes/Scoring/Engine.php` — schema_coverage() reads stored meta only.
+
+---
+
+## Decisions Locked
+
+| Constraint | Decision |
+|---|---|
+| P57 | Dashboard KPI Card pattern applies to Cite Score page cards |
+| P62 | Shrink 36px orbs to 16px inline icons in head row — do not remove icons |
+| P65 | activity__heading stays muted Tier 3 — do not revert |
+| P49 | schema_coverage() excludes posts opted out of llms.txt (same WP_Query guard as render_cite_score_panel) |
+| X12 | "Partial" caption for schema stays advisory — does not imply confirmed schema output |
+| P41 | All 4 KPI cards use outline buttons. "View AI Recommendations →" lower on page remains sole primary-paper CTA |
+| Typography | Card titles use shared `.citewp-aiso-t2` block (600 14px/1 Inter primary). No ad-hoc font declarations |
+| X4 | Per-step commits + pushes |
+| X20 | Spec-compliance audit between code-review and browser verify |
+| X13 | Full pipeline (brainstorm → plan → implement → review → verify) |
+
+---
+
+## Grid Change
+
+| Before | After |
+|---|---|
+| `citewp-aiso-kpi-row--3col` | `citewp-aiso-kpi-row--4col` |
+
+Add `--4col` modifier to CSS: 4 equal columns, ~25% each at 1440px viewport. Existing `--3col` can be retained (used by Crawler Logs page — do not remove).
+
+---
+
+## Card Designs
+
+### Card 1 — Top Crawler (restyle only)
+
+**What changes:** Remove `__visual` 36px orb + `__data` side-by-side wrapper. Add 16px inline bot icon to head row.
+
+| Slot | Content |
+|---|---|
+| Head-left | `IconLibrary::icon('bot', 16)` + "Top Crawler" (Tier 2) |
+| Head-right | Info icon + tooltip: "The AI bot that's visited your site most often in the last 7 days." |
+| Value | Bot display name (e.g. "GPTBot") — JetBrains Mono 700 28px obsidian |
+| Sub | "N visits in last 7 days" |
+| Trend | ↑/↓/→ vs prior 7 days (existing delta logic — preserve as-is) |
+| Button | "View Crawler Logs →" outline |
+
+Empty state (no crawlers): value = "—", sub = "No AI crawler visits yet", trend = flat, button remains.
+
+---
+
+### Card 2 — Posts/Pages Optimized (restyle only)
+
+**What changes:** Remove `__visual` 36px orb + `__data` wrapper + `__kpi-progress` bar. Add 16px inline icon to head row.
+
+| Slot | Content |
+|---|---|
+| Head-left | `IconLibrary::icon('check-circle', 16)` + "Posts/Pages Optimized" (Tier 2) |
+| Head-right | none |
+| Value | "X / Y" fraction — X = `$posts_optimized`, Y = `$total_scored`. Main span 28px, denom span 18px muted |
+| Caption | "posts & pages with Cite Score ≥ 50" |
+| Sub | "N% of your scored content" |
+| Trend | Flat "→ based on current scores" (no historical delta — deferred) |
+| Button | "View All →" outline (scrolls to per-post table anchor) |
+
+Empty state (no scored posts): value = "0 / 0", caption = "No posts scored yet", sub = omitted.
+
+---
+
+### Card 3 — Needs Attention (rename + restyle)
+
+**What changes:** Rename "Issues Detected" → "Needs Attention". Remove `__visual` 36px orb. Add 16px inline icon. Add head-right "View All →" link (matches Dashboard Needs Attention card). No bottom button (head-right link is the action — consistent with Dashboard).
+
+| Slot | Content |
+|---|---|
+| Head-left | `IconLibrary::icon('alert-triangle', 16)` + "Needs Attention" (Tier 2) |
+| Head-right | "View All →" link (scrolls to per-post table) |
+| Value | `$issue_count` — score-grade color (`citewp-aiso-kpi-score--{grade}`) |
+| Caption | "posts need work" |
+| Severity tiles | Critical / Minor tiles (keep existing `__severity-tile` pattern — matches Dashboard) |
+| Trend | Flat "→ based on current scores" |
+| Button | None (head-right link serves as action affordance) |
+
+Empty state (issue_count = 0): value = "0", caption = "All posts are looking good", severity tiles hidden.
+
+---
+
+### Card 4 — Schema Coverage (new)
+
+**What changes:** New card. Requires `DashboardData::schema_coverage()`.
+
+| Slot | Content |
+|---|---|
+| Head-left | `IconLibrary::icon('layers', 16)` + "Schema Coverage" (Tier 2) |
+| Head-right | "Add Schema →" link (scrolls to schema suggestions or links to per-post table) |
+| Value | `$pct_confirmed`% — JetBrains Mono 700 28px obsidian |
+| Caption | "posts with confirmed inline schema" |
+| Tiles (3-tile row) | **Confirmed** (green, count) / **SEO Plugin** (yellow, count) / **None** (red, count) |
+| Trend | ↑/→ confirmed count vs prior 30 days (see schema_coverage() below) |
+| Button | "View Schema Gaps →" outline (scrolls to per-post table filtered to schema-fail rows) |
+
+Tile labels use advisory phrasing per X12: "SEO Plugin" (not "Partial configured") to distinguish from "confirmed inline JSON-LD."
+
+Empty state (no scored posts): value = "—", caption = "Score your posts to see schema coverage", tiles hidden.
+
+---
+
+## New Method: `DashboardData::schema_coverage()`
+
+```php
+/**
+ * Aggregates schema signal states across all scored, llms.txt-included posts.
+ *
+ * Reads the stored 'schema' signal from _citewp_aiso_geo_score post meta.
+ * Does NOT invoke Engine::check_schema() or perform any live scoring —
+ * this is a read-side aggregate of the cached 6/3/0 signal from the last
+ * scoring run. 'partial' means an SEO plugin was detected at score time;
+ * it does NOT verify the plugin outputs schema for this post type (FB42,
+ * deferred — render-time detection).
+ *
+ * Excludes posts opted out of llms.txt (P49) using the same
+ * (NOT EXISTS OR != '1') WP_Query guard as render_cite_score_panel().
+ *
+ * @return array{confirmed: int, partial: int, none: int, total: int, pct_confirmed: int}
+ */
+public function schema_coverage(): array
+```
+
+**Return shape:**
+```php
+[
+    'confirmed'     => int,  // signal status = 'pass'  (6 pts inline JSON-LD)
+    'partial'       => int,  // signal status = 'partial' (3 pts — SEO plugin detected)
+    'none'          => int,  // signal status = 'fail'  (0 pts)
+    'total'         => int,  // confirmed + partial + none
+    'pct_confirmed' => int,  // round(confirmed / total * 100), 0 when total = 0
+]
+```
+
+**Extensibility filters (FB40 / FB42):**
+```php
+// Post types scope — FB40 CPT detection will extend this list
+$post_types = apply_filters( 'citewp_aiso/data/scored_post_types', [ 'post', 'page' ] );
+
+// Return value — FB42 render-time detection will augment confirmed count
+return apply_filters( 'citewp_aiso/data/schema_coverage', $result );
+```
+
+**Data path:** WP_Query for published posts with `Repository::META_KEY_TOTAL` + P49 exclusion guard → for each post ID, read `_citewp_aiso_geo_score` → find signal with `id = 'schema'` → bucket by status.
+
+**Performance note:** Identical query shape to the existing `$scored_ids` loop in `render_cite_score_panel()`. Cap at 1000 posts (same as existing). This is admin-only, called once per page load.
+
+---
+
+## Extensibility Hooks (X15)
+
+| Filter | Purpose |
+|---|---|
+| `citewp_aiso/data/scored_post_types` | FB40: let CPT scope extend posts counted in schema_coverage() |
+| `citewp_aiso/data/schema_coverage` | FB42: let render-time detection augment confirmed count without rewriting the method |
+
+---
+
+## CSS Changes
+
+**Add:**
+- `citewp-aiso-kpi-row--4col` — 4-column grid modifier (CSS Grid, repeat(4, 1fr))
+
+**Remove / restyle for Cite Score page cards:**
+- `citewp-aiso-kpi-card__visual` rules scoped to `.citewp-aiso-cs-kpi-row` — no longer needed
+- `citewp-aiso-kpi-card__data` side-by-side layout for Cite Score cards
+- `citewp-aiso-kpi-progress` bar rules for Card 2
+
+**Keep:**
+- `citewp-aiso-kpi-row--3col` (Crawler Logs page uses this)
+- `citewp-aiso-kpi-card__visual` base rules (may be used elsewhere)
+
+---
+
+## Spec Self-Review
+
+- **Placeholders:** None. All slots defined for all 4 cards including empty states.
+- **Contradictions:** P41 (one primary-paper max) ✓ — all 4 cards use outline. "View AI Recommendations →" lower on page is the sole primary-paper.
+- **Scope:** Single session deliverable. No scoring logic changes (Engine.php untouched). No new REST endpoints.
+- **Ambiguity:** "View Schema Gaps →" button destination — scrolls to per-post table (same page anchor). Confirm with user during implementation if a filtered view is wanted or just the table top.
+- **Typography:** All card titles reference `.citewp-aiso-t2` — no ad-hoc declarations. ✓
+- **P65:** No activity__heading selectors touched. ✓
