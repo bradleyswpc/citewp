@@ -18,6 +18,9 @@
 - **P41:** All 4 KPI cards use `citewp-aiso-btn--outline` buttons. The `citewp-aiso-btn--primary-paper` "View AI Recommendations →" button lower on the page is the sole primary CTA for this surface — do not add a second one.
 - **X4:** Commit AND push after every task. Single-commit-at-end is not acceptable.
 - No `npm run build` needed — no JS changes in this plan.
+- **CSS radius token:** `--radius-sm` (4px) is the correct token in this codebase — no `citewp-` prefix. Verified in `:root`. Do not "fix" it to `--citewp-radius-sm` (undefined).
+- **Schema tile "None" color:** use `--citewp-score-red` (#8C1B1B, rgb 140,27,27). None = worst state. Do not use `--citewp-score-orange` (#E86612) or the pre-P46 hardcoded `rgba(214,54,56,...)`.
+- **Card 4 head-right:** No head-right link on Card 4. "Add Schema →" was dropped — it linked to a read-only table, not a schema-adding surface. The bottom "View Schema Gaps →" button is the only action.
 
 ---
 
@@ -280,12 +283,12 @@ Add at the end of the KPI card section (after severity-tile rules — search `se
 }
 
 .citewp-aiso-kpi-card__schema-tile--none {
-	background: rgba( 214, 54, 56, 0.08 );
-	border-color: rgba( 214, 54, 56, 0.25 );
+	background: rgba( 140, 27, 27, 0.08 );  /* --citewp-score-red #8C1B1B */
+	border-color: rgba( 140, 27, 27, 0.25 );
 }
 
 .citewp-aiso-kpi-card__schema-tile--none .citewp-aiso-kpi-card__schema-tile-count {
-	color: var( --citewp-score-orange );
+	color: var( --citewp-score-red );  /* None = worst state = red, not orange */
 }
 
 .citewp-aiso-kpi-card__schema-tile-count {
@@ -587,7 +590,6 @@ Immediately before the `</div><!-- .citewp-aiso-kpi-row -->` closing tag (~L1080
 						<?php echo IconLibrary::icon( 'layers', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Schema Coverage', 'ai-search-optimizer' ); ?></span>
 					</span>
-					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-kpi-card__head-link"><?php esc_html_e( 'Add Schema →', 'ai-search-optimizer' ); ?></a>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
 					<?php if ( $schema_coverage['total'] > 0 ) : ?>
@@ -709,13 +711,61 @@ git push
 
 ---
 
-## Task 10: Browser Verify
+## Task 10: Code-Reviewer Pass (X13 gate — runs before browser verify)
 
-- [ ] **Step 10.1: Open LocalWP site**
+**This is a separate gate from the X20 spec audit.** X20 checks "does the output match the spec." The code-reviewer checks "is the PHP correct" — escaping, query correctness, method signatures, match() arm coverage, _doing_it_wrong usage.
+
+Run `superpowers:requesting-code-review` against the diff of `includes/Admin/DashboardData.php` and `includes/Admin/Menu.php` only. Do not review CSS (presentation-only, no logic) or IconLibrary.php (path constant, trivial).
+
+- [ ] **Step 10.1: Get the diff for review**
+
+```bash
+git diff HEAD~6 HEAD -- includes/Admin/DashboardData.php includes/Admin/Menu.php
+```
+
+(Adjust the commit count to span from before Task 2 to current HEAD — should cover the `schema_coverage()` method and all 4 card HTML changes.)
+
+- [ ] **Step 10.2: Dispatch code-reviewer subagent**
+
+Use `superpowers:requesting-code-review` with focus areas:
+
+1. **`schema_coverage()` in DashboardData.php:**
+   - WP_Query meta_query: is the P49 exclusion guard correct? (relation=AND outer, relation=OR inner, NOT EXISTS + != '1')
+   - `match()` arms: does `default` correctly bucket `fail` AND any unexpected status values as `none`?
+   - `_doing_it_wrong()` call: correct signature? (method name, message, version constant)
+   - `apply_filters()` calls: correct hook name strings? Return value used correctly?
+   - Repository instantiation inside loop: performance acceptable for ≤1000 posts?
+
+2. **Card 4 HTML in Menu.php:**
+   - All output correctly escaped (`esc_html()`, `esc_attr()`, `esc_url()`)?
+   - `$schema_coverage` variable — is it in scope when Card 4 HTML runs? (Must be set in data prep block before the HTML output section)
+   - Empty state: `$schema_coverage['total'] > 0` guard — correct? What if the array keys are missing (e.g. if the filter clobbers the return)?
+
+3. **Cards 1–3 HTML:**
+   - All `esc_html()` / `esc_attr()` / `phpcs:ignore` comments preserved from original?
+   - `$tc_delta` calculation: no division-by-zero risk?
+
+- [ ] **Step 10.3: Fix any issues the reviewer flags**
+
+Apply fixes inline. Re-run PHP syntax check via PostToolUse hook. Commit fixes if any:
+
+```bash
+git add includes/Admin/DashboardData.php includes/Admin/Menu.php
+git commit -m "fix: code-reviewer corrections — Cite Score KPI card pass S37"
+git push
+```
+
+If no issues: proceed. Do not skip this task even if no fixes are needed — the review must run.
+
+---
+
+## Task 11: Browser Verify
+
+- [ ] **Step 11.1: Open LocalWP site**
 
 Navigate to `http://citewp-dev.local/wp-admin/admin.php?page=citewp#cite-score` in Chrome at 100% zoom (not 90% — per X18 validation contract).
 
-- [ ] **Step 10.2: Verify the 4-card KPI row**
+- [ ] **Step 11.2: Verify the 4-card KPI row**
 
 Confirm:
 - 4 equal-width cards displayed in one row
@@ -725,7 +775,7 @@ Confirm:
 - Card 4 shows Schema Coverage with percentage hero + 3-tile row (Confirmed / SEO Plugin / None)
 - All 4 cards render correctly at 100% zoom without wrapping or overflow
 
-- [ ] **Step 10.3: Verify button styles**
+- [ ] **Step 11.3: Verify button styles**
 
 Confirm:
 - Cards 1, 2, 4 have outline buttons at the bottom
@@ -733,14 +783,14 @@ Confirm:
 - No blue primary-paper buttons in the KPI row
 - The "View AI Recommendations →" primary-paper button below is unchanged
 
-- [ ] **Step 10.4: Verify schema tiles (Card 4)**
+- [ ] **Step 11.4: Verify schema tiles (Card 4)**
 
 Confirm:
 - 3 tiles show: Confirmed (green), SEO Plugin (yellow), None (red)
 - Tile counts are integers, not null/undefined
 - Tile counts sum to total_scored (sanity check: should equal Card 2's Y denominator)
 
-- [ ] **Step 10.5: Check debug.log**
+- [ ] **Step 11.5: Check debug.log**
 
 ```bash
 cat "C:/Users/KingpinBWP/Local Sites/citewp-dev/app/public/wp-content/debug.log" | tail -30
@@ -748,7 +798,7 @@ cat "C:/Users/KingpinBWP/Local Sites/citewp-dev/app/public/wp-content/debug.log"
 
 No new PHP errors or `_doing_it_wrong` notices from this session's changes. If the denominator mismatch notice fires, investigate before claiming the task complete.
 
-- [ ] **Step 10.6: Final push confirmation**
+- [ ] **Step 11.6: Final push confirmation**
 
 ```bash
 git log --oneline -8
@@ -783,7 +833,8 @@ git push
 | P65 activity__heading not touched | Task 9 Step 9.5 |
 | Typography Tier 2 on all titles | Task 9 Step 9.1 |
 | X20 spec-compliance audit | Task 9 |
+| Code-reviewer pass (X13 gate) | Task 10 |
 | X4 per-step commits | Each task |
-| Browser verify at 100% zoom | Task 10 |
+| Browser verify at 100% zoom | Task 11 |
 
 **No gaps found.**
