@@ -92,6 +92,16 @@ Post-browser-verify amendments — spec and plan updated, then implemented:
 
 Amendment commits: `b4b8bca` (spec+plan docs), `cef0a20` (implementation), `eea85df` (X20 re-audit).
 
+### Follow-up pass (same session, third context window)
+
+Root cause: `__kpi-progress__bar` (HTML) vs `__kpi-progress__fill` (CSS) class name mismatch. Bar was in DOM with correct height but zero rendered width because `align-items: flex-start` on `__body` collapsed the track's cross-axis dimension to 0.
+
+- **Task B:** Fixed `__bar` → `__fill` class name. Added P44 score-band grade modifier (`$optimized_grade` match on `$pct_optimized` thresholds ≥80/60/40). Progress bar now renders: 226px track, 113px orange fill (50% of scored content). Track gets `width: 100%` scoped to cs-kpi-row to survive the `flex-start` body.
+- **Task C (kept):** Added card modifier classes to Cards 2/3/4 (`--optimized`, `--needs-attention`, `--schema-coverage`). Decorative per-card icon tints: teal (Card 1), green (Card 2), orange (Card 3), purple (Card 4). Row not visually busy — tints kept.
+- **X20 follow-up:** All D.1–D.4 assertions passed. Heights still equal (273px × 4).
+
+Follow-up commits: `7a4d760` (spec+plan), `3597183` (Tasks B+C), `88c0d86` (track width fix), `3513294` (X20 audit).
+
 ### Carryover into Session 38
 
 **Priority (deferred this session per spec):**
