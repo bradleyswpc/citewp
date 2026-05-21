@@ -2097,9 +2097,23 @@
   display: flex;
   flex-direction: column;
 }
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__head {
+  justify-content: space-between;
+}
+
 .citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__body {
   flex: 1 1 auto;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-1);
+}
+
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__value-main {
+  font-size: 28px;
+}
+
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__value-denom {
+  font-size: 16px;
 }
 
 /* Cite Score KPI row — no orb/data layout (P57/P62 migration) */
