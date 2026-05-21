@@ -974,7 +974,10 @@ final class Menu {
 			<!-- Card 1: Top Crawler -->
 			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--top-crawler">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Top Crawler', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__head-main">
+						<?php echo IconLibrary::icon( 'bot', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Top Crawler', 'ai-search-optimizer' ); ?></span>
+					</span>
 					<span
 						class="citewp-aiso-kpi-card__info"
 						data-tooltip="<?php esc_attr_e( 'The AI bot that\'s visited your site most often in the last 7 days. A signal that your optimization work is being noticed.', 'ai-search-optimizer' ); ?>"
@@ -983,48 +986,43 @@ final class Menu {
 					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-purple-tint);color:var(--citewp-tint-purple)">
-						<?php echo IconLibrary::icon( 'bot', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					</div>
-					<div class="citewp-aiso-kpi-card__data">
-						<?php if ( $top_crawler !== null ) : ?>
-						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( $top_crawler['display_name'] ); ?></div>
-						<div class="citewp-aiso-kpi-card__sub">
-							<?php
-							echo esc_html( sprintf(
-								/* translators: %d: number of bot visits in last 7 days */
-								__( '%d visits in last 7 days', 'ai-search-optimizer' ),
-								(int) ( $top_crawler['visits'] ?? 0 )
-							) );
-							?>
-						</div>
+					<?php if ( $top_crawler !== null ) : ?>
+					<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( $top_crawler['display_name'] ); ?></div>
+					<div class="citewp-aiso-kpi-card__sub">
 						<?php
-						$tc_current = (int) ( $top_crawler['visits'] ?? 0 );
-						$tc_prior   = (int) ( $top_crawler['prior_visits'] ?? 0 );
-						$tc_delta   = $tc_current - $tc_prior;
-						$tc_trend_class = 'citewp-aiso-kpi-card__trend--flat';
-						if ( $tc_current > 0 || $tc_prior > 0 ) :
-							$tc_trend_class = $tc_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $tc_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' );
+						echo esc_html( sprintf(
+							/* translators: %d: number of bot visits in last 7 days */
+							__( '%d visits in last 7 days', 'ai-search-optimizer' ),
+							(int) ( $top_crawler['visits'] ?? 0 )
+						) );
 						?>
-						<div class="citewp-aiso-kpi-card__trend <?php echo esc_attr( $tc_trend_class ); ?>">
-							<?php if ( $tc_delta > 0 ) : ?>
-								<?php echo esc_html( '↑' ); ?> +<?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
-							<?php elseif ( $tc_delta < 0 ) : ?>
-								<?php echo esc_html( '↓' ); ?> <?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
-							<?php else : ?>
-								<?php echo esc_html( '→' ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'no change vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
-							<?php endif; ?>
-						</div>
-						<?php endif; ?>
+					</div>
+					<?php
+					$tc_current = (int) ( $top_crawler['visits'] ?? 0 );
+					$tc_prior   = (int) ( $top_crawler['prior_visits'] ?? 0 );
+					$tc_delta   = $tc_current - $tc_prior;
+					$tc_trend_class = 'citewp-aiso-kpi-card__trend--flat';
+					if ( $tc_current > 0 || $tc_prior > 0 ) :
+						$tc_trend_class = $tc_delta > 0 ? 'citewp-aiso-kpi-card__trend--up' : ( $tc_delta < 0 ? 'citewp-aiso-kpi-card__trend--down' : 'citewp-aiso-kpi-card__trend--flat' );
+					?>
+					<div class="citewp-aiso-kpi-card__trend <?php echo esc_attr( $tc_trend_class ); ?>">
+						<?php if ( $tc_delta > 0 ) : ?>
+							<?php echo esc_html( '↑' ); ?> +<?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
+						<?php elseif ( $tc_delta < 0 ) : ?>
+							<?php echo esc_html( '↓' ); ?> <?php echo esc_html( (string) $tc_delta ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
 						<?php else : ?>
-						<div class="citewp-aiso-kpi-card__value">—</div>
-						<div class="citewp-aiso-kpi-card__sub"><?php esc_html_e( 'No AI crawler visits yet', 'ai-search-optimizer' ); ?></div>
-						<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Visits typically begin within 24–72 hours of publishing.', 'ai-search-optimizer' ); ?></div>
+							<?php echo esc_html( '→' ); ?> <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'no change vs. prior 7 days', 'ai-search-optimizer' ); ?></span>
 						<?php endif; ?>
 					</div>
+					<?php endif; ?>
+					<?php else : ?>
+					<div class="citewp-aiso-kpi-card__value">—</div>
+					<div class="citewp-aiso-kpi-card__sub"><?php esc_html_e( 'No AI crawler visits yet', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'Visits typically begin within 24–72 hours of publishing.', 'ai-search-optimizer' ); ?></span></div>
+					<?php endif; ?>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=citewp#crawler-logs' ) ); ?>"><?php esc_html_e( 'View Crawler Logs →', 'ai-search-optimizer' ); ?></a>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=citewp#crawler-logs' ) ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Crawler Logs →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
