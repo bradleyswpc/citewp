@@ -103,12 +103,12 @@ Empty state (issue_count = 0): value = "0", caption = "All posts are looking goo
 | Slot | Content |
 |---|---|
 | Head-left | `IconLibrary::icon('layers', 16)` + "Schema Coverage" (Tier 2) |
-| Head-right | "Add Schema →" link (scrolls to schema suggestions or links to per-post table) |
+| Head-right | "Add Schema →" link (scrolls to per-post table top — no sitewide schema surface exists) |
 | Value | `$pct_confirmed`% — JetBrains Mono 700 28px obsidian |
 | Caption | "posts with confirmed inline schema" |
 | Tiles (3-tile row) | **Confirmed** (green, count) / **SEO Plugin** (yellow, count) / **None** (red, count) |
-| Trend | ↑/→ confirmed count vs prior 30 days (see schema_coverage() below) |
-| Button | "View Schema Gaps →" outline (scrolls to per-post table filtered to schema-fail rows) |
+| Trend | Flat "→ based on current scores" (schema_coverage() is point-in-time only — no historical delta; trend arrow would fabricate change, per P64 honesty principle) |
+| Button | "View Schema Gaps →" outline (scrolls to per-post table top) |
 
 Tile labels use advisory phrasing per X12: "SEO Plugin" (not "Partial configured") to distinguish from "confirmed inline JSON-LD."
 
@@ -163,6 +163,43 @@ return apply_filters( 'citewp_aiso/data/schema_coverage', $result );
 
 ---
 
+## Link Destinations (all per-post table affordances)
+
+Cards 2, 3, and 4 all send the user to the per-post table on the same page. Confirm the table anchor (`id` attribute) exists in `render_cite_score_panel()` HTML and that all four hrefs point at the same value.
+
+| Affordance | Card | Destination |
+|---|---|---|
+| "View All →" button | Card 2 | per-post table top anchor |
+| "View All →" head-right link | Card 3 | per-post table top anchor |
+| "Add Schema →" head-right link | Card 4 | per-post table top anchor |
+| "View Schema Gaps →" button | Card 4 | per-post table top anchor |
+
+**No filtered view this session.** A schema-fail-only filter on the per-post table requires query-param plumbing (RecommendationFilter-style) — separate FB candidate.
+
+---
+
+## Denominator Reconciliation (Plan Step — Item #3)
+
+`schema_coverage()['total']` and Card 2's `$total_scored` are computed by separate query paths but should be identical: both query published, non-excluded, scored posts for `post`/`page`. A post with a stored score (`_citewp_aiso_geo_score_total` EXISTS) always has all 17 signals including `schema` in its full score array — so any mismatch is a bug signal.
+
+**Plan step:** During `schema_coverage()` implementation, add an assertion comment: if `$schema_total !== $total_scored_from_card2`, log a `_doing_it_wrong()` notice so the discrepancy surfaces in debug.log. The implementation loop should handle the edge case where a scored post has no `schema` signal in its stored array (count it as `none` and log a notice).
+
+---
+
+## IconLibrary Checklist (Plan Step — Item #5)
+
+Verify these icons exist in `IconLibrary.php` before wiring card HTML. If missing, add the Lucide SVG path (in-scope — it's a one-line path constant):
+
+| Icon key | Used by | Known to exist? |
+|---|---|---|
+| `bot` | Card 1 | Yes (S28) |
+| `check-circle` | Card 2 | Verify |
+| `alert-triangle` | Card 3 | Verify |
+| `layers` | Card 4 | Verify |
+| `info` | Card 1 head-right | Yes (S18) |
+
+---
+
 ## Extensibility Hooks (X15)
 
 | Filter | Purpose |
@@ -193,6 +230,6 @@ return apply_filters( 'citewp_aiso/data/schema_coverage', $result );
 - **Placeholders:** None. All slots defined for all 4 cards including empty states.
 - **Contradictions:** P41 (one primary-paper max) ✓ — all 4 cards use outline. "View AI Recommendations →" lower on page is the sole primary-paper.
 - **Scope:** Single session deliverable. No scoring logic changes (Engine.php untouched). No new REST endpoints.
-- **Ambiguity:** "View Schema Gaps →" button destination — scrolls to per-post table (same page anchor). Confirm with user during implementation if a filtered view is wanted or just the table top.
+- **Ambiguity resolved:** All 4 table affordances (Cards 2/3/4) scroll to per-post table top. No filtered view this session — locked per user decision. Filtered schema-fail view is a future FB candidate.
 - **Typography:** All card titles reference `.citewp-aiso-t2` — no ad-hoc declarations. ✓
 - **P65:** No activity__heading selectors touched. ✓
