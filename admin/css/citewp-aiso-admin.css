@@ -2201,6 +2201,11 @@
   border-radius: 2px;
 }
 
+/* Track must stretch full width — __body uses align-items:flex-start which collapses cross-axis */
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-progress {
+	width: 100%;
+}
+
 /* Score-band colored fill — P44 thresholds applied to pct_optimized */
 .citewp-aiso-kpi-progress--green  .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-green ); }
 .citewp-aiso-kpi-progress--yellow .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-yellow ); }
