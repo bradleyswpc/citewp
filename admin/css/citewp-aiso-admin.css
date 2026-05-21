@@ -489,6 +489,10 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
+.citewp-aiso-kpi-row--4col {
+	grid-template-columns: repeat( 4, 1fr );
+}
+
 .citewp-aiso-kpi-card {
   background: var(--citewp-white);
   border: 1px solid var(--citewp-border);
@@ -504,6 +508,18 @@
   align-items: center;
   gap: 10px;
   margin-bottom: var(--sp-1);
+}
+
+/* KPI card head-main — inline icon + Tier-2 title, aligned */
+.citewp-aiso-kpi-card__head-main {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.citewp-aiso-kpi-card__head-main svg {
+	flex-shrink: 0;
+	color: var( --citewp-text-muted );
 }
 
 .citewp-aiso-kpi-card__orb {
@@ -2086,6 +2102,16 @@
   align-items: center;
 }
 
+/* Cite Score KPI row — no orb/data layout (P57/P62 migration) */
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__visual,
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__data {
+	display: none; /* removed in S37 — HTML no longer emits these elements */
+}
+
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-progress {
+	display: none;
+}
+
 /* ── Cite Score KPI card densification (S24) ───────────────────── */
 
 .citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__value-row {
@@ -3168,6 +3194,68 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 3px;
+}
+
+/* ── Schema Coverage tiles (Card 4, Cite Score page) ──────────────── */
+.citewp-aiso-kpi-card__schema-tiles {
+	display: flex;
+	gap: 6px;
+	margin-top: 8px;
+	margin-bottom: 10px;
+}
+
+.citewp-aiso-kpi-card__schema-tile {
+	flex: 1;
+	border-radius: var( --radius-sm );
+	padding: 5px 8px;
+	text-align: center;
+	border: 1px solid;
+}
+
+.citewp-aiso-kpi-card__schema-tile--confirmed {
+	background: rgba( 0, 163, 42, 0.08 );
+	border-color: rgba( 0, 163, 42, 0.25 );
+}
+
+.citewp-aiso-kpi-card__schema-tile--confirmed .citewp-aiso-kpi-card__schema-tile-count {
+	color: var( --citewp-score-green );
+}
+
+.citewp-aiso-kpi-card__schema-tile--seo-plugin {
+	background: rgba( 219, 166, 23, 0.08 );
+	border-color: rgba( 219, 166, 23, 0.3 );
+}
+
+.citewp-aiso-kpi-card__schema-tile--seo-plugin .citewp-aiso-kpi-card__schema-tile-count {
+	color: var( --citewp-score-yellow );
+}
+
+.citewp-aiso-kpi-card__schema-tile--none {
+	background: rgba( 140, 27, 27, 0.08 );  /* --citewp-score-red #8C1B1B */
+	border-color: rgba( 140, 27, 27, 0.25 );
+}
+
+.citewp-aiso-kpi-card__schema-tile--none .citewp-aiso-kpi-card__schema-tile-count {
+	color: var( --citewp-score-red );  /* None = worst state = red, not orange */
+}
+
+.citewp-aiso-kpi-card__schema-tile-count {
+	display: block;
+	font-family: 'JetBrains Mono', monospace;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
+	margin-bottom: 2px;
+}
+
+.citewp-aiso-kpi-card__schema-tile-label {
+	display: block;
+	font-family: Inter, -apple-system, sans-serif;
+	font-size: 10px;
+	font-weight: 600;
+	color: var( --citewp-text-muted );
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
 }
 
 /* Change 11: Lower section vertical match */
