@@ -6,6 +6,97 @@
 
 ---
 
+## Session 37 — Cite Score KPI Card Pass ✅
+
+**Date:** 2026-05-21
+
+### Deliverable
+
+Full X13 pipeline. Restyled the 4 KPI cards on the Cite Score page to the Dashboard KPI Card pattern (P57). Removed 36px `__visual` orbs, added 16px inline icons (P62). Renamed Card 3 "Issues Detected" → "Needs Attention". Added new Card 4 "Schema Coverage" backed by `DashboardData::schema_coverage()`. Grid expanded from `--3col` to `--4col`. All 4 cards use outline buttons (P41).
+
+### What shipped
+
+1. **`includes/Admin/IconLibrary.php`** — Added `layers` Lucide SVG icon for Schema Coverage card.
+
+2. **`DashboardData::schema_coverage()`** — New aggregate method. Reads stored `schema` signal from `_citewp_aiso_geo_score` post meta. 3-state P47 buckets (`pass`/`partial`/`fail` → confirmed/partial/none). Applies P49 exclusion (same WP_Query guard as `render_cite_score_panel()`). WP_DEBUG `_doing_it_wrong()` assertion if `schema_coverage['total'] ≠ $total_scored`. Extensibility filters: `citewp_aiso/data/scored_post_types` + `citewp_aiso/data/schema_coverage` (X15). Engine.php untouched.
+
+3. **`admin/css/citewp-aiso-admin.css`** — `--4col` modifier added. Scoped suppressions for `.citewp-aiso-cs-kpi-row`: `__visual`, `__data`, `kpi-progress` → `display: none`. Schema tile CSS block (13 rules: confirmed/seo-plugin/none variants; none uses `var(--citewp-score-red)`). Layout fix: explicit `flex-direction: column` + `align-items: flex-start` on `.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__body`; `font-size` overrides for `__value-main` (28px) and `__value-denom` (16px); `justify-content: space-between` on `__head`.
+
+4. **`includes/Admin/Menu.php` — Card 1 (Top Crawler)** — Removed `__visual`/`__data` side-by-side layout. Added `__head-main` with 16px bot icon. Value/sub/trend preserved. Footer: "View Crawler Logs →" outline button.
+
+5. **`includes/Admin/Menu.php` — Card 2 (Posts/Pages Optimized)** — Removed `__visual`/`__data`/`__kpi-progress`. Fraction hero (`__value-main`/`__value-denom`). Caption + flat trend. Footer: "View All →" outline button to `#citewp-aiso-cs-post-table`.
+
+6. **`includes/Admin/Menu.php` — Card 3 (Needs Attention)** — Renamed from "Issues Detected". `__head-main` icon wrapper. Head-right "View All →" link to `#citewp-aiso-cs-post-table`. No `__footer` (head-right is the sole CTA).
+
+7. **`includes/Admin/Menu.php` — Card 4 (Schema Coverage)** — New card. `$schema_coverage = $dashboard_data->schema_coverage()` called in data prep. Percentage hero (`$pct_confirmed`%). 3-tile row: Confirmed (green) / SEO Plugin (yellow) / None (red). Flat trend. Head-right "Add Schema →". Footer: "View Schema Gaps →" outline button. Both scroll to `#citewp-aiso-cs-post-table`.
+
+8. **Grid** — `citewp-aiso-kpi-row--3col` → `--4col` on Cite Score page. `--3col` retained (Crawler Logs page).
+
+9. **Table anchor** — `id="citewp-aiso-cs-post-table"` added to per-post table element.
+
+### Bug fixed during browser verify
+
+Base `.citewp-aiso-kpi-card__body` (line ~540) is `display: flex; align-items: center` with default `flex-direction: row`. The cs-kpi-row override omitted `flex-direction: column`, causing all body children (value, sub, trend) to render horizontally. Fix: scoped `flex-direction: column; align-items: flex-start; gap: var(--sp-1)` on `.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__body`, plus `__value-main` font-size 28px override (base was 48px) and `__head` `justify-content: space-between`.
+
+### Files modified
+
+- `includes/Admin/IconLibrary.php`
+- `includes/Admin/DashboardData.php`
+- `includes/Admin/Menu.php`
+- `admin/css/citewp-aiso-admin.css`
+- `docs/superpowers/specs/2026-05-21-cite-score-kpi-card-pass-design.md` (new)
+- `docs/superpowers/plans/2026-05-21-cite-score-kpi-card-pass.md` (new)
+
+### Commits
+
+- `9e97a91` feat: add `layers` icon to IconLibrary for Schema Coverage card
+- `e173912` feat: add DashboardData::schema_coverage() aggregate method
+- `3a7e89d` style: add --4col modifier, schema tile CSS, cs-kpi-row scoped suppressions
+- `bef7524` style: fix --4col indentation + replace hard-coded margin with var(--sp-3)
+- `7ade8f8` feat: add id="citewp-aiso-cs-post-table" anchor to per-post table
+- `1d8f4df` feat: restyle Cite Score KPI Card 1 (Top Crawler) to P57 pattern
+- `f1d07b5` feat: restyle Cite Score KPI Card 2 (Posts/Pages Optimized) to P57 pattern
+- `35d15f6` feat: restyle Cite Score KPI Card 3 (Needs Attention) to P57 pattern
+- `1a91436` fix: Card 3 head-main wrapper + correct anchor href
+- `7ca0a12` feat: add Cite Score KPI Card 4 (Schema Coverage) + --4col grid
+- `d6ef84f` docs: X20 spec-compliance audit
+- `936247b` docs: X13 final code review
+- `31c9bfb` fix: cs-kpi-row body flex-direction column + value font-size overrides (browser verify)
+
+All commits pushed to `origin/main` ✅
+
+### Decisions made
+
+P65 (activity__heading muted, P59 amendment) logged before build. No new decisions — all governing rules (P57, P41, P62, P49, X12, P65) were pre-existing.
+
+### Verified
+
+- All 4 cards render at 4-column layout ✅
+- Schema Coverage card: pct confirmed + 3-tile row + "View Schema Gaps →" ✅
+- Card 3 head-right "View All →" pushes to right edge ✅
+- All card buttons are outline style (P41 compliance) ✅
+- `debug.log`: clean — no S37 PHP errors ✅
+- No JS changes — npm build not required ✅
+- All 13 commits pushed to `origin/main` ✅
+
+### Carryover into Session 38
+
+**Priority (deferred this session per spec):**
+1. **Schema-fail-only table filter** — "View Schema Gaps →" scrolls to per-post table top; a filtered view (schema-fail posts only) requires query-param plumbing (RecommendationFilter-style). FB candidate.
+2. **Hoist `new Repository()` out of foreach in `schema_coverage()`** — instantiated inside the loop, should be hoisted above. Minor refactor.
+
+**Ongoing carryover:**
+3. **Browser verify typography (S36 carryover)** — open LocalWP, confirm all 5 surfaces (Dashboard, Crawler Logs, Cite Score, Settings, EditorPanel)
+4. **WP.org Round 4 watch** — check hello@citewp.com
+5. **P52(e) messaging audit** — readme.txt + plugin-side copy: replace "AI-powered SEO" / "Connect to Claude" patterns
+6. **UI-DESIGN-SYSTEM.md Line Chart Panel entry** — update to reflect single-series D4 architecture
+7. **Scroll-to-top on rail nav clicks**
+8. **Cite Score page top-row brainstorm** — gauge + score breakdown row layout review
+9. **Forward-port slug rename to `main`** — after WP.org approval only
+10. **UI/UX audit queue** — FB46 (aria labels, grade visibility, skeleton states, motion prefs)
+
+---
+
 ## Session 36 — Typography Tier Migration + Hook Fix + Waitlist Rehardening ✅
 
 **Date:** 2026-05-21

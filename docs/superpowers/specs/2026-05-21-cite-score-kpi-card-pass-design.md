@@ -45,24 +45,28 @@ Add `--4col` modifier to CSS: 4 equal columns, ~25% each at 1440px viewport. Exi
 
 ### Card 1 — Top Crawler (restyle only)
 
-**What changes:** Remove `__visual` 36px orb + `__data` side-by-side wrapper. Add 16px inline bot icon to head row.
+**What changes:** Remove `__visual` 36px orb + `__data` side-by-side wrapper. Add 16px inline bot icon to head row. Add two stacked secondary stats below the visit count.
 
 | Slot | Content |
 |---|---|
 | Head-left | `IconLibrary::icon('bot', 16)` + "Top Crawler" (Tier 2) |
 | Head-right | Info icon + tooltip: "The AI bot that's visited your site most often in the last 7 days." |
 | Value | Bot display name (e.g. "GPTBot") — JetBrains Mono 700 28px obsidian |
-| Sub | "N visits in last 7 days" |
+| Sub 1 | "N visits in last 7 days" |
+| Sub 2 | "Top page: {resolved title}" — from `DashboardData::get_top_crawled_pages($cutoff_7d, 1)`, title clamped to one line (`text-overflow: ellipsis; white-space: nowrap; overflow: hidden`), no wrap. **Height-gated** (see below). |
+| Sub 3 | "{N} AI bots detected this week." — from `DashboardData::get_unique_bot_count($cutoff_7d)` |
 | Trend | ↑/↓/→ vs prior 7 days (existing delta logic — preserve as-is) |
-| Button | "View Crawler Logs →" outline |
+| Button | "View Crawler Logs →" outline, full-width |
 
-Empty state (no crawlers): value = "—", sub = "No AI crawler visits yet", trend = flat, button remains.
+**Height gate (X20 + browser-verify kill-switch):** At 100% zoom, if Card 1 renders taller than Cards 3 or 4 (the tile cards), remove Sub 2 (most-hit page) and keep only Sub 3 (bot count). Bot count is the keeper — it is short and never wraps. Most-hit page yields first because a long title can still overflow even with ellipsis on narrow 4-col cards. Document the outcome (kept or cut) as a named checklist item in Task 9 and Task 11.
+
+Empty state (no crawlers): value = "—", Sub 1 = "No AI crawler visits yet", Sub 2 + Sub 3 omitted, trend = flat, button remains.
 
 ---
 
 ### Card 2 — Posts/Pages Optimized (restyle only)
 
-**What changes:** Remove `__visual` 36px orb + `__data` wrapper + `__kpi-progress` bar. Add 16px inline icon to head row.
+**What changes:** Remove `__visual` 36px orb + `__data` wrapper. **Keep `__kpi-progress` bar** (reinstated — matches Dashboard KPI density pattern). Add 16px inline icon to head row.
 
 | Slot | Content |
 |---|---|
@@ -71,10 +75,11 @@ Empty state (no crawlers): value = "—", sub = "No AI crawler visits yet", tren
 | Value | "X / Y" fraction — X = `$posts_optimized`, Y = `$total_scored`. Main span 28px, denom span 18px muted |
 | Caption | "posts & pages with Cite Score ≥ 50" |
 | Sub | "N% of your scored content" |
-| Trend | Flat "→ based on current scores" (no historical delta — deferred) |
-| Button | "View All →" outline (scrolls to per-post table anchor) |
+| Progress bar | `__kpi-progress` bar driven by `$pct_optimized` — same pattern as Dashboard KPI row |
+| Trend | None — removed. Equal card height comes from body density (fraction hero + sub + progress bar), not a filler trend row. |
+| Button | "View All →" outline, full-width (scrolls to per-post table anchor) |
 
-Empty state (no scored posts): value = "0 / 0", caption = "No posts scored yet", sub = omitted.
+Empty state (no scored posts): value = "0 / 0", caption = "No posts scored yet", sub + progress bar omitted.
 
 ---
 
@@ -89,7 +94,7 @@ Empty state (no scored posts): value = "0 / 0", caption = "No posts scored yet",
 | Value | `$issue_count` — score-grade color (`citewp-aiso-kpi-score--{grade}`) |
 | Caption | "posts need work" |
 | Severity tiles | Critical / Minor tiles (keep existing `__severity-tile` pattern — matches Dashboard) |
-| Trend | Flat "→ based on current scores" |
+| Trend | None — removed. Body density comes from severity tiles. |
 | Button | None (head-right link serves as action affordance) |
 
 Empty state (issue_count = 0): value = "0", caption = "All posts are looking good", severity tiles hidden.
@@ -103,12 +108,12 @@ Empty state (issue_count = 0): value = "0", caption = "All posts are looking goo
 | Slot | Content |
 |---|---|
 | Head-left | `IconLibrary::icon('layers', 16)` + "Schema Coverage" (Tier 2) |
-| Head-right | "Add Schema →" link (scrolls to per-post table top — no sitewide schema surface exists) |
+| Head-right | None — "Add Schema →" dropped (links to a read-only table, not a schema-adding surface) |
 | Value | `$pct_confirmed`% — JetBrains Mono 700 28px obsidian |
 | Caption | "posts with confirmed inline schema" |
 | Tiles (3-tile row) | **Confirmed** (green, count) / **SEO Plugin** (yellow, count) / **None** (red, count) |
-| Trend | Flat "→ based on current scores" (schema_coverage() is point-in-time only — no historical delta; trend arrow would fabricate change, per P64 honesty principle) |
-| Button | "View Schema Gaps →" outline (scrolls to per-post table top) |
+| Trend | None — removed. Body density comes from 3-tile row. No historical delta exists (schema_coverage() is point-in-time only). |
+| Button | "View Schema Gaps →" outline, full-width (scrolls to per-post table top) |
 
 Tile labels use advisory phrasing per X12: "SEO Plugin" (not "Partial configured") to distinguish from "confirmed inline JSON-LD."
 
@@ -171,7 +176,6 @@ Cards 2, 3, and 4 all send the user to the per-post table on the same page. Conf
 |---|---|---|
 | "View All →" button | Card 2 | per-post table top anchor |
 | "View All →" head-right link | Card 3 | per-post table top anchor |
-| "Add Schema →" head-right link | Card 4 | per-post table top anchor |
 | "View Schema Gaps →" button | Card 4 | per-post table top anchor |
 
 **No filtered view this session.** A schema-fail-only filter on the per-post table requires query-param plumbing (RecommendationFilter-style) — separate FB candidate.
@@ -213,15 +217,18 @@ Verify these icons exist in `IconLibrary.php` before wiring card HTML. If missin
 
 **Add:**
 - `citewp-aiso-kpi-row--4col` — 4-column grid modifier (CSS Grid, repeat(4, 1fr))
+- `.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer { margin-top: auto; }` — pins footer to card bottom in flex-column cards; buttons baseline-align regardless of body height differences. Do NOT use `flex:1` on a trend row for this.
+- `.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer .citewp-aiso-btn { display: block; width: 100%; text-align: center; }` — full-width buttons for Cards 1, 2, and 4.
+- Sub 2 ellipsis rule for Card 1 top-page line: `white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;`
 
 **Remove / restyle for Cite Score page cards:**
 - `citewp-aiso-kpi-card__visual` rules scoped to `.citewp-aiso-cs-kpi-row` — no longer needed
 - `citewp-aiso-kpi-card__data` side-by-side layout for Cite Score cards
-- `citewp-aiso-kpi-progress` bar rules for Card 2
 
 **Keep:**
 - `citewp-aiso-kpi-row--3col` (Crawler Logs page uses this)
 - `citewp-aiso-kpi-card__visual` base rules (may be used elsewhere)
+- `citewp-aiso-kpi-progress` CSS — Card 2 reinstates the progress bar; do NOT scope this out for `.citewp-aiso-cs-kpi-row`
 
 ---
 

@@ -21,6 +21,10 @@
 - **CSS radius token:** `--radius-sm` (4px) is the correct token in this codebase — no `citewp-` prefix. Verified in `:root`. Do not "fix" it to `--citewp-radius-sm` (undefined).
 - **Schema tile "None" color:** use `--citewp-score-red` (#8C1B1B, rgb 140,27,27). None = worst state. Do not use `--citewp-score-orange` (#E86612) or the pre-P46 hardcoded `rgba(214,54,56,...)`.
 - **Card 4 head-right:** No head-right link on Card 4. "Add Schema →" was dropped — it linked to a read-only table, not a schema-adding surface. The bottom "View Schema Gaps →" button is the only action.
+- **`__kpi-progress` CSS MUST be kept.** Card 2 reinstates the progress bar. Do NOT scope out or suppress `.citewp-aiso-kpi-progress` for `.citewp-aiso-cs-kpi-row`. Only `__visual` and `__data` orb-layout rules are suppressed.
+- **No flat trend rows on Cards 2, 3, 4.** The "→ based on current scores" filler trend has been removed from Cards 2, 3, and 4. Card 1's real ↑/↓/→ delta trend stays. Equal card height comes from body density (secondary stats + progress bar on Card 2; tile rows on Cards 3/4), not from filler rows.
+- **Footer baseline:** each card's `__footer` uses `margin-top: auto` so buttons pin to the card bottom in flex-column context. Do not use `flex:1` on any trend row for this purpose.
+- **Full-width buttons:** footer buttons in Cards 1, 2, 4 use `display: block; width: 100%; text-align: center` for visual conformity across the row.
 
 ---
 
@@ -221,11 +225,11 @@ Add after the `--4col` block (or after existing `__head` rules — search for `k
 }
 ```
 
-- [ ] **Step 3.4: Remove/scope Cite Score `__visual` and `__data` layout rules**
+- [ ] **Step 3.4: Suppress Cite Score `__visual` and `__data` layout rules only — NOT `__kpi-progress`**
 
-From the grep output in Step 3.1, find any rules scoped to `.citewp-aiso-cs-kpi-row` that apply side-by-side `__visual` + `__data` layout. Remove those rules (the new HTML no longer uses `__visual` or `__data` wrappers inside the Cite Score KPI row).
+From the grep output in Step 3.1, find any rules scoped to `.citewp-aiso-cs-kpi-row` that apply side-by-side `__visual` + `__data` layout. Remove those rules only — the new HTML no longer uses `__visual` or `__data` wrappers.
 
-If `citewp-aiso-kpi-card__visual` and `citewp-aiso-kpi-card__data` rules exist only in a `.citewp-aiso-cs-kpi-row` scope block, delete the entire scope block. If they are in a shared block used elsewhere, add a scoped override instead:
+If `citewp-aiso-kpi-card__visual` and `citewp-aiso-kpi-card__data` rules exist only in a `.citewp-aiso-cs-kpi-row` scope block, delete the entire scope block. If they are in a shared block, add a scoped suppression:
 
 ```css
 /* Cite Score KPI row — no orb/data layout (P57/P62 migration) */
@@ -235,15 +239,41 @@ If `citewp-aiso-kpi-card__visual` and `citewp-aiso-kpi-card__data` rules exist o
 }
 ```
 
-Similarly, remove or scope any `.citewp-aiso-kpi-progress` rules that apply to the Cite Score KPI row if they are not shared with other surfaces:
+**Do NOT suppress `.citewp-aiso-kpi-progress` here.** Card 2 reinstates the progress bar — the CSS must remain active for `.citewp-aiso-cs-kpi-row`.
+
+- [ ] **Step 3.5: Add footer baseline + full-width button rules**
+
+Add in the Cite Score KPI row overrides block (near the `__body` flex-column overrides):
 
 ```css
-.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-progress {
-	display: none;
+/* Cite Score KPI row — footer pins to card bottom, buttons full-width */
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer {
+	margin-top: auto;
+}
+
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer .citewp-aiso-btn {
+	display: block;
+	width: 100%;
+	text-align: center;
+	box-sizing: border-box;
 }
 ```
 
-- [ ] **Step 3.5: Add schema tile CSS**
+- [ ] **Step 3.6: Add Card 1 top-page ellipsis rule**
+
+Add in the Cite Score KPI row overrides block:
+
+```css
+/* Card 1 — top-page sub line clamped to prevent height overflow */
+.citewp-aiso-kpi-card__sub--top-page {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+}
+```
+
+- [ ] **Step 3.8: Add schema tile CSS**
 
 Add at the end of the KPI card section (after severity-tile rules — search `severity-tile` to find location):
 
@@ -311,15 +341,15 @@ Add at the end of the KPI card section (after severity-tile rules — search `se
 }
 ```
 
-- [ ] **Step 3.6: Verify no syntax errors**
+- [ ] **Step 3.9: Verify no syntax errors**
 
 PHP syntax check runs automatically. Also visually scan the CSS around your edits for unclosed braces.
 
-- [ ] **Step 3.7: Commit and push**
+- [ ] **Step 3.10: Commit and push**
 
 ```bash
 git add admin/css/citewp-aiso-admin.css
-git commit -m "feat: CSS — --4col grid, __head-main icon rule, schema tile styles, cs-kpi visual cleanup"
+git commit -m "feat: CSS — --4col grid, __head-main, schema tiles, footer baseline, full-width buttons, cs-kpi visual cleanup"
 git push
 ```
 
@@ -359,9 +389,56 @@ git push
 ## Task 5: Restyle Card 1 — Top Crawler
 
 **Files:**
+- Modify: `includes/Admin/DashboardData.php` (if `get_unique_bot_count()` is missing)
 - Modify: `includes/Admin/Menu.php` (within `render_cite_score_panel()`, ~L975–L1029)
 
-Replace the Card 1 block entirely. The existing block has a 36px `__visual` orb + `__data` side-by-side layout. The new block moves the bot icon to the head row and flows content directly in `__body`.
+Replace the Card 1 block entirely. The existing block has a 36px `__visual` orb + `__data` side-by-side layout. The new block moves the bot icon to the head row, adds two stacked secondary stats, and keeps the real ↑/↓/→ trend.
+
+- [ ] **Step 5.0: Verify/add data methods**
+
+Check whether `get_unique_bot_count()` and the 1-result variant of `get_top_crawled_pages()` are available:
+
+```bash
+grep -n "get_unique_bot_count\|get_top_crawled_pages" includes/Admin/DashboardData.php
+```
+
+**`get_top_crawled_pages()`** — should exist from S33. Note its signature (likely takes a `$cutoff` timestamp and `$limit`). You will call it with a 7-day cutoff and limit 1.
+
+**`get_unique_bot_count()`** — if absent, add this method to `DashboardData.php` after `get_top_crawled_pages()`:
+
+```php
+/**
+ * Returns the count of distinct AI bot user-agents seen in the given window.
+ *
+ * @param int $cutoff Unix timestamp — only log rows after this time are counted.
+ * @return int
+ */
+public function get_unique_bot_count( int $cutoff ): int {
+    global $wpdb;
+    $table = \CiteWP\Aiso\Database\Schema::table( 'crawler_logs' );
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Admin-only, no persistent cache needed; $table is esc_sql of a constant.
+    return (int) $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT COUNT(DISTINCT bot_slug) FROM {$table} WHERE created_at > %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table is sanitised above
+            gmdate( 'Y-m-d H:i:s', $cutoff )
+        )
+    );
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+}
+```
+
+If `get_top_crawled_pages()` requires a parameter format you cannot determine from the method signature, use the existing `get_top_crawlers(1)` pattern for the top-page title as a fallback — note which approach you used in the commit message.
+
+In `render_cite_score_panel()` data prep (near the `$top_crawler` call), add:
+
+```php
+$cutoff_7d          = strtotime( '-7 days' );
+$top_page_rows      = $dashboard_data->get_top_crawled_pages( $cutoff_7d, 1 );
+$top_page_title     = ! empty( $top_page_rows ) ? ( $top_page_rows[0]['title'] ?? $top_page_rows[0]['uri'] ?? '' ) : '';
+$unique_bot_count   = $dashboard_data->get_unique_bot_count( $cutoff_7d );
+```
+
+> Check the actual keys returned by `get_top_crawled_pages()` — look at the method and use the correct key for the resolved page title.
 
 - [ ] **Step 5.1: Replace Card 1 HTML**
 
@@ -394,6 +471,28 @@ Locate the comment `<!-- Card 1: Top Crawler -->` (~L974) and replace everything
 						) );
 						?>
 					</div>
+					<?php if ( ! empty( $top_page_title ) ) : ?>
+					<div class="citewp-aiso-kpi-card__sub citewp-aiso-kpi-card__sub--top-page">
+						<?php
+						echo esc_html( sprintf(
+							/* translators: %s: resolved page title */
+							__( 'Top page: %s', 'ai-search-optimizer' ),
+							$top_page_title
+						) );
+						?>
+					</div>
+					<?php endif; ?>
+					<?php if ( $unique_bot_count > 0 ) : ?>
+					<div class="citewp-aiso-kpi-card__sub">
+						<?php
+						echo esc_html( sprintf(
+							/* translators: %d: number of distinct AI bots detected in last 7 days */
+							__( '%d AI bots detected this week.', 'ai-search-optimizer' ),
+							$unique_bot_count
+						) );
+						?>
+					</div>
+					<?php endif; ?>
 					<?php
 					$tc_current = (int) ( $top_crawler['visits'] ?? 0 );
 					$tc_prior   = (int) ( $top_crawler['prior_visits'] ?? 0 );
@@ -465,7 +564,9 @@ Locate the comment `<!-- Card 2: Posts Optimized -->` (~L1031) and replace every
 					/* translators: %d: percentage of scored posts with Cite Score ≥ 50 */
 					echo esc_html( sprintf( __( '%d%% of your scored content', 'ai-search-optimizer' ), absint( $pct_optimized ) ) );
 					?></div>
-					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
+					<div class="citewp-aiso-kpi-progress">
+						<div class="citewp-aiso-kpi-progress__bar" style="width: <?php echo absint( $pct_optimized ); ?>%"></div>
+					</div>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
 					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
@@ -519,7 +620,6 @@ Locate the comment `<!-- Card 3: Issues Detected -->` (~L1056) and replace every
 						</div>
 					</div>
 					<?php endif; ?>
-					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
 				</div>
 			</div>
 ```
@@ -613,7 +713,6 @@ Immediately before the `</div><!-- .citewp-aiso-kpi-row -->` closing tag (~L1080
 					<div class="citewp-aiso-kpi-card__value">—</div>
 					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Score your posts to see schema coverage', 'ai-search-optimizer' ); ?></div>
 					<?php endif; ?>
-					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
 					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Schema Gaps →', 'ai-search-optimizer' ); ?></a>
@@ -697,6 +796,39 @@ grep -n "citewp_aiso/data/schema_coverage\|citewp_aiso/data/scored_post_types" i
 
 Both filters must appear. If either is missing, add it to `schema_coverage()`.
 
+- [ ] **Step 9.7a: Height gate outcome — Card 1 top-page line (KEPT or CUT)**
+
+At 100% zoom in the browser, compare Card 1 (Top Crawler) height against Cards 3 (Needs Attention) and 4 (Schema Coverage).
+
+- **KEPT:** Card 1 height ≤ tile-card height → both Sub 2 (top page) and Sub 3 (bot count) remain. No code change needed.
+- **CUT:** Card 1 height > tile-card height → remove the `<?php if ( ! empty( $top_page_title ) ) :` conditional block from Card 1 HTML in Menu.php (Sub 2 only — keep the `$unique_bot_count` block). Commit the cut, then re-run Steps 9.7c and 9.7b.
+
+**Edit this step before closing Task 9: write "KEPT" or "CUT — top-page line removed" so the outcome is recorded.**
+
+- [ ] **Step 9.7b: `__kpi-progress` NOT suppressed for `.citewp-aiso-cs-kpi-row`**
+
+```bash
+grep -n "kpi-progress" admin/css/citewp-aiso-admin.css
+```
+
+Confirm `.citewp-aiso-kpi-progress` rules are NOT inside any `.citewp-aiso-cs-kpi-row` block with `display: none` or `visibility: hidden`. Card 2 reinstates the progress bar — suppressing it here is a bug.
+
+- [ ] **Step 9.7c: No flat trend rows on Cards 2, 3, or 4**
+
+```bash
+grep -n "trend--flat\|based on current scores" includes/Admin/Menu.php
+```
+
+Flat `→ based on current scores` trend rows must be absent from Cards 2, 3, and 4. Only Card 1's real `$tc_trend_class` trend block is allowed. If any flat trend row remains in Cards 2–4, remove it and re-commit the affected task.
+
+- [ ] **Step 9.7d: Footer `margin-top: auto` rule present**
+
+```bash
+grep -n "margin-top.*auto" admin/css/citewp-aiso-admin.css
+```
+
+The rule `.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer { margin-top: auto; }` must be present. If absent, add it per Task 3 Step 3.5 and re-commit the CSS.
+
 - [ ] **Step 9.8: Commit audit results**
 
 Even if no code changes were needed, commit a timestamp note:
@@ -775,6 +907,21 @@ Confirm:
 - Card 4 shows Schema Coverage with percentage hero + 3-tile row (Confirmed / SEO Plugin / None)
 - All 4 cards render correctly at 100% zoom without wrapping or overflow
 
+- [ ] **Step 11.2a: Height gate — measure Card 1 vs tile-card heights**
+
+At 100% zoom, visually compare the rendered height of Card 1 (Top Crawler) against Card 3 (Needs Attention) and Card 4 (Schema Coverage).
+
+- **KEPT:** Card 1 ≤ tile-card height → both secondary stat lines stay. Record "KEPT" in Step 9.7a.
+- **CUT:** Card 1 > tile-card height → remove the `$top_page_title` conditional block from Card 1 in `includes/Admin/Menu.php` (keep only the `$unique_bot_count` block). Commit:
+
+```bash
+git add includes/Admin/Menu.php
+git commit -m "fix: Card 1 height gate — remove top-page line, keep bot-count line"
+git push
+```
+
+Record "CUT — top-page line removed" in Step 9.7a.
+
 - [ ] **Step 11.3: Verify button styles**
 
 Confirm:
@@ -832,6 +979,14 @@ git push
 | P41 button hierarchy (all outline in KPI row) | Task 9 Step 9.2 |
 | P65 activity__heading not touched | Task 9 Step 9.5 |
 | Typography Tier 2 on all titles | Task 9 Step 9.1 |
+| Card 1 secondary stats: top-page (height-gated) + bot count | Task 5 Step 5.0 + Task 5.1 |
+| get_unique_bot_count() method | Task 5 Step 5.0 |
+| Card 1 top-page ellipsis CSS | Task 3 Step 3.6 |
+| __kpi-progress bar on Card 2 (reinstated) | Task 6 Step 6.1 + Task 9 Step 9.7b |
+| No flat trend rows on Cards 2, 3, 4 | Tasks 6/7/8 + Task 9 Step 9.7c |
+| Footer margin-top: auto (buttons pin to bottom) | Task 3 Step 3.5 + Task 9 Step 9.7d |
+| Full-width outline buttons on Cards 1, 2, 4 | Task 3 Step 3.5 |
+| Height gate outcome documented (KEPT or CUT) | Task 9 Step 9.7a + Task 11 Step 11.2a |
 | X20 spec-compliance audit | Task 9 |
 | Code-reviewer pass (X13 gate) | Task 10 |
 | X4 per-step commits | Each task |
