@@ -1050,27 +1050,31 @@ final class Menu {
 				</div>
 			</div>
 
-			<!-- Card 3: Issues Detected -->
+			<!-- Card 3: Needs Attention -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Issues Detected', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__head-main">
+						<?php echo IconLibrary::icon( 'alert-triangle', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Needs Attention', 'ai-search-optimizer' ); ?></span>
+					</span>
+					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-kpi-card__head-link"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:rgba(249,115,22,0.12);color:var(--citewp-tint-orange)">
-						<?php echo IconLibrary::icon( 'alert-triangle', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					</div>
-					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $issue_count ); ?></div>
-						<div class="citewp-aiso-kpi-card__sub"><?php
-						/* translators: %d: number of posts or pages with unresolved Cite Score issues */
-						echo esc_html( sprintf( __( 'across %d items needing attention', 'ai-search-optimizer' ), absint( $issue_count ) ) );
-						?></div>
-						<div class="citewp-aiso-kpi-card__split">
-							<span class="citewp-aiso-kpi-card__split--critical"><?php echo esc_html( (string) $critical_count ); ?> <?php esc_html_e( 'critical', 'ai-search-optimizer' ); ?></span>
-							<span class="citewp-aiso-kpi-card__split--sep">·</span>
-							<span class="citewp-aiso-kpi-card__split--minor"><?php echo esc_html( (string) $minor_count ); ?> <?php esc_html_e( 'minor', 'ai-search-optimizer' ); ?></span>
+					<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $issue_count > 0 ? ( $critical_count > 0 ? 'red' : 'orange' ) : 'green' ); ?>"><?php echo esc_html( number_format_i18n( $issue_count ) ); ?></div>
+					<div class="citewp-aiso-kpi-card__caption"><?php $issue_count > 0 ? esc_html_e( 'posts need work', 'ai-search-optimizer' ) : esc_html_e( 'All posts are looking good', 'ai-search-optimizer' ); ?></div>
+					<?php if ( $issue_count > 0 ) : ?>
+					<div class="citewp-aiso-kpi-card__severity-tiles">
+						<div class="citewp-aiso-kpi-card__severity-tile citewp-aiso-kpi-card__severity-tile--critical<?php echo $critical_count === 0 ? ' is-zero' : ''; ?>">
+							<span class="citewp-aiso-kpi-card__severity-count"><?php echo esc_html( (string) $critical_count ); ?></span>
+							<span class="citewp-aiso-kpi-card__severity-label"><?php esc_html_e( 'Critical', 'ai-search-optimizer' ); ?></span>
+						</div>
+						<div class="citewp-aiso-kpi-card__severity-tile citewp-aiso-kpi-card__severity-tile--minor<?php echo $minor_count === 0 ? ' is-zero' : ''; ?>">
+							<span class="citewp-aiso-kpi-card__severity-count"><?php echo esc_html( (string) $minor_count ); ?></span>
+							<span class="citewp-aiso-kpi-card__severity-label"><?php esc_html_e( 'Minor', 'ai-search-optimizer' ); ?></span>
 						</div>
 					</div>
+					<?php endif; ?>
+					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
 				</div>
 			</div>
 
