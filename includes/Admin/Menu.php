@@ -767,6 +767,22 @@ final class Menu {
 		$top_crawlers    = $dashboard_data->get_top_crawlers( 1 );
 		$top_crawler     = ! empty( $top_crawlers ) ? $top_crawlers[0] : null;
 
+		$schema_coverage = $dashboard_data->schema_coverage();
+
+		// Denominator consistency check: schema_coverage() total should equal $total_scored.
+		// A mismatch means query paths diverged — investigate rather than ignore.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && isset( $schema_coverage['total'] ) && $schema_coverage['total'] !== $total_scored ) {
+			_doing_it_wrong(
+				'render_cite_score_panel',
+				sprintf(
+					'schema_coverage() total (%d) does not match $total_scored (%d). A post with a stored score is missing from one query path.',
+					$schema_coverage['total'],
+					$total_scored
+				),
+				CITEWP_AISO_VERSION
+			);
+		}
+
 		// ── Site-wide stats (sample first 50 for signal analysis) ───────
 		$score_sum      = 0;
 		$issue_count    = 0;
@@ -972,7 +988,7 @@ final class Menu {
 		</div>
 
 		<!-- KPI card row — separate row below page header -->
-		<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--3col citewp-aiso-cs-kpi-row">
+		<div class="citewp-aiso-kpi-row citewp-aiso-kpi-row--4col citewp-aiso-cs-kpi-row">
 
 			<!-- Card 1: Top Crawler -->
 			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--top-crawler">
@@ -1078,6 +1094,43 @@ final class Menu {
 					</div>
 					<?php endif; ?>
 					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
+				</div>
+			</div>
+
+			<!-- Card 4: Schema Coverage -->
+			<div class="citewp-aiso-kpi-card">
+				<div class="citewp-aiso-kpi-card__head">
+					<span class="citewp-aiso-kpi-card__head-main">
+						<?php echo IconLibrary::icon( 'layers', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Schema Coverage', 'ai-search-optimizer' ); ?></span>
+					</span>
+				</div>
+				<div class="citewp-aiso-kpi-card__body">
+					<?php if ( $schema_coverage['total'] > 0 ) : ?>
+					<div class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $schema_coverage['pct_confirmed'] ); ?><span class="citewp-aiso-kpi-card__value-denom">%</span></div>
+					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'posts with confirmed inline schema', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-kpi-card__schema-tiles">
+						<div class="citewp-aiso-kpi-card__schema-tile citewp-aiso-kpi-card__schema-tile--confirmed">
+							<span class="citewp-aiso-kpi-card__schema-tile-count"><?php echo esc_html( (string) $schema_coverage['confirmed'] ); ?></span>
+							<span class="citewp-aiso-kpi-card__schema-tile-label"><?php esc_html_e( 'Confirmed', 'ai-search-optimizer' ); ?></span>
+						</div>
+						<div class="citewp-aiso-kpi-card__schema-tile citewp-aiso-kpi-card__schema-tile--seo-plugin">
+							<span class="citewp-aiso-kpi-card__schema-tile-count"><?php echo esc_html( (string) $schema_coverage['partial'] ); ?></span>
+							<span class="citewp-aiso-kpi-card__schema-tile-label"><?php esc_html_e( 'SEO Plugin', 'ai-search-optimizer' ); ?></span>
+						</div>
+						<div class="citewp-aiso-kpi-card__schema-tile citewp-aiso-kpi-card__schema-tile--none">
+							<span class="citewp-aiso-kpi-card__schema-tile-count"><?php echo esc_html( (string) $schema_coverage['none'] ); ?></span>
+							<span class="citewp-aiso-kpi-card__schema-tile-label"><?php esc_html_e( 'None', 'ai-search-optimizer' ); ?></span>
+						</div>
+					</div>
+					<?php else : ?>
+					<div class="citewp-aiso-kpi-card__value">—</div>
+					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Score your posts to see schema coverage', 'ai-search-optimizer' ); ?></div>
+					<?php endif; ?>
+					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
+				</div>
+				<div class="citewp-aiso-kpi-card__footer">
+					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Schema Gaps →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
