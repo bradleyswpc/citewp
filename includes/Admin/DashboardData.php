@@ -822,4 +822,84 @@ final class DashboardData {
 		usort( $events, static fn( $a, $b ) => $b['timestamp'] - $a['timestamp'] );
 		return array_slice( $events, 0, $limit );
 	}
+
+	/**
+	 * Aggregates schema signal states across all scored, llms.txt-included posts.
+	 *
+	 * Reads the stored 'schema' signal status from _citewp_aiso_geo_score post meta.
+	 * Does NOT invoke Engine::check_schema() or perform live scoring — this is a
+	 * read-side aggregate of the cached 6/3/0 signal from the last scoring run.
+	 * 'partial' means an SEO plugin was active at score time; it does NOT verify
+	 * the plugin outputs schema for this post type (FB42, render-time detection, deferred).
+	 *
+	 * Excludes posts opted out of llms.txt (P49): same WP_Query guard as
+	 * render_cite_score_panel() — (NOT EXISTS OR != '1') on _citewp_aiso_exclude_from_llms.
+	 *
+	 * @return array{confirmed: int, partial: int, none: int, total: int, pct_confirmed: int}
+	 */
+	public function schema_coverage(): array {
+		/** @var string[] $post_types — FB40: CPT scope hook */
+		$post_types = apply_filters( 'citewp_aiso/data/scored_post_types', [ 'post', 'page' ] );
+
+		$scored_ids = get_posts( [
+			'post_type'      => $post_types,
+			'post_status'    => 'publish',
+			'posts_per_page' => 1000,
+			'no_found_rows'  => true,
+			'fields'         => 'ids',
+			'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Admin-only, once per page load. Required: filters to scored posts while excluding llms.txt opt-outs.
+				'relation' => 'AND',
+				[
+					'key'     => Repository::META_KEY_TOTAL,
+					'compare' => 'EXISTS',
+				],
+				[
+					'relation' => 'OR',
+					[ 'key' => '_citewp_aiso_exclude_from_llms', 'compare' => 'NOT EXISTS' ],
+					[ 'key' => '_citewp_aiso_exclude_from_llms', 'value' => '1', 'compare' => '!=' ],
+				],
+			],
+		] );
+
+		$confirmed = 0;
+		$partial   = 0;
+		$none      = 0;
+
+		foreach ( $scored_ids as $post_id ) {
+			$data = ( new Repository() )->get( (int) $post_id );
+
+			if ( ! $data || empty( $data['signals'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf( 'Post %d has a stored Cite Score but no signals array in _citewp_aiso_geo_score. Counted as uncovered.', (int) $post_id ),
+					CITEWP_AISO_VERSION
+				);
+				++$none;
+				continue;
+			}
+
+			$schema_status = 'fail';
+			foreach ( $data['signals'] as $signal ) {
+				if ( isset( $signal['id'] ) && 'schema' === $signal['id'] ) {
+					$schema_status = $signal['status'] ?? 'fail';
+					break;
+				}
+			}
+
+			match ( $schema_status ) {
+				'pass'    => ++$confirmed,
+				'partial' => ++$partial,
+				default   => ++$none,
+			};
+		}
+
+		$total         = $confirmed + $partial + $none;
+		$pct_confirmed = $total > 0 ? (int) round( ( $confirmed / $total ) * 100 ) : 0;
+
+		/** @var array{confirmed:int,partial:int,none:int,total:int,pct_confirmed:int} $result */
+		$result = compact( 'confirmed', 'partial', 'none', 'total', 'pct_confirmed' );
+
+		/** FB42: render-time detection will augment $result['confirmed'] via this filter */
+		return apply_filters( 'citewp_aiso/data/schema_coverage', $result );
+	}
 }
