@@ -1230,7 +1230,7 @@ final class Menu {
 				</div>
 
 				<?php if ( $tbl_q->have_posts() ) : ?>
-				<table class="citewp-aiso-cs-table">
+				<table class="citewp-aiso-cs-table" id="citewp-aiso-cs-post-table">
 					<thead>
 						<tr>
 							<th style="width:36%"><?php esc_html_e( 'Title',        'ai-search-optimizer' ); ?></th>
