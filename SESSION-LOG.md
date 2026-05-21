@@ -6,49 +6,77 @@
 
 ---
 
-## Session 36 — Typography Tier Migration + Hook Fix ✅
+## Session 36 — Typography Tier Migration + Hook Fix + Waitlist Rehardening ✅
 
-**Date:** 2026-05-20
+**Date:** 2026-05-21
 
 ### Deliverable
 
-**Main:** Typography tier migration across all 5 admin surfaces (Dashboard, Crawler Logs, Cite Score, Settings, EditorPanel). Single shared T2 and T3 multi-selector blocks replace 13 per-surface font declarations. Nine wrong declarations fixed (CiteScore panel titles were 700/15px/obsidian; needs/actions headings were 13px; activity__heading had primary color instead of muted; kpi-card__head-title had weight 700). T1, hero, protip, and subtitle outliers untouched.
+**Main (plugin):** Typography tier migration across all 5 admin surfaces. Single shared T2 block (`600 14px/1 'Inter'` primary) and T3 block (`600 11px/1 'Inter'` muted uppercase 0.05em) replace 13 per-surface font declarations. Nine wrong declarations fixed (CiteScore panel titles were 700/15px/obsidian; needs/actions headings were 13px; activity__heading was primary color instead of muted; kpi-card__head-title had weight 700). T1, hero, protip, and subtitle outliers untouched.
 
-**Detour:** Fixed PostToolUse hooks (`php-syntax-check.sh`, `js-build-reminder.sh`) failing in Git Bash due to `python3`/`python` not being on Git Bash's PATH. Added `py` (Windows Python launcher) as first candidate.
+**Detour (plugin):** Fixed PostToolUse hooks (`php-syntax-check.sh`, `js-build-reminder.sh`) failing in Git Bash — `py` (Windows Python launcher) added as first candidate before `python3`.
+
+**citewp.com / Supabase (not plugin repo):** Waitlist signup security rehardening. Removed exposed `x-webhook-secret` from client-side JS. Replaced with origin gate + honeypot + IP rate limit. Source value landing bug (allowlist silently mapping `'pro'` → `'unknown'`) diagnosed and fixed in v6.
 
 ### What shipped
 
+**Plugin repo (committed to `main`):**
 - `admin/css/citewp-aiso-admin.css` — shared T2 + T3 tier blocks (multi-selector, one font/color definition per tier); 13 individual blocks stripped; 9 wrong spec values corrected
 - `.claude/hooks/php-syntax-check.sh` — `py` added as first `command -v` candidate before `python3`
 - `.claude/hooks/js-build-reminder.sh` — same change
 
+**Supabase / Kinsta (not in plugin repo):**
+- Edge function `waitlist-signup` v5: secret check removed; origin/referer as primary gate (citewp.com + www + dev.local); honeypot on `website` field (off-screen CSS, not `display:none`); rate limit 5 inserts/IP/hour via DB counter; per-request CORS origin (not `*`); probabilistic prune (~1-in-20 writes cleans rows >24h old)
+- DB migration `waitlist_rate_limits_and_revoke_grants`: `waitlist_rate_limits(ip, window_start, count)` table + `increment_rate_limit()` atomic upsert function + `prune_rate_limits()` function; anon/authenticated grants revoked on `waitlist` and `waitlist_rate_limits`
+- Edge function `waitlist-signup` v6: `ALLOWED_SOURCES` allowlist dropped; source accepts any non-empty string (trim + lowercase + 64-char cap), defaults to `'unknown'` — fixes silent remapping bug
+- Client diff provided for Kinsta site (manually applied): removed `SECRET` constant + `x-webhook-secret` header; added off-screen honeypot `<input name="website">`; sends `{ email, source, website }`; redirects to `/thank-you` on success
+
 ### Verified
 
-- Shared T2 block at L339: `600 14px/1 'Inter'` primary ✓
+**Plugin:**
+- Shared T2 block: `600 14px/1 'Inter'` primary ✓
 - Shared T3 block: `600 11px/1 'Inter'` muted uppercase 0.05em ✓
 - No residual font/color on any tier selector ✓
 - Outliers intact: hero 800/22px/white, protip 700/13px/citrine, panel subtitle 400/14px/secondary ✓
 - X20 spec audit: all 3 tiers match UI-DESIGN-SYSTEM.md Typography Tiers spec ✓
-- Browser verify (5 surfaces): **pending — needs manual check in LocalWP**
 - `py --version` → Python 3.13.13 ✓
+- Browser verify (5 surfaces): pending — manual check in LocalWP
 
-### Commits
+**Waitlist (citewp.com):**
+- Valid signup from citewp.com: 200, row inserted with correct email + source ✓
+- Duplicate email: 200, no duplicate row ✓
+- Honeypot filled: 200 fake success, no row inserted ✓
+- Wrong/no Origin: 403 ✓
+- source="pro": row lands with source="pro" (v6 fix) ✓
+- No secret in page source ✓
+- anon/authenticated grants on `waitlist`: zero (revoked) ✓
 
+### Commits (plugin repo)
+
+- `b7cf24a` docs: S36 session log — typography migration entry + carryover update
 - `2938102` refactor: typography tier migration — single T2/T3 source blocks
 - `3cd16f1` docs: S36 session log — hook fix entry + carryover list
 - `3bb56e2` fix: use py launcher first in PostToolUse hook JSON parser (Git Bash compat)
 
+### Decisions made
+
+P61 (P57 amendment — Crawler Logs KPI exception), P62 (P57 amendment — small inline icons permitted), P63 (WP 7.0 GA verified — Fix with AI zero CiteWP inference cost) logged in DECISIONS.md via Desktop Commander. No new plugin-repo decisions this session.
+
 ### Carryover into Session 37
 
-1. **Browser verify typography** — open LocalWP and visually confirm all 5 surfaces: Dashboard, Crawler Logs, Cite Score, Settings, EditorPanel (Gutenberg sidebar)
-2. **WP.org Round 4 watch** — check hello@citewp.com
-3. **UI-DESIGN-SYSTEM.md Line Chart Panel entry** — update to reflect single-series D4 architecture (Desktop Commander)
-4. **Scroll-to-top on rail nav clicks**
-5. **Cite Score page top-row brainstorm** — options A/B/C decision needed
-6. **Dynamic Pro Tip content engine** — deferred
-7. **Forward-port slug rename to main** — after WP.org approval only
-8. **UI/UX audit queue** — FB46 (skeleton, prefers-reduced-motion, ARIA verify, grade label verify)
-9. **P52 messaging audit** — replace "AI-powered SEO" / "Connect to Claude" patterns
+**Priority (new work scoped this session):**
+1. **Cite Score KPI card pass** — 4 cards (Top Crawler, Posts/Pages Optimized, Needs Attention restyled to Dashboard format, + NEW Schema Coverage card); small inline icons per P62; new `DashboardData::schema_coverage()` aggregate method. Full X13 pipeline.
+2. **activity__heading P59 conflict** — typography migration moved it from primary to muted color; P59 specced primary. Ruling needed before any further CSS: amend P59 (keep muted) or revert (keep primary). Unresolved.
+3. **Browser verify typography** — open LocalWP, confirm all 5 surfaces: Dashboard, Crawler Logs, Cite Score, Settings, EditorPanel
+
+**Ongoing carryover:**
+4. **WP.org Round 4 watch** — check hello@citewp.com
+5. **P52(e) messaging audit** — readme.txt + plugin-side copy: replace "AI-powered SEO" / "Connect to Claude" patterns
+6. **UI-DESIGN-SYSTEM.md Line Chart Panel entry** — update to reflect single-series D4 architecture (Desktop Commander)
+7. **Scroll-to-top on rail nav clicks**
+8. **Cite Score page top-row brainstorm** — gauge + score breakdown row layout review
+9. **Forward-port slug rename to `main`** — after WP.org approval only
+10. **UI/UX audit queue** — FB46 (aria labels, grade visibility, skeleton states, motion prefs)
 
 ---
 
