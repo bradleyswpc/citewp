@@ -988,3 +988,178 @@ git push
 | Browser verify at 100% zoom | Task 11 |
 
 **No gaps found.**
+
+---
+
+## S37 Follow-Up Amendment Tasks
+
+### Task A-diag: Diagnosis (complete — no implementation needed)
+
+Root cause confirmed via Playwright computed styles: Card 2 HTML emits `.citewp-aiso-kpi-progress__bar`; the CSS targets `.citewp-aiso-kpi-progress__fill`. The `__bar` element receives no height or background, so the bar renders invisible despite `width: 50%` inline style. Fix is in Task B: rename inner element class in Menu.php.
+
+---
+
+### Task B: Fix progress bar — correct class name + score-band color
+
+**Files:**
+- Modify: `includes/Admin/Menu.php` (Card 2 HTML block, data prep)
+- Modify: `admin/css/citewp-aiso-admin.css` (score-band modifier rules)
+
+- [ ] **Step B.1: Add `$optimized_grade` to data prep**
+
+In `render_cite_score_panel()`, find `$pct_optimized` (already computed ~L826). Immediately after it, add:
+
+```php
+$optimized_grade = match ( true ) {
+    $pct_optimized >= 80 => 'green',
+    $pct_optimized >= 60 => 'yellow',
+    $pct_optimized >= 40 => 'orange',
+    default              => 'red',
+};
+```
+
+- [ ] **Step B.2: Fix Card 2 progress bar HTML**
+
+In Card 2 HTML, find:
+
+```php
+					<div class="citewp-aiso-kpi-progress">
+						<div class="citewp-aiso-kpi-progress__bar" style="width: <?php echo absint( $pct_optimized ); ?>%"></div>
+					</div>
+```
+
+Replace with:
+
+```php
+					<div class="citewp-aiso-kpi-progress citewp-aiso-kpi-progress--<?php echo esc_attr( $optimized_grade ); ?>">
+						<div class="citewp-aiso-kpi-progress__fill" style="width: <?php echo absint( $pct_optimized ); ?>%"></div>
+					</div>
+```
+
+- [ ] **Step B.3: Add score-band modifier rules to CSS**
+
+In `admin/css/citewp-aiso-admin.css`, find the `.citewp-aiso-kpi-progress__fill` rule (~L2192) and add the modifier overrides immediately after it:
+
+```css
+/* Score-band colored fill — P44 thresholds applied to pct_optimized */
+.citewp-aiso-kpi-progress--green  .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-green ); }
+.citewp-aiso-kpi-progress--yellow .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-yellow ); }
+.citewp-aiso-kpi-progress--orange .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-orange ); }
+.citewp-aiso-kpi-progress--red    .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-red ); }
+```
+
+Do NOT remove or change the base `.citewp-aiso-kpi-progress__fill { background: var(--citewp-score-green); }` — Dashboard KPI bars use the element without a modifier and rely on it as a fallback.
+
+- [ ] **Step B.4: Verify PHP syntax + commit**
+
+```bash
+git add includes/Admin/Menu.php admin/css/citewp-aiso-admin.css
+git commit -m "fix: Card 2 progress bar — __bar→__fill, score-band modifier class (P44)"
+git push
+```
+
+---
+
+### Task C: Head-icon tints (decorative, P38/P62)
+
+**Files:**
+- Modify: `includes/Admin/Menu.php` (add modifier classes to Cards 2, 3, 4)
+- Modify: `admin/css/citewp-aiso-admin.css` (per-card icon tint overrides)
+
+- [ ] **Step C.1: Add modifier classes to Cards 2, 3, 4 in Menu.php**
+
+Find the opening div of each card and add the modifier class:
+
+Card 2 (`<!-- Card 2: Posts/Pages Optimized -->`):
+```php
+<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--optimized">
+```
+
+Card 3 (`<!-- Card 3: Needs Attention -->`):
+```php
+<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--needs-attention">
+```
+
+Card 4 (`<!-- Card 4: Schema Coverage -->`):
+```php
+<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--schema-coverage">
+```
+
+Card 1 already has `citewp-aiso-kpi-card--top-crawler` — no change needed.
+
+- [ ] **Step C.2: Add icon tint CSS overrides**
+
+Find the `.citewp-aiso-kpi-card__head-main svg` rule (within the `__head-main` block added in Task 3 Step 3.3) and add per-card overrides immediately after it:
+
+```css
+/* Per-card decorative icon tints (P38 — wallpaper level, no semantic encoding) */
+.citewp-aiso-kpi-card--top-crawler    .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-tint-teal ); }
+.citewp-aiso-kpi-card--optimized      .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-score-green ); }
+.citewp-aiso-kpi-card--needs-attention .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-score-orange ); }
+.citewp-aiso-kpi-card--schema-coverage .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-tint-purple ); }
+```
+
+> **Kill-switch:** If browser-verify shows the row feels visually busy, revert Task C only — remove these four rules from CSS and the three modifier classes from Cards 2/3/4 HTML. Task B is independent and must stay.
+
+- [ ] **Step C.3: Verify + commit**
+
+```bash
+git add includes/Admin/Menu.php admin/css/citewp-aiso-admin.css
+git commit -m "feat: head-icon tints per card (decorative P38/P62 — kill-switch see spec)"
+git push
+```
+
+---
+
+### Task D: X20 Audit (follow-up assertions)
+
+- [ ] **Step D.1: Progress bar visible**
+
+```bash
+# Playwright / browser inspect on Card 2:
+# .citewp-aiso-kpi-progress__fill computed height > 0, background != transparent
+```
+
+Confirm `__fill` (not `__bar`) is in DOM, height = 4px (inherits from track), background = score-band token matching `$pct_optimized` grade.
+
+- [ ] **Step D.2: Score-band token correct**
+
+At current `$pct_optimized = 50%` → grade should be `yellow` (≥40, <60). Confirm modifier class is `citewp-aiso-kpi-progress--yellow` and fill background computes to `var(--citewp-score-yellow)`.
+
+- [ ] **Step D.3: Icon tints don't collide with functional colors**
+
+Card 3 value digit uses `citewp-aiso-kpi-score--red` or `--orange` (functional). Card 4 tiles use score-band tokens (functional). Confirm the icon tint overrides (decorative) target `__head-main svg` only — no bleed onto value, caption, or tile elements.
+
+- [ ] **Step D.4: Commit audit**
+
+```bash
+git commit --allow-empty -m "chore: X20 follow-up audit — progress bar + icon tints S37"
+git push
+```
+
+---
+
+### Task E: Browser Verify (follow-up)
+
+- [ ] **Step E.1: Card 2 progress bar visible**
+
+Navigate to `http://citewp-dev.local/wp-admin/admin.php?page=citewp#cite-score` at 100% zoom. Card 2 must show a colored bar below "50% of your scored content". At 50%, the bar should be yellow.
+
+- [ ] **Step E.2: Card heights still equal**
+
+All 4 cards must still render at equal height. Adding the progress bar should not increase Card 2's height above the others (bar fits within existing body height via `overflow: hidden` on the track).
+
+- [ ] **Step E.3: Icon tints (if Task C kept)**
+
+Each card head icon shows its assigned tint: teal (Card 1), green (Card 2), orange (Card 3), purple (Card 4). Confirm tints are subtle — if visually busy, apply kill-switch.
+
+- [ ] **Step E.4: debug.log clean**
+
+No new PHP errors from the amendment.
+
+- [ ] **Step E.5: Final push**
+
+```bash
+git log --oneline -5
+git push
+```

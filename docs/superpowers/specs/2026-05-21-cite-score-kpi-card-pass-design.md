@@ -232,6 +232,59 @@ Verify these icons exist in `IconLibrary.php` before wiring card HTML. If missin
 
 ---
 
+---
+
+## S37 Follow-Up Amendment — Progress Bar Fix + Score-Band Color + Icon Tints
+
+**Session 37 (continuation) | Date: 2026-05-21**
+
+### Task A — Diagnosis (complete)
+
+Root cause: HTML emits `.citewp-aiso-kpi-progress__bar`; CSS targets `.citewp-aiso-kpi-progress__fill`. The fill element has no height or background rule, so the bar is invisible. Fix: rename the inner element in Card 2 HTML from `__bar` to `__fill`.
+
+### Task B — Score-Band Colored Progress Bar
+
+**Card 2 progress bar fill** must be colored by the optimized ratio using the P44 score-band ramp applied to `$pct_optimized`:
+
+| `$pct_optimized` | Grade | Token |
+|---|---|---|
+| ≥ 80 | green | `--citewp-score-green` |
+| ≥ 60 | yellow | `--citewp-score-yellow` |
+| ≥ 40 | orange | `--citewp-score-orange` |
+| < 40 | red | `--citewp-score-red` |
+
+**PHP:** Compute `$optimized_grade` using a `match(true)` on `$pct_optimized` (same thresholds). Add modifier class `citewp-aiso-kpi-progress--{grade}` to the outer `.citewp-aiso-kpi-progress` element.
+
+**CSS:** Add four modifier rules that override `__fill` background per grade. The base `__fill { background: var(--citewp-score-green) }` remains as a no-modifier fallback (Dashboard KPI bars use the element without a modifier).
+
+**Empty state** (`$total_scored === 0`): bar hidden — consistent with Card 2 empty state.
+
+### Task C — Head-Icon Tints (decorative, per P38/P62)
+
+Override the shared `__head-main svg { color: var(--citewp-text-muted) }` rule with per-card decorative tints. Tints are wallpaper-level (P38) — they do NOT encode state. Functional score-band colors on Card 3 value and Card 4 tiles are unaffected.
+
+Add unique modifier classes to Cards 2, 3, 4 in Menu.php (Card 1 already has `citewp-aiso-kpi-card--top-crawler`):
+- Card 2: `citewp-aiso-kpi-card--optimized`
+- Card 3: `citewp-aiso-kpi-card--needs-attention`
+- Card 4: `citewp-aiso-kpi-card--schema-coverage`
+
+| Card | Tint token | Rationale |
+|---|---|---|
+| Card 1 Top Crawler | `--citewp-tint-teal` | Bot/crawler = teal (matches Dashboard crawler widget) |
+| Card 2 Posts/Pages Optimized | `--citewp-score-green` | Optimized = positive = green |
+| Card 3 Needs Attention | `--citewp-score-orange` | Warning state = orange |
+| Card 4 Schema Coverage | `--citewp-tint-purple` | Schema/data = purple (matches Structure category) |
+
+**Kill-switch:** If the row feels visually busy at browser-verify, revert Task C only (remove the four icon-tint overrides from CSS and the card modifier classes from HTML). Task B is independent and must stay regardless.
+
+**X20 additions:**
+- Card 2 `__fill` element present in DOM (not `__bar`)
+- `__fill` has computed non-zero height AND non-transparent background
+- `__fill` background matches the expected score-band token for `$pct_optimized`
+- Icon tints (if Task C kept): decorative tokens, not score tokens; do not collide with Card 3 value color or Card 4 tile colors
+
+---
+
 ## Spec Self-Review
 
 - **Placeholders:** None. All slots defined for all 4 cards including empty states.
