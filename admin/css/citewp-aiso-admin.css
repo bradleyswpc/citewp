@@ -522,6 +522,12 @@
 	color: var( --citewp-text-muted );
 }
 
+/* Per-card decorative icon tints (P38 wallpaper-level — kill-switch: remove these 4 rules) */
+.citewp-aiso-kpi-card--top-crawler     .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-tint-teal ); }
+.citewp-aiso-kpi-card--optimized       .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-score-green ); }
+.citewp-aiso-kpi-card--needs-attention .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-score-orange ); }
+.citewp-aiso-kpi-card--schema-coverage .citewp-aiso-kpi-card__head-main svg { color: var( --citewp-tint-purple ); }
+
 .citewp-aiso-kpi-card__orb {
   width: 28px;
   height: 28px;
@@ -2194,6 +2200,12 @@
   background: var(--citewp-score-green);
   border-radius: 2px;
 }
+
+/* Score-band colored fill — P44 thresholds applied to pct_optimized */
+.citewp-aiso-kpi-progress--green  .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-green ); }
+.citewp-aiso-kpi-progress--yellow .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-yellow ); }
+.citewp-aiso-kpi-progress--orange .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-orange ); }
+.citewp-aiso-kpi-progress--red    .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-red ); }
 
 .citewp-aiso-kpi-card__split {
   display: flex;

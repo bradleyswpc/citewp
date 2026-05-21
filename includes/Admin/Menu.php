@@ -827,6 +827,12 @@ final class Menu {
 
 		$posts_optimized = max( 0, $total_scored - $issue_count );
 		$pct_optimized   = $total_scored > 0 ? (int) round( ( $posts_optimized / $total_scored ) * 100 ) : 0;
+		$optimized_grade = match ( true ) {
+			$pct_optimized >= 80 => 'green',
+			$pct_optimized >= 60 => 'yellow',
+			$pct_optimized >= 40 => 'orange',
+			default              => 'red',
+		};
 		$published_total_all = (int) wp_count_posts( 'post' )->publish + (int) wp_count_posts( 'page' )->publish;
 
 		$avg_score = $total_scored > 0 ? (int) round( $score_sum / $total_scored ) : null;
@@ -1071,7 +1077,7 @@ final class Menu {
 			</div>
 
 			<!-- Card 2: Posts/Pages Optimized -->
-			<div class="citewp-aiso-kpi-card">
+			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--optimized">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__head-main">
 						<?php echo IconLibrary::icon( 'check-circle', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -1087,8 +1093,8 @@ final class Menu {
 					/* translators: %d: percentage of scored posts with Cite Score ≥ 50 */
 					echo esc_html( sprintf( __( '%d%% of your scored content', 'ai-search-optimizer' ), absint( $pct_optimized ) ) );
 					?></div>
-					<div class="citewp-aiso-kpi-progress">
-						<div class="citewp-aiso-kpi-progress__bar" style="width: <?php echo absint( $pct_optimized ); ?>%"></div>
+					<div class="citewp-aiso-kpi-progress citewp-aiso-kpi-progress--<?php echo esc_attr( $optimized_grade ); ?>">
+						<div class="citewp-aiso-kpi-progress__fill" style="width: <?php echo absint( $pct_optimized ); ?>%"></div>
 					</div>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
@@ -1097,7 +1103,7 @@ final class Menu {
 			</div>
 
 			<!-- Card 3: Needs Attention -->
-			<div class="citewp-aiso-kpi-card">
+			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--needs-attention">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__head-main">
 						<?php echo IconLibrary::icon( 'alert-triangle', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -1124,7 +1130,7 @@ final class Menu {
 			</div>
 
 			<!-- Card 4: Schema Coverage -->
-			<div class="citewp-aiso-kpi-card">
+			<div class="citewp-aiso-kpi-card citewp-aiso-kpi-card--schema-coverage">
 				<div class="citewp-aiso-kpi-card__head">
 					<span class="citewp-aiso-kpi-card__head-main">
 						<?php echo IconLibrary::icon( 'layers', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
