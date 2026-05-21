@@ -479,8 +479,11 @@ final class Menu {
 			<!-- Card 4: Needs Attention -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Needs Attention', 'ai-search-optimizer' ); ?></span>
-					<a href="<?php echo esc_url( $all_issues_url ); ?>" class="citewp-aiso-kpi-card__head-link"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
+					<span class="citewp-aiso-kpi-card__head-main">
+						<?php echo IconLibrary::icon( 'alert-triangle', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Needs Attention', 'ai-search-optimizer' ); ?></span>
+					</span>
+					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-kpi-card__head-link"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
 					<div class="citewp-aiso-kpi-card__value citewp-aiso-kpi-score--<?php echo esc_attr( $issue_grade ); ?>"><?php echo esc_html( number_format_i18n( $issue_count ) ); ?></div>
