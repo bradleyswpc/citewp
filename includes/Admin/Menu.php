@@ -1026,28 +1026,27 @@ final class Menu {
 				</div>
 			</div>
 
-			<!-- Card 2: Posts Optimized -->
+			<!-- Card 2: Posts/Pages Optimized -->
 			<div class="citewp-aiso-kpi-card">
 				<div class="citewp-aiso-kpi-card__head">
-					<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Posts/Pages Optimized', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-kpi-card__head-main">
+						<?php echo IconLibrary::icon( 'check-circle', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="citewp-aiso-kpi-card__title"><?php esc_html_e( 'Posts/Pages Optimized', 'ai-search-optimizer' ); ?></span>
+					</span>
 				</div>
 				<div class="citewp-aiso-kpi-card__body">
-					<div class="citewp-aiso-kpi-card__visual" style="background:var(--citewp-green-tint);color:var(--citewp-tint-green)">
-						<?php echo IconLibrary::icon( 'check-circle', 36 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<div class="citewp-aiso-kpi-card__value">
+						<span class="citewp-aiso-kpi-card__value-main"><?php echo esc_html( (string) $posts_optimized ); ?></span><span class="citewp-aiso-kpi-card__value-denom"> / <?php echo esc_html( (string) $total_scored ); ?></span>
 					</div>
-					<div class="citewp-aiso-kpi-card__data">
-						<div class="citewp-aiso-kpi-card__value-row">
-							<span class="citewp-aiso-kpi-card__value"><?php echo esc_html( (string) $posts_optimized ); ?></span>
-							<span class="citewp-aiso-kpi-card__pct"><?php echo esc_html( $pct_optimized . '%' ); ?></span>
-						</div>
-						<div class="citewp-aiso-kpi-progress">
-							<div class="citewp-aiso-kpi-progress__fill" style="width:<?php echo esc_attr( (string) $pct_optimized ); ?>%"></div>
-						</div>
-						<div class="citewp-aiso-kpi-card__sub"><?php
-						/* translators: %d: percentage of posts and pages that have a Cite Score */
-						echo esc_html( sprintf( __( '%d%% of your content is optimized', 'ai-search-optimizer' ), absint( $pct_optimized ) ) );
-						?></div>
-					</div>
+					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'posts & pages with Cite Score ≥ 50', 'ai-search-optimizer' ); ?></div>
+					<div class="citewp-aiso-kpi-card__sub"><?php
+					/* translators: %d: percentage of scored posts with Cite Score ≥ 50 */
+					echo esc_html( sprintf( __( '%d%% of your scored content', 'ai-search-optimizer' ), absint( $pct_optimized ) ) );
+					?></div>
+					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
+				</div>
+				<div class="citewp-aiso-kpi-card__footer">
+					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
 				</div>
 			</div>
 
