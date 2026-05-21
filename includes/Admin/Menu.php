@@ -766,6 +766,9 @@ final class Menu {
 		$excluded_count  = $dashboard_data->get_excluded_count();
 		$top_crawlers    = $dashboard_data->get_top_crawlers( 1 );
 		$top_crawler     = ! empty( $top_crawlers ) ? $top_crawlers[0] : null;
+		$top_page_rows   = $dashboard_data->get_top_crawled_pages( gmdate( 'Y-m-d H:i:s', (int) strtotime( '-7 days' ) ), 1 );
+		$top_page_title  = ! empty( $top_page_rows ) ? ( $top_page_rows[0]['title'] ?? $top_page_rows[0]['request_uri'] ?? '' ) : '';
+		$unique_bot_count = $dashboard_data->get_unique_bot_count();
 
 		$schema_coverage = $dashboard_data->schema_coverage();
 
@@ -1016,6 +1019,28 @@ final class Menu {
 						) );
 						?>
 					</div>
+					<?php if ( ! empty( $top_page_title ) ) : ?>
+					<div class="citewp-aiso-kpi-card__sub citewp-aiso-kpi-card__sub--top-page">
+						<?php
+						echo esc_html( sprintf(
+							/* translators: %s: resolved page title of the most-crawled page */
+							__( 'Top page: %s', 'ai-search-optimizer' ),
+							$top_page_title
+						) );
+						?>
+					</div>
+					<?php endif; ?>
+					<?php if ( $unique_bot_count > 0 ) : ?>
+					<div class="citewp-aiso-kpi-card__sub">
+						<?php
+						echo esc_html( sprintf(
+							/* translators: %d: number of distinct AI bot types detected in last 7 days */
+							__( '%d AI bots detected this week.', 'ai-search-optimizer' ),
+							$unique_bot_count
+						) );
+						?>
+					</div>
+					<?php endif; ?>
 					<?php
 					$tc_current = (int) ( $top_crawler['visits'] ?? 0 );
 					$tc_prior   = (int) ( $top_crawler['prior_visits'] ?? 0 );
@@ -1062,7 +1087,9 @@ final class Menu {
 					/* translators: %d: percentage of scored posts with Cite Score ≥ 50 */
 					echo esc_html( sprintf( __( '%d%% of your scored content', 'ai-search-optimizer' ), absint( $pct_optimized ) ) );
 					?></div>
-					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
+					<div class="citewp-aiso-kpi-progress">
+						<div class="citewp-aiso-kpi-progress__bar" style="width: <?php echo absint( $pct_optimized ); ?>%"></div>
+					</div>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
 					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View All →', 'ai-search-optimizer' ); ?></a>
@@ -1093,7 +1120,6 @@ final class Menu {
 						</div>
 					</div>
 					<?php endif; ?>
-					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
 				</div>
 			</div>
 
@@ -1127,7 +1153,6 @@ final class Menu {
 					<div class="citewp-aiso-kpi-card__value">—</div>
 					<div class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Score your posts to see schema coverage', 'ai-search-optimizer' ); ?></div>
 					<?php endif; ?>
-					<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--flat">→ <span class="citewp-aiso-kpi-card__trend-suffix"><?php esc_html_e( 'based on current scores', 'ai-search-optimizer' ); ?></span></div>
 				</div>
 				<div class="citewp-aiso-kpi-card__footer">
 					<a href="#citewp-aiso-cs-post-table" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Schema Gaps →', 'ai-search-optimizer' ); ?></a>

@@ -2122,8 +2122,24 @@
 	display: none; /* removed in S37 — HTML no longer emits these elements */
 }
 
-.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-progress {
-	display: none;
+/* Cite Score KPI row — footer pins to card bottom, buttons full-width */
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer {
+	margin-top: auto;
+}
+
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__footer .citewp-aiso-btn {
+	display: block;
+	width: 100%;
+	text-align: center;
+	box-sizing: border-box;
+}
+
+/* Card 1 — top-page sub line clamped to prevent height overflow */
+.citewp-aiso-kpi-card__sub--top-page {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
 }
 
 /* ── Cite Score KPI card densification (S24) ───────────────────── */
