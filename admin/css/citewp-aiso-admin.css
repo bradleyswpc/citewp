@@ -490,7 +490,7 @@
 }
 
 .citewp-aiso-kpi-row--4col {
-	grid-template-columns: repeat( 4, 1fr );
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .citewp-aiso-kpi-card {
@@ -3198,10 +3198,10 @@
 
 /* ── Schema Coverage tiles (Card 4, Cite Score page) ──────────────── */
 .citewp-aiso-kpi-card__schema-tiles {
-	display: flex;
-	gap: 6px;
-	margin-top: 8px;
-	margin-bottom: 10px;
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: var(--sp-3);
 }
 
 .citewp-aiso-kpi-card__schema-tile {
