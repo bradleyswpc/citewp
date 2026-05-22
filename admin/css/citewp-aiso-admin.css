@@ -2209,8 +2209,11 @@
 }
 /* Breathing room between hero value and caption+bar group */
 .citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card--optimized .citewp-aiso-kpi-card__caption {
-	margin-top: var(--sp-2);
+	margin-top: var(--sp-3);
 }
+/* Bold secondary stats on Cite Score KPI cards */
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__sub--top-page { font-weight: 600; }
+.citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card--needs-attention .citewp-aiso-kpi-card__sub { font-weight: 600; }
 
 /* Score-band colored fill — P44 thresholds applied to pct_optimized */
 .citewp-aiso-kpi-progress--green  .citewp-aiso-kpi-progress__fill { background: var( --citewp-score-green ); }
