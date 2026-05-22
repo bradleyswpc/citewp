@@ -2209,7 +2209,7 @@
 }
 /* Breathing room between hero value and caption+bar group */
 .citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card--optimized .citewp-aiso-kpi-card__caption {
-	margin-top: var(--sp-3);
+	margin-top: var(--sp-5);
 }
 /* Bold secondary stats on Cite Score KPI cards */
 .citewp-aiso-cs-kpi-row .citewp-aiso-kpi-card__sub--top-page { font-weight: 600; }
