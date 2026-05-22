@@ -61,8 +61,12 @@ final class EditorPanel {
 	}
 
 	public function register_meta_box( string $post_type = '' ): void {
-		// Suppress in Gutenberg — PluginSidebar handles it there
-		if ( $post_type && use_block_editor_for_post_type( $post_type ) ) {
+		// Suppress only when the current screen is actually rendering the block editor.
+		// use_block_editor_for_post_type() reports post-type capability, not the active
+		// editor, so it returns true on Classic Editor (plugin) screens and wrongly
+		// suppresses the box. P22/P24: box must appear on every non-Gutenberg surface.
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( $screen && method_exists( $screen, 'is_block_editor' ) && $screen->is_block_editor() ) {
 			return;
 		}
 		add_meta_box(

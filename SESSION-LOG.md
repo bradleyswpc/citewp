@@ -46,6 +46,19 @@ FB44: Fixed the Recalculate feedback loop in the Gutenberg sidebar. The root cau
 - Manual browser verify required before commit (dirty path + clean path)
 - `debug.log`: no new PHP errors
 
+### P22/P24 regression fix (same session, post-FB44 verify)
+
+**Bug:** The Cite Score meta box did not appear on Classic Editor screens — not in the box list and not in Screen Options. RankMath's box showed; ours didn't. Confirmed on LocalWP and live citewp.com.
+
+**Root cause:** `register_meta_box()` guarded with `use_block_editor_for_post_type($post_type)`, which reports post-type _capability_, not the active editor. With Classic Editor plugin active per-post, the function still returns `true` (site default is block editor), suppressing the box on every Classic Editor screen.
+
+**Fix (`includes/Admin/EditorPanel.php`):** Replaced the `use_block_editor_for_post_type()` guard with a `get_current_screen()->is_block_editor()` check — reads actual current-screen state rather than post-type capability. The method_exists and null guards handle WP installs where `is_block_editor()` is unavailable (pre-5.0) or where `get_current_screen()` returns null.
+
+**Verify required (manual):**
+1. Classic Editor post → Cite Score meta box must appear (normal/high position, checkbox in Screen Options)
+2. Gutenberg post → meta box must stay hidden (PluginSidebar handles it)
+3. `debug.log` clean
+
 ### Carryover into Session 39
 
 **From S38 (new):**
