@@ -51,6 +51,8 @@ function ScoreSidebar() {
 	const postId = useSelect( ( select ) => select( 'core/editor' ).getCurrentPostId(), [] );
 	const isSavingPost = useSelect( ( select ) => select( 'core/editor' ).isSavingPost(), [] );
 	const isAutosavingPost = useSelect( ( select ) => select( 'core/editor' ).isAutosavingPost(), [] );
+	const isDirty = useSelect( ( select ) => select( 'core/editor' ).isEditedPostDirty(), [] );
+	const { savePost } = useDispatch( 'core/editor' );
 
 	const [ score, setScore ] = useState( null );
 	const [ loading, setLoading ] = useState( false );
@@ -71,11 +73,20 @@ function ScoreSidebar() {
 		}
 	}, [ postId ] );
 
-	const recalculate = useCallback( async () => {
+	const saveAndRecalculate = useCallback( async () => {
 		if ( ! postId ) return;
 		setLoading( true );
 		setError( null );
 		try {
+			if ( isDirty ) {
+				await savePost();
+				// savePost() resolves even on failure — check the editor store for errors.
+				const saveError = select( 'core/editor' ).getSaveError?.();
+				if ( saveError ) {
+					setError( saveError.message || 'Save failed — recalculation aborted.' );
+					return;
+				}
+			}
 			const data = await apiFetch( {
 				path: `/citewp/aiso/v1/score/${ postId }/recalculate`,
 				method: 'POST',
@@ -86,7 +97,7 @@ function ScoreSidebar() {
 		} finally {
 			setLoading( false );
 		}
-	}, [ postId ] );
+	}, [ postId, isDirty, savePost ] );
 
 	// Initial load.
 	useEffect( () => { fetchScore(); }, [ fetchScore ] );
@@ -136,14 +147,16 @@ function ScoreSidebar() {
 							<div className="citewp-aiso-sidebar-recalc">
 								<Button
 									variant="secondary"
-									onClick={ recalculate }
+									onClick={ saveAndRecalculate }
 									disabled={ loading }
 									isBusy={ loading }
 								>
-									Recalculate
+									{ isDirty ? 'Save & Recalculate' : 'Recalculate' }
 								</Button>
 								<p className="citewp-aiso-sidebar-recalc-hint">
-									Saves trigger auto-recalculation.
+									{ isDirty
+										? 'Will save your changes first.'
+										: 'Saves trigger auto-recalculation.' }
 								</p>
 							</div>
 						</>
@@ -400,7 +413,7 @@ function SchemaTypeRow( { label, detected, generated, inserted, inserting, onIns
 
 	let action;
 	if ( detected || inserted ) {
-		const statusLabel = ( inserted && ! detected ) ? '✓ Added' : 'Already detected';
+		const statusLabel = ( inserted && ! detected ) ? 'Added to editor (save to apply)' : 'Already detected';
 		action = (
 			<span className="citewp-aiso-sidebar-schema-row__pill">
 				{ statusLabel }

@@ -6,6 +6,64 @@
 
 ---
 
+## Session 38 — FB44 Dirty-Aware Recalculate (Gutenberg Sidebar) ✅
+
+**Date:** 2026-05-22
+
+### Deliverable
+
+FB44: Fixed the Recalculate feedback loop in the Gutenberg sidebar. The root cause was that `ScoreController::recalculate()` calls `get_post()` which reads saved DB content — in-memory editor changes are invisible until `save_post` fires. Clicking Recalculate on a dirty post always scored stale content.
+
+### What shipped
+
+1. **`src/sidebar/index.js` — `ScoreSidebar`:**
+   - Added `isDirty` via `useSelect(s => s('core/editor').isEditedPostDirty(), [])`.
+   - Added `savePost` from `useDispatch('core/editor')`.
+   - Replaced `recalculate` callback with `saveAndRecalculate`: if `isDirty`, calls `await savePost()` first, checks `select('core/editor').getSaveError?.()` to abort on save failure, then fires the recalculate REST endpoint. If clean, goes straight to the endpoint (preserves "rescore after plugin update" use case).
+   - Button label: `'Save & Recalculate'` when dirty, `'Recalculate'` when clean.
+   - Hint line: `'Will save your changes first.'` when dirty, `'Saves trigger auto-recalculation.'` when clean.
+   - `saveAndRecalculate` extracted as a named `useCallback` — FB39 (Publish block injection) can call this same path.
+
+2. **`src/sidebar/index.js` — `SchemaTypeRow`:**
+   - Changed `'✓ Added'` pill label → `'Added to editor (save to apply)'` to accurately reflect that `insertSchemaBlock` writes to the in-memory block tree only and does not persist until the user saves.
+
+3. **`ai-search-optimizer.php`:** Version bump 0.7.5 → 0.7.6.
+
+### Classic Editor limitation (verify-only, no fix)
+
+`EditorPanel.php` meta box is suppressed in Gutenberg (P24). Classic Editor's inline JS uses `fetch()` directly — no `isEditedPostDirty()` equivalent exists without adding a framework. Known limitation: Classic Editor users who click Recalculate without clicking "Update" will score stale DB content. Not fixed this session; document if a user reports it.
+
+### Files modified
+
+- `src/sidebar/index.js`
+- `build/index.js` (compiled)
+- `ai-search-optimizer.php`
+- `docs/superpowers/plans/2026-05-22-fb44-recalculate-feedback-loop.md` (new)
+
+### Verified
+
+- `npm run build` — clean ✅
+- Manual browser verify required before commit (dirty path + clean path)
+- `debug.log`: no new PHP errors
+
+### Carryover into Session 39
+
+**From S38 (new):**
+1. **Schema-fail-only table filter** — "View Schema Gaps →" needs query-param plumbing. FB candidate.
+2. **Hoist `new Repository()` out of foreach in `schema_coverage()`** — minor refactor.
+
+**Ongoing (unchanged from S37):**
+3. Browser verify typography (S36 carryover)
+4. WP.org Round 4 watch
+5. P52(e) messaging audit
+6. UI-DESIGN-SYSTEM.md Line Chart Panel entry update
+7. Scroll-to-top on rail nav clicks
+8. Cite Score page top-row brainstorm
+9. Forward-port slug rename to `main` (post WP.org approval)
+10. UI/UX audit queue — FB46
+
+---
+
 ## Session 37 — Cite Score KPI Card Pass ✅
 
 **Date:** 2026-05-21
