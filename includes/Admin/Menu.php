@@ -1144,6 +1144,9 @@ final class Menu {
 					</div>
 					<?php endif; ?>
 				</div>
+				<div class="citewp-aiso-kpi-card__footer">
+					<a href="<?php echo esc_url( admin_url( 'edit.php?orderby=citewp_aiso_geo_score&order=asc' ) ); ?>" class="citewp-aiso-btn citewp-aiso-btn--outline"><?php esc_html_e( 'View Lowest Scores →', 'ai-search-optimizer' ); ?></a>
+				</div>
 			</div>
 
 			<!-- Card 4: Schema Coverage -->
