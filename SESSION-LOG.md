@@ -100,7 +100,18 @@ Root cause: `__kpi-progress__bar` (HTML) vs `__kpi-progress__fill` (CSS) class n
 - **Task C (kept):** Added card modifier classes to Cards 2/3/4 (`--optimized`, `--needs-attention`, `--schema-coverage`). Decorative per-card icon tints: teal (Card 1), green (Card 2), orange (Card 3), purple (Card 4). Row not visually busy — tints kept.
 - **X20 follow-up:** All D.1–D.4 assertions passed. Heights still equal (273px × 4).
 
-Follow-up commits: `7a4d760` (spec+plan), `3597183` (Tasks B+C), `88c0d86` (track width fix), `3513294` (X20 audit).
+Follow-up commits: `7a4d760` (spec+plan), `3597183` (Tasks B+C), `88c0d86` (track width fix), `3513294` (X20 audit), `11436a4` (icon tints Task C).
+
+### Follow-up pass 2 (same session, fourth context window)
+
+Card 3 top failing signal advisory line.
+
+- **Task F (reuse path confirmed):** `render_cite_score_panel()` already computes `$top_signal_ids` (top 3 by fail count) and `$top_recs` (mapper labels). Both in scope at Card 3 render point. No new methods needed.
+- **Task F implementation:** Added `$top_gap_label` lookup (iterates `$top_signal_ids`, returns first signal with a mapper label). Card 3 body gets `__sub` line "Most common gap: {label}" — shown only when `$issue_count > 0 && $top_gap_label !== null`. Text via `__()` with translator comment (X12 advisory phrasing).
+- **X20 follow-up:** G.1 presence/absence gate correct ✅; G.2 advisory phrasing (not "Fix your X") ✅; G.3 P49 consistency (`$signal_fails` sourced from same guarded `$scored_ids`) ✅; G.4 `__sub` token only, no ad-hoc font ✅.
+- **Browser verify:** "Most common gap: Self-contained passages" renders on reload. All 4 cards still 273px. debug.log clean.
+
+Follow-up 2 commits: `9c8845b` (Card 3 top-signal line + plan append), `2b077f6` (X20 audit).
 
 ### Carryover into Session 38
 
