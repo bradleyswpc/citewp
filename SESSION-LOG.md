@@ -111,7 +111,19 @@ Card 3 top failing signal advisory line.
 - **X20 follow-up:** G.1 presence/absence gate correct ✅; G.2 advisory phrasing (not "Fix your X") ✅; G.3 P49 consistency (`$signal_fails` sourced from same guarded `$scored_ids`) ✅; G.4 `__sub` token only, no ad-hoc font ✅.
 - **Browser verify:** "Most common gap: Self-contained passages" renders on reload. All 4 cards still 273px. debug.log clean.
 
-Follow-up 2 commits: `9c8845b` (Card 3 top-signal line + plan append), `2b077f6` (X20 audit).
+Follow-up 2 commits: `9c8845b` (Card 3 top-signal line + plan append), `2b077f6` (X20 audit), `501a2bc` (session log).
+
+### Follow-up pass 3 (same session, fifth context window)
+
+Additional UI polish on all 4 Cite Score KPI cards.
+
+- **Card 3:** Added "View Lowest Scores →" footer button linking to `edit.php?orderby=citewp_aiso_geo_score&order=asc`. Uses existing `PostListColumn::COLUMN_KEY` orderby slug — no new infrastructure. Scoped to `render_cite_score_panel()` only; Dashboard card untouched.
+- **Card 2:** Progress bar track height 4px → 8px to match `__category-bar-track` on Dashboard KPI cards (visual consistency). Caption `margin-top` bumped sp-2 → sp-3 → sp-5 (20px) for breathing room between hero value and caption+bar group.
+- **Card 1:** `get_top_crawlers(1)` → `get_top_crawlers(3)` in data prep. Added `__bot-list` with 3 `__bot-row` entries (same dot/name/count pattern as Dashboard Bot Visits card). Moved trend from body `__trend` div → `__head-pill` showing visit % change vs prior 7 days. Removed `__info` tooltip. Bold applied to `__sub--top-page` via scoped CSS.
+- **Card 3:** Bold applied to `__sub` ("Most common gap") via scoped CSS (`--needs-attention` modifier scope).
+- **Browser verify:** All 4 cards equal height (285px). Pill shows ↑ 3900%. Bot list: GPTBot 40 / Perplexity 34 / Google-Extended 29. Screenshot taken.
+
+Follow-up 3 commits: `501a2bc` (session log), `01706e4` (Card 3 footer btn), `a3be6e8` (bar 8px + spacing), `a198b98` (Card 1 bot list + pill + bold), `0091a49` (Card 2 spacing sp-5).
 
 ### Carryover into Session 38
 
