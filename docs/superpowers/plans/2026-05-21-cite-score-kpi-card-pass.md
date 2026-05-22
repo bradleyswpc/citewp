@@ -1163,3 +1163,106 @@ No new PHP errors from the amendment.
 git log --oneline -5
 git push
 ```
+
+---
+
+## Follow-Up Amendment 2 — Card 3 Top Failing Signal
+
+### Task F: Add "Most common gap" advisory line to Card 3
+
+**Files:**
+- Modify: `includes/Admin/Menu.php` (two locations: data prep + Card 3 HTML)
+
+**Context:** `render_cite_score_panel()` already computes `$top_signal_ids` (sorted by fail count, top 3) and `$top_recs` (mapper labels for those signals). Both are in scope when Card 3 renders. Reuse path confirmed — no new methods required.
+
+- [ ] **Step F.1: Add `$top_gap_label` data prep**
+
+In `includes/Admin/Menu.php`, find the block after `$top_rec_ids = array_keys( $top_recs );` and add the label lookup immediately after:
+
+```php
+$top_rec_ids    = array_keys( $top_recs );
+
+$top_gap_label = null;
+foreach ( $top_signal_ids as $sig_id ) {
+    if ( isset( $top_recs[ $sig_id ]['label'] ) ) {
+        $top_gap_label = $top_recs[ $sig_id ]['label'];
+        break;
+    }
+}
+```
+
+- [ ] **Step F.2: Add advisory line to Card 3 body**
+
+In Card 3 HTML, directly after the `<?php endif; ?>` that closes the severity-tiles block and before the `</div>` that closes `__body`, add:
+
+```php
+					<?php if ( $issue_count > 0 && $top_gap_label !== null ) : ?>
+					<div class="citewp-aiso-kpi-card__sub">
+						<?php echo esc_html( sprintf(
+							/* translators: %s: display name of the most common failing signal */
+							__( 'Most common gap: %s', 'ai-search-optimizer' ),
+							$top_gap_label
+						) ); ?>
+					</div>
+					<?php endif; ?>
+```
+
+- [ ] **Step F.3: Commit + push**
+
+```bash
+git add includes/Admin/Menu.php
+git commit -m "feat: Card 3 — most-common-gap advisory line via top_signal_ids reuse"
+git push
+```
+
+---
+
+### Task G: X20 Follow-Up Audit (Amendment 2)
+
+- [ ] **Step G.1: Top-signal line presence/absence**
+
+When `$issue_count > 0` and `$top_gap_label !== null`: confirm `citewp-aiso-kpi-card__sub` is present in Card 3 with text matching "Most common gap: {label}".
+
+When `$issue_count === 0`: confirm no `__sub` element appears in Card 3.
+
+- [ ] **Step G.2: Advisory phrasing (X12)**
+
+Confirm text reads "Most common gap: {label}" — not "Fix your {label}", not "You have issues with {label}". Label sourced from `RecommendationMapper`, not hardcoded.
+
+- [ ] **Step G.3: P49 consistency**
+
+`$top_signal_ids` is derived from `$signal_fails`, which was already built from the P49-guarded `$scored_ids` WP_Query (excludes `_citewp_aiso_exclude_from_llms = '1'` posts). Confirm the gap label is therefore consistent with the `$issue_count` value shown (both exclude the same posts).
+
+- [ ] **Step G.4: Typography token**
+
+`__sub` class uses existing CSS token (muted Tier 3, 12px). Confirm no ad-hoc font-size or color declarations were added for this element.
+
+- [ ] **Step G.5: Commit audit**
+
+```bash
+git commit --allow-empty -m "chore: X20 follow-up audit — Card 3 top-signal line S37"
+git push
+```
+
+---
+
+### Task H: Browser Verify (Amendment 2)
+
+- [ ] **Step H.1: Card 3 top-signal line visible**
+
+Navigate to `http://citewp-dev.local/wp-admin/admin.php?page=citewp#cite-score`. When `$issue_count > 0`, Card 3 body should show "Most common gap: {signal label}" in muted small text below the severity tiles.
+
+- [ ] **Step H.2: Height check**
+
+Card 3 now has an extra `__sub` line when issues exist. Measure all 4 cards with `getBoundingClientRect()`. If Card 3 is taller than others, document the difference — acceptable minor variance since Card 3 has no `__footer` with `margin-top: auto`.
+
+- [ ] **Step H.3: debug.log clean**
+
+No new PHP errors.
+
+- [ ] **Step H.4: Final push**
+
+```bash
+git log --oneline -5
+git push
+```

@@ -876,6 +876,14 @@ final class Menu {
 		$top_recs       = $mapper->get_many( $top_signal_ids );
 		$top_rec_ids    = array_keys( $top_recs );
 
+		$top_gap_label = null;
+		foreach ( $top_signal_ids as $sig_id ) {
+			if ( isset( $top_recs[ $sig_id ]['label'] ) ) {
+				$top_gap_label = $top_recs[ $sig_id ]['label'];
+				break;
+			}
+		}
+
 		// Pad to exactly 3 rows.
 		$recs_display = array_values( $top_recs );
 		while ( count( $recs_display ) < 3 ) {
@@ -1124,6 +1132,15 @@ final class Menu {
 							<span class="citewp-aiso-kpi-card__severity-count"><?php echo esc_html( (string) $minor_count ); ?></span>
 							<span class="citewp-aiso-kpi-card__severity-label"><?php esc_html_e( 'Minor', 'ai-search-optimizer' ); ?></span>
 						</div>
+					</div>
+					<?php endif; ?>
+					<?php if ( $issue_count > 0 && $top_gap_label !== null ) : ?>
+					<div class="citewp-aiso-kpi-card__sub">
+						<?php echo esc_html( sprintf(
+							/* translators: %s: display name of the most common failing signal */
+							__( 'Most common gap: %s', 'ai-search-optimizer' ),
+							$top_gap_label
+						) ); ?>
 					</div>
 					<?php endif; ?>
 				</div>
