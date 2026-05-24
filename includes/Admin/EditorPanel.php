@@ -71,7 +71,7 @@ final class EditorPanel {
 		}
 		add_meta_box(
 			'citewp_aiso_editor_panel',
-			__( 'Cite Score', 'ai-search-optimizer' ),
+			__( 'Cite Score', 'citewp-ai-search-optimizer' ),
 			[ $this, 'render' ],
 			[ 'post', 'page' ],
 			'normal',   // ← P31: was 'side', now 'normal'
@@ -97,7 +97,7 @@ final class EditorPanel {
 			[
 				[
 					'slug'   => 'general',
-					'label'  => __( 'General', 'ai-search-optimizer' ),
+					'label'  => __( 'General', 'citewp-ai-search-optimizer' ),
 					'render' => [ $this, 'render_general_tab' ],
 				],
 			],
@@ -118,7 +118,7 @@ final class EditorPanel {
 			[
 				[
 					'slug'   => 'schema',
-					'label'  => __( 'Schema', 'ai-search-optimizer' ),
+					'label'  => __( 'Schema', 'citewp-ai-search-optimizer' ),
 					'render' => [ $this, 'render_schema_tab' ],
 				],
 			],
@@ -193,7 +193,7 @@ final class EditorPanel {
 								<span class="citewp-aiso-mb-badge citewp-aiso-mb-badge--<?php echo esc_attr( $grade ); ?>">
 									<?php echo esc_html( (string) $total ); ?>
 								</span>
-								<span class="citewp-aiso-mb-total-label"><?php esc_html_e( '/ 100', 'ai-search-optimizer' ); ?></span>
+								<span class="citewp-aiso-mb-total-label"><?php esc_html_e( '/ 100', 'citewp-ai-search-optimizer' ); ?></span>
 							</div>
 							<?php if ( ! empty( $categories ) ) : ?>
 								<div class="citewp-aiso-mb-categories">
@@ -230,7 +230,7 @@ final class EditorPanel {
 									<?php
 									printf(
 										/* translators: %s: human-readable time difference */
-										esc_html__( 'Scored %s ago', 'ai-search-optimizer' ),
+										esc_html__( 'Scored %s ago', 'citewp-ai-search-optimizer' ),
 										esc_html( human_time_diff( $ts, time() ) )
 									);
 									?>
@@ -238,7 +238,7 @@ final class EditorPanel {
 							<?php endif; ?>
 						<?php else : ?>
 							<p class="citewp-aiso-mb-empty">
-								<?php esc_html_e( 'Score not yet calculated.', 'ai-search-optimizer' ); ?>
+								<?php esc_html_e( 'Score not yet calculated.', 'citewp-ai-search-optimizer' ); ?>
 							</p>
 						<?php endif; ?>
 					</div>
@@ -247,11 +247,11 @@ final class EditorPanel {
 								class="button button-secondary citewp-aiso-recalc-btn"
 								data-nonce="<?php echo esc_attr( $nonce ); ?>"
 								data-url="<?php echo esc_url( $recalc_url ); ?>">
-							<?php esc_html_e( 'Recalculate', 'ai-search-optimizer' ); ?>
+							<?php esc_html_e( 'Recalculate', 'citewp-ai-search-optimizer' ); ?>
 						</button>
 					</p>
 					<p class="citewp-aiso-recalc-error" style="display:none;">
-						<?php esc_html_e( 'Recalculation failed — please try again.', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'Recalculation failed — please try again.', 'citewp-ai-search-optimizer' ); ?>
 					</p>
 				</div>
 
@@ -280,7 +280,7 @@ final class EditorPanel {
 			btn.addEventListener( 'click', function() {
 				var origText = btn.textContent;
 				btn.disabled    = true;
-				btn.textContent = <?php echo wp_json_encode( __( 'Recalculating…', 'ai-search-optimizer' ) ); ?>;
+				btn.textContent = <?php echo wp_json_encode( __( 'Recalculating…', 'citewp-ai-search-optimizer' ) ); ?>;
 				errEl.style.display = 'none';
 
 				fetch( btn.dataset.url, {
@@ -313,7 +313,7 @@ final class EditorPanel {
 						} );
 						html += '</div>';
 					}
-					html += '<p class="citewp-aiso-mb-time">' + <?php echo wp_json_encode( __( 'Scored just now', 'ai-search-optimizer' ) ); ?> + '</p>';
+					html += '<p class="citewp-aiso-mb-time">' + <?php echo wp_json_encode( __( 'Scored just now', 'citewp-ai-search-optimizer' ) ); ?> + '</p>';
 					if ( contEl ) { contEl.innerHTML = html; }
 					btn.disabled    = false;
 					btn.textContent = origText;
@@ -322,7 +322,7 @@ final class EditorPanel {
 					btn.disabled    = false;
 					btn.textContent = origText;
 					if ( status === 403 ) {
-						errEl.textContent = <?php echo wp_json_encode( __( 'Session expired — please reload the page.', 'ai-search-optimizer' ) ); ?>;
+						errEl.textContent = <?php echo wp_json_encode( __( 'Session expired — please reload the page.', 'citewp-ai-search-optimizer' ) ); ?>;
 					}
 					errEl.style.display = 'block';
 				} );
@@ -340,7 +340,7 @@ final class EditorPanel {
 		$detected     = $generator->detect_existing_types( $post );
 		$article_json = wp_json_encode( $article, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 		if ( false === $article_json ) {
-			echo '<p class="citewp-aiso-mb-empty-note">' . esc_html__( 'Schema could not be generated (content encoding error).', 'ai-search-optimizer' ) . '</p>';
+			echo '<p class="citewp-aiso-mb-empty-note">' . esc_html__( 'Schema could not be generated (content encoding error).', 'citewp-ai-search-optimizer' ) . '</p>';
 			return;
 		}
 		$faq_encoded  = ! empty( $faqpage )
@@ -350,38 +350,38 @@ final class EditorPanel {
 		$article_known = in_array( 'Article', $detected, true );
 		$faq_known     = in_array( 'FAQPage', $detected, true );
 		$box_id        = 'citewp-ep-schema-' . $post->ID;
-		$copy_note     = __( 'Paste into a Custom HTML block (Gutenberg) or a Code/HTML widget in your page builder.', 'ai-search-optimizer' );
+		$copy_note     = __( 'Paste into a Custom HTML block (Gutenberg) or a Code/HTML widget in your page builder.', 'citewp-ai-search-optimizer' );
 		?>
 		<div class="citewp-aiso-schema-metabox" id="<?php echo esc_attr( $box_id ); ?>">
 			<div class="citewp-aiso-mb-schema-row">
-				<span class="citewp-aiso-mb-schema-label"><?php esc_html_e( 'Article Schema', 'ai-search-optimizer' ); ?></span>
+				<span class="citewp-aiso-mb-schema-label"><?php esc_html_e( 'Article Schema', 'citewp-ai-search-optimizer' ); ?></span>
 				<?php if ( $article_known ) : ?>
-					<span class="citewp-aiso-mb-detected"><?php esc_html_e( '✓ Already in content', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-mb-detected"><?php esc_html_e( '✓ Already in content', 'citewp-ai-search-optimizer' ); ?></span>
 				<?php else : ?>
 					<button type="button"
 					        class="button button-secondary citewp-aiso-copy-btn"
 					        data-schema="<?php echo esc_attr( '<script type="application/ld+json">' . $article_json . '</script>' ); ?>"
-					        data-label="<?php esc_attr_e( 'Copy Article schema', 'ai-search-optimizer' ); ?>">
-						<?php esc_html_e( 'Copy Article schema', 'ai-search-optimizer' ); ?>
+					        data-label="<?php esc_attr_e( 'Copy Article schema', 'citewp-ai-search-optimizer' ); ?>">
+						<?php esc_html_e( 'Copy Article schema', 'citewp-ai-search-optimizer' ); ?>
 					</button>
 					<span class="citewp-aiso-mb-copy-note"><?php echo esc_html( $copy_note ); ?></span>
 				<?php endif; ?>
 			</div>
 			<div class="citewp-aiso-mb-schema-row">
-				<span class="citewp-aiso-mb-schema-label"><?php esc_html_e( 'FAQPage Schema', 'ai-search-optimizer' ); ?></span>
+				<span class="citewp-aiso-mb-schema-label"><?php esc_html_e( 'FAQPage Schema', 'citewp-ai-search-optimizer' ); ?></span>
 				<?php if ( $faq_known ) : ?>
-					<span class="citewp-aiso-mb-detected"><?php esc_html_e( '✓ Already in content', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-mb-detected"><?php esc_html_e( '✓ Already in content', 'citewp-ai-search-optimizer' ); ?></span>
 				<?php elseif ( $faq_json ) : ?>
 					<button type="button"
 					        class="button button-secondary citewp-aiso-copy-btn"
 					        data-schema="<?php echo esc_attr( '<script type="application/ld+json">' . $faq_json . '</script>' ); ?>"
-					        data-label="<?php esc_attr_e( 'Copy FAQPage schema', 'ai-search-optimizer' ); ?>">
-						<?php esc_html_e( 'Copy FAQPage schema', 'ai-search-optimizer' ); ?>
+					        data-label="<?php esc_attr_e( 'Copy FAQPage schema', 'citewp-ai-search-optimizer' ); ?>">
+						<?php esc_html_e( 'Copy FAQPage schema', 'citewp-ai-search-optimizer' ); ?>
 					</button>
 					<span class="citewp-aiso-mb-copy-note"><?php echo esc_html( $copy_note ); ?></span>
 				<?php else : ?>
 					<span class="citewp-aiso-mb-empty-note">
-						<?php esc_html_e( 'No FAQ content detected (need ≥ 2 Q&A pairs)', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'No FAQ content detected (need ≥ 2 Q&A pairs)', 'citewp-ai-search-optimizer' ); ?>
 					</span>
 				<?php endif; ?>
 			</div>
@@ -393,7 +393,7 @@ final class EditorPanel {
 				<?php
 				printf(
 					/* translators: %s: comma-separated list of schema @type values */
-					esc_html__( '%s schema detected — more types coming soon', 'ai-search-optimizer' ),
+					esc_html__( '%s schema detected — more types coming soon', 'citewp-ai-search-optimizer' ),
 					esc_html( implode( ', ', $other ) )
 				);
 				?>
@@ -411,7 +411,7 @@ final class EditorPanel {
 					var schema    = btn.dataset.schema;
 					var origLabel = btn.dataset.label;
 					function onSuccess() {
-						btn.textContent = <?php echo wp_json_encode( __( '✓ Copied to clipboard', 'ai-search-optimizer' ) ); ?>;
+						btn.textContent = <?php echo wp_json_encode( __( '✓ Copied to clipboard', 'citewp-ai-search-optimizer' ) ); ?>;
 						if ( fadeTimer )   { clearTimeout( fadeTimer ); }
 						if ( revertTimer ) { clearTimeout( revertTimer ); }
 						note.style.transition = '';
@@ -425,7 +425,7 @@ final class EditorPanel {
 						}, 8000 );
 					}
 					function onFailure() {
-						btn.textContent = <?php echo wp_json_encode( __( 'Copy failed — try again', 'ai-search-optimizer' ) ); ?>;
+						btn.textContent = <?php echo wp_json_encode( __( 'Copy failed — try again', 'citewp-ai-search-optimizer' ) ); ?>;
 						if ( revertTimer ) { clearTimeout( revertTimer ); }
 						revertTimer = setTimeout( function() { btn.textContent = origLabel; }, 3000 );
 					}
@@ -515,9 +515,9 @@ final class EditorPanel {
 						echo $bot_svg_citrine;
 						?>
 					</span>
-					<span class="citewp-aiso-bv__title"><?php esc_html_e( 'Bot Visits', 'ai-search-optimizer' ); ?></span>
+					<span class="citewp-aiso-bv__title"><?php esc_html_e( 'Bot Visits', 'citewp-ai-search-optimizer' ); ?></span>
 				</div>
-				<span class="citewp-aiso-bv__pill"><?php esc_html_e( 'Last 7 days', 'ai-search-optimizer' ); ?></span>
+				<span class="citewp-aiso-bv__pill"><?php esc_html_e( 'Last 7 days', 'citewp-ai-search-optimizer' ); ?></span>
 			</div>
 
 			<?php if ( $has_data ) : ?>
@@ -525,9 +525,9 @@ final class EditorPanel {
 				<table class="citewp-aiso-bv__table">
 					<thead>
 						<tr>
-							<th><?php esc_html_e( 'Bot', 'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Visits', 'ai-search-optimizer' ); ?></th>
-							<th><?php esc_html_e( 'Last seen', 'ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Bot', 'citewp-ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Visits', 'citewp-ai-search-optimizer' ); ?></th>
+							<th><?php esc_html_e( 'Last seen', 'citewp-ai-search-optimizer' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -536,7 +536,7 @@ final class EditorPanel {
 							$dot_color = $this->bot_dot_color( (string) $row->bot_signature );
 							$last_seen = sprintf(
 								/* translators: %s: human-readable time difference, e.g. "2 hours" */
-								__( '%s ago', 'ai-search-optimizer' ),
+								__( '%s ago', 'citewp-ai-search-optimizer' ),
 								human_time_diff( (int) strtotime( (string) $row->last_seen ), time() )
 							);
 							?>
@@ -561,7 +561,7 @@ final class EditorPanel {
 						<?php
 						printf(
 							/* translators: %d: number of additional bot signatures */
-							esc_html__( 'and %d more', 'ai-search-optimizer' ),
+							esc_html__( 'and %d more', 'citewp-ai-search-optimizer' ),
 							(int) $n_more
 						);
 						?>
@@ -571,7 +571,7 @@ final class EditorPanel {
 				<p class="citewp-aiso-bv__footer">
 					<?php
 					echo wp_kses(
-						__( 'Free tier shows 7 days of crawler activity. <strong>Pro extends to 90 days.</strong>', 'ai-search-optimizer' ),
+						__( 'Free tier shows 7 days of crawler activity. <strong>Pro extends to 90 days.</strong>', 'citewp-ai-search-optimizer' ),
 						[ 'strong' => [] ]
 					);
 					?>
@@ -587,10 +587,10 @@ final class EditorPanel {
 						?>
 					</div>
 					<p class="citewp-aiso-bv__empty-title">
-						<?php esc_html_e( 'No AI bot visits yet', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'No AI bot visits yet', 'citewp-ai-search-optimizer' ); ?>
 					</p>
 					<p class="citewp-aiso-bv__empty-desc">
-						<?php esc_html_e( 'Most bots discover new posts within 24–72 hours of publishing.', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'Most bots discover new posts within 24–72 hours of publishing.', 'citewp-ai-search-optimizer' ); ?>
 					</p>
 				</div>
 
@@ -629,20 +629,20 @@ final class EditorPanel {
 			<?php wp_nonce_field( 'citewp_aiso_ep_' . $post->ID, '_citewp_aiso_ep_nonce', false ); ?>
 			<div class="citewp-aiso-pc__header">
 				<span class="citewp-aiso-pc__title">
-					<?php esc_html_e( 'Publishing Controls', 'ai-search-optimizer' ); ?>
+					<?php esc_html_e( 'Publishing Controls', 'citewp-ai-search-optimizer' ); ?>
 				</span>
 			</div>
 
 			<div class="citewp-aiso-pc__row">
 				<div class="citewp-aiso-pc__label-wrap">
 					<label class="citewp-aiso-pc__label" for="<?php echo esc_attr( $checkbox_id ); ?>">
-						<?php esc_html_e( 'Include in llms.txt', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'Include in llms.txt', 'citewp-ai-search-optimizer' ); ?>
 					</label>
 					<span class="citewp-aiso-pc__help">
-						<?php esc_html_e( 'AI search engines may discover this post via llms.txt. Toggle off to exclude this post from the file.', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'AI search engines may discover this post via llms.txt. Toggle off to exclude this post from the file.', 'citewp-ai-search-optimizer' ); ?>
 					</span>
 				</div>
-				<label class="citewp-aiso-pc__toggle" aria-label="<?php esc_attr_e( 'Include in llms.txt', 'ai-search-optimizer' ); ?>">
+				<label class="citewp-aiso-pc__toggle" aria-label="<?php esc_attr_e( 'Include in llms.txt', 'citewp-ai-search-optimizer' ); ?>">
 					<input type="checkbox"
 					       id="<?php echo esc_attr( $checkbox_id ); ?>"
 					       name="citewp_aiso_llms_include"
