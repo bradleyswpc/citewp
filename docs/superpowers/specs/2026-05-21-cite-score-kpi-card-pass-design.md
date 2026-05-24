@@ -293,3 +293,63 @@ Add unique modifier classes to Cards 2, 3, 4 in Menu.php (Card 1 already has `ci
 - **Ambiguity resolved:** All 4 table affordances (Cards 2/3/4) scroll to per-post table top. No filtered view this session — locked per user decision. Filtered schema-fail view is a future FB candidate.
 - **Typography:** All card titles reference `.citewp-aiso-t2` — no ad-hoc declarations. ✓
 - **P65:** No activity__heading selectors touched. ✓
+
+---
+
+## S37 Follow-Up Amendment 2 — Card 3 Top Failing Signal
+
+**Session 37 (continuation) | Date: 2026-05-21**
+
+### Task A — Reuse check (complete)
+
+Reuse path confirmed. `render_cite_score_panel()` already computes:
+- `$signal_fails` — map of `signal_id → fail_count` across all scored posts in the P49-guarded `$scored_ids` set (capped at 50 posts for performance)
+- `$top_signal_ids` — signal IDs sorted descending by fail count (`arsort` + `array_slice`)
+- `$top_recs` — `RecommendationMapper::get_many($top_signal_ids)` result, keyed by signal ID, each entry containing `label`, `copy`, `category`
+
+Both variables are in scope before Card 3 HTML renders. No new query path, no new aggregation method needed.
+
+**Semantic note:** `$signal_fails` counts fail/partial signals across ALL scored posts (not issue-only posts with score < 50). This is the same ranking the AI Recommendations panel uses — acceptable for a KPI advisory line. The top failing signal across all scored posts is the actionable gap regardless.
+
+**P49 status:** `$signal_fails` inherits from `$scored_ids` which has the `(NOT EXISTS OR != '1')` exclusion guard. ✓
+
+### Task B — Card 3 top-signal line
+
+**Data prep:** Resolve the first `$top_signal_ids` entry that has a mapper label. Add after the existing `$top_recs` assignment:
+
+```php
+$top_gap_label = null;
+foreach ( $top_signal_ids as $sig_id ) {
+    if ( isset( $top_recs[ $sig_id ]['label'] ) ) {
+        $top_gap_label = $top_recs[ $sig_id ]['label'];
+        break;
+    }
+}
+```
+
+**Card 3 HTML:** Add one line in `__body`, below the severity tiles block, immediately before the closing `</div>` of `__body`. Conditional: `$issue_count > 0 && $top_gap_label !== null`.
+
+```php
+<?php if ( $issue_count > 0 && $top_gap_label !== null ) : ?>
+<div class="citewp-aiso-kpi-card__sub">
+    <?php echo esc_html( sprintf(
+        /* translators: %s: display name of the most common failing signal */
+        __( 'Most common gap: %s', 'ai-search-optimizer' ),
+        $top_gap_label
+    ) ); ?>
+</div>
+<?php endif; ?>
+```
+
+**Typography:** `__sub` (caption/body styling, Inter, muted). Not a Tier title, not mono.
+
+**Empty state:** Line hidden when `$issue_count === 0`. ✓
+
+### X20 Additions
+
+- Card 3 top-signal line present when `$issue_count > 0` and mapper has a label for the top signal
+- Line hidden when `$issue_count === 0`
+- Phrasing is advisory: "Most common gap: {Name}" — not prescriptive (X12)
+- Signal name from `$top_recs[id]['label']` — not hardcoded
+- `$signal_fails` sourced from `$scored_ids` (P49-guarded) ✓
+- Card heights: Card 3 adding one `__sub` line should not exceed Cards 1/2/4 (currently 273px each). Card 3 has no `__footer`, so `margin-top: auto` does not apply. Verify equal height or document acceptable minor difference.
