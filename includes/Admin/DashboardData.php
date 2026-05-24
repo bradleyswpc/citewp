@@ -872,7 +872,7 @@ final class DashboardData {
 				_doing_it_wrong(
 					__METHOD__,
 					sprintf( 'Post %d has a stored Cite Score but no signals array in _citewp_aiso_geo_score. Counted as uncovered.', (int) $post_id ),
-					CITEWP_AISO_VERSION
+					esc_html( CITEWP_AISO_VERSION )
 				);
 				++$none;
 				continue;

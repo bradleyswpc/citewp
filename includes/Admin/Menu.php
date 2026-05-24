@@ -388,7 +388,9 @@ final class Menu {
 						<?php echo $avg_score !== null ? esc_html( (string) $avg_score ) : '—'; ?>
 					</div>
 					<div class="citewp-aiso-kpi-card__caption">
-						<?php echo esc_html( sprintf( __( 'out of 100 · %d scored', 'citewp-ai-search-optimizer' ), $scored_count ) ); ?>
+						<?php
+						/* translators: %d: number of posts/pages with a Cite Score */
+						echo esc_html( sprintf( __( 'out of 100 · %d scored', 'citewp-ai-search-optimizer' ), $scored_count ) ); ?>
 					</div>
 					<?php if ( $score_delta > 0 ) : ?>
 						<div class="citewp-aiso-kpi-card__trend citewp-aiso-kpi-card__trend--up">↑ +<?php echo esc_html( (string) $score_delta ); ?> pts this week</div>
@@ -779,10 +781,10 @@ final class Menu {
 				'render_cite_score_panel',
 				sprintf(
 					'schema_coverage() total (%d) does not match $total_scored (%d). A post with a stored score is missing from one query path.',
-					$schema_coverage['total'],
-					$total_scored
+					absint( $schema_coverage['total'] ),
+					absint( $total_scored )
 				),
-				CITEWP_AISO_VERSION
+				esc_html( CITEWP_AISO_VERSION )
 			);
 		}
 
