@@ -4,7 +4,7 @@ Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.6
+Stable tag: 0.7.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,11 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.7 =
+* Cite Score page — 'Excluded from llms.txt' pill on per-post table rows for posts excluded from llms.txt generation.
+* Cite Score Over Time chart — sparse-data state shown when the selected window has fewer than 3 recorded data points.
+* Left rail — 'Request a Feature' link below the Pro card.
 
 = 0.7.6 =
 First public release on WordPress.org.
