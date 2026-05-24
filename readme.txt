@@ -2,9 +2,9 @@
 Contributors: bradleyswpc
 Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.5
+Stable tag: 0.7.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,38 +77,15 @@ It's an emerging standard that helps AI engines understand your site's most impo
 
 == Changelog ==
 
-= 0.7.5 =
-* Crawler Logs: Top Crawled Pages card — column headers, post-type icons, homepage title resolution, bold titles, numeric bot counts
-* Crawler Logs: Bot Visits Over Time chart — Y-axis labels and gridlines
-* Cite Score page: Cite Score Over Time chart — Y-axis labels, gridlines, X-axis date labels, fixed horizontal squish
+= 0.7.6 =
+First public release on WordPress.org.
 
-= 0.7.4 =
-* Cite Score page: Top Crawler card value text constrained for long bot names; KPI card row height equalized
-* Cite Score page: Cite Score Over Time chart moved into left column (under Post & Page table); Pro Tip footer corrected to full-width position
-* Cite Score page: Post-type pill right-justified in Title column for consistent row alignment
-
-= 0.7.3 =
-* Cite Score page: replaced duplicate Avg Cite Score KPI card with Top Crawler card showing most active AI bot + 7-day trend
-* Cite Score page: renamed to "Posts/Pages Optimized" and "Post & Page Cite Scores" for accuracy across content types
-* Cite Score page: added post-type pill (Post/Page) to Cite Scores table
-* Cite Score page: AI Recommendation cards now link to rubric page (Learn More) and route to correct post type in edit list
-* Cite Score page: Cite Score Over Time chart moved to full-width position below the table
-* Admin: left rail navigation densified for 100% browser zoom usability
-
-= 0.7.2 =
-* Improvement: Exclude posts toggled off from llms.txt from aggregate Cite Score metrics (Dashboard and Cite Score page KPI cards, daily cron average).
-
-= 0.7.1 =
-* Improvement: FAQ detection now recognises accordions built with Kadence, Elementor, Divi, Beaver Builder, Bricks, Spectra, and HTML5 details/summary — in addition to standard headings.
-* Improvement: Schema Suggestions panel shows accurate FAQ pair count (0, 1, or N pairs found) instead of a generic "need ≥ 2" message.
-* Fix: Schema signal now awards incremental points — 6 pts for inline JSON-LD, 3 pts when an SEO plugin is active, 0 pts with no schema detected. Previously an active SEO plugin always awarded full points regardless of whether schema was actually configured.
-
-= 0.6.0 =
-* Initial WordPress.org release.
-* Cite Score: transparent 100-point AI citation score with 17 signals across Structure, Citability, and Authority categories.
-* AI Crawler Tracking: log and filter visits from GPTBot, ClaudeBot, PerplexityBot, and 38+ other AI bots.
-* llms.txt and llms-full.txt generation with cornerstone content prioritization.
-* Gutenberg sidebar with category drilldown.
-* Sortable Cite Score column on Posts and Pages.
-* Dashboard widget with site-wide score, top crawled pages, and bot activity trends.
-* Integrations with Yoast SEO, Rank Math, SEOPress, and AIOSEO.
+* Cite Score — transparent 100-point AI citation readiness score across 17 signals in three categories (Structure, Citability, Authority). Full rubric published at https://citewp.com/cite-score with research citations for every weight.
+* AI Crawler Tracking — log and filter visits from GPTBot, ClaudeBot, PerplexityBot, and 40+ other AI bots across 19 vendors. Bot-type and date-range filters, summary stats, CSV export.
+* llms.txt Generation — automatic llms.txt and llms-full.txt with cornerstone content prioritization. Integrates with Yoast SEO, Rank Math, SEOPress, and AIOSEO.
+* Cite Score in every editor — Gutenberg sidebar with per-signal drilldown and on-demand recalculation; universal meta box brings the Cite Score and schema suggestions to Classic Editor, Elementor, Divi, Beaver Builder, and Bricks.
+* Schema Suggestions — one-click Article and FAQPage JSON-LD generation with per-post schema type selection. FAQ detection recognizes accordions from Kadence, Elementor, Divi, Beaver Builder, Bricks, Spectra, and HTML5 details/summary.
+* Cite Score dashboard — site-wide score, score-over-time trend, per-post score table, AI recommendations, and schema coverage.
+* Crawler Logs page — Bot Visits Over Time and Top Crawled Pages, with date-range-aware KPIs.
+* Per-post llms.txt control — exclude individual posts or pages from llms.txt; excluded content is also dropped from aggregate score metrics.
+* Dashboard widget — average Cite Score, top crawled pages, and AI bot activity at a glance.
