@@ -99,6 +99,9 @@ foreach ($pattern in $ExcludePatterns) {
     if ($pattern.EndsWith("/")) {
         $dirName = $pattern.TrimEnd("/")
         $ExcludeDirs += (Join-Path $PluginRoot $dirName)
+    } elseif ($pattern.Contains("*") -or $pattern.Contains("?")) {
+        # Wildcard: pass filename pattern only; robocopy /XF matches by name, not path
+        $ExcludeFiles += $pattern
     } else {
         $ExcludeFiles += (Join-Path $PluginRoot $pattern)
     }
