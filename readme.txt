@@ -69,11 +69,11 @@ It's an emerging standard that helps AI engines understand your site's most impo
 
 == Screenshots ==
 
-1. Cite Score in the Gutenberg sidebar — 100-point score with category breakdown (Structure, Citability, Authority) and per-signal drilldown. Recalculate on demand.
-2. Sortable Cite Score column on the All Posts screen — color-coded red/orange/yellow/green so weak content stands out at a glance.
-3. WordPress Dashboard widget — site-wide average Cite Score, top crawled pages, and AI bot visit trends.
-4. Crawler Logs — AI bot visit log with bot type filter, date range filter, 24h/7d/30d summary stats, and CSV export.
-5. llms.txt Settings — configure which content appears in your llms.txt and llms-full.txt files.
+1. Cite Score in the WordPress editor — a transparent 100-point AI citation readiness score with category breakdown (Structure, Citability, Authority) and signal-by-signal recommendations, shown live in the editor sidebar.
+2. The CiteWP Dashboard — site-wide Cite Score health, AI bot visit totals, indexed-page coverage, top AI crawlers, and posts needing attention, all at a glance.
+3. Cite Score in every editor — the universal meta box brings the per-post Cite Score, category breakdown, AI bot visits, and llms.txt controls to the Classic Editor and page builders, not just Gutenberg.
+4. Crawler Logs — AI crawler activity across your site with total crawls, unique bots, pages crawled, a Bot Visits Over Time chart, top crawled pages, bot-type and date-range filters, and CSV export.
+5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
 
