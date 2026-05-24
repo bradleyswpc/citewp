@@ -11,11 +11,11 @@ final class ScoreDial {
 
 	public static function grade_label( string $grade ): string {
 		$labels = [
-			'green'  => __( 'Excellent',         'ai-search-optimizer' ),
-			'yellow' => __( 'Good',              'ai-search-optimizer' ),
-			'orange' => __( 'Fair',              'ai-search-optimizer' ),
-			'red'    => __( 'Needs Improvement', 'ai-search-optimizer' ),
-			'empty'  => __( 'No data',           'ai-search-optimizer' ),
+			'green'  => __( 'Excellent',         'citewp-ai-search-optimizer' ),
+			'yellow' => __( 'Good',              'citewp-ai-search-optimizer' ),
+			'orange' => __( 'Fair',              'citewp-ai-search-optimizer' ),
+			'red'    => __( 'Needs Improvement', 'citewp-ai-search-optimizer' ),
+			'empty'  => __( 'No data',           'citewp-ai-search-optimizer' ),
 		];
 		return $labels[ $grade ] ?? '';
 	}
@@ -48,18 +48,18 @@ final class ScoreDial {
 		$gradient_id  = 'citewp-gauge-gradient-' . self::$instance;
 		$score        = max( 0, min( 100, $score ) );
 		$grade_labels = [
-			'green'  => __( 'Excellent',         'ai-search-optimizer' ),
-			'yellow' => __( 'Good',              'ai-search-optimizer' ),
-			'orange' => __( 'Fair',              'ai-search-optimizer' ),
-			'red'    => __( 'Needs Improvement', 'ai-search-optimizer' ),
-			'empty'  => __( 'No data',           'ai-search-optimizer' ),
+			'green'  => __( 'Excellent',         'citewp-ai-search-optimizer' ),
+			'yellow' => __( 'Good',              'citewp-ai-search-optimizer' ),
+			'orange' => __( 'Fair',              'citewp-ai-search-optimizer' ),
+			'red'    => __( 'Needs Improvement', 'citewp-ai-search-optimizer' ),
+			'empty'  => __( 'No data',           'citewp-ai-search-optimizer' ),
 		];
 		$grade_label = $grade_labels[ $grade ] ?? '';
 		?>
 		<div class="citewp-cite-score-gauge citewp-cite-score-gauge--<?php echo esc_attr( $grade ); ?>"
 		     style="--score:<?php echo esc_attr( (string) $score ); ?>;--gauge-gradient:url(#<?php echo esc_attr( $gradient_id ); ?>)">
 			<svg viewBox="0 0 240 140" role="img"
-			     aria-label="<?php echo esc_attr( sprintf( /* translators: 1: score integer 0-100, 2: grade label e.g. "Excellent" */ __( 'Cite Score %1$d out of 100, %2$s', 'ai-search-optimizer' ), $score, $grade_label ) ); ?>">
+			     aria-label="<?php echo esc_attr( sprintf( /* translators: 1: score integer 0-100, 2: grade label e.g. "Excellent" */ __( 'Cite Score %1$d out of 100, %2$s', 'citewp-ai-search-optimizer' ), $score, $grade_label ) ); ?>">
 				<defs>
 					<linearGradient id="<?php echo esc_attr( $gradient_id ); ?>" x1="30" y1="120" x2="210" y2="120" gradientUnits="userSpaceOnUse">
 						<stop offset="0%"   stop-color="#ef4444" />
