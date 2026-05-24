@@ -89,7 +89,7 @@ final class DashboardData {
 					$title   = get_the_title( $front_page_id );
 				} else {
 					$post_id = 0;
-					$title   = __( 'Homepage', 'ai-search-optimizer' );
+					$title   = __( 'Homepage', 'citewp-ai-search-optimizer' );
 				}
 			} else {
 				$uri     = ltrim( $row['request_uri'], '/' );
@@ -746,7 +746,7 @@ final class DashboardData {
 			if ( $ts >= $thirty_d ) {
 				$events[] = [
 					'type'      => 'score-update',
-					'text'      => __( 'Site score recalculated', 'ai-search-optimizer' ),
+					'text'      => __( 'Site score recalculated', 'citewp-ai-search-optimizer' ),
 					'timestamp' => $ts,
 					'icon'      => 'cite-score',
 				];
@@ -758,7 +758,7 @@ final class DashboardData {
 		if ( $llms_regen && is_numeric( $llms_regen ) && (int) $llms_regen >= $thirty_d ) {
 			$events[] = [
 				'type'      => 'llms-regenerated',
-				'text'      => __( 'llms.txt regenerated', 'ai-search-optimizer' ),
+				'text'      => __( 'llms.txt regenerated', 'citewp-ai-search-optimizer' ),
 				'timestamp' => (int) $llms_regen,
 				'icon'      => 'llms-txt',
 			];
@@ -774,7 +774,7 @@ final class DashboardData {
 				$events[] = [
 					'type'      => 'top-bot-visit',
 					/* translators: %s: bot name */
-					'text'      => sprintf( __( '%s visited', 'ai-search-optimizer' ), $visit['bot_name'] ),
+					'text'      => sprintf( __( '%s visited', 'citewp-ai-search-optimizer' ), $visit['bot_name'] ),
 					'timestamp' => $ts,
 					'icon'      => 'bot',
 				];
@@ -808,7 +808,7 @@ final class DashboardData {
 				$events[] = [
 					'type'      => 'high-impact-issue',
 					/* translators: %s: post title */
-					'text'      => sprintf( __( '%s scored', 'ai-search-optimizer' ), $title ),
+					'text'      => sprintf( __( '%s scored', 'citewp-ai-search-optimizer' ), $title ),
 					'timestamp' => $ts,
 					'icon'      => 'alert-triangle',
 				];

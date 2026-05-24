@@ -45,11 +45,11 @@ final class PostListColumn {
 		foreach ( $cols as $key => $label ) {
 			$new[ $key ] = $label;
 			if ( $key === 'title' ) {
-				$new[ self::COLUMN_KEY ] = __( 'Cite Score', 'ai-search-optimizer' );
+				$new[ self::COLUMN_KEY ] = __( 'Cite Score', 'citewp-ai-search-optimizer' );
 			}
 		}
 		if ( ! isset( $new[ self::COLUMN_KEY ] ) ) {
-			$new[ self::COLUMN_KEY ] = __( 'Cite Score', 'ai-search-optimizer' );
+			$new[ self::COLUMN_KEY ] = __( 'Cite Score', 'citewp-ai-search-optimizer' );
 		}
 		return $new;
 	}
@@ -63,7 +63,7 @@ final class PostListColumn {
 		$grade = get_post_meta( $post_id, Repository::META_KEY_GRADE, true );
 
 		if ( $total === '' || $total === false ) {
-			echo '<span class="citewp-aiso-score citewp-aiso-score--none" title="' . esc_attr__( 'Not yet scored', 'ai-search-optimizer' ) . '">—</span>';
+			echo '<span class="citewp-aiso-score citewp-aiso-score--none" title="' . esc_attr__( 'Not yet scored', 'citewp-ai-search-optimizer' ) . '">—</span>';
 			return;
 		}
 

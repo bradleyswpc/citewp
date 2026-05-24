@@ -154,14 +154,14 @@ final class RecommendationFilter {
 						'Showing %1$d post flagged for: %2$s.',
 						'Showing %1$d posts flagged for: %2$s.',
 						$count,
-						'ai-search-optimizer'
+						'citewp-ai-search-optimizer'
 					),
 					$count,
 					$label
 				)
 			),
 			esc_url( $clear ),
-			esc_html__( '× All posts', 'ai-search-optimizer' )
+			esc_html__( '× All posts', 'citewp-ai-search-optimizer' )
 		);
 	}
 }
