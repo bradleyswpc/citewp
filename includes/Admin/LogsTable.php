@@ -33,12 +33,12 @@ final class LogsTable extends \WP_List_Table {
 	 */
 	public function get_columns(): array {
 		return [
-			'detected_at' => __( 'When', 'ai-search-optimizer' ),
-			'bot_name'    => __( 'Bot', 'ai-search-optimizer' ),
-			'bot_vendor'  => __( 'Vendor', 'ai-search-optimizer' ),
-			'request_uri' => __( 'URL', 'ai-search-optimizer' ),
-			'ip_address'  => __( 'IP', 'ai-search-optimizer' ),
-			'user_agent'  => __( 'User Agent', 'ai-search-optimizer' ),
+			'detected_at' => __( 'When', 'citewp-ai-search-optimizer' ),
+			'bot_name'    => __( 'Bot', 'citewp-ai-search-optimizer' ),
+			'bot_vendor'  => __( 'Vendor', 'citewp-ai-search-optimizer' ),
+			'request_uri' => __( 'URL', 'citewp-ai-search-optimizer' ),
+			'ip_address'  => __( 'IP', 'citewp-ai-search-optimizer' ),
+			'user_agent'  => __( 'User Agent', 'citewp-ai-search-optimizer' ),
 		];
 	}
 
@@ -135,17 +135,17 @@ final class LogsTable extends \WP_List_Table {
 		?>
 		<div class="alignleft actions">
 			<label class="screen-reader-text" for="citewp_aiso_bot_filter">
-				<?php esc_html_e( 'Filter by bot', 'ai-search-optimizer' ); ?>
+				<?php esc_html_e( 'Filter by bot', 'citewp-ai-search-optimizer' ); ?>
 			</label>
 			<select id="citewp_aiso_bot_filter" name="citewp_aiso_bot">
-				<option value=""><?php esc_html_e( 'All bots', 'ai-search-optimizer' ); ?></option>
+				<option value=""><?php esc_html_e( 'All bots', 'citewp-ai-search-optimizer' ); ?></option>
 				<?php foreach ( $this->distinct_bots as $bot ) : ?>
 					<option value="<?php echo esc_attr( $bot ); ?>" <?php selected( $current_bot, $bot ); ?>>
 						<?php echo esc_html( $bot ); ?>
 					</option>
 				<?php endforeach; ?>
 			</select>
-			<?php submit_button( __( 'Filter', 'ai-search-optimizer' ), '', 'filter_action', false ); ?>
+			<?php submit_button( __( 'Filter', 'citewp-ai-search-optimizer' ), '', 'filter_action', false ); ?>
 		</div>
 		<?php
 	}
@@ -227,6 +227,6 @@ final class LogsTable extends \WP_List_Table {
 	}
 
 	public function no_items(): void {
-		esc_html_e( 'No crawler activity matches your filters.', 'ai-search-optimizer' );
+		esc_html_e( 'No crawler activity matches your filters.', 'citewp-ai-search-optimizer' );
 	}
 }
