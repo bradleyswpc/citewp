@@ -1387,17 +1387,21 @@ final class Menu {
 						<tr>
 							<td class="citewp-aiso-cs-post-cell">
 								<span style="color:var(--citewp-text-muted);display:inline-flex;flex-shrink:0;margin-top:2px"><?php echo IconLibrary::icon( $t_type_icon, 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-								<?php if ( $t_edit_url ) : ?>
-								<a href="<?php echo esc_url( $t_edit_url ); ?>" title="<?php echo esc_attr( get_the_title() ?: __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?></a>
-								<?php else : ?>
-								<span><?php echo esc_html( get_the_title() ?: __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?></span>
-								<?php endif; ?>
-								<span class="citewp-aiso-cs-post-type-pill citewp-aiso-cs-post-type-pill--<?php echo esc_attr( $t_post_type ); ?>">
-									<?php echo esc_html( $t_post_type === 'page' ? __( 'Page', 'citewp-ai-search-optimizer' ) : __( 'Post', 'citewp-ai-search-optimizer' ) ); ?>
-								</span>
-								<?php if ( $t_excluded ) : ?>
-								<span class="citewp-aiso-cs-excluded-pill"><?php esc_html_e( 'Excluded from llms.txt', 'citewp-ai-search-optimizer' ); ?></span>
-								<?php endif; ?>
+								<div class="citewp-aiso-cs-post-info">
+									<?php if ( $t_edit_url ) : ?>
+									<a class="citewp-aiso-cs-post-info__title" href="<?php echo esc_url( $t_edit_url ); ?>" title="<?php echo esc_attr( get_the_title() ?: __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?>"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?></a>
+									<?php else : ?>
+									<span class="citewp-aiso-cs-post-info__title"><?php echo esc_html( get_the_title() ?: __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?></span>
+									<?php endif; ?>
+									<div class="citewp-aiso-cs-post-info__pills">
+										<span class="citewp-aiso-cs-post-type-pill citewp-aiso-cs-post-type-pill--<?php echo esc_attr( $t_post_type ); ?>">
+											<?php echo esc_html( $t_post_type === 'page' ? __( 'Page', 'citewp-ai-search-optimizer' ) : __( 'Post', 'citewp-ai-search-optimizer' ) ); ?>
+										</span>
+										<?php if ( $t_excluded ) : ?>
+										<span class="citewp-aiso-cs-excluded-pill" title="<?php esc_attr_e( 'Excluded from llms.txt', 'citewp-ai-search-optimizer' ); ?>"><?php esc_html_e( 'Excluded', 'citewp-ai-search-optimizer' ); ?></span>
+										<?php endif; ?>
+									</div>
+								</div>
 							</td>
 							<td><span class="citewp-aiso-score-pill citewp-aiso-score-pill--<?php echo esc_attr( $t_grade ); ?>"><?php echo esc_html( (string) $t_score ); ?></span></td>
 							<td><?php echo $t_trend_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>

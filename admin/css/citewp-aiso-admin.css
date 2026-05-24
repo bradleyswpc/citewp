@@ -2847,26 +2847,31 @@
   gap: 4px;
 }
 
-/* Post-type pill — right-justified in the Title column */
 .citewp-aiso-cs-post-cell {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   gap: var(--sp-3);
   vertical-align: middle;
 }
-
-.citewp-aiso-cs-post-cell > a {
+.citewp-aiso-cs-post-info {
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
+}
+.citewp-aiso-cs-post-info__title {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.citewp-aiso-cs-post-info__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: 4px;
+  align-items: center;
 }
 
 .citewp-aiso-cs-post-type-pill {
-  flex: 0 0 auto;
   display: inline-block;
   padding: 2px 8px;
   font-size: 10px;
@@ -2885,7 +2890,6 @@
   color: var(--citewp-tint-purple);
 }
 .citewp-aiso-cs-excluded-pill {
-  flex: 0 0 auto;
   display: inline-block;
   padding: 2px 8px;
   font-size: 11px;
