@@ -1874,8 +1874,8 @@
 }
 .citewp-aiso-rail__feature-link {
   display: block;
-  text-align: center;
-  margin: 0 var(--sp-4) var(--sp-4);
+  padding: var(--sp-2) var(--sp-4);
+  margin-bottom: var(--sp-2);
   font-size: 12px;
   color: var(--citewp-text-muted);
   text-decoration: none;

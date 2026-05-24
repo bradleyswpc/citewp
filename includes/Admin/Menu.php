@@ -181,6 +181,10 @@ final class Menu {
 					<?php endforeach; ?>
 				</div>
 
+				<a href="https://github.com/bradleyswpc/citewp/discussions/categories/ideas" target="_blank" rel="noopener noreferrer" class="citewp-aiso-rail__feature-link">
+					<?php esc_html_e( 'Request a Feature →', 'citewp-ai-search-optimizer' ); ?>
+				</a>
+
 				<div class="citewp-aiso-rail__pro-card">
 					<div class="citewp-aiso-pro__title-row">
 						<span class="citewp-aiso-pro__icon"><?php echo IconLibrary::icon( 'sparkles', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary::icon() returns pre-escaped SVG ?></span>
@@ -191,10 +195,6 @@ final class Menu {
 						<?php esc_html_e( 'View Pro Plans →', 'citewp-ai-search-optimizer' ); ?>
 					</a>
 				</div>
-
-				<a href="https://github.com/bradleyswpc/citewp/discussions/categories/ideas" target="_blank" rel="noopener noreferrer" class="citewp-aiso-rail__feature-link">
-					<?php esc_html_e( 'Request a Feature →', 'citewp-ai-search-optimizer' ); ?>
-				</a>
 
 			</nav>
 
