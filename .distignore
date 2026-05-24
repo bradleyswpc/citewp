@@ -4,6 +4,7 @@
 .gitignore
 .distignore
 .playwright-mcp/
+.remember/
 .superpowers/
 assets/
 CLAUDE.md
@@ -15,3 +16,10 @@ package-lock.json
 package.ps1
 src/
 tests/
+cite-score-followup-verify.png
+cite-score-kpi-cards.png
+plugin-check-form.png
+plugin-check-results.png
+plugin-check-results2.png
+s31-plugin-check-result.png
+plugin-check-results.md
