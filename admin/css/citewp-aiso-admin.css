@@ -1872,6 +1872,18 @@
 .citewp-aiso-rail__pro-card .citewp-aiso-btn--citrine {
   margin-top: var(--sp-4);
 }
+.citewp-aiso-rail__feature-link {
+  display: block;
+  text-align: center;
+  margin: 0 var(--sp-4) var(--sp-4);
+  font-size: 12px;
+  color: var(--citewp-text-muted);
+  text-decoration: none;
+}
+.citewp-aiso-rail__feature-link:hover {
+  color: var(--wp-admin-theme-color);
+  text-decoration: underline;
+}
 
 /* === SECTION 32: Dashboard KPI v2 — densified 4-card row (D1.5b) === */
 
@@ -2871,6 +2883,18 @@
 .citewp-aiso-cs-post-type-pill--page {
   background: var(--citewp-purple-tint);
   color: var(--citewp-tint-purple);
+}
+.citewp-aiso-cs-excluded-pill {
+  flex: 0 0 auto;
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  border-radius: 4px;
+  vertical-align: middle;
+  background: var(--citewp-orange-tint, #fff4e5);
+  color: var(--citewp-tint-orange, #b45309);
 }
 
 .citewp-aiso-cs-recs-btn {

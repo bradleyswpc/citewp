@@ -192,6 +192,10 @@ final class Menu {
 					</a>
 				</div>
 
+				<a href="https://github.com/bradleyswpc/citewp/discussions/categories/ideas" target="_blank" rel="noopener noreferrer" class="citewp-aiso-rail__feature-link">
+					<?php esc_html_e( 'Request a Feature →', 'citewp-ai-search-optimizer' ); ?>
+				</a>
+
 			</nav>
 
 			<div class="citewp-aiso-main">
@@ -1378,6 +1382,7 @@ final class Menu {
 							}
 							// Trend: no per-post history available yet → show "—"
 							$t_trend_html = '<span class="citewp-aiso-cs-table__trend--flat">—</span>';
+							$t_excluded   = get_post_meta( $t_id, '_citewp_aiso_exclude_from_llms', true ) === '1';
 						?>
 						<tr>
 							<td class="citewp-aiso-cs-post-cell">
@@ -1390,6 +1395,9 @@ final class Menu {
 								<span class="citewp-aiso-cs-post-type-pill citewp-aiso-cs-post-type-pill--<?php echo esc_attr( $t_post_type ); ?>">
 									<?php echo esc_html( $t_post_type === 'page' ? __( 'Page', 'citewp-ai-search-optimizer' ) : __( 'Post', 'citewp-ai-search-optimizer' ) ); ?>
 								</span>
+								<?php if ( $t_excluded ) : ?>
+								<span class="citewp-aiso-cs-excluded-pill"><?php esc_html_e( 'Excluded from llms.txt', 'citewp-ai-search-optimizer' ); ?></span>
+								<?php endif; ?>
 							</td>
 							<td><span class="citewp-aiso-score-pill citewp-aiso-score-pill--<?php echo esc_attr( $t_grade ); ?>"><?php echo esc_html( (string) $t_score ); ?></span></td>
 							<td><?php echo $t_trend_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
@@ -1662,6 +1670,29 @@ final class Menu {
 				</svg>
 				<p class="citewp-aiso-history-panel__empty-text">
 					<?php esc_html_e( 'Not enough history yet. Site Cite Score is recorded daily — check back tomorrow for your first data point.', 'citewp-ai-search-optimizer' ); ?>
+				</p>
+			</div>
+			<?php
+			return;
+		}
+
+		// ── 3b. Sparse-data state: fewer than 3 non-null points in the selected window. ─
+		$sparse_point_count = 0;
+		foreach ( $score_datasets as $i => $ds ) {
+			foreach ( $spine as $date ) {
+				if ( ( $score_maps[ $i ][ $date ] ?? null ) !== null ) {
+					$sparse_point_count++;
+				}
+			}
+		}
+		if ( $sparse_point_count < 3 ) {
+			?>
+			<div class="citewp-aiso-history-panel__empty">
+				<svg viewBox="0 0 340 60" width="100%" height="60" aria-hidden="true">
+					<line x1="0" y1="30" x2="340" y2="30" stroke="var(--citewp-border)" stroke-width="2" stroke-dasharray="6 4"/>
+				</svg>
+				<p class="citewp-aiso-history-panel__empty-text">
+					<?php esc_html_e( 'Not enough history yet — daily scores accumulate over time.', 'citewp-ai-search-optimizer' ); ?>
 				</p>
 			</div>
 			<?php
