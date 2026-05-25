@@ -6,6 +6,103 @@
 
 ---
 
+## Session 39 — WP.org Launch: v0.7.7 First Public Release ✅
+
+**Date:** 2026-05-24
+
+### Deliverable
+
+First public release of CiteWP AI Search Optimizer on WordPress.org. Covered six phases: textdomain rename (Phase 1), readme.txt updates (Phase 2), Plugin Check cleanup (Phase 3), pre-launch UI polish + version bump to 0.7.7 (Phase 5), and SVN push — trunk + tag + assets (Phases 4–6). citewp.com update zip also built and verified.
+
+### What shipped
+
+**Phase 1 — Textdomain rename:**
+- `ai-search-optimizer` → `citewp-ai-search-optimizer` across 322 instances in 13 PHP files
+- readme.txt: stable tag updated, tested-up-to 6.9 → 7.0
+
+**Phase 3 — Plugin Check cleanup (5 errors → 0):**
+- `Menu.php`: `esc_html( sprintf() )` wraps on unescaped outputs, `/* translators: */` comments added, `absint( wp_unslash() )` on `$_GET` reads, precise `phpcs:ignore` justifications on SlowDBQuery
+- `DashboardData.php`: `MissingTranslatorsComment` resolved
+
+**Phase 5 — Pre-launch polish (v0.7.7):**
+- `includes/Admin/Menu.php`: FB47 excluded pill label → "Excluded" + `title` tooltip; post cell restructured to two-line layout (title row + pills row — title always visible on excluded rows); sparse chart "Not enough history yet" state (< 3 data points); "Request a Feature →" link moved above pro card, left-aligned
+- `admin/css/citewp-aiso-admin.css`: `.citewp-aiso-cs-post-info` wrapper + `__title` (-webkit-line-clamp: 2) + `__pills` flex row; `.citewp-aiso-rail__feature-link` left-aligned above pro card; `.citewp-aiso-cs-excluded-pill` shortened label styling
+- `.distignore`: wildcard PNG patterns (`smoke-*.png`, `plugin-check-*.png`, `cite-score-*.png`, `s31-*.png`, `*.md`)
+- `package.ps1`: wildcard support fix — passes filename-only patterns to robocopy `/XF` (prevents exit code 16 on wildcard paths)
+- `ai-search-optimizer.php`: version bump → 0.7.7
+- `readme.txt`: stable tag 0.7.7 + 0.7.7 changelog entry
+
+**Phases 4–6 — SVN push to WordPress.org:**
+- Checkout: `https://plugins.svn.wordpress.org/citewp-ai-search-optimizer` (r3546752, empty repo)
+- Trunk commit: r3546760 (48 files, 0.78 MB, clean)
+- Tag: `svn cp trunk tags/0.7.7` → r3546762
+- Assets: r3546767 (9 files: banner-1544x500, banner-772x250, icon-128x128, icon-256x256, screenshot-1 through screenshot-5)
+
+**citewp.com update zip:**
+- `ai-search-optimizer.0.7.7.zip` verified — top-level folder: `ai-search-optimizer/`, 48 files, stable tag 0.7.7, no dev files. Safe in-place replace via WP Admin upload.
+
+### Files modified
+
+- `includes/Admin/Menu.php` — excluded pill layout + label, sparse chart state, Request a Feature link
+- `admin/css/citewp-aiso-admin.css` — post cell two-line layout, excluded pill, feature link
+- `ai-search-optimizer.php` — version 0.7.7
+- `readme.txt` — stable tag 0.7.7, changelog
+- `.distignore` — wildcard PNG patterns
+- `package.ps1` — robocopy wildcard support
+
+### Decisions made
+
+- **X23:** citewp.com update zip uses `ai-search-optimizer/` as top-level folder (not `citewp-ai-search-optimizer/`) — see DECISIONS.md
+
+### Verified
+
+- Plugin Check on real 0.7.7 dist (extracted zip): **0 errors, 4 warnings** (3× `trademarked_term` + 1× `DirectDB.UnescapedDBParameter` — all known false-positives) ✅
+- Excluded pill: title always visible on excluded rows; pill reads "Excluded" with hover tooltip ✅
+- SVN: trunk r3546760, tag r3546762, assets r3546767 committed ✅
+- citewp.com zip: top-level folder = `ai-search-optimizer/`, 48 files, stable tag 0.7.7 ✅
+- debug.log: no new plugin PHP errors (connection-refused entries are LocalWP-offline artifacts) ✅
+- npm build: no JS changes this session — no build required ✅
+
+### Carryover into Session 40
+
+**Completed this session — removed from backlog:**
+- Forward-port textdomain rename to `main` ✅
+- WP.org Round 4 watch ✅ (plugin approved, SVN pushed)
+- "Suggest a Feature" link in plugin rail ✅ (shipped as "Request a Feature →" in Phase 5)
+
+**New immediate tasks:**
+1. **Upload 0.7.7 to citewp.com** — WP Admin → Plugins → Upload → `ai-search-optimizer.0.7.7.zip` (in-place replace, folder matches)
+2. **Post-launch verify** — confirm `wordpress.org/plugins/citewp-ai-search-optimizer/` renders, version shows 0.7.7, screenshots display
+
+**Ongoing carryover (unchanged):**
+3. Schema-fail-only table filter — "View Schema Gaps →" query-param plumbing. FB candidate.
+4. Hoist `new Repository()` out of foreach in `schema_coverage()` — minor refactor.
+5. citewp.com client diff — apply honeypot HTML + JS changes manually on Kinsta
+6. UI/UX audit queue — 5 queued fixes from S33 audit (aria labels, grade visibility, skeleton states, motion prefs)
+7. P52 messaging audit — replace "AI-powered SEO" / "Connect to Claude" copy patterns across plugin surfaces
+8. UI-DESIGN-SYSTEM.md Line Chart Panel entry — stale pre-D4; update to reflect single-series architecture
+9. Cite Score page top-row brainstorm — gauge + score breakdown row layout review (S35 deferred)
+10. Scroll-to-top on rail nav clicks
+11. Dynamic Pro Tip content engine — contextual tips based on current score/recommendations (S35 deferred)
+12. Browser verify typography (S36 carryover)
+
+**Still active from Sessions 16–25:**
+- Anti-cloaking content (S7)
+- Page-builder canvas-mode awareness surface
+- Per-post surface consolidation doc
+- Brain consolidation session
+- Cite Score badge rectangular shape (S20 Group 6 deferral)
+- S22 polish carryover: JetBrains Mono for category/signal fractions; Lucide chevrons for expand/collapse
+- **Note:** entities detector bug (`ContentAnalysis.php` `count_entities()` regex) is A11-gated.
+- **Note:** P33 (Posts/Pages stat split) still deferred.
+- **Note:** Needs Attention "what's wrong" reasoning logic — deferred.
+
+### Next session focus
+
+**Session 40:** Post-launch tasks — (a) upload 0.7.7 to citewp.com, (b) verify WP.org listing renders correctly, (c) pick next feature from Phase 1.5 remaining sequence or user-directed.
+
+---
+
 ## Session 38 — FB44 Dirty-Aware Recalculate (Gutenberg Sidebar) ✅
 
 **Date:** 2026-05-22
