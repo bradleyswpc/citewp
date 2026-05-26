@@ -38,6 +38,9 @@ final class Detector {
 
 	private ?int $capture_post_id = null;
 
+	/** @var array<string, array> In-memory cache — prevents duplicate tier-1 requests per scoring run. */
+	private array $request_cache = [];
+
 	public function register(): void {
 		add_action( 'template_redirect', [ $this, 'on_template_redirect' ] );
 		add_action( 'save_post', [ $this, 'on_save_post' ], 10 );
@@ -100,13 +103,20 @@ final class Detector {
 	 * @return array{state: string, types: string[], faq_valid: bool, article_valid: bool, source: string}
 	 */
 	public function get_detected_types( int $post_id, bool $explicit_recalculate = false ): array {
+		$cache_key = $post_id . ':' . ( $explicit_recalculate ? '1' : '0' );
+		if ( isset( $this->request_cache[ $cache_key ] ) ) {
+			return $this->request_cache[ $cache_key ];
+		}
+
 		$post = get_post( $post_id );
 
 		// Tier 1: sync self-request — explicit Recalculate on published posts only.
 		if ( $explicit_recalculate && $post instanceof \WP_Post && $post->post_status === 'publish' ) {
 			$result = $this->fetch_from_permalink( $post_id );
 			if ( $result !== null ) {
-				return array_merge( $result, [ 'source' => 'tier1' ] );
+				$final = array_merge( $result, [ 'source' => 'tier1' ] );
+				$this->request_cache[ $cache_key ] = $final;
+				return $final;
 			}
 		}
 
@@ -115,24 +125,30 @@ final class Detector {
 		if ( is_string( $cached ) && $cached !== '' ) {
 			$decoded = json_decode( $cached, true );
 			if ( is_array( $decoded ) && isset( $decoded['state'] ) ) {
-				return array_merge( $decoded, [ 'source' => 'tier2' ] );
+				$final = array_merge( $decoded, [ 'source' => 'tier2' ] );
+				$this->request_cache[ $cache_key ] = $final;
+				return $final;
 			}
 		}
 
 		// Tier 3: post_content scan — fenced to hand-rolled wp:html blocks only.
 		$result = $this->scan_post_content( $post_id );
 		if ( $result !== null ) {
-			return array_merge( $result, [ 'source' => 'tier3' ] );
+			$final = array_merge( $result, [ 'source' => 'tier3' ] );
+			$this->request_cache[ $cache_key ] = $final;
+			return $final;
 		}
 
 		// Cold-start: could not verify, do not credit.
-		return [
+		$final = [
 			'state'         => 'not_verified',
 			'types'         => [],
 			'faq_valid'     => false,
 			'article_valid' => false,
 			'source'        => 'cold_start',
 		];
+		$this->request_cache[ $cache_key ] = $final;
+		return $final;
 	}
 
 	// ── Tier 1: sync self-request ─────────────────────────────────────────────
