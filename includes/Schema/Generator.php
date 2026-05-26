@@ -210,7 +210,7 @@ final class Generator {
 		while ( $sib ) {
 			if ( $sib instanceof \DOMElement ) {
 				if ( $sib->nodeName === 'p' ) {
-					return trim( wp_strip_all_tags( $sib->textContent ) );
+					return $this->clean_text( $sib );
 				}
 				if ( preg_match( '/^h[1-6]$/i', $sib->nodeName ) ) {
 					break;
@@ -218,7 +218,7 @@ final class Generator {
 				if ( in_array( $sib->nodeName, [ 'div', 'section' ], true ) ) {
 					foreach ( $sib->childNodes as $child ) {
 						if ( $child instanceof \DOMElement && $child->nodeName === 'p' ) {
-							return trim( wp_strip_all_tags( $child->textContent ) );
+							return $this->clean_text( $child );
 						}
 					}
 				}
@@ -237,7 +237,9 @@ final class Generator {
 			if ( $child->isSameNode( $summary ) ) {
 				continue;
 			}
-			$text = trim( wp_strip_all_tags( $child->textContent ?? '' ) );
+			$text = $child instanceof \DOMElement
+				? $this->clean_text( $child )
+				: trim( $child->textContent ?? '' );
 			if ( $text !== '' ) {
 				$parts[] = $text;
 			}
@@ -253,14 +255,17 @@ final class Generator {
 		$controls = $btn->getAttribute( 'aria-controls' );
 		if ( $controls !== '' ) {
 			$target = $xpath->query( '//*[@id="' . esc_attr( $controls ) . '"]' )->item( 0 );
-			if ( $target ) {
-				return trim( wp_strip_all_tags( $target->textContent ) );
+			if ( $target instanceof \DOMElement ) {
+				return $this->clean_text( $target );
 			}
 		}
 		$sib = $btn->nextSibling;
 		while ( $sib ) {
 			if ( $sib instanceof \DOMElement ) {
-				return trim( wp_strip_all_tags( $sib->textContent ) );
+				$text = $this->clean_text( $sib );
+				if ( $text !== '' ) {
+					return $text;
+				}
 			}
 			$sib = $sib->nextSibling;
 		}
@@ -269,7 +274,10 @@ final class Generator {
 			$sib = $parent->nextSibling;
 			while ( $sib ) {
 				if ( $sib instanceof \DOMElement ) {
-					return trim( wp_strip_all_tags( $sib->textContent ) );
+					$text = $this->clean_text( $sib );
+					if ( $text !== '' ) {
+						return $text;
+					}
 				}
 				$sib = $sib->nextSibling;
 			}
@@ -357,25 +365,10 @@ final class Generator {
 		$seen  = [];
 		$q_re  = '/^(how|what|why|when|where|can|should|is|does|do|will)\b/i';
 
-		// ── Pattern 1: h2 / h3 / h4 + first <p> sibling ────────────────────────
-		$headings = $xpath->query( '//h2|//h3|//h4' );
-		if ( $headings ) {
-			foreach ( $headings as $heading ) {
-				$q = trim( wp_strip_all_tags( $heading->textContent ) );
-				if ( $q === '' || isset( $seen[ $q ] ) ) {
-					continue;
-				}
-				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
-					continue;
-				}
-				$a = $this->first_p_after( $heading );
-				if ( $a === '' ) {
-					continue;
-				}
-				$seen[ $q ] = true;
-				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
-			}
-		}
+		// Normalises a question string to a cross-pattern dedup key.
+		$q_key = static function ( string $q ): string {
+			return strtolower( preg_replace( '/\s+/', ' ', trim( $q ) ) );
+		};
 
 		// ── Pattern 2: <details> / <summary> ────────────────────────────────────
 		$details_list = $xpath->query( '//details' );
@@ -387,19 +380,17 @@ final class Generator {
 				if ( ! $summary instanceof \DOMElement ) {
 					continue;
 				}
-				$q = trim( wp_strip_all_tags( $summary->textContent ) );
-				if ( $q === '' || isset( $seen[ $q ] ) ) {
-					continue;
-				}
-				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
+				$q   = $this->clean_text( $summary );
+				$key = $q_key( $q );
+				if ( $key === '' || isset( $seen[ $key ] ) ) {
 					continue;
 				}
 				$a = $this->details_body( $details, $summary );
 				if ( $a === '' ) {
 					continue;
 				}
-				$seen[ $q ] = true;
-				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
+				$seen[ $key ] = true;
+				$pairs[]      = [ 'question' => $q, 'answer' => $a ];
 			}
 		}
 
@@ -419,55 +410,86 @@ final class Generator {
 				if ( $inner_aria && $inner_aria->length > 0 ) {
 					continue;
 				}
-				$q = trim( wp_strip_all_tags( $btn->textContent ) );
-				if ( $q === '' || isset( $seen[ $q ] ) ) {
-					continue;
-				}
-				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
+				$q   = $this->clean_text( $btn );
+				$key = $q_key( $q );
+				if ( $key === '' || isset( $seen[ $key ] ) ) {
 					continue;
 				}
 				$a = $this->aria_answer( $xpath, $btn );
 				if ( $a === '' ) {
 					continue;
 				}
-				$seen[ $q ] = true;
-				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
+				$seen[ $key ] = true;
+				$pairs[]      = [ 'question' => $q, 'answer' => $a ];
 			}
 		}
 
-		// ── Pattern 4: CSS-class accordion containers ────────────────────────────
-		$css_query = '//*[contains(@class,"accordion") or contains(@class,"faq")'
+		// ── Pattern 4: heading + sibling block inside accordion-class ancestor ──
+		// Targets builders (e.g. Kadence in PHP output) that render accordion
+		// headers as real heading tags without ARIA attributes. Finds h2-h5 or
+		// button elements that: (a) are descendants of an accordion-class parent,
+		// and (b) have a block-level sibling — then pairs each with that sibling.
+		// Avoids the class-substring problem (every kt-accordion-* class contains
+		// "accordion") by matching on tag name + sibling structure, not class names.
+		$acc_q_nodes = $xpath->query(
+			'//*[contains(@class,"accordion") or contains(@class,"faq")'
 			. ' or contains(@class,"toggle") or contains(@class,"collapse")]'
-			. '[not(@role) and not(@aria-expanded)]';
-		$css_nodes = $xpath->query( $css_query );
-		if ( $css_nodes ) {
-			foreach ( $css_nodes as $container ) {
-				/** @var \DOMElement $container */
-				$q_node = $xpath->query(
-					'.//*[contains(@class,"question") or contains(@class,"title")'
-					. ' or contains(@class,"header") or contains(@class,"heading")]',
-					$container
-				);
-				$a_node = $xpath->query(
-					'.//*[contains(@class,"answer") or contains(@class,"body")'
-					. ' or contains(@class,"content") or contains(@class,"panel")]',
-					$container
-				);
-				$q_el = $q_node ? $q_node->item( 0 ) : null;
-				$a_el = $a_node ? $a_node->item( 0 ) : null;
-				if ( ! $q_el || ! $a_el ) {
+			. '//*[(self::h2 or self::h3 or self::h4 or self::h5 or self::button)'
+			. ' and not(@role) and not(@aria-expanded)'
+			. ' and (following-sibling::div or following-sibling::section)]'
+		);
+		if ( $acc_q_nodes ) {
+			foreach ( $acc_q_nodes as $q_el ) {
+				/** @var \DOMElement $q_el */
+				$q   = $this->clean_text( $q_el );
+				$key = $q_key( $q );
+				if ( $key === '' || isset( $seen[ $key ] ) ) {
 					continue;
 				}
-				$q = trim( wp_strip_all_tags( $q_el->textContent ) );
-				$a = trim( wp_strip_all_tags( $a_el->textContent ) );
-				if ( $q === '' || $a === '' || isset( $seen[ $q ] ) ) {
+				// Walk forward through siblings to find the first non-empty block.
+				$sib = $q_el->nextSibling;
+				$a   = '';
+				while ( $sib ) {
+					if ( $sib instanceof \DOMElement
+						&& in_array( $sib->nodeName, [ 'div', 'section', 'p', 'ul', 'ol' ], true )
+					) {
+						$a = $this->clean_text( $sib );
+						if ( $a !== '' ) {
+							break;
+						}
+					}
+					$sib = $sib->nextSibling;
+				}
+				if ( $a === '' ) {
 					continue;
 				}
-				if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
-					continue;
+				$seen[ $key ] = true;
+				$pairs[]      = [ 'question' => $q, 'answer' => $a ];
+			}
+		}
+
+		// ── Pattern 1: h2/h3/h4 + first <p> sibling (fallback only) ────────────
+		// Only fires when Patterns 2/3/4 found nothing — prevents article headings
+		// that look question-shaped from matching alongside real FAQ structures.
+		if ( empty( $pairs ) ) {
+			$headings = $xpath->query( '//h2|//h3|//h4' );
+			if ( $headings ) {
+				foreach ( $headings as $heading ) {
+					$q   = $this->clean_text( $heading );
+					$key = $q_key( $q );
+					if ( $key === '' || isset( $seen[ $key ] ) ) {
+						continue;
+					}
+					if ( ! preg_match( $q_re, $q ) && ! str_ends_with( $q, '?' ) ) {
+						continue;
+					}
+					$a = $this->first_p_after( $heading );
+					if ( $a === '' ) {
+						continue;
+					}
+					$seen[ $key ] = true;
+					$pairs[]      = [ 'question' => $q, 'answer' => $a ];
 				}
-				$seen[ $q ] = true;
-				$pairs[]    = [ 'question' => $q, 'answer' => $a ];
 			}
 		}
 
@@ -485,5 +507,35 @@ final class Generator {
 			$this->analysis_cache[ $post->ID ] = new ContentAnalysis( $post );
 		}
 		return $this->analysis_cache[ $post->ID ];
+	}
+
+	/**
+	 * Returns trimmed plain text from a DOM node after removing noise descendants.
+	 * Strips <style>/<script>/<noscript> from a clone before reading textContent,
+	 * preventing injected CSS/JS (e.g. Kadence inline styles) from leaking into schema.
+	 */
+	private function clean_text( \DOMNode $node ): string {
+		$clone = $node->cloneNode( true );
+		$this->strip_noise_nodes( $clone );
+		return trim( wp_strip_all_tags( $clone->textContent ) );
+	}
+
+	/**
+	 * Recursively removes <style>, <script>, and <noscript> elements from a DOM node.
+	 */
+	private function strip_noise_nodes( \DOMNode $node ): void {
+		$to_remove = [];
+		foreach ( $node->childNodes as $child ) {
+			if ( $child instanceof \DOMElement
+				&& in_array( strtolower( $child->nodeName ), [ 'style', 'script', 'noscript' ], true )
+			) {
+				$to_remove[] = $child;
+			} else {
+				$this->strip_noise_nodes( $child );
+			}
+		}
+		foreach ( $to_remove as $el ) {
+			$node->removeChild( $el );
+		}
 	}
 }
