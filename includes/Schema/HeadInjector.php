@@ -48,8 +48,7 @@ final class HeadInjector {
 			return;
 		}
 		echo '<!-- CiteWP AI Search Optimizer - https://citewp.com -->' . "\n";
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- schema blocks are built from wp_json_encode() with JSON_HEX_TAG (no raw HTML in values) and hardcoded <script> wrappers; content is safe.
-		echo implode( "\n", $blocks ) . "\n";
+		echo implode( "\n", $blocks ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Safe: each block is a hardcoded opening script tag, wp_json_encode output (JSON_HEX_TAG flag escapes angle brackets in string values so a closing script tag cannot appear), and a hardcoded closing script tag. No user data reaches the output unescaped.
 		echo '<!-- /CiteWP AI Search Optimizer -->' . "\n";
 	}
 
