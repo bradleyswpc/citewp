@@ -82,6 +82,8 @@ It's an emerging standard that helps AI engines understand your site's most impo
 * FAQ/Article signal independence — Article/Schema signal gates on Article-type validation, not presence of any schema type; FAQPage-only detections credit the FAQ signal only. Schema detection cache survives content edits and clears on post status transitions only (not every save).
 * json_decode_tolerant — hand-crafted JSON-LD with literal CR/LF in string values (accepted by Google Rich Results, rejected by PHP's strict parser) now parsed correctly.
 * Flag-don't-inject — CiteWP no longer offers to insert FAQPage schema when a valid FAQPage already exists on the rendered page, preventing Rich Result clobbering. Removes the Kadence block-label auto-generation trigger that caused duplicate FAQPage schema insertion.
+* FAQ extraction fix — inline CSS from Kadence accordion blocks no longer leaks into acceptedAnswer.text; clean_text() strips style/script noise nodes before extracting text content.
+* Head injection — Schema Suggestions Insert/Remove now stores generated schema in post meta and emits via wp_head, replacing block-editor insertion. Eliminates wpautop corruption of JSON-LD in post_content. Insert and Remove buttons backed by REST endpoint with detect-before-inject conflict guard.
 
 = 0.7.7 =
 * Cite Score page — 'Excluded from llms.txt' pill on per-post table rows for posts excluded from llms.txt generation.
