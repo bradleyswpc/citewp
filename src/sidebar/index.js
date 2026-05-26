@@ -12,7 +12,6 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button, Spinner, PanelBody, ToggleControl } from '@wordpress/components';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
-import { createBlock } from '@wordpress/blocks';
 import './style.scss';
 
 function CiteWPIcon() {
@@ -284,8 +283,6 @@ function SchemaSuggestions() {
 	const postId       = useSelect( ( s ) => s( 'core/editor' ).getCurrentPostId(), [] );
 	const isSavingPost = useSelect( ( s ) => s( 'core/editor' ).isSavingPost(), [] );
 	const isAutosaving = useSelect( ( s ) => s( 'core/editor' ).isAutosavingPost(), [] );
-	const { insertBlock } = useDispatch( 'core/block-editor' );
-
 	const [ schema,    setSchema    ] = useState( null );
 	const [ loading,   setLoading   ] = useState( false );
 	const [ error,     setError     ] = useState( null );
@@ -294,12 +291,14 @@ function SchemaSuggestions() {
 
 	const fetchSchema = useCallback( async () => {
 		if ( ! postId ) return;
-		setInserted( {} );
 		setLoading( true );
 		setError( null );
 		try {
 			const data = await apiFetch( { path: `/citewp/aiso/v1/schema/${ postId }` } );
 			setSchema( data );
+			const map = {};
+			( data.injected || [] ).forEach( ( type ) => { map[ type ] = true; } );
+			setInserted( map );
 		} catch ( e ) {
 			setError( e.message || 'Failed to load schema suggestions' );
 		} finally {
@@ -320,20 +319,28 @@ function SchemaSuggestions() {
 		}
 	}, [ isSavingPost, isAutosaving, wasSaving, fetchSchema ] );
 
-	const insertSchemaBlock = useCallback( ( schemaKey ) => {
-		if ( ! schema || ! schema[ schemaKey ] ) return;
+	const injectSchema = useCallback( async ( schemaKey, action = 'inject' ) => {
+		if ( ! postId ) return;
 		setInserting( ( prev ) => ( { ...prev, [ schemaKey ]: true } ) );
-
-		const json    = JSON.stringify( schema[ schemaKey ], null, 2 );
-		const content = `<script type="application/ld+json">\n${ json }\n</script>`;
-		const block   = createBlock( 'core/html', { content } );
-		// Append to end — omitting the index is the safe pattern since getBlockCount()
-		// returns root-level blocks only and would misplace the block inside nested blocks.
-		insertBlock( block );
-
-		setInserting( ( prev ) => ( { ...prev, [ schemaKey ]: false } ) );
-		setInserted( ( prev ) => ( { ...prev, [ schemaKey ]: true } ) );
-	}, [ schema, insertBlock ] );
+		try {
+			const data = await apiFetch( {
+				path: `/citewp/aiso/v1/schema/${ postId }/inject`,
+				method: 'POST',
+				data: { type: schemaKey, action },
+			} );
+			// Optimistic update from POST response so button flips immediately.
+			const map = {};
+			( data.injected || [] ).forEach( ( type ) => { map[ type ] = true; } );
+			setInserted( map );
+		} catch ( e ) {
+			// fall through — fetchSchema below will correct state
+		} finally {
+			setInserting( ( prev ) => ( { ...prev, [ schemaKey ]: false } ) );
+			// Always re-fetch so schema.faqpage/article refreshes (e.g. Insert
+			// reappears after Remove without needing a manual page reload).
+			fetchSchema();
+		}
+	}, [ postId, fetchSchema ] );
 
 	if ( ! postId ) return null;
 
@@ -387,7 +394,8 @@ function SchemaSuggestions() {
 						generated={ !! schema[ type.key ] }
 						inserted={ !! inserted[ type.key ] }
 						inserting={ !! inserting[ type.key ] }
-						onInsert={ () => insertSchemaBlock( type.key ) }
+						onInsert={ () => injectSchema( type.key ) }
+						onRemove={ () => injectSchema( type.key, 'remove' ) }
 						emptyMessage={ emptyMsg }
 						statusText={ statusText }
 					/>
@@ -402,8 +410,8 @@ function SchemaSuggestions() {
 	);
 }
 
-function SchemaTypeRow( { label, detected, generated, inserted, inserting, onInsert, emptyMessage, statusText } ) {
-	if ( ! generated && ! detected ) {
+function SchemaTypeRow( { label, detected, generated, inserted, inserting, onInsert, onRemove, emptyMessage, statusText } ) {
+	if ( ! generated && ! detected && ! inserted ) {
 		return emptyMessage ? (
 			<div className="citewp-aiso-sidebar-schema-row__empty">
 				{ emptyMessage }
@@ -412,11 +420,22 @@ function SchemaTypeRow( { label, detected, generated, inserted, inserting, onIns
 	}
 
 	let action;
-	if ( detected || inserted ) {
-		const statusLabel = ( inserted && ! detected ) ? 'Added to editor (save to apply)' : 'Already detected';
+	if ( inserted ) {
+		action = (
+			<Button
+				variant="secondary"
+				size="small"
+				onClick={ onRemove }
+				isBusy={ inserting }
+				disabled={ inserting }
+			>
+				Remove
+			</Button>
+		);
+	} else if ( detected ) {
 		action = (
 			<span className="citewp-aiso-sidebar-schema-row__pill">
-				{ statusLabel }
+				Already detected
 			</span>
 		);
 	} else {
