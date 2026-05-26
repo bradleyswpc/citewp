@@ -63,7 +63,10 @@ final class Plugin {
 		$this->modules['rest_score_controller']->register();
 
 		// REST API for schema suggestions (Document Settings panel).
-		$this->modules['rest_schema_controller'] = new Rest\SchemaController();
+		$this->modules['rest_schema_controller'] = new Rest\SchemaController(
+			null,
+			$this->modules['schema_detector']
+		);
 		$this->modules['rest_schema_controller']->register();
 
 		// Score history: cron callback registered on every request.

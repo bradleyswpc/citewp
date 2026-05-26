@@ -12,6 +12,7 @@ declare( strict_types=1 );
 
 namespace CiteWP\Aiso\Rest;
 
+use CiteWP\Aiso\Schema\Detector;
 use CiteWP\Aiso\Schema\Generator;
 
 defined( 'ABSPATH' ) || exit;
@@ -21,9 +22,11 @@ final class SchemaController {
 	private const NAMESPACE = 'citewp/aiso/v1';
 
 	private Generator $generator;
+	private Detector  $detector;
 
-	public function __construct( ?Generator $generator = null ) {
+	public function __construct( ?Generator $generator = null, ?Detector $detector = null ) {
 		$this->generator = $generator ?? new Generator();
+		$this->detector  = $detector ?? new Detector();
 	}
 
 	public function register(): void {
@@ -68,16 +71,26 @@ final class SchemaController {
 			return new \WP_REST_Response( [ 'error' => 'post_not_found' ], 404 );
 		}
 
-		$article   = $this->generator->generate_article_schema( $post );
-		$faqpage   = $this->generator->generate_faq_schema( $post );
-		$detected  = $this->generator->detect_existing_types( $post );
+		$article = $this->generator->generate_article_schema( $post );
+
+		// Use emitter-agnostic detection for the 'detected' badge list.
+		$schema_result = $this->detector->get_detected_types( $post->ID );
+		$detected      = $schema_result['types'] ?: $this->generator->detect_existing_types( $post );
+
+		// Decision 1 (S40): flag-don't-inject. If valid FAQPage schema already exists
+		// on the rendered page, suppress the generated FAQ schema so we don't offer to
+		// insert a second one that would clobber the user's existing markup.
+		$faqpage   = null;
 		$faq_count = $this->generator->count_faq_pairs( $post );
+		if ( ! $schema_result['faq_valid'] ) {
+			$faqpage = $this->generator->generate_faq_schema( $post ) ?: null;
+		}
 
 		return new \WP_REST_Response(
 			[
 				'article'   => $article,
-				'faqpage'   => $faqpage ?: null,
-				'detected'  => array_values( $detected ),
+				'faqpage'   => $faqpage,
+				'detected'  => array_values( (array) $detected ),
 				'faq_count' => $faq_count,
 			],
 			200
