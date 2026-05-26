@@ -45,9 +45,17 @@ final class Plugin {
 			$this->modules['llms_router']->register();
 		}
 
+		// Schema detector: captures rendered-page JSON-LD via template_redirect cache
+		// and tier-1 self-request. Must run on every request, not admin-only.
+		$this->modules['schema_detector'] = new Schema\Detector();
+		$this->modules['schema_detector']->register();
+
 		// Scoring: persists scores on save_post; runs on every request because
 		// the save_post hook needs to be registered.
-		$this->modules['scoring_repository'] = new Scoring\Repository();
+		$this->modules['scoring_repository'] = new Scoring\Repository(
+			null,
+			$this->modules['schema_detector']
+		);
 		$this->modules['scoring_repository']->register();
 
 		// REST API for score retrieval (Gutenberg sidebar + post list).
