@@ -12,6 +12,8 @@ declare( strict_types=1 );
 
 namespace CiteWP\Aiso\Scoring;
 
+use CiteWP\Aiso\Schema\Detector;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Repository {
@@ -26,8 +28,8 @@ final class Repository {
 
 	private Engine $engine;
 
-	public function __construct( ?Engine $engine = null ) {
-		$this->engine = $engine ?? new Engine();
+	public function __construct( ?Engine $engine = null, ?Detector $detector = null ) {
+		$this->engine = $engine ?? new Engine( $detector ?? new Detector() );
 	}
 
 	public function register(): void {
@@ -40,14 +42,17 @@ final class Repository {
 
 	/**
 	 * Recalculate and persist a post's score.
+	 *
+	 * @param bool $explicit_recalculate Set true when triggered by the Recalculate REST endpoint
+	 *                                   to enable tier-1 sync self-request schema detection.
 	 */
-	public function recalculate( int $post_id ): ?ScoreResult {
+	public function recalculate( int $post_id, bool $explicit_recalculate = false ): ?ScoreResult {
 		$post = get_post( $post_id );
 		if ( ! $post || ! in_array( $post->post_type, $this->scorable_types(), true ) ) {
 			return null;
 		}
 
-		$result = $this->engine->score( $post );
+		$result = $this->engine->score( $post, $explicit_recalculate );
 		$this->save( $post_id, $result );
 		return $result;
 	}

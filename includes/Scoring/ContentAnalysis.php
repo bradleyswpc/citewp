@@ -120,9 +120,8 @@ final class ContentAnalysis {
 			}
 		}
 
-		// Yoast / Rank Math schema is added at output time, not stored in post_content.
-		// We treat presence of the SEO plugin as a positive signal in the schema check.
-
+		// has_faq_schema reflects only post_content-embedded JSON-LD (hand-rolled wp:html blocks).
+		// Hook-injected schema (Rank Math, Yoast, AIOSEO) is detected by Schema\Detector instead.
 		$this->has_faq_schema = in_array( 'FAQPage', $this->schema_types, true )
 			|| in_array( 'Question', $this->schema_types, true );
 	}

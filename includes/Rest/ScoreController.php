@@ -99,7 +99,7 @@ final class ScoreController {
 
 	public function recalculate( \WP_REST_Request $request ): \WP_REST_Response {
 		$post_id = (int) $request['post_id'];
-		$result  = $this->repo->recalculate( $post_id );
+		$result  = $this->repo->recalculate( $post_id, true );
 
 		if ( $result === null ) {
 			return new \WP_REST_Response(

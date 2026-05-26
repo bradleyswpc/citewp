@@ -36,16 +36,24 @@ declare( strict_types=1 );
 
 namespace CiteWP\Aiso\Scoring;
 
+use CiteWP\Aiso\Schema\Detector;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Engine {
 
-	public function score( \WP_Post $post ): ScoreResult {
+	private Detector $detector;
+
+	public function __construct( ?Detector $detector = null ) {
+		$this->detector = $detector ?? new Detector();
+	}
+
+	public function score( \WP_Post $post, bool $explicit_recalculate = false ): ScoreResult {
 		$analysis = new ContentAnalysis( $post );
 		$result   = new ScoreResult();
 
 		// --- Structure signals (35 max) ---
-		$result->signals[] = $this->check_faq_schema_or_qa( $analysis );
+		$result->signals[] = $this->check_faq_schema_or_qa( $analysis, $explicit_recalculate );
 		$result->signals[] = $this->check_heading_hierarchy( $analysis );
 		$result->signals[] = $this->check_structured_blocks( $analysis );
 		$result->signals[] = $this->check_answer_first( $analysis );
@@ -63,7 +71,7 @@ final class Engine {
 		// --- Authority signals (25 max) ---
 		$result->signals[] = $this->check_author_byline( $analysis );
 		$result->signals[] = $this->check_internal_links( $analysis );
-		$result->signals[] = $this->check_schema( $analysis );
+		$result->signals[] = $this->check_schema( $analysis, $explicit_recalculate );
 		$result->signals[] = $this->check_meta_description( $analysis );
 		$result->signals[] = $this->check_featured_image( $analysis );
 
@@ -85,9 +93,20 @@ final class Engine {
 	// STRUCTURE SIGNALS
 	// =========================================================================
 
-	private function check_faq_schema_or_qa( ContentAnalysis $a ): SignalResult {
-		// Full credit: explicit FAQ/Question schema.
-		if ( $a->has_faq_schema ) {
+	private function check_faq_schema_or_qa( ContentAnalysis $a, bool $explicit_recalculate = false ): SignalResult {
+		$schema = $this->detector->get_detected_types( $a->post->ID, $explicit_recalculate );
+
+		// Full credit: valid FAQPage or Question types detected from any emitter.
+		if ( $schema['faq_valid'] || in_array( 'Question', $schema['types'], true ) ) {
+			return new SignalResult(
+				'faq_schema_or_qa', 'structure', 'FAQ schema or Q&A pattern',
+				8, 8, 'pass',
+				'FAQ schema detected — AI engines can extract Q&A pairs directly.'
+			);
+		}
+
+		// Cold-start fallback: check ContentAnalysis in-content schema.
+		if ( $schema['state'] === 'not_verified' && $a->has_faq_schema ) {
 			return new SignalResult(
 				'faq_schema_or_qa', 'structure', 'FAQ schema or Q&A pattern',
 				8, 8, 'pass',
@@ -107,7 +126,7 @@ final class Engine {
 				'faq_schema_or_qa', 'structure', 'FAQ schema or Q&A pattern',
 				5, 8, 'partial',
 				sprintf( '%d question-format headings detected. Add FAQ schema for full credit.', $q_headings ),
-				'Use a schema plugin or block to mark up Q&A sections as FAQPage schema.'
+				'Use a schema plugin (Rank Math, Yoast) or add a JSON-LD block to mark up Q&A sections as FAQPage schema.'
 			);
 		}
 		if ( $q_headings >= 1 ) {
@@ -552,35 +571,38 @@ final class Engine {
 		);
 	}
 
-	private function check_schema( ContentAnalysis $a ): SignalResult {
-		// SEO plugin presence implies potential schema output but cannot be verified
-		// without a render-time scan (deferred to FB42 — render-time schema detection).
-		$has_seo_plugin = defined( 'WPSEO_VERSION' )
-			|| defined( 'RANK_MATH_VERSION' )
-			|| defined( 'AIOSEO_VERSION' )
-			|| defined( 'AIOSEO_VERSION_LITE' )
-			|| defined( 'SEOPRESS_VERSION' )
-			|| defined( 'SEOPRESS_PRO_VERSION' );
+	private function check_schema( ContentAnalysis $a, bool $explicit_recalculate = false ): SignalResult {
+		$schema = $this->detector->get_detected_types( $a->post->ID, $explicit_recalculate );
 
-		$inline_count = count( array_unique( $a->schema_types ) );
-
-		if ( $inline_count >= 1 ) {
+		// Schema confirmed on rendered page — full credit, any emitter.
+		if ( $schema['state'] === 'detected' ) {
 			return new SignalResult(
 				'schema', 'authority', 'Schema markup',
 				6, 6, 'pass',
-				sprintf( 'Schema types detected: %s.', implode( ', ', array_unique( $a->schema_types ) ) )
+				sprintf( 'Schema types detected: %s.', implode( ', ', $schema['types'] ) )
 			);
 		}
 
-		if ( $has_seo_plugin ) {
+		// Cold-start: could not reach the rendered page yet.
+		if ( $schema['state'] === 'not_verified' ) {
+			// Last-resort: check for in-content JSON-LD that the block renderer exposes.
+			$inline_types = array_unique( $a->schema_types );
+			if ( ! empty( $inline_types ) ) {
+				return new SignalResult(
+					'schema', 'authority', 'Schema markup',
+					6, 6, 'pass',
+					sprintf( 'Schema types detected: %s.', implode( ', ', $inline_types ) )
+				);
+			}
 			return new SignalResult(
 				'schema', 'authority', 'Schema markup',
-				3, 6, 'partial',
-				'Active SEO plugin detected. Verify it is configured to output schema for this post type.',
-				'You have an SEO plugin installed but no schema was found in your post content. Use the Schema Suggestions panel to insert JSON-LD directly, or verify your SEO plugin outputs schema for this post type.'
+				0, 6, 'partial',
+				'Schema not yet verified — visit this post\'s URL once, then Recalculate.',
+				'Open the post in a browser tab, then click Recalculate in the sidebar to scan for schema.'
 			);
 		}
 
+		// Confirmed not_found: page was checked, no schema present.
 		return new SignalResult(
 			'schema', 'authority', 'Schema markup',
 			0, 6, 'fail',
