@@ -110,7 +110,7 @@ final class ContentAnalysis {
 
 	private function detect_schema( string $html ): void {
 		// Inline JSON-LD scripts.
-		if ( preg_match_all( '#<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>#is', $html, $m ) ) {
+		if ( preg_match_all( '#<script[^>]*\btype=["\']application/ld\+json["\'][^>]*>(.*?)</script>#is', $html, $m ) ) {
 			foreach ( $m[1] as $blob ) {
 				$decoded = json_decode( trim( $blob ), true );
 				if ( ! $decoded ) {

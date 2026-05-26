@@ -105,8 +105,10 @@ final class Engine {
 			);
 		}
 
-		// Cold-start fallback: check ContentAnalysis in-content schema.
-		if ( $schema['state'] === 'not_verified' && $a->has_faq_schema ) {
+		// Supplement: check ContentAnalysis in-content schema. This covers hand-rolled
+		// wp:html JSON-LD blocks that tier 1 may miss when a server-side cache serves
+		// a rendered page without the body, or when the Detector hasn't run yet.
+		if ( $a->has_faq_schema ) {
 			return new SignalResult(
 				'faq_schema_or_qa', 'structure', 'FAQ schema or Q&A pattern',
 				8, 8, 'pass',

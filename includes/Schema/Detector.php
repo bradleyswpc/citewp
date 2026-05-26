@@ -216,7 +216,7 @@ final class Detector {
 		$article_valid = false;
 
 		if ( ! preg_match_all(
-			'#<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>#is',
+			'#<script[^>]*\btype=["\']application/ld\+json["\'][^>]*>(.*?)</script>#is',
 			$html,
 			$m
 		) ) {
@@ -229,7 +229,7 @@ final class Detector {
 		}
 
 		foreach ( $m[1] as $blob ) {
-			$decoded = json_decode( trim( $blob ), true );
+			$decoded = $this->json_decode_tolerant( trim( $blob ) );
 			if ( ! is_array( $decoded ) ) {
 				continue;
 			}
@@ -275,6 +275,46 @@ final class Detector {
 			'faq_valid'     => $faq_valid,
 			'article_valid' => $article_valid,
 		];
+	}
+
+	/**
+	 * Decodes a JSON-LD blob, retrying with control-character normalization on failure.
+	 *
+	 * Some hand-crafted JSON-LD embeds literal CR/LF inside quoted strings (e.g.
+	 * in acceptedAnswer.text), which is invalid per RFC 8259 but accepted by lenient
+	 * parsers like Google Rich Results. php json_decode() is strict and returns null
+	 * for such inputs, silently dropping the entire block. We detect this case and
+	 * escape the control characters inside string tokens before retrying.
+	 *
+	 * @return array<mixed>|null
+	 */
+	private function json_decode_tolerant( string $blob ): ?array {
+		$decoded = json_decode( $blob, true );
+		if ( is_array( $decoded ) ) {
+			return $decoded;
+		}
+		// Escape unescaped control chars inside JSON string tokens only.
+		// The regex matches a complete double-quoted JSON string, handling
+		// already-escaped sequences so we don't double-escape them.
+		$normalized = preg_replace_callback(
+			'/"(?:[^"\\\\]|\\\\.)*"/s',
+			static function ( array $m ): string {
+				return preg_replace_callback(
+					'/[\x00-\x1F\x7F]/',
+					static function ( array $c ): string {
+						static $map = [ "\n" => '\n', "\r" => '\r', "\t" => '\t' ];
+						return $map[ $c[0] ] ?? sprintf( '\u%04X', ord( $c[0] ) );
+					},
+					$m[0]
+				) ?? $m[0];
+			},
+			$blob
+		);
+		if ( $normalized === null ) {
+			return null;
+		}
+		$decoded = json_decode( $normalized, true );
+		return is_array( $decoded ) ? $decoded : null;
 	}
 
 	/**
