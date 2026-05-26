@@ -4,7 +4,7 @@ Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.7
+Stable tag: 0.7.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,12 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.8 =
+* Schema detection — emitter-agnostic FAQPage and Article detection via rendered-page JSON-LD (template_redirect cache + sync self-request on Recalculate). Credits schema from Rank Math, Yoast, AIOSEO, and hand-rolled wp:html blocks equally.
+* FAQPage signal — 0/8 false-negative fixed; json_decode_tolerant() handles hand-crafted JSON-LD with literal CR/LF in string values.
+* Article/Schema signal — SEO plugin proxy (3/6 for "plugin installed") replaced with real rendered-page detection; full 6/6 credit for any valid emitter.
+* Flag-don't-inject — CiteWP no longer offers to insert FAQPage schema when valid FAQPage already exists on the rendered page, preventing Rich Result clobbering.
 
 = 0.7.7 =
 * Cite Score page — 'Excluded from llms.txt' pill on per-post table rows for posts excluded from llms.txt generation.
