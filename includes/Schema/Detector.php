@@ -43,7 +43,10 @@ final class Detector {
 
 	public function register(): void {
 		add_action( 'template_redirect', [ $this, 'on_template_redirect' ] );
-		add_action( 'save_post', [ $this, 'on_save_post' ], 10 );
+		// Clear on status transitions only (publish ↔ draft/trash), NOT on every save.
+		// Head-injected schema (Rank Math, Yoast) lives in <head> and does not change
+		// when post content is edited, so the rendered-schema cache stays valid across saves.
+		add_action( 'transition_post_status', [ $this, 'on_transition_post_status' ], 10, 3 );
 	}
 
 	// ── Tier 2: template_redirect full-page capture ──────────────────────────
@@ -78,11 +81,23 @@ final class Detector {
 
 	// ── Cache invalidation ────────────────────────────────────────────────────
 
-	public function on_save_post( int $post_id ): void {
-		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
+	/**
+	 * Clears the schema detection cache only when a post's status actually changes.
+	 * Regular content edits (publish → publish) do not alter head-injected schema
+	 * from SEO plugins, so the cached detection result stays valid.
+	 *
+	 * @param string   $new_status
+	 * @param string   $old_status
+	 * @param \WP_Post $post
+	 */
+	public function on_transition_post_status( string $new_status, string $old_status, \WP_Post $post ): void {
+		if ( $new_status === $old_status ) {
 			return;
 		}
-		$this->clear_cache( $post_id );
+		if ( wp_is_post_autosave( $post->ID ) || wp_is_post_revision( $post->ID ) ) {
+			return;
+		}
+		$this->clear_cache( $post->ID );
 	}
 
 	public function clear_cache( int $post_id ): void {
