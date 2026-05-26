@@ -74,8 +74,17 @@ final class SchemaController {
 		$article = $this->generator->generate_article_schema( $post );
 
 		// Use emitter-agnostic detection for the 'detected' badge list.
+		// tier1/tier2 = full rendered page — authoritative, no supplement needed.
+		// tier3/cold_start = post_content only — head-injected Article from SEO plugins is
+		// not visible; supplement with detect_existing_types so in-content JSON-LD still
+		// contributes (note: head schema requires tier1/tier2 to appear as detected).
 		$schema_result = $this->detector->get_detected_types( $post->ID );
-		$detected      = $schema_result['types'] ?: $this->generator->detect_existing_types( $post );
+		if ( in_array( $schema_result['source'], [ 'tier1', 'tier2' ], true ) ) {
+			$detected = $schema_result['types'] ?: $this->generator->detect_existing_types( $post );
+		} else {
+			$from_generator = $this->generator->detect_existing_types( $post );
+			$detected       = array_values( array_unique( array_merge( $schema_result['types'], $from_generator ) ) );
+		}
 
 		// Decision 1 (S40): flag-don't-inject. If valid FAQPage schema already exists
 		// on the rendered page, suppress the generated FAQ schema so we don't offer to

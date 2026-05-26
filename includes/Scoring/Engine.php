@@ -576,8 +576,11 @@ final class Engine {
 	private function check_schema( ContentAnalysis $a, bool $explicit_recalculate = false ): SignalResult {
 		$schema = $this->detector->get_detected_types( $a->post->ID, $explicit_recalculate );
 
-		// Schema confirmed on rendered page — full credit, any emitter.
-		if ( $schema['state'] === 'detected' ) {
+		// Article-type schema confirmed on the rendered page — full credit, any emitter.
+		// Gate is article_valid, NOT state='detected': a FAQPage-only post_content scan
+		// must not credit this signal — that is the FAQ signal's job. The two detections
+		// are intentionally independent.
+		if ( $schema['article_valid'] ) {
 			return new SignalResult(
 				'schema', 'authority', 'Schema markup',
 				6, 6, 'pass',
@@ -585,31 +588,33 @@ final class Engine {
 			);
 		}
 
-		// Cold-start: could not reach the rendered page yet.
-		if ( $schema['state'] === 'not_verified' ) {
-			// Last-resort: check for in-content JSON-LD that the block renderer exposes.
-			$inline_types = array_unique( $a->schema_types );
-			if ( ! empty( $inline_types ) ) {
-				return new SignalResult(
-					'schema', 'authority', 'Schema markup',
-					6, 6, 'pass',
-					sprintf( 'Schema types detected: %s.', implode( ', ', $inline_types ) )
-				);
-			}
+		// Full rendered page was checked (tier1/tier2) — definitive: no Article schema here.
+		if ( in_array( $schema['source'], [ 'tier1', 'tier2' ], true ) ) {
 			return new SignalResult(
 				'schema', 'authority', 'Schema markup',
-				0, 6, 'partial',
-				'Schema not yet verified — visit this post\'s URL once, then Recalculate.',
-				'Open the post in a browser tab, then click Recalculate in the sidebar to scan for schema.'
+				0, 6, 'fail',
+				'No schema markup detected.',
+				'Install Yoast, Rank Math, or AIOSEO — or use the Schema Suggestions panel to insert JSON-LD directly.'
 			);
 		}
 
-		// Confirmed not_found: page was checked, no schema present.
+		// Cold-start or post_content scan only: head-injected Article (Rank Math, Yoast,
+		// AIOSEO) is invisible here. ContentAnalysis is a last resort for hand-rolled Article
+		// blocks embedded directly in post_content.
+		$inline_types = array_unique( $a->schema_types );
+		if ( ! empty( $inline_types ) ) {
+			return new SignalResult(
+				'schema', 'authority', 'Schema markup',
+				6, 6, 'pass',
+				sprintf( 'Schema types detected: %s.', implode( ', ', $inline_types ) )
+			);
+		}
+
 		return new SignalResult(
 			'schema', 'authority', 'Schema markup',
-			0, 6, 'fail',
-			'No schema markup detected.',
-			'Install Yoast, Rank Math, or AIOSEO — or use the Schema Suggestions panel to insert JSON-LD directly.'
+			0, 6, 'partial',
+			'Schema not yet verified — visit this post\'s URL once, then Recalculate.',
+			'Open the post in a browser tab, then click Recalculate in the sidebar to scan for schema.'
 		);
 	}
 
