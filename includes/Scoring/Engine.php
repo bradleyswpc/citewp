@@ -101,7 +101,11 @@ final class Engine {
 			return new SignalResult(
 				'faq_schema_or_qa', 'structure', 'FAQ schema or Q&A pattern',
 				8, 8, 'pass',
-				'FAQ schema detected — AI engines can extract Q&A pairs directly.'
+				sprintf(
+					'[DEBUG path=detector source=%s types=%s] FAQ schema detected.',
+					$schema['source'] ?? 'unknown',
+					implode( ',', $schema['types'] )
+				)
 			);
 		}
 
@@ -112,7 +116,11 @@ final class Engine {
 			return new SignalResult(
 				'faq_schema_or_qa', 'structure', 'FAQ schema or Q&A pattern',
 				8, 8, 'pass',
-				'FAQ schema detected — AI engines can extract Q&A pairs directly.'
+				sprintf(
+					'[DEBUG path=content_analysis detector_source=%s detector_faq_valid=%s] FAQ schema detected.',
+					$schema['source'] ?? 'unknown',
+					$schema['faq_valid'] ? 'true' : 'false'
+				)
 			);
 		}
 
