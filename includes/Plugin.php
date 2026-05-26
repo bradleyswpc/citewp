@@ -50,6 +50,11 @@ final class Plugin {
 		$this->modules['schema_detector'] = new Schema\Detector();
 		$this->modules['schema_detector']->register();
 
+		// Head injector: emits CiteWP-stored schema via wp_head unconditionally.
+		// Conflict prevention is at inject time (REST endpoint), not here.
+		$this->modules['head_injector'] = new Schema\HeadInjector();
+		$this->modules['head_injector']->register();
+
 		// Scoring: persists scores on save_post; runs on every request because
 		// the save_post hook needs to be registered.
 		$this->modules['scoring_repository'] = new Scoring\Repository(
@@ -65,7 +70,8 @@ final class Plugin {
 		// REST API for schema suggestions (Document Settings panel).
 		$this->modules['rest_schema_controller'] = new Rest\SchemaController(
 			null,
-			$this->modules['schema_detector']
+			$this->modules['schema_detector'],
+			$this->modules['head_injector']
 		);
 		$this->modules['rest_schema_controller']->register();
 
