@@ -78,10 +78,10 @@ It's an emerging standard that helps AI engines understand your site's most impo
 == Changelog ==
 
 = 0.7.8 =
-* Schema detection — emitter-agnostic FAQPage and Article detection via rendered-page JSON-LD (template_redirect cache + sync self-request on Recalculate). Credits schema from Rank Math, Yoast, AIOSEO, and hand-rolled wp:html blocks equally.
-* FAQPage signal — 0/8 false-negative fixed; json_decode_tolerant() handles hand-crafted JSON-LD with literal CR/LF in string values.
-* Article/Schema signal — SEO plugin proxy (3/6 for "plugin installed") replaced with real rendered-page detection; full 6/6 credit for any valid emitter.
-* Flag-don't-inject — CiteWP no longer offers to insert FAQPage schema when valid FAQPage already exists on the rendered page, preventing Rich Result clobbering.
+* Schema detection — emitter-agnostic rendered-output detection via template_redirect full-page cache and sync self-request on Recalculate. Credits schema from Rank Math, Yoast, AIOSEO, and hand-rolled wp:html blocks equally.
+* FAQ/Article signal independence — Article/Schema signal gates on Article-type validation, not presence of any schema type; FAQPage-only detections credit the FAQ signal only. Schema detection cache survives content edits and clears on post status transitions only (not every save).
+* json_decode_tolerant — hand-crafted JSON-LD with literal CR/LF in string values (accepted by Google Rich Results, rejected by PHP's strict parser) now parsed correctly.
+* Flag-don't-inject — CiteWP no longer offers to insert FAQPage schema when a valid FAQPage already exists on the rendered page, preventing Rich Result clobbering. Removes the Kadence block-label auto-generation trigger that caused duplicate FAQPage schema insertion.
 
 = 0.7.7 =
 * Cite Score page — 'Excluded from llms.txt' pill on per-post table rows for posts excluded from llms.txt generation.
