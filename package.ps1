@@ -28,7 +28,8 @@
 #>
 
 param(
-    [string]$OutputPath = $null
+    [string]$OutputPath = $null,
+    [string]$Slug = $null
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,7 +38,8 @@ $ErrorActionPreference = "Stop"
 # Resolve paths
 # ============================================================================
 $PluginRoot = $PSScriptRoot
-$PluginSlug = Split-Path -Leaf $PluginRoot
+$FolderName = Split-Path -Leaf $PluginRoot
+$PluginSlug = if ($Slug) { $Slug } else { $FolderName }
 $DistIgnorePath = Join-Path $PluginRoot ".distignore"
 
 if (-not (Test-Path $DistIgnorePath)) {
@@ -46,7 +48,7 @@ if (-not (Test-Path $DistIgnorePath)) {
 }
 
 # Read plugin version from the main plugin file header for output naming
-$MainFile = Join-Path $PluginRoot "$PluginSlug.php"
+$MainFile = Join-Path $PluginRoot "$FolderName.php"
 $PluginVersion = ""
 if (Test-Path $MainFile) {
     $versionMatch = Select-String -Path $MainFile -Pattern '^\s*\*\s*Version:\s*(.+)$' | Select-Object -First 1

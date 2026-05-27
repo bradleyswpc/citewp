@@ -6,6 +6,51 @@
 
 ---
 
+## Session 42 — WP.org 0.7.9 release ✅
+
+**Date:** 2026-05-27
+
+### Deliverable
+
+WP.org release of version 0.7.9. Includes P68 aggregate-exclusion fix (AI Recommendations card counts now exclude llms.txt-opted-out posts) plus all S40 schema rework shipped in 0.7.8 on citewp.com. SVN committed at r3551338.
+
+### What shipped
+
+- `ai-search-optimizer.php` — version bumped 0.7.8 → 0.7.9 (header + constant)
+- `readme.txt` — Stable tag 0.7.9; 0.7.9 changelog added (9 bullets)
+- `includes/Admin/RecommendationFilter.php` — `get_affected_ids_aggregate()` added: filters out `_citewp_aiso_exclude_from_llms = '1'` posts; uses separate cache key `$signal_id . ':aggregate'`; per-post call sites (`apply_filter`, `dominant_post_type`, `render_notice`) unchanged
+- `includes/Admin/Menu.php` — AI Recommendations card count call site switched to `get_affected_ids_aggregate()`
+- `package.ps1` — `$Slug` override param added; `$FolderName` separated from `$PluginSlug` so `$MainFile` always resolves against the real folder; enables `.\package.ps1 -Slug citewp-ai-search-optimizer` to produce correct WP.org top-level folder name from the `ai-search-optimizer/` dev folder
+
+### Files modified
+
+- `ai-search-optimizer.php`
+- `readme.txt`
+- `includes/Admin/RecommendationFilter.php`
+- `includes/Admin/Menu.php`
+- `package.ps1`
+
+### Decisions made / confirmed
+
+- **P68:** Aggregate surfaces (recommendation card counts) exclude llms.txt-opted-out posts. Per-post surfaces (posts-list filter, render_notice, dominant_post_type) do NOT exclude — excluded posts remain visible when user clicks through from a card.
+- **X24 confirmed:** citewp.com stays on 0.7.8 permanently. WP.org 0.7.9 is a separate release. No citewp.com zip update this session.
+
+### Verified
+
+- Plugin Check ran against `ai-search-optimizer/` (0.7.9 code) — JSON filename `ai-search-optimizer-ai-search-optimizer-php` confirms correct folder ✅
+- Only known false-positive: `TextDomainMismatch` (folder slug ≠ text domain) ✅
+- Zip: `citewp-ai-search-optimizer.0.7.9.zip` — 50 files, 0.79 MB, top-level folder `citewp-ai-search-optimizer/` ✅
+- SVN: r3551338 — trunk + tags/0.7.9 committed ✅
+- Rollback: tags/0.7.7 at r3546762 remains intact ✅
+- Empty-state CSS verified as no-op — `align-self: start` on `.citewp-aiso-cite-score-page__right` (line 2321 of admin CSS) already sizes to content; no change needed ✅
+
+### Carryover into Session 43
+
+1. **Re-Insert schema on previously-injected posts** — old string-format meta (pre-S41) fails `is_array()` guard; open each post and click Insert to re-inject with array storage
+2. **Upload citewp.com 0.7.8 zip** — still pending from S41 carryover (WP Admin → Plugins → Upload → `ai-search-optimizer.0.7.8.zip`)
+
+---
+
 ## Session 41 — HeadInjector storage + FAQ word-fusion bug fixes ✅
 
 **Date:** 2026-05-26
