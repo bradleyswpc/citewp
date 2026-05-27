@@ -77,6 +77,36 @@ final class RecommendationFilter {
 	}
 
 	/**
+	 * Aggregate-surface variant — same as get_affected_ids() but filters out
+	 * posts opted out of llms.txt (_citewp_aiso_exclude_from_llms = '1').
+	 *
+	 * Used for the Cite Score page AI Recommendations card counts (P68).
+	 * Per-post call sites (apply_filter, dominant_post_type) use get_affected_ids()
+	 * directly so excluded posts remain visible when the user clicks through.
+	 *
+	 * @return int[]
+	 */
+	public static function get_affected_ids_aggregate( string $signal_id ): array {
+		$cache_key = $signal_id . ':aggregate';
+		if ( isset( self::$id_cache[ $cache_key ] ) ) {
+			return self::$id_cache[ $cache_key ];
+		}
+
+		$all_ids  = self::get_affected_ids( $signal_id );
+		$filtered = array_values(
+			array_filter(
+				$all_ids,
+				static function ( int $pid ): bool {
+					return '1' !== get_post_meta( $pid, '_citewp_aiso_exclude_from_llms', true );
+				}
+			)
+		);
+
+		self::$id_cache[ $cache_key ] = $filtered;
+		return $filtered;
+	}
+
+	/**
 	 * Returns the dominant post type ('post' or 'page') among the affected IDs
 	 * for a given signal, so recommendation links route to the correct list screen.
 	 */

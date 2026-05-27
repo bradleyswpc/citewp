@@ -1487,7 +1487,7 @@ final class Menu {
 				if ( '' === $sig_id ) {
 					continue;
 				}
-				$cnt = count( RecommendationFilter::get_affected_ids( $sig_id ) );
+				$cnt = count( RecommendationFilter::get_affected_ids_aggregate( $sig_id ) );
 				if ( $cnt > 0 ) {
 					$displayable_recs[] = [
 						'rec'       => $rec,
