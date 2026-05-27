@@ -84,6 +84,8 @@ It's an emerging standard that helps AI engines understand your site's most impo
 * Flag-don't-inject — CiteWP no longer offers to insert FAQPage schema when a valid FAQPage already exists on the rendered page, preventing Rich Result clobbering. Removes the Kadence block-label auto-generation trigger that caused duplicate FAQPage schema insertion.
 * FAQ extraction fix — inline CSS from Kadence accordion blocks no longer leaks into acceptedAnswer.text; clean_text() strips style/script noise nodes before extracting text content.
 * Head injection — Schema Suggestions Insert/Remove now stores generated schema in post meta and emits via wp_head, replacing block-editor insertion. Eliminates wpautop corruption of JSON-LD in post_content. Insert and Remove buttons backed by REST endpoint with detect-before-inject conflict guard.
+* Schema storage — injected schema stored as serialized PHP array instead of JSON string, preventing wp_unslash from corrupting Unicode escapes (e.g. em-dash rendered as 'u2014').
+* FAQ word-fusion fix — clean_text() replaces br elements with a space text node before reading textContent, preventing adjacent words from fusing at line breaks.
 
 = 0.7.7 =
 * Cite Score page — 'Excluded from llms.txt' pill on per-post table rows for posts excluded from llms.txt generation.

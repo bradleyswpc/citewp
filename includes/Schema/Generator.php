@@ -517,7 +517,18 @@ final class Generator {
 	private function clean_text( \DOMNode $node ): string {
 		$clone = $node->cloneNode( true );
 		$this->strip_noise_nodes( $clone );
-		return trim( wp_strip_all_tags( $clone->textContent ) );
+		// <br> contributes zero characters to textContent, so "and<br>keyword"
+		// fuses to "andkeyword". Replace each <br> with a space text node first.
+		if ( method_exists( $clone, 'getElementsByTagName' ) ) {
+			$doc = $clone instanceof \DOMDocument ? $clone : $clone->ownerDocument;
+			if ( $doc ) {
+				foreach ( iterator_to_array( $clone->getElementsByTagName( 'br' ) ) as $br ) {
+					$br->parentNode?->replaceChild( $doc->createTextNode( ' ' ), $br );
+				}
+			}
+		}
+		$text = wp_strip_all_tags( $clone->textContent );
+		return trim( preg_replace( '/\s+/', ' ', $text ) );
 	}
 
 	/**

@@ -56,12 +56,8 @@ final class HeadInjector {
 	 * @return array<string, array<mixed>>
 	 */
 	public function get_stored( int $post_id ): array {
-		$raw = get_post_meta( $post_id, self::META_KEY, true );
-		if ( ! is_string( $raw ) || $raw === '' ) {
-			return [];
-		}
-		$decoded = json_decode( $raw, true );
-		return is_array( $decoded ) ? $decoded : [];
+		$stored = get_post_meta( $post_id, self::META_KEY, true );
+		return is_array( $stored ) ? $stored : [];
 	}
 
 	/**
@@ -70,7 +66,7 @@ final class HeadInjector {
 	public function store( int $post_id, string $type, array $schema ): void {
 		$stored          = $this->get_stored( $post_id );
 		$stored[ $type ] = $schema;
-		update_post_meta( $post_id, self::META_KEY, wp_json_encode( $stored ) );
+		update_post_meta( $post_id, self::META_KEY, $stored );
 	}
 
 	public function remove( int $post_id, string $type ): void {
@@ -79,7 +75,7 @@ final class HeadInjector {
 		if ( empty( $stored ) ) {
 			delete_post_meta( $post_id, self::META_KEY );
 		} else {
-			update_post_meta( $post_id, self::META_KEY, wp_json_encode( $stored ) );
+			update_post_meta( $post_id, self::META_KEY, $stored );
 		}
 	}
 }
