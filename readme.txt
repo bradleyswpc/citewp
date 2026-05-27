@@ -4,7 +4,7 @@ Tags: ai, ai-seo, ai-search, llm, llms-txt
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.8
+Stable tag: 0.7.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,17 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.9 =
+* Schema detection now reads rendered page output, crediting FAQPage and Article schema from any emitter (Rank Math, Yoast, AIOSEO, hand-rolled JSON-LD) equally.
+* Schema generation moved from post content insertion to head injection (wp_head), eliminating wpautop corruption and improving compatibility with caching plugins.
+* FAQ and Article signals now score independently — Article signal credits validated Article schema only, not generic SEO-plugin presence.
+* FAQ extractor fixes: CSS leak in text extraction, br-tag word-fusion, and whitespace handling.
+* Tolerant JSON-LD parsing handles hand-crafted schema with embedded line breaks.
+* Unicode handling fix — em-dashes and other escaped Unicode characters now render correctly in injected schema.
+* Removed block-label as a schema-generation trigger to prevent overwriting existing user-authored schema.
+* New REST endpoint POST /citewp/aiso/v1/schema/[id]/inject for Insert/Remove with conflict guard.
+* AI Recommendations card on the Cite Score page now excludes llms.txt-opted-out posts from per-signal counts and card visibility, matching the rest of the dashboard's exclusion behavior.
 
 = 0.7.8 =
 * Schema detection — emitter-agnostic rendered-output detection via template_redirect full-page cache and sync self-request on Recalculate. Credits schema from Rank Math, Yoast, AIOSEO, and hand-rolled wp:html blocks equally.
