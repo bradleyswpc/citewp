@@ -6,6 +6,87 @@
 
 ---
 
+## Session 41 — HeadInjector storage + FAQ word-fusion bug fixes ✅
+
+**Date:** 2026-05-26
+
+### Deliverable
+
+Two bug fixes in the S40 head-injection architecture. (1) HeadInjector was storing injected schema as a `wp_json_encode()` string; `update_post_meta()` calls `wp_unslash()` internally, stripping backslashes from Unicode escapes — em-dashes stored as "u2014". Fixed by storing the PHP array directly so WP's serialization handles it. (2) `Generator::clean_text()` used `textContent` which gives `<br>` zero characters, fusing adjacent words. Fixed by replacing `<br>` nodes with a space text node before reading `textContent`. 0.7.8 zip re-cut (version stays 0.7.8 — citewp.com only, never public on WP.org).
+
+### What shipped
+
+- `includes/Schema/HeadInjector.php` — `get_stored()` / `store()` / `remove()` rewritten to use PHP array storage via `update_post_meta()` instead of `wp_json_encode()` string
+- `includes/Schema/Generator.php` — `clean_text()` replaces `<br>` elements with a space text node before reading `textContent`; `preg_replace('/\s+/', ' ')` added to collapse newline-fused whitespace
+- `readme.txt` — 0.7.8 changelog: two new bullet points for both fixes
+
+### Files modified
+
+- `includes/Schema/HeadInjector.php` — array storage, drop json_decode/wp_json_encode layer
+- `includes/Schema/Generator.php` — clean_text() br-space fix + whitespace collapse
+- `readme.txt` — changelog
+
+### Decisions made
+
+- **X24:** Pre-public versions (citewp.com only, not yet on WP.org) may be re-cut under the same version number rather than bumped. Once a version is live on WP.org SVN it is immutable. See DECISIONS.md.
+
+### Verified
+
+- `hasU2014_corruption: false` — em-dash renders as literal `—` in view-source ✅
+- `hasLiteralEmdash: true` — JSON_UNESCAPED_UNICODE in emit() writes literal `—` ✅
+- `hasAndKeyword_fusion: false` / `hasAuthorAttrib_fusion: false` — word-fusing fixed ✅
+- 5 FAQ pairs, `cssLeaks: NONE` — Fix 1 CSS strip (S40) did not regress ✅
+- `injected: ["faqpage"]` — array storage confirmed (em-dash working IS the proof) ✅
+- Article 409 conflict (Rank Math owns Article on pillar post) — conflict guard working ✅
+- Old string-format meta → `injected: []` — `is_array()` guard fails safe; posts need manual re-Insert ✅
+- debug.log: no new CiteWP PHP errors ✅
+- npm build: no JS changes this session — no build required ✅
+- Zip: `ai-search-optimizer.0.7.8.zip` (0.78 MB) rebuilt and ready for citewp.com re-upload
+
+### Carryover into Session 42
+
+1. **Upload re-cut 0.7.8 zip to citewp.com** — WP Admin → Plugins → Upload → `ai-search-optimizer.0.7.8.zip`
+2. **Re-Insert schema on any previously-injected posts** — old string-format meta fails `is_array()` guard and reads as empty; open each post and click Insert to re-inject with clean array storage
+3. **WP.org 0.7.8 release** — commit verified; ready to SVN push trunk + tag when chosen
+
+---
+
+## Session 40 — Schema rework: emitter-agnostic detection + head injection ✅
+
+**Date:** 2026-05-25
+
+### Deliverable
+
+Major schema subsystem rework. (1) Emitter-agnostic detection: `Schema\Detector` now captures the full rendered page via `template_redirect` cache (Tier 2) and a sync self-request on explicit Recalculate (Tier 1). Credits FAQPage and Article schema from Rank Math, Yoast, AIOSEO, and hand-rolled `wp:html` blocks equally. (2) Article/FAQ signal independence: Article signal gates on `article_valid`, not "any schema present". (3) `json_decode_tolerant` handles CR/LF in string values (Google-valid JSON rejected by PHP strict parser). (4) Flag-don't-inject: conflict guard prevents inserting when valid schema already exists. (5) CSS leak fix in `clean_text()` via `strip_noise_nodes()`. (6) Head injection: `HeadInjector` stores generated schema in post meta (`_citewp_aiso_injected_schema`), emits unconditionally via `wp_head`. Replaces block-editor insertion that suffered wpautop `<script>` corruption. REST endpoint `/schema/<id>/inject` handles Insert/Remove with conflict check. Gutenberg sidebar wired with Insert/Remove buttons. Version bumped 0.7.7 → 0.7.8.
+
+### Files modified
+
+- `includes/Schema/Detector.php` — Tier 1/2/3 detection, template_redirect cache, sync self-request, json_tolerant, article_valid/faq_valid flags, clear_cache()
+- `includes/Schema/Generator.php` — strip_noise_nodes() for CSS leak fix, count_faq_pairs()
+- `includes/Schema/HeadInjector.php` — new file: store/get_stored/remove/emit, CiteWP HTML comments, JSON_UNESCAPED_UNICODE
+- `includes/Rest/SchemaController.php` — GET + POST /inject routes, conflict guard, HeadInjector wired
+- `includes/Plugin.php` — head_injector module registered, SchemaController receives head_injector
+- `src/sidebar/index.js` — injectSchema() POST to /inject, Insert/Remove/Already-detected states, fetchSchema() in finally
+- `ai-search-optimizer.php` — version bump 0.7.7 → 0.7.8
+- `readme.txt` — 0.7.8 changelog (6 bullet points)
+
+### Verified
+
+- FAQPage signal: 8/8 ✅
+- Article signal: 6/6 ✅
+- Rank Math Article detected via Tier 1/2 ✅
+- Insert → Remove button flip ✅
+- Remove → Insert reappears (fetchSchema in finally) ✅
+- post_content unchanged after Insert ✅
+- Em-dash bug found at session close (carried to S41)
+
+### Carryover into Session 41
+
+- Em-dash corruption in HeadInjector::store() — carried and fixed in S41 ✅
+- Word-fusing in clean_text() — carried and fixed in S41 ✅
+
+---
+
 ## Session 39 — WP.org Launch: v0.7.7 First Public Release ✅
 
 **Date:** 2026-05-24
