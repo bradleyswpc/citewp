@@ -1,6 +1,6 @@
 === CiteWP AI Search Optimizer – Optimize Content for AI Engines ===
 Contributors: bradleyswpc
-Tags: ai, ai-seo, ai-search, llm, llms-txt
+Tags: generative engine optimization, ai search optimization, aeo, llms-txt, rankmath
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
@@ -8,7 +8,7 @@ Stable tag: 0.7.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Optimize WordPress content for AI search. AI crawler tracking, llms.txt generation, and a transparent 100-point Cite Score.
+Get cited by AI engines. Generative Engine Optimization for WordPress: AI crawler tracking, llms.txt, and a transparent 100-point Cite Score.
 
 == Description ==
 
@@ -18,17 +18,27 @@ Traditional SEO optimizes for ranking in search results. AI Search Optimizer foc
 
 = What's included =
 
-**Cite Score** — a transparent 100-point score showing how likely your content is to be cited by AI engines. Calculated across 17 signals in three categories: Structure, Citability, and Authority. The full scoring rubric is published — no black box.
+✅ **Cite Score** — a transparent 100-point score across 17 signals (Structure, Citability, Authority). Full rubric at citewp.com/cite-score — no black box.
 
-**AI Crawler Tracking** — see which AI bots visit your site, when, and what they request. Filter by bot, export to CSV, and identify which content AI is paying attention to.
+✅ **AI Crawler Tracking** — see which AI bots visit your site, what they request, and which content gets attention. Filter by bot, export to CSV.
 
-**llms.txt Generation** — automatically generate llms.txt and llms-full.txt files using your most important content. Integrates with Yoast SEO, Rank Math, SEOPress, and AIOSEO to respect your existing settings.
+✅ **llms.txt Generation** — auto-generate llms.txt and llms-full.txt from your most important content. Respects Yoast, Rank Math, SEOPress, and AIOSEO settings.
 
-**Gutenberg Sidebar** — see your Cite Score and signal-by-signal breakdown directly in the WordPress editor while you write. No context switching.
+✅ **Gutenberg Sidebar** — Cite Score and signal-by-signal breakdown live in the editor as you write. No context switching.
 
-**Post List Column** — sortable Cite Score column in All Posts and All Pages. Spot weak content at a glance.
+✅ **Post List Column** — sortable Cite Score column in All Posts and All Pages. Spot weak content at a glance.
 
-**Dashboard Widget** — average Cite Score across your site, top crawled pages, AI bot trends.
+✅ **Dashboard Widget** — site-wide Cite Score average, top crawled pages, and AI bot trends at a glance.
+
+= Who this is for =
+
+✅ **Bloggers and content publishers** — your audience is already asking AI for recommendations. Be the source they cite.
+
+✅ **WordPress agencies and freelancers** — measure AI citation readiness across client sites alongside traditional SEO metrics.
+
+✅ **DIY founders and small-business owners** — own your WordPress site, want to be found by AI search? Start here.
+
+✅ **SaaS companies and documentation sites** — AI engines cite authoritative reference content. Measure whether yours qualifies.
 
 = Why this matters =
 
