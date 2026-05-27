@@ -32,8 +32,15 @@ WP.org release of version 0.7.9. Includes P68 aggregate-exclusion fix (AI Recomm
 
 ### Decisions made / confirmed
 
-- **P68:** Aggregate surfaces (recommendation card counts) exclude llms.txt-opted-out posts. Per-post surfaces (posts-list filter, render_notice, dominant_post_type) do NOT exclude — excluded posts remain visible when user clicks through from a card.
-- **X24 confirmed:** citewp.com stays on 0.7.8 permanently. WP.org 0.7.9 is a separate release. No citewp.com zip update this session.
+- **P68 (S41, confirmed shipped in 0.7.9):** Aggregate surfaces (recommendation card counts, `get_affected_ids_aggregate()`) exclude llms.txt-opted-out posts. Per-post surfaces (dominant_post_type, render_notice) do NOT exclude.
+- **P68-amend (S42 close):** `apply_filter()` moves to the AGGREGATE group — S26 count-match contract requires the filtered posts-list to match the card button count. Pre-amend: card said "3 posts," list said "12 posts." Fix: one-line swap to `get_affected_ids_aggregate()` in `apply_filter()`. Tracked as FB52, ships in 0.7.10. See DECISIONS.md P68-amend.
+- **X24-amend:** X24 "permanent gap accepted" framing reversed at S42 close. citewp.com manually uploaded to 0.7.9 (same day as WP.org push); version parity restored. X24's re-cut rule (SVN = immutable, pre-SVN = re-cuttable) survives unchanged.
+- **X23-amend:** Folder geography clarified — `ai-search-optimizer/` is active everywhere (dev + citewp.com); `citewp-ai-search-optimizer/` exists only in WP.org SVN. Old 0.7.7 stub on citewp-dev is obsolete (Brad-manual delete via WP admin).
+- **X27:** WP.org-bound builds use `.\package.ps1 -Slug citewp-ai-search-optimizer`. citewp.com builds use plain `.\package.ps1`. Always verify zip top-level folder name before `svn ci`.
+- **X28:** Verify plugin folder version by reading the file header (`Version:` line), not by inferring from folder name.
+- **X29:** Before scoping a P/X row across call sites, search past chats for each surface's original spec. The S26 count-match contract was a `conversation_search` query away when P68 was drafted.
+- **FB53 surfaced (A11-gated):** Scoring rubric expansion for non-Article/non-FAQPage schema types + Article tab UI inconsistency. No release target. See FEATURE-BACKLOG.md FB53.
+- **wp:html cleanup on test posts** — decision NOT to log as a new FB item. Stays in S41 brief's deferred list as a Brad-manual task.
 
 ### Verified
 
@@ -43,11 +50,16 @@ WP.org release of version 0.7.9. Includes P68 aggregate-exclusion fix (AI Recomm
 - SVN: r3551338 — trunk + tags/0.7.9 committed ✅
 - Rollback: tags/0.7.7 at r3546762 remains intact ✅
 - Empty-state CSS verified as no-op — `align-self: start` on `.citewp-aiso-cite-score-page__right` (line 2321 of admin CSS) already sizes to content; no change needed ✅
+- citewp.com bumped to 0.7.9 via manual upload (Brad confirmed); version parity with WP.org restored ✅
+- P68-amend regression observed live on citewp.com 0.7.9: recommendation card "3 posts" → filtered list "12 posts." Regression confirmed; fix tracked as FB52 (0.7.10) ⚠️ (carries)
 
 ### Carryover into Session 43
 
-1. **Re-Insert schema on previously-injected posts** — old string-format meta (pre-S41) fails `is_array()` guard; open each post and click Insert to re-inject with array storage
-2. **Upload citewp.com 0.7.8 zip** — still pending from S41 carryover (WP Admin → Plugins → Upload → `ai-search-optimizer.0.7.8.zip`)
+1. **FB52: restore S26 count-match contract** — one-line swap in `apply_filter()` to call `get_affected_ids_aggregate()` instead of `get_affected_ids()`. P68-amend in DECISIONS.md is the authority. Ships in 0.7.10. Plugin Check re-run + verify count-match on citewp-dev before SVN push.
+2. **FB53 A11 gate decision** — rubric expansion for non-Article/non-FAQPage schema types. Sidebar already shows "Other detected types" + "more types coming soon" — disconnect is user-visible. Worth prioritizing; A11 approval required before any scoring math changes.
+3. **Re-Insert schema on previously-injected posts** — old string-format meta (pre-S41) fails `is_array()` guard; open each post and click Insert to re-inject with array storage. Brad-manual.
+4. **Stale wp:html block cleanup on test posts** — Brad-manual; carries from S41 brief.
+5. **Brain consolidation session** — priority flag: 10+ DECISIONS.md rows added in S42 alone; system coherence audit warranted.
 
 ---
 
