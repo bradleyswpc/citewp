@@ -60,6 +60,8 @@ WP.org release of version 0.7.9. Includes P68 aggregate-exclusion fix (AI Recomm
 3. **Re-Insert schema on previously-injected posts** — old string-format meta (pre-S41) fails `is_array()` guard; open each post and click Insert to re-inject with array storage. Brad-manual.
 4. **Stale wp:html block cleanup on test posts** — Brad-manual; carries from S41 brief.
 5. **Brain consolidation session** — priority flag: 10+ DECISIONS.md rows added in S42 alone; system coherence audit warranted.
+6. **P69 — Statistics density floor (ships in 0.7.10):** Engine.php `check_statistics()` updated with raw-count floor (10+ raw = full credit, 5-9 raw = 7pts). SCORING-RUBRIC.md and DECISIONS.md updated. No other files changed. Include in 0.7.10 changelog.
+7. **P70 — Named entity counter extended to CamelCase brands (ships in 0.7.10):** `ContentAnalysis.php` `count_entities()` extended with Pattern 2: single-word CamelCase/mixed-case brands (ChatGPT, WordPress, GPTBot, SEMrush, ClaudeBot, CiteWP). 5-char minimum enforced. Pure all-caps acronyms (SEO, HTML) and pluralised acronyms (APIs, URLs) excluded. Thresholds unchanged. SCORING-RUBRIC.md and DECISIONS.md updated. Include in 0.7.10 changelog.
 
 ---
 

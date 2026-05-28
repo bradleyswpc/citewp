@@ -335,22 +335,22 @@ final class Engine {
 	// =========================================================================
 
 	private function check_statistics( ContentAnalysis $a ): SignalResult {
-		// Per 1000 words. Density matters more than raw count.
+		// Full credit: 8+ per 1k words OR 10+ raw count (floor prevents penalising long-form reference pages).
 		$per_1k = $a->word_count > 0 ? ( $a->statistic_count / $a->word_count ) * 1000 : 0;
 
-		if ( $per_1k >= 8 ) {
+		if ( $per_1k >= 8 || $a->statistic_count >= 10 ) {
 			return new SignalResult(
 				'statistics', 'citability', 'Statistics density',
 				10, 10, 'pass',
 				sprintf( '%d statistics found (%.1f per 1k words).', $a->statistic_count, $per_1k )
 			);
 		}
-		if ( $per_1k >= 4 ) {
+		if ( $per_1k >= 4 || $a->statistic_count >= 5 ) {
 			return new SignalResult(
 				'statistics', 'citability', 'Statistics density',
 				7, 10, 'partial',
 				sprintf( '%d statistics — moderate density.', $a->statistic_count ),
-				'Adding statistics is shown to improve AI visibility by ~41%. Aim for 8+ per 1000 words.'
+				'Adding statistics is shown to improve AI visibility by ~41%. Aim for 8+ per 1000 words or 10+ total.'
 			);
 		}
 		if ( $a->statistic_count >= 1 ) {

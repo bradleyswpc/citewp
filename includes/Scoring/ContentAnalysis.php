@@ -167,18 +167,42 @@ final class ContentAnalysis {
 	}
 
 	private function count_entities( string $text ): int {
-		// Heuristic: capitalized 2+ word phrases that aren't sentence starts.
-		// Not perfect — full NER would need an external service — but good enough for v1.
-		preg_match_all(
-			'/(?<![\.\?\!]\s)(?<!^)\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,4})\b/',
-			$text,
-			$m
-		);
-		$entities = array_unique( $m[1] ?? [] );
+		$found = [];
 
-		// Filter common false positives.
-		$blacklist = [ 'New York Times', 'Wall Street Journal' ]; // example — could be configurable
-		$entities  = array_diff( $entities, $blacklist );
+		// Pattern 1 (unchanged): capitalized 2+ word Title Case phrases, not at sentence start.
+		// Catches: "Rank Math", "Google AI Overviews", "Retrieval Augmented Generation".
+		preg_match_all(
+			'/(?<![.?!]\s)(?<!^)\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,4})\b/',
+			$text,
+			$m1
+		);
+		foreach ( $m1[1] ?? [] as $e ) {
+			$found[] = $e;
+		}
+
+		// Pattern 2 (new): single-word CamelCase / mixed-case brands.
+		// Alternative A: starts uppercase, has 1+ mixed chars, then another uppercase, then 1+ more.
+		//   Catches: ChatGPT, WordPress, GPTBot, ClaudeBot, PerplexityBot, CiteWP, AiBoost, FAQPage.
+		// Alternative B: 2+ leading uppercase then 2+ lowercase (e.g. SEMrush, GPTBot alt form).
+		//   Catches: SEMrush. Requires 2+ lowercase to avoid matching pluralised acronyms (APIs, URLs).
+		// Minimum 5 chars enforced below to filter any sub-4-char noise.
+		preg_match_all(
+			'/\b([A-Z][a-zA-Z0-9]{1,}[A-Z][a-zA-Z0-9]+|[A-Z]{2,}[a-z]{2,}[a-zA-Z0-9]*)\b/',
+			$text,
+			$m2
+		);
+		foreach ( $m2[1] ?? [] as $e ) {
+			if ( mb_strlen( $e ) >= 5 ) {
+				$found[] = $e;
+			}
+		}
+
+		// Deduplicate and filter known false positives.
+		$entities  = array_unique( $found );
+		$blocklist = [
+			'New York Times', 'Wall Street Journal',
+		];
+		$entities  = array_diff( $entities, $blocklist );
 
 		return count( $entities );
 	}
