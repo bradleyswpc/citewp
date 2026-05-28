@@ -1,6 +1,6 @@
 === CiteWP AI Search Optimizer – Optimize Content for AI Engines ===
 Contributors: bradleyswpc
-Tags: generative engine optimization, ai search optimization, aeo, llms-txt, rankmath
+Tags: seo, ai seo, llms-txt, chatgpt, rankmath
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
@@ -8,7 +8,7 @@ Stable tag: 0.7.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Get cited by AI engines. Generative Engine Optimization for WordPress: AI crawler tracking, llms.txt, and a transparent 100-point Cite Score.
+SEO gets you ranked. CiteWP gets you cited. AI crawler tracking, llms.txt generation, and a 100-point citation readiness score — free.
 
 == Description ==
 
