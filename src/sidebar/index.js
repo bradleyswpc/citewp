@@ -34,7 +34,7 @@ function CiteWPIcon() {
 				fill="#0C0C0D"
 				textAnchor="middle"
 			>
-				[A]
+				[C]
 			</text>
 		</svg>
 	);
