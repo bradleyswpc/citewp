@@ -2614,7 +2614,7 @@
 /* AI Recommendations rec rows (Cite Score-specific, inside citewp-aiso-insights) */
 .citewp-aiso-cs-rec-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--sp-3);
   padding: var(--sp-3) 0;
   border-top: 1px solid var(--citewp-border);
