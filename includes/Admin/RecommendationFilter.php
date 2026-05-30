@@ -169,6 +169,51 @@ final class RecommendationFilter {
 	}
 
 	/**
+	 * Sum of (max − score) for the given signal across all affected published
+	 * posts of $post_type (aggregate path — llms.txt-excluded posts removed).
+	 *
+	 * Reads stored signal data from the meta; does NOT re-run Engine.php.
+	 * Returns 0 if no affected posts exist or stored data is missing.
+	 *
+	 * Cache key: "{signal_id}:{post_type}:points"
+	 *
+	 * @param  string $signal_id Engine signal identifier.
+	 * @param  string $post_type 'post' or 'page'.
+	 * @return int    Recoverable points (≥ 0).
+	 */
+	public static function get_recoverable_points_for_type(
+		string $signal_id,
+		string $post_type
+	): int {
+		$cache_key = $signal_id . ':' . $post_type . ':points';
+		if ( isset( self::$id_cache[ $cache_key ] ) ) {
+			return self::$id_cache[ $cache_key ];
+		}
+
+		$ids   = self::get_affected_ids_for_type( $signal_id, $post_type );
+		$repo  = new Repository();
+		$total = 0;
+
+		foreach ( $ids as $pid ) {
+			$data = $repo->get( $pid );
+			if ( ! is_array( $data ) || empty( $data['signals'] ) ) {
+				continue;
+			}
+			foreach ( $data['signals'] as $sig ) {
+				if ( ( $sig['id'] ?? '' ) === $signal_id ) {
+					$score  = (int) ( $sig['score'] ?? 0 );
+					$max    = (int) ( $sig['max']   ?? 0 );
+					$total += max( 0, $max - $score );
+					break;
+				}
+			}
+		}
+
+		self::$id_cache[ $cache_key ] = $total;
+		return $total;
+	}
+
+	/**
 	 * Returns the dominant post type ('post' or 'page') among the affected IDs
 	 * for a given signal, so recommendation links route to the correct list screen.
 	 */
