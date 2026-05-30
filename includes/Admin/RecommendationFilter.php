@@ -234,16 +234,17 @@ final class RecommendationFilter {
 
 	/**
 	 * Narrows the main posts-list query when ?aiso_recommendation= is set.
+	 *
+	 * Uses $GLOBALS['pagenow'] instead of get_current_screen() — the latter
+	 * may return null at pre_get_posts time on some WP configurations.
+	 * Uses get_affected_ids_for_type() so the filter is scoped to the
+	 * destination screen's post type and excludes llms.txt-opted-out posts.
 	 */
 	public function apply_filter( \WP_Query $query ): void {
 		if ( ! is_admin() || ! $query->is_main_query() ) {
 			return;
 		}
-		if ( ! function_exists( 'get_current_screen' ) ) {
-			return;
-		}
-		$screen = get_current_screen();
-		if ( ! $screen || 'edit' !== $screen->base ) {
+		if ( ( $GLOBALS['pagenow'] ?? '' ) !== 'edit.php' ) {
 			return;
 		}
 
@@ -253,20 +254,25 @@ final class RecommendationFilter {
 			return;
 		}
 
-		$ids = self::get_affected_ids( $signal_id );
-		// post__in with an empty array returns ALL posts, so force zero-result set instead.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_type = sanitize_key( $_GET['post_type'] ?? 'post' );
+		if ( ! in_array( $post_type, [ 'post', 'page' ], true ) ) {
+			$post_type = 'post';
+		}
+
+		$ids = self::get_affected_ids_for_type( $signal_id, $post_type );
+		// post__in with an empty array returns ALL posts; force zero-result set instead.
 		$query->set( 'post__in', ! empty( $ids ) ? $ids : [ 0 ] );
 	}
 
 	/**
 	 * Renders the filter-active notice above the posts list.
+	 *
+	 * Count and noun are type-scoped to the current screen's post_type so
+	 * banner = card = list (count-match contract, per S26/S43).
 	 */
 	public function render_notice(): void {
-		if ( ! function_exists( 'get_current_screen' ) ) {
-			return;
-		}
-		$screen = get_current_screen();
-		if ( ! $screen || 'edit' !== $screen->base ) {
+		if ( ( $GLOBALS['pagenow'] ?? '' ) !== 'edit.php' ) {
 			return;
 		}
 
@@ -276,29 +282,43 @@ final class RecommendationFilter {
 			return;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_type = sanitize_key( $_GET['post_type'] ?? 'post' );
+		if ( ! in_array( $post_type, [ 'post', 'page' ], true ) ) {
+			$post_type = 'post';
+		}
+
 		$mapper = new RecommendationMapper();
 		$rec    = $mapper->get( $signal_id );
 		$label  = $rec ? $rec['label'] : $signal_id;
-		$count  = count( self::get_affected_ids( $signal_id ) );
+		$count  = count( self::get_affected_ids_for_type( $signal_id, $post_type ) );
 		$clear  = remove_query_arg( 'aiso_recommendation' );
+
+		if ( 'page' === $post_type ) {
+			/* translators: 1: number of pages, 2: recommendation label */
+			$template = _n(
+				'Showing %1$d page flagged for: %2$s.',
+				'Showing %1$d pages flagged for: %2$s.',
+				$count,
+				'citewp-ai-search-optimizer'
+			);
+			$clear_label = esc_html__( '× All pages', 'citewp-ai-search-optimizer' );
+		} else {
+			/* translators: 1: number of posts, 2: recommendation label */
+			$template = _n(
+				'Showing %1$d post flagged for: %2$s.',
+				'Showing %1$d posts flagged for: %2$s.',
+				$count,
+				'citewp-ai-search-optimizer'
+			);
+			$clear_label = esc_html__( '× All posts', 'citewp-ai-search-optimizer' );
+		}
 
 		printf(
 			'<div class="notice notice-info"><p>%s &nbsp;&nbsp;<a href="%s">%s</a></p></div>',
-			esc_html(
-				sprintf(
-					/* translators: 1: number of posts, 2: recommendation label */
-					_n(
-						'Showing %1$d post flagged for: %2$s.',
-						'Showing %1$d posts flagged for: %2$s.',
-						$count,
-						'citewp-ai-search-optimizer'
-					),
-					$count,
-					$label
-				)
-			),
+			esc_html( sprintf( $template, $count, $label ) ),
 			esc_url( $clear ),
-			esc_html__( '× All posts', 'citewp-ai-search-optimizer' )
+			$clear_label // already escaped above via esc_html__()
 		);
 	}
 }
