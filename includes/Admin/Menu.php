@@ -1647,7 +1647,7 @@ final class Menu {
 	?>
 	<div class="citewp-aiso-protip">
 		<div class="citewp-aiso-protip__left">
-			<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'zap', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+			<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'lightbulb', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 			<div class="citewp-aiso-protip__content">
 				<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'citewp-ai-search-optimizer' ); ?></p>
 				<p class="citewp-aiso-protip__body"><?php echo esc_html( $cs_protip ); ?></p>
