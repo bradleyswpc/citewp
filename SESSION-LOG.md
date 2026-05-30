@@ -6,6 +6,51 @@
 
 ---
 
+## Session 43 — 0.7.10 release: per-(signal × post-type) AI Recommendations ✅
+
+**Date:** 2026-05-30
+
+### Deliverable
+
+v0.7.10 shipped to WP.org SVN (trunk r3554934, tag r3554935). Core feature: AI Recommendations cards redesigned from per-signal blended counts to per-(signal × post-type) groups ranked by recoverable Cite Score points. Broken "View N" filter fixed. Count-match contract (banner = list = card) restored. P69/P70 (already committed) ride along in the release. Six polish fixes landed same session.
+
+### What shipped
+
+- `includes/Admin/RecommendationFilter.php` — `get_affected_ids_for_type()`: published-only, type-scoped, aggregate-aware (llms.txt-excluded posts removed); `get_recoverable_points_for_type()`: sums stored `max−score` deltas per (signal × type); `apply_filter()` rewritten: `$GLOBALS['pagenow']` guard replaces broken `get_current_screen()`, type-scoped IDs, fixes the "opens full dashboard" bug; `render_notice()` rewritten: same pagenow guard, type-scoped count, type-correct noun ("posts"/"pages"), clear-filter link noun matches
+- `includes/Admin/Menu.php` — ranking: replaces 50-post sample `arsort($signal_fails)` with exhaustive per-(signal × post-type) usort (recoverable points DESC → count DESC → rubric order ASC), top 3 served; card render: title `{label} · {N} Posts/Pages}`, button `View {N} Posts/Pages`, shared `$type_noun` variable, explicit `$group_type` in URL, no `dominant_post_type()` call; empty state: "Every post and page is optimized…" approved copy; `$top_gap_label` preserved from `$signal_fails` (Needs Attention KPI card unaffected); Cite Score protip: replaced non-functional GSC "Connect Now" tip with actionable "Posts scoring 80+…" tip, removed "Connect Now →" button; protip orb: `zap` (missing from IconLibrary) → `lightbulb`; Recent Activity: capped to 2 items (was 3)
+- `admin/css/citewp-aiso-admin.css` — `.citewp-aiso-cs-rec-row`: `align-items: center` → `flex-start` (orb aligns with title, not card midpoint); rail nav label: 13px → 12px; rail desc: 12px → 11px
+- `src/sidebar/index.js` — `CiteWPIcon`: `[A]` → `[C]` (CiteWP parent brand glyph; `[A]` was plugin-specific and unused elsewhere)
+- `build/index.js`, `build/index.asset.php` — recompiled after sidebar icon change
+- `ai-search-optimizer.php` — version 0.7.9 → 0.7.10 (header + constant, 2 spots)
+- `readme.txt` — stable tag 0.7.10; 0.7.10 changelog entry (8 bullets)
+- `docs/superpowers/plans/2026-05-30-recommendation-cards-by-type.md` — implementation plan (S43 build contract)
+
+### Decisions made / confirmed
+
+- **FB52 superseded:** The one-liner `apply_filter()` swap (FB52) is fully folded into this session's RecommendationFilter rewrite. FB52 is closed.
+- **FB54 (this session):** Per-(signal × post-type) recommendation model with recoverable-points ranking. Spec document: `Brain/design-reference/S43-recommendation-cards-by-type.md`. Not A11-gated (reads stored scores only).
+- **No new DECISIONS.md rows:** All changes were implementation of approved spec. No architectural, product, pricing, or process decisions were made.
+
+### Verified
+
+- Smoke test on citewp-dev ✅ (Brad confirmed "Smoke Test clean")
+- Build: `webpack 5.106.2 compiled successfully` ✅
+- debug.log: no new CiteWP errors (pre-session LocalWP DB + Rank Math notices only) ✅
+- SVN trunk r3554934 committed ✅; tag `0.7.10` r3554935 committed ✅
+- Zip `ai-search-optimizer.0.7.10.zip` (50 files, 0.79 MB) on Desktop for citewp.com upload ✅
+- Top-level folder: `ai-search-optimizer/` (citewp.com zip) + `citewp-ai-search-optimizer/` (WP.org zip) — both verified ✅
+
+### Carryover into Session 44
+
+1. **Upload `ai-search-optimizer.0.7.10.zip` to citewp.com** — zip on Desktop, upload via WP Admin → Plugins → Upload. Brad-manual.
+2. **FB53 A11 gate decision** — scoring rubric expansion for non-Article/non-FAQPage schema types + Article tab UI inconsistency. Requires explicit A11 approval before any scoring math changes.
+3. **Brain consolidation session** (priority flag) — 10+ DECISIONS.md rows added in S42 alone; system coherence audit warranted.
+4. **`$top_gap_label` source drift** — Needs Attention KPI card derives label from 50-post sample; recommendation cards use exhaustive ranking. These can now diverge on sites with >50 scored posts. Fix: derive `$top_gap_label` from `$top_groups[0]` instead of `$signal_fails`. Small change, next session candidate.
+5. **Re-insert schema on previously-injected posts** — old string-format meta fails `is_array()` guard. Brad-manual.
+6. **Stale wp:html block cleanup on test posts** — Brad-manual.
+
+---
+
 ## Session 42 — WP.org 0.7.9 release ✅
 
 **Date:** 2026-05-27
