@@ -281,13 +281,13 @@
 }
 
 .citewp-aiso-rail__item-label {
-  font: 700 13px/1 'Inter', system-ui, -apple-system, sans-serif;
+  font: 700 12px/1 'Inter', system-ui, -apple-system, sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .citewp-aiso-rail__item-desc {
-  font: 400 12px/1.25 'Inter', system-ui, -apple-system, sans-serif;
+  font: 400 11px/1.25 'Inter', system-ui, -apple-system, sans-serif;
   color: rgba(255, 255, 255, 0.45);
 }
 
