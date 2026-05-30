@@ -1641,7 +1641,7 @@ final class Menu {
 	<?php
 	$cs_protip = apply_filters(
 		'citewp_aiso/protip',
-		__( 'Connect Google Search Console to get more insights and improve your Cite Score faster.', 'citewp-ai-search-optimizer' ),
+		__( 'Posts scoring 80+ are significantly more likely to be cited by AI engines. Use the AI Recommendations panel to find the highest-impact fixes for your lowest-scoring content.', 'citewp-ai-search-optimizer' ),
 		'cite-score'
 	);
 	?>
@@ -1653,9 +1653,6 @@ final class Menu {
 				<p class="citewp-aiso-protip__body"><?php echo esc_html( $cs_protip ); ?></p>
 			</div>
 		</div>
-		<a href="https://citewp.com/pro" target="_blank" rel="noopener noreferrer" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
-			<?php esc_html_e( 'Connect Now →', 'citewp-ai-search-optimizer' ); ?>
-		</a>
 	</div>
 
 	<?php endif; // total_scored === 0
