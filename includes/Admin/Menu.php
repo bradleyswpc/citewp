@@ -318,7 +318,7 @@ final class Menu {
 		$score_trend     = $data->get_avg_score_trend();
 		$cat_breakdown   = $data->get_issue_counts_by_category();
 		$cat_colors      = [ 'structure' => 'citrine', 'citability' => 'orange', 'authority' => 'red' ];
-		$recent_activity = $data->get_recent_activity();
+		$recent_activity = $data->get_recent_activity( 2 );
 
 		/**
 		 * Filters the Quick Actions grid items on the Dashboard.
