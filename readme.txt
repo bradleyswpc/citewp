@@ -4,7 +4,7 @@ Tags: seo, ai seo, llms-txt, chatgpt, rankmath
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.9
+Stable tag: 0.7.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -86,6 +86,16 @@ It's an emerging standard that helps AI engines understand your site's most impo
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.10 =
+* Improvement: AI Recommendations cards now group by signal and post type — Posts and Pages are shown as separate, targeted cards.
+* Improvement: Cards ranked by recoverable Cite Score points so the highest-impact fixes surface first.
+* Fix: "View N Posts/Pages" button now opens a curated list showing exactly those N affected items — not the full dashboard.
+* Fix: Card count, button count, and filter-banner count now always agree (count-match contract restored).
+* Fix: Recommendation filter correctly scopes to published content only, excluding llms.txt-opted-out posts.
+* Improvement: Empty state shows a positive message when all content is fully optimized.
+* Improvement: Statistics density scoring uses a raw-count floor for more consistent scoring across content lengths.
+* Improvement: Named entity detection extended to CamelCase brand names (ChatGPT, WordPress, SEMrush, etc.).
 
 = 0.7.9 =
 * Schema detection now reads rendered page output, crediting FAQPage and Article schema from any emitter (Rank Math, Yoast, AIOSEO, hand-rolled JSON-LD) equally.
