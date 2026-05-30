@@ -875,30 +875,89 @@ final class Menu {
 			$cat_avgs[ $cat_key ] = $sample_n > 0 ? (int) round( $sum / $sample_n ) : 0;
 		}
 
-		// ── Top 3 failing signals → AI Recommendations ──────────────────
+		// ── Top 3 AI Recommendations — per-(signal × post-type) model ───────
+		// $top_gap_label: first label from the sample-fail list (used in Needs Attention KPI card).
 		arsort( $signal_fails );
-		$top_signal_ids = array_slice( array_keys( $signal_fails ), 0, 3 );
-		$mapper         = new RecommendationMapper();
-		$top_recs       = $mapper->get_many( $top_signal_ids );
-		$top_rec_ids    = array_keys( $top_recs );
+		$top_gap_signal_ids = array_keys( $signal_fails );
+		$top_gap_label      = null;
+		{
+			$_mapper = new RecommendationMapper();
+			foreach ( $top_gap_signal_ids as $_sig_id ) {
+				$_r = $_mapper->get( $_sig_id );
+				if ( $_r && isset( $_r['label'] ) ) {
+					$top_gap_label = $_r['label'];
+					break;
+				}
+			}
+			unset( $_mapper, $_sig_id, $_r );
+		}
 
-		$top_gap_label = null;
-		foreach ( $top_signal_ids as $sig_id ) {
-			if ( isset( $top_recs[ $sig_id ]['label'] ) ) {
-				$top_gap_label = $top_recs[ $sig_id ]['label'];
-				break;
+		// Canonical signal order for tie-break (rubric order — Engine.php signal sequence).
+		$_signal_rubric_order = [
+			'faq_schema_or_qa'   => 0,
+			'heading_hierarchy'  => 1,
+			'structured_blocks'  => 2,
+			'answer_first'       => 3,
+			'paragraph_chunks'   => 4,
+			'word_count'         => 5,
+			'statistics'         => 6,
+			'external_citations' => 7,
+			'entities'           => 8,
+			'non_promotional'    => 9,
+			'freshness'          => 10,
+			'audience_use_case'  => 11,
+			'author_byline'      => 12,
+			'internal_links'     => 13,
+			'schema'             => 14,
+			'meta_description'   => 15,
+			'featured_image'     => 16,
+		];
+
+		// Build all (signal × post-type) candidate groups across the FULL scored set.
+		// get_affected_ids_for_type() queries all published posts (no sample cap).
+		// Each group: signal_id, post_type, rec data, affected count, recoverable points, rubric order.
+		$_rec_mapper   = new RecommendationMapper();
+		$_all_groups   = [];
+		foreach ( array_keys( $_signal_rubric_order ) as $_sig_id ) {
+			$_rec = $_rec_mapper->get( $_sig_id );
+			if ( ! $_rec ) {
+				continue;
+			}
+			foreach ( [ 'post', 'page' ] as $_pt ) {
+				$_ids = RecommendationFilter::get_affected_ids_for_type( $_sig_id, $_pt );
+				$_cnt = count( $_ids );
+				if ( $_cnt <= 0 ) {
+					continue;
+				}
+				$_pts          = RecommendationFilter::get_recoverable_points_for_type( $_sig_id, $_pt );
+				$_all_groups[] = [
+					'signal_id'    => $_sig_id,
+					'post_type'    => $_pt,
+					'rec'          => $_rec,
+					'count'        => $_cnt,
+					'points'       => $_pts,
+					'rubric_order' => $_signal_rubric_order[ $_sig_id ],
+				];
 			}
 		}
+		unset( $_rec_mapper, $_sig_id, $_rec, $_pt, $_ids, $_cnt, $_pts );
 
-		// Pad to exactly 3 rows.
-		$recs_display = array_values( $top_recs );
-		while ( count( $recs_display ) < 3 ) {
-			$recs_display[] = [
-				'label'    => __( 'Keep publishing', 'citewp-ai-search-optimizer' ),
-				'copy'     => __( 'Your content is performing well. Keep publishing high-quality posts to maintain your score.', 'citewp-ai-search-optimizer' ),
-				'category' => '',
-			];
-		}
+		// Sort: recoverable points DESC, then count DESC, then rubric order ASC.
+		usort(
+			$_all_groups,
+			static function ( array $a, array $b ): int {
+				if ( $b['points'] !== $a['points'] ) {
+					return $b['points'] <=> $a['points'];
+				}
+				if ( $b['count'] !== $a['count'] ) {
+					return $b['count'] <=> $a['count'];
+				}
+				return $a['rubric_order'] <=> $b['rubric_order'];
+			}
+		);
+		$top_groups       = array_slice( $_all_groups, 0, 3 );
+		$top_groups_count = count( $top_groups );
+		unset( $_all_groups, $_signal_rubric_order );
 
 		// ── Score History ────────────────────────────────────────────────
 		$history_range     = absint( $_GET['cs_range'] ?? 30 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
