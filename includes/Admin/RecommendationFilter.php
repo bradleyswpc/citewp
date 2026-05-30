@@ -107,6 +107,68 @@ final class RecommendationFilter {
 	}
 
 	/**
+	 * Returns IDs of PUBLISHED posts of a specific type where the given signal
+	 * has status 'fail' or 'partial'.
+	 *
+	 * When $aggregate is true (default), llms.txt-excluded posts are removed —
+	 * matching the aggregate Cite Score surfaces (P49). Set $aggregate = false
+	 * only when you genuinely need excluded posts included (e.g. per-post debug).
+	 *
+	 * Cache key: "{signal_id}:{post_type}:{agg|raw}"
+	 *
+	 * @param  string $signal_id  Engine signal identifier (e.g. 'statistics').
+	 * @param  string $post_type  'post' or 'page'.
+	 * @param  bool   $aggregate  When true, exclude llms.txt-opted-out posts.
+	 * @return int[]
+	 */
+	public static function get_affected_ids_for_type(
+		string $signal_id,
+		string $post_type,
+		bool $aggregate = true
+	): array {
+		$cache_key = $signal_id . ':' . $post_type . ':' . ( $aggregate ? 'agg' : 'raw' );
+		if ( isset( self::$id_cache[ $cache_key ] ) ) {
+			return self::$id_cache[ $cache_key ];
+		}
+
+		$all_ids = get_posts( [
+			'post_type'              => [ $post_type ],
+			'post_status'            => [ 'publish' ],
+			'posts_per_page'         => -1,
+			'fields'                 => 'ids',
+			'meta_key'               => Repository::META_KEY_FULL,  // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+			'meta_compare'           => 'EXISTS',
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
+		] );
+
+		$repo     = new Repository();
+		$matching = [];
+
+		foreach ( (array) $all_ids as $pid ) {
+			$pid = (int) $pid;
+			if ( $aggregate && '1' === get_post_meta( $pid, '_citewp_aiso_exclude_from_llms', true ) ) {
+				continue;
+			}
+			$data = $repo->get( $pid );
+			if ( ! is_array( $data ) || empty( $data['signals'] ) ) {
+				continue;
+			}
+			foreach ( $data['signals'] as $sig ) {
+				if ( ( $sig['id'] ?? '' ) === $signal_id
+					&& in_array( $sig['status'] ?? '', [ 'fail', 'partial' ], true )
+				) {
+					$matching[] = $pid;
+					break;
+				}
+			}
+		}
+
+		self::$id_cache[ $cache_key ] = $matching;
+		return $matching;
+	}
+
+	/**
 	 * Returns the dominant post type ('post' or 'page') among the affected IDs
 	 * for a given signal, so recommendation links route to the correct list screen.
 	 */
