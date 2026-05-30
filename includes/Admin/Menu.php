@@ -1592,15 +1592,12 @@ final class Menu {
 								);
 								// Title and button noun must match the group's post type exactly.
 								if ( 'page' === $group_type ) {
-									/* translators: %d: affected page count */
-									$type_noun = _n( 'Page', 'Pages', $affected_cnt, 'citewp-ai-search-optimizer' );
+									$type_noun = 1 === $affected_cnt ? __( 'Page', 'citewp-ai-search-optimizer' ) : __( 'Pages', 'citewp-ai-search-optimizer' );
 								} else {
-									/* translators: %d: affected post count */
-									$type_noun = _n( 'Post', 'Posts', $affected_cnt, 'citewp-ai-search-optimizer' );
+									$type_noun = 1 === $affected_cnt ? __( 'Post', 'citewp-ai-search-optimizer' ) : __( 'Posts', 'citewp-ai-search-optimizer' );
 								}
-								$card_title = $rec['label'] . ' · ' . $affected_cnt . ' ' . $type_noun;
 								/* translators: 1: count, 2: type noun (Posts or Pages) */
-								$btn_label  = sprintf( __( 'View %1$d %2$s', 'citewp-ai-search-optimizer' ), $affected_cnt, $type_noun );
+								$btn_label = sprintf( __( 'View %1$d %2$s', 'citewp-ai-search-optimizer' ), $affected_cnt, $type_noun );
 							?>
 							<div class="citewp-aiso-cs-rec-row">
 								<div class="citewp-aiso-cs-rec-row__orb" style="background:<?php echo esc_attr( $cat_orb['bg'] ); ?>;color:<?php echo esc_attr( $cat_orb['color'] ); ?>">
@@ -1608,7 +1605,7 @@ final class Menu {
 								</div>
 								<div class="citewp-aiso-cs-rec-row__text">
 									<div class="citewp-aiso-cs-rec-row__title">
-										<?php echo esc_html( $card_title ); ?>
+										<?php echo esc_html( $rec['label'] ) . ' · ' . (int) $affected_cnt . ' ' . esc_html( $type_noun ); ?>
 									</div>
 									<div class="citewp-aiso-cs-rec-row__sub">
 										<?php echo esc_html( $rec['copy'] ); ?>
