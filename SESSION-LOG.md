@@ -6,6 +6,60 @@
 
 ---
 
+## Session 44 — Competitive intelligence, sitemap fix, WP.org listing rewrite ✅
+
+**Date:** 2026-05-31
+
+### Deliverable
+
+No plugin code shipped. Session focused on three areas: (1) competitive intelligence — 107-agent deep-research audit of Ayzeo, Citelayer, RankReady, and LovedByAI with Brain files updated; (2) citewp.com sitemap diagnosis and fix; (3) WP.org listing rewrite live at SVN r3556006.
+
+### What shipped
+
+- `readme.txt` — full WP.org listing rewrite: outcome-first title/tagline, improved tags (dropped `rankmath`, added `generative engine optimization`/`ai citations`/`chatgpt seo`), expanded Cite Score section with 17 signals listed, new "Why no API key?" and "White-hat by design" sections, 4 new FAQs. SVN r3556006.
+
+### Brain files updated
+
+- `Brain/COMPETITORS.md` — full rewrite (Apr → May 2026): Citelayer added as HIGH THREAT, Ayzeo upgraded HIGH, RankReady + Website LLMs.txt added, differentiator truth table, commodity tools section. Commit `440dafb`.
+- `Brain/FEATURE-BACKLOG.md` — FB56–FB61 added: editor metabox (FB56), CSV export (FB57), 86-bot expansion (FB58), AI Blind Spots (FB59), Visits from AI (FB60), MCP Server + Agent Skills (FB61). Commit `a6c28dd`.
+- `Brain/WEBSITE-COPY.md` — new file: outcome-first headline strategy, 5 proof points, WP.org listing gaps, 4 comparison pages, homepage section structure, messaging to avoid. Commit `440dafb`.
+
+### Decisions made
+
+- **No new DECISIONS.md rows.** No architectural, product, pricing, or process decisions were made. Competitive research and copy work only.
+
+### Verified
+
+- debug.log: no new CiteWP errors (pre-session Rank Math notices only, last entry 2026-05-27) ✅
+- No JS changes — build not required ✅
+- readme.txt SVN r3556006 committed to `citewp-ai-search-optimizer` trunk ✅
+- citewp.com sitemap `https://citewp.com/sitemap_index.xml` — confirmed working after permalink flush ✅
+- Google Search Console sitemap resubmitted ✅
+
+### Ops fix: citewp.com sitemap
+
+Root cause: WordPress rewrite rules (stored in DB) were missing Rank Math's `sitemap_index.xml → ?sitemap=1` mapping. Fix: Settings → Permalinks → Save Changes. Diagnosis confirmed via access log (request routing through `index.php`, 12KB 404 page, no PHP errors — rewrite rule issue, not PHP crash). Site is on Kinsta/Nginx — no `.htaccess` involved.
+
+### Carryover into Session 45
+
+**From S43 (still open):**
+1. **Upload `ai-search-optimizer.0.7.10.zip` to citewp.com** — zip on Desktop. Brad-manual.
+2. **FB53 A11 gate decision** — scoring rubric expansion for non-Article/non-FAQPage schema types.
+3. **Brain consolidation session** — priority flag; system coherence audit warranted.
+4. **`$top_gap_label` source drift** — Needs Attention KPI card vs. recommendation cards can diverge on >50 post sites. Fix: derive from `$top_groups[0]`.
+5. **Re-insert schema on previously-injected posts** — Brad-manual.
+6. **Stale wp:html block cleanup** — Brad-manual.
+
+**New from S44:**
+7. **Website copy rewrite** — `Brain/WEBSITE-COPY.md` written; citewp.com homepage, comparison pages, and content work not yet started.
+8. **FB56–FB59 are P1 plugin features** — editor metabox, CSV export, 86-bot expansion, AI Blind Spots. Ready to build.
+
+### Next session focus
+
+Brad to decide: plugin features (FB56–FB59, P1 quick wins) vs. website/content work (WEBSITE-COPY.md brief is ready) vs. Brain consolidation.
+
+---
+
 ## Session 43 — 0.7.10 release: per-(signal × post-type) AI Recommendations ✅
 
 **Date:** 2026-05-30
