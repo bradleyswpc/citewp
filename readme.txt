@@ -1,6 +1,6 @@
-=== CiteWP AI Search Optimizer – Optimize Content for AI Engines ===
+=== CiteWP AI Search Optimizer – Get Cited by ChatGPT, Perplexity & Claude ===
 Contributors: bradleyswpc
-Tags: seo, ai seo, llms-txt, chatgpt, rankmath
+Tags: ai seo, generative engine optimization, llms.txt, chatgpt seo, ai citations
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
@@ -8,49 +8,73 @@ Stable tag: 0.7.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-SEO gets you ranked. CiteWP gets you cited. AI crawler tracking, llms.txt generation, and a 100-point citation readiness score — free.
+SEO gets you ranked. CiteWP gets you cited. 17-signal AI citation score, AI crawler tracking, and llms.txt — free, no API key required.
 
 == Description ==
 
-AI Search Optimizer helps your WordPress content get cited by AI search engines.
+**Show up when ChatGPT, Perplexity, Claude, and Google AI answer your customers' questions.**
 
-Traditional SEO optimizes for ranking in search results. AI Search Optimizer focuses on a different goal: getting your content referenced inside AI-generated answers from ChatGPT, Claude, Perplexity, and other AI engines.
+Your content can rank on the first page of Google and still be completely invisible to AI assistants. CiteWP measures exactly why — and shows you what to fix.
 
-= What's included =
+It's the only WordPress plugin with a public, rubric-based AI citation score. Every signal, every weight, fully documented at citewp.com/cite-score. No black box. No API key required. Scores run locally on your server, free forever.
 
-✅ **Cite Score** — a transparent 100-point score across 17 signals (Structure, Citability, Authority). Full rubric at citewp.com/cite-score — no black box.
+Works alongside Yoast SEO, Rank Math, SEOPress, and AIOSEO — your SEO plugin gets you ranked; CiteWP gets you cited.
 
-✅ **AI Crawler Tracking** — see which AI bots visit your site, what they request, and which content gets attention. Filter by bot, export to CSV.
+= The Cite Score =
 
-✅ **llms.txt Generation** — auto-generate llms.txt and llms-full.txt from your most important content. Respects Yoast, Rank Math, SEOPress, and AIOSEO settings.
+Most AI SEO tools give you a number. CiteWP shows you the number, explains every point, and tells you exactly what to fix.
 
-✅ **Gutenberg Sidebar** — Cite Score and signal-by-signal breakdown live in the editor as you write. No context switching.
+The Cite Score measures 17 weighted signals across three categories:
+
+* **Structure** — heading hierarchy, answer-first formatting, passage length, semantic HTML
+* **Citability** — statistics density, named entities, FAQ content, self-contained passages
+* **Authority** — schema markup, author signals, internal linking, content depth
+
+Every signal is documented at citewp.com/cite-score with research citations for every weight. Unlike competitor "AI scores," there is no black box — SEO professionals can audit, explain, and defend every recommendation to their clients.
+
+= What's Included (Free) =
+
+✅ **Cite Score** — transparent 100-point AI citation readiness score with per-signal breakdown and ranked improvement recommendations. See your top 3 highest-impact fixes right on the dashboard.
+
+✅ **AI Crawler Tracking** — log visits from GPTBot, ClaudeBot, PerplexityBot, and 40+ other AI bots. See what they request, which content gets attention, and which published pages have never been visited by any AI crawler. Filter by bot, export to CSV.
+
+✅ **llms.txt Generation** — auto-generate /llms.txt and /llms-full.txt from your most important content with cornerstone prioritization. Respects Yoast, Rank Math, SEOPress, and AIOSEO settings automatically.
+
+✅ **Gutenberg Sidebar** — Cite Score, category breakdown, and signal-by-signal recommendations live in the editor as you write. Check your score without leaving the page.
+
+✅ **Schema Suggestions** — one-click Article and FAQPage JSON-LD generation. FAQ detection works with Kadence, Elementor, Divi, Beaver Builder, Bricks, Spectra, and HTML5 accordions.
+
+✅ **AI Recommendations** — the dashboard surfaces your highest-impact fixes, grouped by signal and post type, ranked by recoverable Cite Score points. No guessing what to work on next.
 
 ✅ **Post List Column** — sortable Cite Score column in All Posts and All Pages. Spot weak content at a glance.
 
-✅ **Dashboard Widget** — site-wide Cite Score average, top crawled pages, and AI bot trends at a glance.
+✅ **Dashboard Widget** — site-wide Cite Score average, top crawled pages, and AI bot activity at a glance.
+
+= Why no API key? =
+
+Other AI SEO plugins require you to connect an OpenAI or Anthropic API key just to see your score — meaning every analysis costs you money and sends your content to an external server.
+
+CiteWP scores your content locally on your own WordPress server. No API key. No per-analysis cost. No data leaving your site. The full feature set is free, forever.
 
 = Who this is for =
 
 ✅ **Bloggers and content publishers** — your audience is already asking AI for recommendations. Be the source they cite.
 
-✅ **WordPress agencies and freelancers** — measure AI citation readiness across client sites alongside traditional SEO metrics.
+✅ **SEO professionals and agencies** — measure AI citation readiness across client sites with a transparent, auditable rubric you can explain and defend.
 
-✅ **DIY founders and small-business owners** — own your WordPress site, want to be found by AI search? Start here.
+✅ **Founders and small-business owners** — if you own your WordPress site and want to show up in AI search, this is where you start.
 
 ✅ **SaaS companies and documentation sites** — AI engines cite authoritative reference content. Measure whether yours qualifies.
 
-= Why this matters =
+= White-hat by design =
 
-AI engines now influence a meaningful share of search behavior. Your content can rank well on Google and still be invisible to AI assistants. AI Search Optimizer measures and improves your content's likelihood of being cited.
+Some AI SEO plugins work by serving a different, "optimized" version of your page to AI crawlers — a technique that's functionally cloaking and carries real risk under Google's spam policies.
 
-= About the Cite Score =
+CiteWP takes the opposite approach: measure your actual content, find the gaps, fix them. Your real page gets better for AI and humans alike. No separate version for bots. No CDN dependency. No cloaking risk.
 
-The Cite Score is the heart of this plugin. Unlike competitors with proprietary "AI scoring" formulas, our rubric is fully public. The 17 signals are documented at https://citewp.com/cite-score, with research citations for every weight.
+= Built by CiteWP =
 
-= Built for the future =
-
-This plugin is built and maintained by **CiteWP**. Visit citewp.com for documentation, blog posts on AI search optimization, and product updates.
+CiteWP is a dedicated AI search optimization tool built specifically for WordPress. Visit citewp.com for documentation, the full scoring rubric, and blog posts on Generative Engine Optimization (GEO).
 
 == Installation ==
 
@@ -63,19 +87,39 @@ This plugin is built and maintained by **CiteWP**. Visit citewp.com for document
 
 = Does this replace my SEO plugin? =
 
-No. AI Search Optimizer complements Yoast SEO, Rank Math, SEOPress, and AIOSEO. Keep your SEO plugin for traditional search; add this for AI search.
+No — and it's not meant to. CiteWP complements Yoast SEO, Rank Math, SEOPress, and AIOSEO. Your SEO plugin handles traditional search rankings, meta tags, and sitemaps. CiteWP handles AI citation readiness. Run both together.
+
+= How is this different from other AI SEO plugins? =
+
+Three things set CiteWP apart:
+
+1. **Public rubric.** The Cite Score's 17 signals and weights are fully documented at citewp.com/cite-score. Every other AI scoring tool hides its formula. You can see exactly what we measure and why.
+2. **No API key required.** Other tools require an OpenAI or Anthropic key just to generate a score — meaning every analysis costs you money. CiteWP scores locally on your server for free, forever.
+3. **Per-signal recommendations.** We don't just show you a number. We show you the 3 highest-impact fixes on your site right now, ranked by recoverable points.
 
 = Is the Cite Score formula public? =
 
-Yes. The full 100-point rubric is published at https://citewp.com/cite-score with research citations for every signal. Unlike competitor "AI scores," there's no black box.
+Yes. The full 100-point rubric is published at https://citewp.com/cite-score with research citations for every signal weight. Unlike competitor "AI scores," there is no black box.
 
-= Does this work with WooCommerce? =
+= Do I need an API key or external account? =
 
-Cite Score and llms.txt generation work with any post type, including WooCommerce products. Crawler tracking is site-wide.
+No. CiteWP scores your content locally on your WordPress server. No OpenAI key, no Anthropic key, no external account required. The full feature set is free with no external dependencies.
 
 = What's an llms.txt file? =
 
-It's an emerging standard that helps AI engines understand your site's most important content. AI Search Optimizer generates it automatically, similar to how SEO plugins generate sitemap.xml.
+An emerging standard that helps AI engines understand your site's most important content. CiteWP generates it automatically from your published content — similar to how SEO plugins generate sitemap.xml — and keeps it updated when you publish or update posts.
+
+= Does this work with WooCommerce? =
+
+Yes. Cite Score and llms.txt generation work with any post type including WooCommerce products. Crawler tracking is site-wide.
+
+= Does this work with my page builder? =
+
+Yes. The Cite Score is available in Gutenberg (sidebar panel), Classic Editor, Elementor, Divi, Beaver Builder, Bricks, and any other editor via the universal meta box. Schema suggestion and FAQ detection also work with Kadence, Elementor, Divi, Beaver Builder, Bricks, and Spectra accordion blocks.
+
+= Will this slow down my site? =
+
+No. Scoring runs in the background on post save and on manual recalculation — never on front-end page loads. Crawler tracking adds a lightweight background log on AI bot visits only, with no impact on regular visitor performance.
 
 == Screenshots ==
 
