@@ -5,6 +5,7 @@ namespace CiteWP\Aiso\Admin;
 
 use CiteWP\Aiso\Scoring\Repository;
 use CiteWP\Aiso\Schema\Generator;
+use CiteWP\Aiso\Schema\Detector;
 use CiteWP\Aiso\Database\Schema;
 
 defined( 'ABSPATH' ) || exit;
@@ -341,6 +342,15 @@ final class EditorPanel {
 		$article      = $generator->generate_article_schema( $post );
 		$faqpage      = $generator->generate_faq_schema( $post );
 		$detected     = $generator->detect_existing_types( $post );
+
+		// Full rendered-page detection (head-injected schema from Yoast / Rank Math /
+		// AIOSEO included) for the read-only "Detected on this page" readout. No explicit
+		// recalculate → reads the template_redirect cache / post_content only, never blocks
+		// on an HTTP self-request. The Article/FAQ pill logic below stays on $detected
+		// (post_content) per P67-C — entity types do NOT suppress the copy buttons.
+		$detector     = new Detector();
+		$rendered      = $detector->get_detected_types( $post->ID );
+		$all_detected  = array_values( array_unique( array_merge( $rendered['types'], $detected ) ) );
 		$article_json = wp_json_encode( $article, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 		if ( false === $article_json ) {
 			echo '<p class="citewp-aiso-mb-empty-note">' . esc_html__( 'Schema could not be generated (content encoding error).', 'citewp-ai-search-optimizer' ) . '</p>';
@@ -388,18 +398,10 @@ final class EditorPanel {
 					</span>
 				<?php endif; ?>
 			</div>
-			<?php
-			$other = array_values( array_filter( $detected, static fn( string $t ) => ! in_array( $t, [ 'Article', 'FAQPage' ], true ) ) );
-			if ( ! empty( $other ) ) :
-			?>
+			<?php if ( ! empty( $all_detected ) ) : ?>
 			<p class="citewp-aiso-mb-other-types">
-				<?php
-				printf(
-					/* translators: %s: comma-separated list of schema @type values */
-					esc_html__( '%s schema detected — more types coming soon', 'citewp-ai-search-optimizer' ),
-					esc_html( implode( ', ', $other ) )
-				);
-				?>
+				<strong><?php esc_html_e( 'Detected on this page:', 'citewp-ai-search-optimizer' ); ?></strong>
+				<?php echo esc_html( ' ' . implode( ', ', $all_detected ) ); ?>
 			</p>
 			<?php endif; ?>
 		</div>

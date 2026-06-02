@@ -358,16 +358,7 @@ function SchemaSuggestions() {
 
 	if ( ! schema ) return null;
 
-	const detected         = schema.detected || [];
-	const allKnownVariants = SCHEMA_TYPES.flatMap( ( t ) => t.variants );
-	// 'Question' is a child node type of FAQPage schema (in mainEntity), not a
-	// standalone @type from the generator — excluded to avoid double-counting alongside FAQPage.
-	// A manually inserted root-level @type="Question" block would be detected, but
-	// the generator does not produce this (confirmed: collect_root_types() does not
-	// recurse into mainEntity, only @graph).
-	const otherDetected = detected.filter(
-		( t ) => ! allKnownVariants.includes( t ) && t !== 'Question'
-	);
+	const detected = schema.detected || [];
 
 	return (
 		<div className="citewp-aiso-sidebar-schema">
@@ -401,9 +392,12 @@ function SchemaSuggestions() {
 					/>
 				);
 			} ) }
-			{ otherDetected.length > 0 && (
+			{ detected.length > 0 && (
 				<div className="citewp-aiso-sidebar-schema-other">
-					{ `Other detected types: ${ otherDetected.join( ', ' ) } — more types coming soon` }
+					<span className="citewp-aiso-sidebar-schema-other__label">
+						Detected on this page:
+					</span>
+					{ ` ${ detected.join( ', ' ) }` }
 				</div>
 			) }
 		</div>

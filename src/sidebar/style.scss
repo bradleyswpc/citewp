@@ -234,6 +234,11 @@ $citewp-bg-subtle:    #f9fafb;
   padding: 6px 0;
   border-top: 1px solid $citewp-border-faint;
   color: $citewp-text-muted;
+
+  &__label {
+    font-weight: 600;
+    color: $citewp-text-body;
+  }
 }
 
 .citewp-aiso-sidebar-schema-row__label-group {
