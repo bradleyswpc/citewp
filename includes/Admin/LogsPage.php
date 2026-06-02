@@ -20,6 +20,7 @@ final class LogsPage {
 	public function register(): void {
 		add_action( 'admin_init',                         [ $this, 'maybe_init_table' ] );
 		add_action( 'admin_post_citewp_aiso_export_logs', [ $this, 'handle_csv_export' ] );
+		add_action( 'admin_enqueue_scripts',              [ $this, 'enqueue_scripts' ] );
 		// Bust the AI Blind Spots transient when a post is saved or its status changes,
 		// because either event can add a new post to the denominator.
 		add_action( 'save_post',               [ $this, 'bust_blind_spot_cache' ] );
@@ -322,6 +323,12 @@ final class LogsPage {
 
 			</div>
 
+			<?php
+			$all_blind_spots   = $data->get_blind_spot_posts( 500 );
+			$blind_spots_total = count( $all_blind_spots );
+			$this->render_blind_spots_card( array_slice( $all_blind_spots, 0, 50 ), $blind_spots_total );
+			?>
+
 				<div class="citewp-aiso-crawler-row-2col">
 
 					<!-- Left: Bot Visits Over Time chart -->
@@ -464,8 +471,6 @@ final class LogsPage {
 					</form>
 				</div>
 			<?php endif; ?>
-
-			<?php $this->render_blind_spots_card( $data->get_blind_spot_posts( 20 ) ); ?>
 
 			<div class="citewp-aiso-protip">
 				<div class="citewp-aiso-protip__left">
@@ -651,24 +656,42 @@ final class LogsPage {
 	}
 
 	/**
+	 * Register the Blind Spots pager inline script on the CiteWP admin page only.
+	 */
+	public function enqueue_scripts( string $hook ): void {
+		if ( 'toplevel_page_citewp' !== $hook ) {
+			return;
+		}
+		// Inline-only handle: false src + wp_add_inline_script is a documented WP pattern.
+		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+		wp_register_script( 'citewp-aiso-logs-pager', false, [], CITEWP_AISO_VERSION, true );
+		wp_enqueue_script( 'citewp-aiso-logs-pager' );
+		wp_add_inline_script( 'citewp-aiso-logs-pager', $this->blind_spots_pager_js() );
+	}
+
+	/**
 	 * Render the AI Blind Spots collapsible card (FB59).
 	 *
-	 * @param array<int, array{ID: int, post_title: string, edit_link: string|null}> $posts
+	 * Starts collapsed — count badge keeps it discoverable without pushing the table down.
+	 * Shows up to 50 items; paginated at 10/page by the footer JS.
+	 *
+	 * @param array<int, array{ID: int, post_title: string, edit_link: string|null}> $posts Up to 50 display items.
+	 * @param int $total True blind-spot count (may exceed count($posts) if > 500).
 	 */
-	private function render_blind_spots_card( array $posts ): void {
+	private function render_blind_spots_card( array $posts, int $total ): void {
 		$count = count( $posts );
 		?>
-		<details class="citewp-aiso-blind-spots" open>
+		<details class="citewp-aiso-blind-spots">
 			<summary class="citewp-aiso-blind-spots__summary">
-				<span class="citewp-aiso-blind-spots__title">
+				<span class="citewp-aiso-cs-panel__title citewp-aiso-blind-spots__title">
 					<?php esc_html_e( 'AI Blind Spots', 'citewp-ai-search-optimizer' ); ?>
 				</span>
-				<?php if ( $count > 0 ) : ?>
-					<span class="citewp-aiso-blind-spots__badge"><?php echo esc_html( number_format_i18n( $count ) ); ?></span>
+				<?php if ( $total > 0 ) : ?>
+					<span class="citewp-aiso-blind-spots__badge"><?php echo esc_html( number_format_i18n( $total ) ); ?></span>
 				<?php endif; ?>
 			</summary>
 			<div class="citewp-aiso-blind-spots__body">
-				<?php if ( 0 === $count ) : ?>
+				<?php if ( 0 === $total ) : ?>
 					<p class="citewp-aiso-blind-spots__empty">
 						<?php esc_html_e( 'All published posts and pages have been visited by at least one AI crawler.', 'citewp-ai-search-optimizer' ); ?>
 					</p>
@@ -681,17 +704,30 @@ final class LogsPage {
 								_n(
 									'%d published post has never been visited by an AI crawler. AI engines may not know this content exists.',
 									'%d published posts have never been visited by any AI crawler. AI engines may not know this content exists.',
-									$count,
+									$total,
 									'citewp-ai-search-optimizer'
 								),
-								$count
+								$total
 							)
 						);
 						?>
 					</p>
+					<?php if ( $total > $count ) : ?>
+						<p class="citewp-aiso-blind-spots__cap-note">
+							<?php
+							echo esc_html(
+								sprintf(
+									/* translators: %d: number of items displayed */
+									__( 'Showing first %d.', 'citewp-ai-search-optimizer' ),
+									$count
+								)
+							);
+							?>
+						</p>
+					<?php endif; ?>
 					<ul class="citewp-aiso-blind-spots__list">
-						<?php foreach ( $posts as $post ) : ?>
-							<li class="citewp-aiso-blind-spots__item">
+						<?php foreach ( $posts as $i => $post ) : ?>
+							<li class="citewp-aiso-blind-spots__item" data-bs-page="<?php echo esc_attr( (string) (int) floor( $i / 10 ) ); ?>">
 								<span class="citewp-aiso-blind-spots__item-title">
 									<?php echo esc_html( $post['post_title'] !== '' ? $post['post_title'] : __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?>
 								</span>
@@ -703,10 +739,47 @@ final class LogsPage {
 							</li>
 						<?php endforeach; ?>
 					</ul>
+					<?php if ( $count > 10 ) : ?>
+						<div class="citewp-aiso-blind-spots__pager">
+							<button type="button" class="citewp-aiso-bsp-prev">&#8592;</button>
+							<span class="citewp-aiso-bsp-label"></span>
+							<button type="button" class="citewp-aiso-bsp-next">&#8594;</button>
+						</div>
+					<?php endif; ?>
 				<?php endif; ?>
 			</div>
 		</details>
 		<?php
+	}
+
+	/**
+	 * Vanilla JS for the Blind Spots pager (no jQuery, no build step).
+	 * Runs synchronously in the footer — DOM is fully rendered by then.
+	 */
+	private function blind_spots_pager_js(): string {
+		return <<<'CITEBS'
+(function(){
+var c=document.querySelector('.citewp-aiso-blind-spots');
+if(!c)return;
+var p=c.querySelector('.citewp-aiso-blind-spots__pager');
+if(!p)return;
+var items=c.querySelectorAll('.citewp-aiso-blind-spots__item');
+var tp=Math.ceil(items.length/10),cur=0;
+var prev=p.querySelector('.citewp-aiso-bsp-prev');
+var next=p.querySelector('.citewp-aiso-bsp-next');
+var lbl=p.querySelector('.citewp-aiso-bsp-label');
+function go(n){
+cur=n;
+items.forEach(function(li){li.hidden=(parseInt(li.dataset.bsPage,10)!==cur);});
+lbl.textContent='Page '+(cur+1)+' of '+tp;
+prev.disabled=(cur===0);
+next.disabled=(cur>=tp-1);
+}
+prev.addEventListener('click',function(){if(cur>0)go(cur-1);});
+next.addEventListener('click',function(){if(cur<tp-1)go(cur+1);});
+go(0);
+})();
+CITEBS;
 	}
 
 }
