@@ -109,6 +109,63 @@ final class BotRegistry {
 			[ 'match' => 'webzio-extended',       'name' => 'Webzio-Extended',       'vendor' => 'Webz.io',    'purpose' => 'training' ],
 			[ 'match' => 'scalenut',              'name' => 'Scalenut',              'vendor' => 'Scalenut',   'purpose' => 'misc' ],
 			[ 'match' => 'velenpublicwebcrawler', 'name' => 'VelenPublicWebCrawler', 'vendor' => 'Velen',      'purpose' => 'training' ],
+
+			// --- FB58: Bot registry expansion to 86+ verified AI crawlers ---
+			// Sources: darkvisitors.com, official bot documentation, Citelayer changelog.
+
+			// --- AI training crawlers ---
+			[ 'match' => 'deepseek',              'name' => 'DeepSeek-Bot',              'vendor' => 'DeepSeek',              'purpose' => 'training'    ],
+			[ 'match' => 'ai2-bot',               'name' => 'AI2Bot',                    'vendor' => 'Allen Institute for AI', 'purpose' => 'training'    ],
+			[ 'match' => 'friendlycrawler',       'name' => 'FriendlyCrawler',           'vendor' => 'Open Training',         'purpose' => 'training'    ],
+			[ 'match' => 'kangarobot',            'name' => 'KangarooBot',               'vendor' => 'Knowledge AI',          'purpose' => 'training'    ],
+			[ 'match' => 'brightbot',             'name' => 'Brightbot',                 'vendor' => 'Bright Data',           'purpose' => 'training'    ],
+			[ 'match' => 'icc-crawler',           'name' => 'ICC-Crawler',               'vendor' => 'ICC',                   'purpose' => 'training'    ],
+			[ 'match' => 'turnitin',              'name' => 'TurnitinBot',               'vendor' => 'Turnitin',              'purpose' => 'training'    ],
+			[ 'match' => 'ia_archiver',           'name' => 'Heritrix',                  'vendor' => 'Internet Archive',      'purpose' => 'training'    ],
+			// Open-source ML pipeline tools — appear in AI-lab crawl pipelines.
+			[ 'match' => 'news-please',           'name' => 'news-please',               'vendor' => 'Open Source',           'purpose' => 'training'    ],
+			[ 'match' => 'newspaper3k',           'name' => 'newspaper3k',               'vendor' => 'Open Source',           'purpose' => 'training'    ],
+			[ 'match' => 'trafilatura',           'name' => 'trafilatura',               'vendor' => 'Open Source',           'purpose' => 'training'    ],
+			[ 'match' => 'scrapy',                'name' => 'Scrapy',                    'vendor' => 'Open Source',           'purpose' => 'training'    ],
+			// Mistral catch-all: must follow mistralai-user so user_action is matched first.
+			[ 'match' => 'mistralai',             'name' => 'MistralAI',                 'vendor' => 'Mistral',               'purpose' => 'training'    ],
+
+			// --- AI search crawlers ---
+			[ 'match' => 'brave-search',          'name' => 'Brave-SearchBot',           'vendor' => 'Brave Software',        'purpose' => 'search'      ],
+			[ 'match' => 'petalbot',              'name' => 'PetalBot',                  'vendor' => 'Huawei Technologies',   'purpose' => 'search'      ],
+			[ 'match' => 'mojeekbot',             'name' => 'MojeekBot',                 'vendor' => 'Mojeek',                'purpose' => 'search'      ],
+			[ 'match' => 'neevabot',              'name' => 'NeevaBot',                  'vendor' => 'Neeva',                 'purpose' => 'search'      ],
+			[ 'match' => 'yisouspider',           'name' => 'YisouSpider',               'vendor' => 'Qihoo 360',             'purpose' => 'search'      ],
+			[ 'match' => 'semrushbot',            'name' => 'SemrushBot',                'vendor' => 'Semrush',               'purpose' => 'search'      ],
+			[ 'match' => 'ahrefsbot',             'name' => 'AhrefsBot',                 'vendor' => 'Ahrefs',                'purpose' => 'search'      ],
+			[ 'match' => 'mj12bot',               'name' => 'MJ12bot',                   'vendor' => 'Majestic',              'purpose' => 'search'      ],
+			[ 'match' => 'dotbot',                'name' => 'DotBot',                    'vendor' => 'Moz',                   'purpose' => 'search'      ],
+			[ 'match' => 'dataforseobot',         'name' => 'DataForSeoBot',             'vendor' => 'DataForSEO',            'purpose' => 'search'      ],
+			[ 'match' => 'qwantbot',              'name' => 'QwantBot',                  'vendor' => 'Qwant',                 'purpose' => 'search'      ],
+			[ 'match' => 'bingbot',               'name' => 'BingBot',                   'vendor' => 'Microsoft',             'purpose' => 'search'      ],
+			[ 'match' => 'baiduspider',           'name' => 'Baiduspider',               'vendor' => 'Baidu',                 'purpose' => 'search'      ],
+			[ 'match' => 'sogou',                 'name' => 'Sogou Web Spider',          'vendor' => 'Sogou',                 'purpose' => 'search'      ],
+			[ 'match' => 'naver',                 'name' => 'NaverBot (Yeti)',            'vendor' => 'Naver',                 'purpose' => 'search'      ],
+			[ 'match' => '360spider',             'name' => '360Spider',                 'vendor' => 'Qihoo 360',             'purpose' => 'search'      ],
+
+			// --- Social link-preview bots (AI assistants extract content from these fetches) ---
+			// facebot must precede any longer 'facebook*' variant — though none currently conflict.
+			[ 'match' => 'facebot',               'name' => 'Facebot',                   'vendor' => 'Meta',                  'purpose' => 'misc'        ],
+			[ 'match' => 'twitterbot',            'name' => 'Twitterbot',                'vendor' => 'X / Twitter',           'purpose' => 'misc'        ],
+			[ 'match' => 'linkedinbot',           'name' => 'LinkedInBot',               'vendor' => 'LinkedIn',              'purpose' => 'misc'        ],
+			[ 'match' => 'slackbot-linkexpanding','name' => 'Slackbot-LinkExpanding',    'vendor' => 'Slack',                 'purpose' => 'misc'        ],
+			[ 'match' => 'discordbot',            'name' => 'DiscordBot',                'vendor' => 'Discord',               'purpose' => 'misc'        ],
+			[ 'match' => 'telegrambot',           'name' => 'TelegramBot',               'vendor' => 'Telegram',              'purpose' => 'misc'        ],
+			[ 'match' => 'whatsapp',              'name' => 'WhatsApp',                  'vendor' => 'Meta',                  'purpose' => 'misc'        ],
+			[ 'match' => 'pinterestbot',          'name' => 'PinterestBot',              'vendor' => 'Pinterest',             'purpose' => 'misc'        ],
+
+			// --- Media monitoring / AI analytics ---
+			[ 'match' => 'meltwater',             'name' => 'MeltwaterBot',              'vendor' => 'Meltwater',             'purpose' => 'misc'        ],
+			[ 'match' => 'brandwatch',            'name' => 'BrandwatchBot',             'vendor' => 'Brandwatch',            'purpose' => 'misc'        ],
+			[ 'match' => 'sentibot',              'name' => 'SentiBot',                  'vendor' => 'Senti.io',              'purpose' => 'misc'        ],
+			[ 'match' => 'blexbot',               'name' => 'BLEXBot',                   'vendor' => 'Webmeup',               'purpose' => 'misc'        ],
+			[ 'match' => 'peer39_crawler',        'name' => 'peer39_crawler',            'vendor' => 'Peer39',                'purpose' => 'misc'        ],
+			[ 'match' => 'apify',                 'name' => 'ApifyBot',                  'vendor' => 'Apify',                 'purpose' => 'misc'        ],
 		];
 	}
 
