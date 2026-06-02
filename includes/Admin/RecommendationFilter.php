@@ -302,7 +302,7 @@ final class RecommendationFilter {
 				$count,
 				'citewp-ai-search-optimizer'
 			);
-			$clear_label = esc_html__( '× All pages', 'citewp-ai-search-optimizer' );
+			$clear_label = __( '× All pages', 'citewp-ai-search-optimizer' );
 		} else {
 			/* translators: 1: number of posts, 2: recommendation label */
 			$template = _n(
@@ -311,14 +311,14 @@ final class RecommendationFilter {
 				$count,
 				'citewp-ai-search-optimizer'
 			);
-			$clear_label = esc_html__( '× All posts', 'citewp-ai-search-optimizer' );
+			$clear_label = __( '× All posts', 'citewp-ai-search-optimizer' );
 		}
 
 		printf(
 			'<div class="notice notice-info"><p>%s &nbsp;&nbsp;<a href="%s">%s</a></p></div>',
 			esc_html( sprintf( $template, $count, $label ) ),
 			esc_url( $clear ),
-			$clear_label // already escaped above via esc_html__()
+			esc_html( $clear_label )
 		);
 	}
 }
