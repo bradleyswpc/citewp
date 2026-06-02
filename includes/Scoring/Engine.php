@@ -646,14 +646,15 @@ final class Engine {
 		// Full rendered page was checked (tier1/tier2) — definitive: no Article and no
 		// authority-entity type for this page.
 		if ( in_array( $schema['source'], [ 'tier1', 'tier2' ], true ) ) {
-			// Name what WAS found (typically site-chrome from an SEO plugin) instead of
-			// the misleading "no schema" — chrome types do not credit (P47/P67 anti-proxy).
+			// Name what WAS found (typically site-chrome from an SEO plugin, or a FAQPage
+			// credited under the Structure signal) instead of the misleading "no schema" —
+			// these types do not credit Authority (P47/P67 anti-proxy; FAQPage = no double-credit).
 			if ( ! empty( $schema['types'] ) ) {
 				return new SignalResult(
 					'schema', 'authority', 'Schema markup',
 					0, 6, 'fail',
 					sprintf(
-						'Only site-wide schema found (%s) — no Article or entity schema for this page.',
+						'Schema found (%s), but no Article or authority-entity type for this page.',
 						implode( ', ', $schema['types'] )
 					),
 					'Add Article, Product, Organization, or another entity schema for this page — or use the Schema Suggestions panel to insert JSON-LD directly.'
