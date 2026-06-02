@@ -1015,6 +1015,9 @@ final class Menu {
 		$cspp     = isset( $_GET['cspp'] ) ? absint( wp_unslash( $_GET['cspp'] ) ) : 5; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only per-page param; value validated against allowlist below.
 		$per_page = in_array( $cspp, [ 5, 10, 25 ], true ) ? $cspp : 5;
 		$search_q = sanitize_text_field( wp_unslash( $_GET['css'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// FB62: optional "hide excluded" filter. Default shows all — P49 keeps llms.txt-excluded
+		// posts visible on per-post surfaces; this only hides them when the user opts in.
+		$hide_excluded = ( sanitize_key( wp_unslash( $_GET['cs_excl'] ?? '' ) ) === 'hide' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display filter; no data modification.
 		$tbl_args  = [
 			'post_type'      => [ 'post', 'page' ],
 			'post_status'    => [ 'publish', 'draft' ],
@@ -1025,6 +1028,15 @@ final class Menu {
 			'order'          => 'ASC',
 			'meta_query'     => [ [ 'key' => Repository::META_KEY_TOTAL, 'compare' => 'EXISTS' ] ], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required to exclude unscored posts from the Cite Score table; same meta key as orderby above. Admin-only.
 		];
+		if ( $hide_excluded ) {
+			// Same exclusion pattern as DashboardData::get_average_score() / schema_coverage().
+			$tbl_args['meta_query']['relation'] = 'AND';
+			$tbl_args['meta_query'][]           = [
+				'relation' => 'OR',
+				[ 'key' => '_citewp_aiso_exclude_from_llms', 'compare' => 'NOT EXISTS' ],
+				[ 'key' => '_citewp_aiso_exclude_from_llms', 'value' => '1', 'compare' => '!=' ],
+			];
+		}
 		if ( $search_q !== '' ) {
 			$tbl_args['s'] = $search_q;
 		}
@@ -1356,6 +1368,7 @@ final class Menu {
 						<input type="hidden" name="csp"  value="<?php echo esc_attr( (string) $paged ); ?>">
 						<input type="hidden" name="cspp" value="<?php echo esc_attr( (string) $per_page ); ?>">
 						<input type="hidden" name="css"  value="<?php echo esc_attr( $search_q ); ?>">
+						<?php if ( $hide_excluded ) : ?><input type="hidden" name="cs_excl" value="hide"><?php endif; ?>
 						<select name="cs_range" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
 							<?php foreach ( [ 7 => __( 'Last 7 Days', 'citewp-ai-search-optimizer' ), 30 => __( 'Last 30 Days', 'citewp-ai-search-optimizer' ), 90 => __( 'Last 90 Days', 'citewp-ai-search-optimizer' ) ] as $days => $label ) : ?>
 							<option value="<?php echo esc_attr( (string) $days ); ?>"<?php selected( $days, $history_range ); ?>><?php echo esc_html( $label ); ?></option>
@@ -1393,6 +1406,15 @@ final class Menu {
 					<form method="get" action="<?php echo esc_url( $base_url ); ?>">
 						<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
 						<input type="hidden" name="cspp" value="<?php echo esc_attr( (string) $per_page ); ?>">
+						<?php if ( $hide_excluded ) : ?><input type="hidden" name="cs_excl" value="hide"><?php endif; ?>
+						<?php
+						$excl_toggle_args = array_merge( $base_q, [ 'cspp' => $per_page ] );
+						if ( $search_q !== '' ) { $excl_toggle_args['css'] = $search_q; }
+						if ( ! $hide_excluded ) { $excl_toggle_args['cs_excl'] = 'hide'; }
+						$excl_toggle_url = add_query_arg( $excl_toggle_args, $base_url ) . '#cite-score';
+						$excl_pill_cls   = $hide_excluded ? 'citewp-aiso-filter-pill citewp-aiso-filter-pill--active' : 'citewp-aiso-filter-pill citewp-aiso-filter-pill--inactive';
+						?>
+						<a href="<?php echo esc_url( $excl_toggle_url ); ?>" class="citewp-aiso-cs-excl-toggle <?php echo esc_attr( $excl_pill_cls ); ?>"><?php echo $hide_excluded ? esc_html__( 'Show excluded', 'citewp-ai-search-optimizer' ) : esc_html__( 'Hide excluded', 'citewp-ai-search-optimizer' ); ?></a>
 						<input
 							type="search"
 							name="css"
@@ -1491,7 +1513,7 @@ final class Menu {
 					<?php if ( $total_pages > 1 ) : ?>
 					<div class="citewp-aiso-cs-pagination__pages">
 						<?php for ( $pg = 1; $pg <= $total_pages; $pg++ ) :
-							$pg_url = esc_url( add_query_arg( array_merge( $base_q, [ 'csp' => $pg, 'cspp' => $per_page, 'css' => $search_q ] ), $base_url ) . '#cite-score' );
+							$pg_url = esc_url( add_query_arg( array_merge( $base_q, [ 'csp' => $pg, 'cspp' => $per_page, 'css' => $search_q ], ( $hide_excluded ? [ 'cs_excl' => 'hide' ] : [] ) ), $base_url ) . '#cite-score' );
 						?>
 						<?php if ( $pg === $paged ) : ?>
 						<span class="citewp-aiso-cs-pagination__page is-active"><?php echo esc_html( (string) $pg ); ?></span>
@@ -1507,6 +1529,7 @@ final class Menu {
 					<form method="get" action="<?php echo esc_url( $base_url ); ?>">
 						<input type="hidden" name="page" value="<?php echo esc_attr( self::SLUG_PARENT ); ?>">
 						<input type="hidden" name="css"  value="<?php echo esc_attr( $search_q ); ?>">
+						<?php if ( $hide_excluded ) : ?><input type="hidden" name="cs_excl" value="hide"><?php endif; ?>
 						<select name="cspp" class="citewp-aiso-cs-perpage" onchange="this.form.submit()">
 							<?php foreach ( [ 5, 10, 25 ] as $pp ) : ?>
 							<option value="<?php echo esc_attr( (string) $pp ); ?>"<?php selected( $pp, $per_page ); ?>><?php echo esc_html( $pp . ' ' . __( 'per page', 'citewp-ai-search-optimizer' ) ); ?></option>

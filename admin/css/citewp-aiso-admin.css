@@ -2699,6 +2699,17 @@
   min-width: 180px;
 }
 
+/* FB62: search form now holds the "Hide excluded" toggle pill + the search box */
+.citewp-aiso-cs-table-head form {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.citewp-aiso-cs-excl-toggle {
+  white-space: nowrap;
+}
+
 .citewp-aiso-cs-table {
   width: 100%;
   border-collapse: collapse;
