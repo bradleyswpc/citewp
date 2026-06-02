@@ -51,11 +51,14 @@ final class Menu {
 			return;
 		}
 
+		$css_path    = CITEWP_AISO_PLUGIN_DIR . 'admin/css/citewp-aiso-admin.css';
+		$css_version = file_exists( $css_path ) ? filemtime( $css_path ) : CITEWP_AISO_VERSION;
+
 		wp_enqueue_style(
 			'citewp-aiso-admin',
 			CITEWP_AISO_PLUGIN_URL . 'admin/css/citewp-aiso-admin.css',
 			[],
-			CITEWP_AISO_VERSION
+			$css_version
 		);
 	}
 
