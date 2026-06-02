@@ -3867,7 +3867,7 @@
    ============================================================ */
 
 .citewp-aiso-blind-spots {
-	background: var(--citewp-paper);
+	background: #fff;           /* match other panel cards on this page */
 	border: 1px solid var(--citewp-border);
 	border-radius: 6px;
 	margin-top: var(--sp-4);    /* P59 vertical rhythm — matches gap KPI → table */
@@ -3933,9 +3933,11 @@
 	margin: 0;
 }
 
+/* Bold intro sentence — visually separates the count statement from the post list */
 .citewp-aiso-blind-spots__intro {
-	color: var(--citewp-secondary);
+	color: var(--citewp-primary);
 	font-size: 13px;
+	font-weight: 600;
 	margin: 0 0 var(--sp-3);
 }
 
@@ -4021,8 +4023,27 @@
 }
 
 .citewp-aiso-bsp-label {
-	flex: 1;
-	text-align: center;
 	font-size: 12px;
 	color: var(--citewp-secondary);
+	white-space: nowrap;
+}
+
+/* Per-page select — pushed to the right, arrows + label stay centred */
+.citewp-aiso-bsp-per-page-wrap {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: var(--sp-2);
+	font-size: 12px;
+	color: var(--citewp-secondary);
+}
+
+.citewp-aiso-bsp-per-page {
+	font-size: 12px;
+	border: 1px solid var(--citewp-border);
+	border-radius: 4px;
+	padding: 1px 4px;
+	color: var(--citewp-primary);
+	background: #fff;
+	cursor: pointer;
 }

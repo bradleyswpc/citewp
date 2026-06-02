@@ -323,12 +323,6 @@ final class LogsPage {
 
 			</div>
 
-			<?php
-			$all_blind_spots   = $data->get_blind_spot_posts( 500 );
-			$blind_spots_total = count( $all_blind_spots );
-			$this->render_blind_spots_card( array_slice( $all_blind_spots, 0, 50 ), $blind_spots_total );
-			?>
-
 				<div class="citewp-aiso-crawler-row-2col">
 
 					<!-- Left: Bot Visits Over Time chart -->
@@ -451,6 +445,12 @@ final class LogsPage {
 					</div>
 
 				</div><!-- .citewp-aiso-crawler-row-2col -->
+
+			<?php
+			$all_blind_spots   = $data->get_blind_spot_posts( 500 );
+			$blind_spots_total = count( $all_blind_spots );
+			$this->render_blind_spots_card( array_slice( $all_blind_spots, 0, 50 ), $blind_spots_total );
+			?>
 
 			<?php if ( $total === 0 && $range_filter === '' ) : ?>
 				<div class="citewp-aiso-empty">
@@ -726,8 +726,8 @@ final class LogsPage {
 						</p>
 					<?php endif; ?>
 					<ul class="citewp-aiso-blind-spots__list">
-						<?php foreach ( $posts as $i => $post ) : ?>
-							<li class="citewp-aiso-blind-spots__item" data-bs-page="<?php echo esc_attr( (string) (int) floor( $i / 10 ) ); ?>">
+						<?php foreach ( $posts as $post ) : ?>
+							<li class="citewp-aiso-blind-spots__item">
 								<span class="citewp-aiso-blind-spots__item-title">
 									<?php echo esc_html( $post['post_title'] !== '' ? $post['post_title'] : __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?>
 								</span>
@@ -739,11 +739,18 @@ final class LogsPage {
 							</li>
 						<?php endforeach; ?>
 					</ul>
-					<?php if ( $count > 10 ) : ?>
+					<?php if ( $count > 5 ) : ?>
 						<div class="citewp-aiso-blind-spots__pager">
 							<button type="button" class="citewp-aiso-bsp-prev">&#8592;</button>
 							<span class="citewp-aiso-bsp-label"></span>
 							<button type="button" class="citewp-aiso-bsp-next">&#8594;</button>
+							<span class="citewp-aiso-bsp-per-page-wrap">
+								<select class="citewp-aiso-bsp-per-page" aria-label="<?php esc_attr_e( 'Rows per page', 'citewp-ai-search-optimizer' ); ?>">
+									<option value="5">5</option>
+									<option value="10">10</option>
+								</select>
+								<?php esc_html_e( 'per page', 'citewp-ai-search-optimizer' ); ?>
+							</span>
 						</div>
 					<?php endif; ?>
 				<?php endif; ?>
@@ -754,7 +761,9 @@ final class LogsPage {
 
 	/**
 	 * Vanilla JS for the Blind Spots pager (no jQuery, no build step).
-	 * Runs synchronously in the footer — DOM is fully rendered by then.
+	 * Runs synchronously in footer — DOM is fully rendered by then.
+	 * Uses forEach index for pagination so no PHP data-bs-page attribute is needed.
+	 * Default 5/page; select switches to 10/page and resets to page 1.
 	 */
 	private function blind_spots_pager_js(): string {
 		return <<<'CITEBS'
@@ -763,20 +772,23 @@ var c=document.querySelector('.citewp-aiso-blind-spots');
 if(!c)return;
 var p=c.querySelector('.citewp-aiso-blind-spots__pager');
 if(!p)return;
-var items=c.querySelectorAll('.citewp-aiso-blind-spots__item');
-var tp=Math.ceil(items.length/10),cur=0;
+var items=Array.from(c.querySelectorAll('.citewp-aiso-blind-spots__item'));
+var perPage=5,cur=0;
 var prev=p.querySelector('.citewp-aiso-bsp-prev');
 var next=p.querySelector('.citewp-aiso-bsp-next');
 var lbl=p.querySelector('.citewp-aiso-bsp-label');
+var sel=p.querySelector('.citewp-aiso-bsp-per-page');
+function tp(){return Math.ceil(items.length/perPage);}
 function go(n){
 cur=n;
-items.forEach(function(li){li.hidden=(parseInt(li.dataset.bsPage,10)!==cur);});
-lbl.textContent='Page '+(cur+1)+' of '+tp;
+items.forEach(function(li,i){li.hidden=(Math.floor(i/perPage)!==cur);});
+lbl.textContent='Page '+(cur+1)+' of '+tp();
 prev.disabled=(cur===0);
-next.disabled=(cur>=tp-1);
+next.disabled=(cur>=tp()-1);
 }
 prev.addEventListener('click',function(){if(cur>0)go(cur-1);});
-next.addEventListener('click',function(){if(cur<tp-1)go(cur+1);});
+next.addEventListener('click',function(){if(cur<tp()-1)go(cur+1);});
+if(sel){sel.addEventListener('change',function(){perPage=parseInt(sel.value,10);go(0);});}
 go(0);
 })();
 CITEBS;
