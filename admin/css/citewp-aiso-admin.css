@@ -3936,9 +3936,9 @@
 /* Intro sentence styled as a subheader: bold + rule underneath separates it from the list */
 .citewp-aiso-blind-spots__intro {
 	color: var(--citewp-primary);
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 600;
-	padding-bottom: var(--sp-3);
+	padding-bottom: var(--sp-4); /* lifts text away from the divider line */
 	border-bottom: 1px solid var(--citewp-border);
 	margin: 0 0 var(--sp-3);
 }
@@ -4017,6 +4017,16 @@
 	color: var(--citewp-secondary);
 	white-space: nowrap;
 	padding: 0 var(--sp-1);
+}
+
+.citewp-aiso-bsp-per-page {
+	font-size: 12px;
+	border: 1px solid var(--citewp-border);
+	border-radius: 3px;
+	padding: 1px 4px;
+	color: var(--citewp-primary);
+	background: #fff;
+	cursor: pointer;
 }
 
 .citewp-aiso-bsp-prev:disabled,

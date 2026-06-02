@@ -739,19 +739,10 @@ final class LogsPage {
 					</ul>
 					<?php if ( $count > 5 ) : ?>
 						<div class="citewp-aiso-blind-spots__pager">
-							<button type="button" class="button citewp-aiso-bsp-show-more">
-								<?php
-								echo esc_html(
-									$count > 10
-										? __( 'Show 10', 'citewp-ai-search-optimizer' )
-										: sprintf(
-											/* translators: %d: total number of blind-spot posts to show */
-											__( 'Show all %d', 'citewp-ai-search-optimizer' ),
-											$count
-										)
-								);
-								?>
-							</button>
+							<select class="citewp-aiso-bsp-per-page" aria-label="<?php esc_attr_e( 'Posts per page', 'citewp-ai-search-optimizer' ); ?>">
+								<option value="5" selected>5</option>
+								<option value="10">10</option>
+							</select>
 							<?php if ( $count > 10 ) : ?>
 								<span class="citewp-aiso-bsp-nav" hidden>
 									<button type="button" class="button citewp-aiso-bsp-prev" disabled>&#8249;</button>
@@ -787,7 +778,7 @@ if(!items.length)return;
 var p=c.querySelector('.citewp-aiso-blind-spots__pager');
 if(!p)return;
 var perPage=5,cur=0;
-var showMore=p.querySelector('.citewp-aiso-bsp-show-more');
+var sel=p.querySelector('.citewp-aiso-bsp-per-page');
 var nav=p.querySelector('.citewp-aiso-bsp-nav');
 var prev=nav&&nav.querySelector('.citewp-aiso-bsp-prev');
 var next=nav&&nav.querySelector('.citewp-aiso-bsp-next');
@@ -800,11 +791,10 @@ if(lbl)lbl.textContent='Page '+(cur+1)+' of '+tp();
 if(prev)prev.disabled=(cur===0);
 if(next)next.disabled=(cur>=tp()-1);
 }
-if(showMore){
-showMore.addEventListener('click',function(){
-perPage=10;cur=0;
-showMore.hidden=true;
-if(nav)nav.hidden=false;
+if(sel){
+sel.addEventListener('change',function(){
+perPage=parseInt(sel.value,10);cur=0;
+if(nav)nav.hidden=(perPage<10);
 go(0);
 });
 }
