@@ -42,6 +42,47 @@ defined( 'ABSPATH' ) || exit;
 
 final class Engine {
 
+	/**
+	 * Authority-entity @types that grant full `schema` credit when present on the
+	 * rendered page, even without an Article type (P72). Article + its subtypes are
+	 * handled separately via the Detector's article_valid flag (Detector::ARTICLE_TYPES)
+	 * and are intentionally NOT duplicated here. Site-chrome types (WebSite,
+	 * BreadcrumbList, WebPage, CollectionPage, SiteNavigationElement) and FAQPage are
+	 * deliberately excluded: chrome is site-wide SEO-plugin noise (P47/P67 anti-proxy),
+	 * and FAQPage is credited under the Structure faq_schema_or_qa signal (no double-credit).
+	 * Hardcoded, not filterable — scoring stays deterministic per S6.
+	 */
+	private const AUTHORITY_ENTITY_TYPES = [
+		'SoftwareApplication',
+		'Organization',
+		'Person',
+		'Product',
+		'LocalBusiness',
+		'Service',
+		'Course',
+		'Recipe',
+		'HowTo',
+		'Event',
+		'Book',
+		'Review',
+	];
+
+	/**
+	 * Article @types, mirrored from Detector::ARTICLE_TYPES. Used only by the cold-start
+	 * inline post_content fallback in check_schema() to credit hand-rolled Article JSON-LD
+	 * when the rendered-page detection could not run. The rendered-page path uses the
+	 * Detector's own ARTICLE_TYPES via article_valid.
+	 */
+	private const INLINE_ARTICLE_TYPES = [
+		'Article',
+		'BlogPosting',
+		'NewsArticle',
+		'TechArticle',
+		'ScholarlyArticle',
+		'SocialMediaPosting',
+		'Report',
+	];
+
 	private Detector $detector;
 
 	public function __construct( ?Detector $detector = null ) {
@@ -588,8 +629,36 @@ final class Engine {
 			);
 		}
 
-		// Full rendered page was checked (tier1/tier2) — definitive: no Article schema here.
+		// No Article, but an authority-entity type is present on the rendered page → full
+		// credit (P72). Covers product/landing/service pages that legitimately carry
+		// SoftwareApplication, Organization, Product, LocalBusiness, etc. but no Article.
+		$entity_matches = array_values(
+			array_intersect( $schema['types'], self::AUTHORITY_ENTITY_TYPES )
+		);
+		if ( ! empty( $entity_matches ) ) {
+			return new SignalResult(
+				'schema', 'authority', 'Schema markup',
+				6, 6, 'pass',
+				sprintf( 'Authority schema detected: %s.', implode( ', ', $entity_matches ) )
+			);
+		}
+
+		// Full rendered page was checked (tier1/tier2) — definitive: no Article and no
+		// authority-entity type for this page.
 		if ( in_array( $schema['source'], [ 'tier1', 'tier2' ], true ) ) {
+			// Name what WAS found (typically site-chrome from an SEO plugin) instead of
+			// the misleading "no schema" — chrome types do not credit (P47/P67 anti-proxy).
+			if ( ! empty( $schema['types'] ) ) {
+				return new SignalResult(
+					'schema', 'authority', 'Schema markup',
+					0, 6, 'fail',
+					sprintf(
+						'Only site-wide schema found (%s) — no Article or entity schema for this page.',
+						implode( ', ', $schema['types'] )
+					),
+					'Add Article, Product, Organization, or another entity schema for this page — or use the Schema Suggestions panel to insert JSON-LD directly.'
+				);
+			}
 			return new SignalResult(
 				'schema', 'authority', 'Schema markup',
 				0, 6, 'fail',
@@ -598,15 +667,22 @@ final class Engine {
 			);
 		}
 
-		// Cold-start or post_content scan only: head-injected Article (Rank Math, Yoast,
-		// AIOSEO) is invisible here. ContentAnalysis is a last resort for hand-rolled Article
-		// blocks embedded directly in post_content.
-		$inline_types = array_unique( $a->schema_types );
-		if ( ! empty( $inline_types ) ) {
+		// Cold-start or post_content scan only: head-injected schema (Rank Math, Yoast,
+		// AIOSEO) is invisible here. ContentAnalysis is a last resort for hand-rolled
+		// Article/entity blocks embedded directly in post_content. Credit only Article-ish
+		// or allowlist-entity types (P72) — not every inline @type (chrome must not pass).
+		$inline_types  = array_unique( $a->schema_types );
+		$inline_credit = array_values(
+			array_intersect(
+				$inline_types,
+				array_merge( self::INLINE_ARTICLE_TYPES, self::AUTHORITY_ENTITY_TYPES )
+			)
+		);
+		if ( ! empty( $inline_credit ) ) {
 			return new SignalResult(
 				'schema', 'authority', 'Schema markup',
 				6, 6, 'pass',
-				sprintf( 'Schema types detected: %s.', implode( ', ', $inline_types ) )
+				sprintf( 'Schema types detected: %s.', implode( ', ', $inline_credit ) )
 			);
 		}
 
