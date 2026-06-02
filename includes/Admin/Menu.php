@@ -609,8 +609,7 @@ final class Menu {
 								<tr class="citewp-aiso-crawlers__row">
 									<td class="citewp-aiso-crawlers__cell">
 										<div class="citewp-aiso-crawlers__bot">
-											<span class="citewp-aiso-crawlers__avatar <?php echo esc_attr( $crawler['color_class'] ); ?>"><?php echo esc_html( $crawler['initial'] ); ?></span>
-											<span class="citewp-aiso-crawlers__name"><?php echo esc_html( $crawler['display_name'] ); ?></span>
+																						<span class="citewp-aiso-crawlers__name"><?php echo esc_html( $crawler['display_name'] ); ?></span>
 										</div>
 									</td>
 									<td class="citewp-aiso-crawlers__cell citewp-aiso-crawlers__type"><?php echo esc_html( $crawler['bot_type'] ?? 'AI Crawler' ); ?></td>
