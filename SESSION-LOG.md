@@ -6,6 +6,64 @@
 
 ---
 
+## Session 46 — WP.org 0.7.11 release: P72 entity-schema scoring + Detected-on-this-page readout ✅
+
+**Date:** 2026-06-02
+
+### Deliverable
+
+WP.org release of **0.7.11** (SVN trunk r3558581, tag `0.7.11` r3558582). Bundles the already-on-`main` S45 work (FB58 86-bot expansion, FB59 AI Blind Spots, FB62 Hide Excluded toggle, FB65 content-only Top Crawled Pages, FB68 tooltip removal, filemtime CSS cache-bust) plus three new changes built this session: the A11-approved P72 schema-scoring widening, a read-only "Detected on this page" schema readout, and the `$top_gap_label` drift fix.
+
+### What shipped (new this session)
+
+- **CHANGE 1 — P72 (A11-approved scoring), `includes/Scoring/Engine.php`:** `check_schema()` now grants full 6/6 Authority credit when the rendered page carries an allowlisted entity `@type` (SoftwareApplication, Organization, Person, Product, LocalBusiness, Service, Course, Recipe, HowTo, Event, Book, Review) even without an Article type. Article path unchanged. Site-chrome (WebSite/BreadcrumbList/WebPage/CollectionPage/SiteNavigationElement) and FAQPage excluded (P47/P67 anti-proxy; FAQPage credited under the Structure signal). tier1/tier2 fail message now names what *was* found instead of the false "No schema markup detected." Cold-start inline fallback restricted to the same allowlist. Allowlist hardcoded as `AUTHORITY_ENTITY_TYPES` (+ `INLINE_ARTICLE_TYPES` mirror) — deterministic per S6, no filter. **Detector untouched.** Matches SCORING-RUBRIC.md P72 exactly.
+- **CHANGE 2 — "Detected on this page" readout (UI):** `src/sidebar/index.js` Schema Suggestions panel now lists the full `detected` types array read-only (replacing "Other detected types … coming soon"); REST payload already returned `detected` (no controller change). `includes/Admin/EditorPanel.php` Schema tab gets the same read-only list, sourced from the emitter-agnostic `Detector` (head-injected schema included) merged with the generator's post_content detection — called without explicit recalculate, so it reads cache/post_content only and never blocks on an HTTP self-request. **Guardrail honored:** Insert Article/FAQ "Already detected" pill logic untouched (P67-C); entity types do not suppress the Insert/Copy buttons.
+- **CHANGE 3 — `$top_gap_label` drift, `includes/Admin/Menu.php`:** Needs Attention KPI card label now derives from `$top_groups[0]['rec']['label']` (the exhaustive per-(signal×type) ranking) instead of the 50-post-sample `$signal_fails`, so the KPI label and the AI Recommendation cards can't diverge on >50-post sites. Removed the now-dead `$signal_fails` accumulation from the sample loop.
+- **Release plumbing:** version 0.7.10 → 0.7.11 (`ai-search-optimizer.php` header + `CITEWP_AISO_VERSION`); `readme.txt` Stable tag 0.7.11 + 0.7.11 changelog (10 bullets); Description copy updated "40+ other AI bots" → "GPTBot, ClaudeBot, PerplexityBot, DeepSeek, and 80+ other AI bots" (FB58 reflected; the 0.7.6 changelog 40+/19-vendors line left as historical record).
+- **Plugin Check fix — `includes/Admin/RecommendationFilter.php`:** the clear-filter `$clear_label` was already escaped via `esc_html__()` but Plugin Check's `EscapeOutput.OutputNotEscaped` couldn't trace it across the branch; switched assignments to `__()` and wrapped the output in `esc_html()` (no double-encoding — `×` is a literal char). Output identical.
+
+### Modified
+
+- `includes/Scoring/Engine.php` — P72 allowlist + messages
+- `src/sidebar/index.js`, `src/sidebar/style.scss`, `build/index.js`, `build/index.asset.php`, `build/style-index.css`, `build/style-index-rtl.css` — readout
+- `includes/Admin/EditorPanel.php` — readout (Detector merge)
+- `includes/Admin/Menu.php` — `$top_gap_label` from `$top_groups[0]`
+- `includes/Admin/RecommendationFilter.php` — escape-at-output fix
+- `ai-search-optimizer.php`, `readme.txt` — version + changelog + copy
+
+### Decisions
+
+- **No new DECISIONS.md rows.** CHANGE 1 implements the already-logged **P72** (logged by Brad in Desktop 2026-06-02; SCORING-RUBRIC.md already synced). CHANGES 2/3 are UI/bugfix. The RecommendationFilter change is a lint-satisfying escape refactor, not a behavior change.
+
+### Verified
+
+- **P72 scoring — 7-case Engine harness (real `check_schema` path, synthetic Detector cache) on citewp-dev:** SoftwareApplication+Organization (no Article) → **6/6 pass** "Authority schema detected: …"; chrome-only → 0/6 fail names the chrome; FAQPage-only → Authority 0/6 (Structure still credits, no double-credit); Article → 6/6 (no regression); empty → 0/6 "No schema markup detected."; cold-start inline Product → 6/6; cold-start inline chrome → 0/6 partial. **All correct.**
+- **Smoke test (headless against live site + DB):** load/version 0.7.11 ✅; DB table `wp_citewp_aiso_crawler_logs` ✅; 3 required options present ✅; llms.txt/llms-full.txt 200 text/plain ✅; GPTBot logged → vendor OpenAI ✅; REST `citewp_aiso_forbidden` 403 without nonce ✅. Browser steps (4/7/8/10) not run headlessly — display-only changes, low risk.
+- **Plugin Check (Brad-run, twice):** after the escape fix, **0 real errors** — remaining findings are all dev-folder false-positives (334× TextDomainMismatch — vanishes in the `citewp-ai-search-optimizer/` dist; `.distignore`-excluded hidden/markdown/app files) or known/accepted warnings (DirectDB FP, trademarked_term "wp", mismatched_plugin_name — ignored per Brad).
+- `npm run build` clean ✅; all PHP `php -l` clean ✅; `debug.log` no new CiteWP errors (only env Kadence OOM + LocalWP-offline mysqli) ✅.
+- **SVN:** trunk r3558581 (14 files M, 0 added/deleted), tag `0.7.11` r3558582; `svn ls tags` confirms `0.7.11/` ✅.
+- WP.org build via `package.ps1 -Slug citewp-ai-search-optimizer` → top-level folder `citewp-ai-search-optimizer/`, version 0.7.11, stable tag 0.7.11 (X27/X28) ✅.
+
+### Carryover into Session 47
+
+**Brad-manual:**
+1. **Upload `ai-search-optimizer.0.7.11.zip` to citewp.com** — zip on Desktop (top-level folder `ai-search-optimizer/`), WP Admin → Plugins → Upload → in-place replace.
+2. **Post-release verify** — confirm `wordpress.org/plugins/citewp-ai-search-optimizer/` shows 0.7.11 once WP.org propagates (a few minutes).
+
+**Desktop (Brain) tasks:**
+3. **00-CITEWP-MASTER.md** — bump "Last updated" to 2026-06-02; add Session 46 + 0.7.11 under Shipped; update Next Session.
+4. **FEATURE-BACKLOG.md** — confirm FB58/FB59/FB62/FB65 marked SHIPPED (S45 already noted); FB53 → resolved by P72.
+
+**Code (open):**
+5. **`mismatched_plugin_name`** Plugin Check warning — readme `===` title ("…Get Cited by ChatGPT, Perplexity & Claude") differs from the header Plugin Name ("…Optimize Content for AI Engines"). Non-blocking; intentional per S44 marketing title. Align only if desired.
+6. **FB39** publish-block Cite Score panel; website copy per WEBSITE-COPY.md.
+
+### Next session focus
+
+citewp.com 0.7.11 upload + WP.org propagation verify, then FB39 (publish panel) or website/content work (WEBSITE-COPY.md).
+
+---
+
 ## Session 45 — FB58 + FB59 + dashboard/Crawler Logs polish (FB62, FB65) ✅
 
 **Date:** 2026-06-01
