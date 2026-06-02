@@ -3938,9 +3938,9 @@
 	color: var(--citewp-primary);
 	font-size: 14px;
 	font-weight: 600;
-	padding-bottom: var(--sp-4) !important; /* gap between text and divider; !important beats WP admin p rules */
+	padding-bottom: var(--sp-3) !important; /* gap between text and divider; !important beats WP admin p rules */
 	border-bottom: 1px solid var(--citewp-border);
-	margin: 0 0 var(--sp-4) !important;     /* gap between divider and the post list */
+	margin: 0 !important;                   /* below-divider gap comes solely from list padding-top */
 }
 
 /* JS pagination hide class — explicit display:none so WP admin CSS can't override */
@@ -3951,7 +3951,7 @@
 .citewp-aiso-blind-spots__list {
 	margin: 0;
 	padding: 0;
-	padding-top: var(--sp-4) !important; /* WP admin resets ul padding:0 — !important wins */
+	padding-top: var(--sp-3) !important; /* WP admin resets ul padding:0 — !important wins */
 	list-style: none;
 }
 
