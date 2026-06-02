@@ -3950,7 +3950,8 @@
 
 .citewp-aiso-blind-spots__list {
 	margin: 0;
-	padding: var(--sp-4) 0 0; /* padding-top guarantees gap after intro divider */
+	padding: 0;
+	padding-top: var(--sp-4) !important; /* WP admin resets ul padding:0 — !important wins */
 	list-style: none;
 }
 
