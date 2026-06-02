@@ -36,7 +36,7 @@ Every signal is documented at citewp.com/cite-score with research citations for 
 
 ✅ **Cite Score** — transparent 100-point AI citation readiness score with per-signal breakdown and ranked improvement recommendations. See your top 3 highest-impact fixes right on the dashboard.
 
-✅ **AI Crawler Tracking** — log visits from GPTBot, ClaudeBot, PerplexityBot, and 40+ other AI bots. See what they request, which content gets attention, and which published pages have never been visited by any AI crawler. Filter by bot, export to CSV.
+✅ **AI Crawler Tracking** — log visits from GPTBot, ClaudeBot, PerplexityBot, DeepSeek, and 80+ other AI bots. See what they request, which content gets attention, and which published pages have never been visited by any AI crawler. Filter by bot, export to CSV.
 
 ✅ **llms.txt Generation** — auto-generate /llms.txt and /llms-full.txt from your most important content with cornerstone prioritization. Respects Yoast, Rank Math, SEOPress, and AIOSEO settings automatically.
 
