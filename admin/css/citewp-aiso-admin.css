@@ -3201,10 +3201,10 @@
 
 /* Change 3: Smaller primary value */
 .citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value {
-  font-size: 42px;
+  font-size: 34px;
 }
-.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value-main { font-size: 42px; }
-.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value-denom { font-size: 17px; }
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value-main { font-size: 34px; }
+.citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__value-denom { font-size: 15px; }
 
 /* Change 4: Bump secondary text one tier */
 .citewp-aiso-kpi-row--dashboard .citewp-aiso-kpi-card__sub {
