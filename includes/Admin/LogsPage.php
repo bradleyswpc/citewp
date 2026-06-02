@@ -447,9 +447,8 @@ final class LogsPage {
 				</div><!-- .citewp-aiso-crawler-row-2col -->
 
 			<?php
-			$all_blind_spots   = $data->get_blind_spot_posts( 500 );
-			$blind_spots_total = count( $all_blind_spots );
-			$this->render_blind_spots_card( array_slice( $all_blind_spots, 0, 50 ), $blind_spots_total );
+			$blind_spots = $data->get_blind_spot_posts( 50 );
+			$this->render_blind_spots_card( $blind_spots, count( $blind_spots ) );
 			?>
 
 			<?php if ( $total === 0 && $range_filter === '' ) : ?>
@@ -662,11 +661,10 @@ final class LogsPage {
 		if ( 'toplevel_page_citewp' !== $hook ) {
 			return;
 		}
-		// Inline-only handle: false src + wp_add_inline_script is a documented WP pattern.
-		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
-		wp_register_script( 'citewp-aiso-logs-pager', false, [], CITEWP_AISO_VERSION, true );
-		wp_enqueue_script( 'citewp-aiso-logs-pager' );
-		wp_add_inline_script( 'citewp-aiso-logs-pager', $this->blind_spots_pager_js() );
+		// Attach to the always-present jquery handle. Our script is vanilla JS and
+		// does not use jQuery, but jquery is guaranteed to be enqueued on every WP
+		// admin page, making it the most reliable attachment point.
+		wp_add_inline_script( 'jquery', $this->blind_spots_pager_js() );
 	}
 
 	/**
@@ -766,8 +764,11 @@ final class LogsPage {
 	 * Default 5/page; select switches to 10/page and resets to page 1.
 	 */
 	private function blind_spots_pager_js(): string {
+		// classList toggling avoids WP admin CSS overriding the [hidden] attribute.
+		// readyState guard handles both head and footer script placement.
 		return <<<'CITEBS'
 (function(){
+function init(){
 var c=document.querySelector('.citewp-aiso-blind-spots');
 if(!c)return;
 var p=c.querySelector('.citewp-aiso-blind-spots__pager');
@@ -781,7 +782,7 @@ var sel=p.querySelector('.citewp-aiso-bsp-per-page');
 function tp(){return Math.ceil(items.length/perPage);}
 function go(n){
 cur=n;
-items.forEach(function(li,i){li.hidden=(Math.floor(i/perPage)!==cur);});
+items.forEach(function(li,i){li.classList.toggle('citewp-bsp-hidden',Math.floor(i/perPage)!==cur);});
 lbl.textContent='Page '+(cur+1)+' of '+tp();
 prev.disabled=(cur===0);
 next.disabled=(cur>=tp()-1);
@@ -790,6 +791,8 @@ prev.addEventListener('click',function(){if(cur>0)go(cur-1);});
 next.addEventListener('click',function(){if(cur<tp()-1)go(cur+1);});
 if(sel){sel.addEventListener('change',function(){perPage=parseInt(sel.value,10);go(0);});}
 go(0);
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 })();
 CITEBS;
 	}

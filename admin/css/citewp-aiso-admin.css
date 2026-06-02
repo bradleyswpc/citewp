@@ -3938,7 +3938,12 @@
 	color: var(--citewp-primary);
 	font-size: 13px;
 	font-weight: 600;
-	margin: 0 0 var(--sp-3);
+	margin: 0 0 var(--sp-4); /* extra breathing room before the post list */
+}
+
+/* JS pagination hide class — explicit display:none so WP admin CSS can't override */
+.citewp-aiso-blind-spots__item.citewp-bsp-hidden {
+	display: none;
 }
 
 .citewp-aiso-blind-spots__list {
