@@ -405,7 +405,6 @@ final class LogsPage {
 					<div class="citewp-aiso-cs-panel citewp-aiso-top-pages-panel">
 						<div class="citewp-aiso-cs-panel__head">
 							<span class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Top Crawled Pages', 'citewp-ai-search-optimizer' ); ?></span>
-							<span class="citewp-aiso-kpi-tooltip" title="<?php esc_attr_e( 'Pages most frequently visited by AI crawlers in the selected period.', 'citewp-ai-search-optimizer' ); ?>">?</span>
 						</div>
 						<div class="citewp-aiso-cs-panel__subhead"><?php echo esc_html( $range['label'] ); ?></div>
 						<?php if ( empty( $top_pages ) ) : ?>
