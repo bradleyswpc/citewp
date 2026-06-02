@@ -6,6 +6,72 @@
 
 ---
 
+## Session 45 — FB58 + FB59 + dashboard/Crawler Logs polish (FB62, FB65) ✅
+
+**Date:** 2026-06-01
+
+### Deliverable
+
+Two backlog features (FB58 bot expansion, FB59 AI Blind Spots) plus a chain of dashboard / Crawler Logs / Cite Score polish edits (FB62 Hide Excluded toggle, FB65 simplified content-only filter, KPI font, avatar removal, tooltip removal). Also fixed a root-cause cache-busting bug that had been silently blocking CSS updates. **All committed to `main`; no version bump — these ride the next WP.org release.**
+
+### What shipped
+
+- **FB58 — `includes/Crawler/BotRegistry.php`:** expanded from 43 → 86 verified AI crawlers (DeepSeek, Brave, PetalBot, Semrush, Ahrefs, Mojeek, Qwant, Bing/Baidu/Sogou/Naver, social link-preview bots, open-source ML pipeline tools, media-monitoring bots). Preserves first-hit-wins ordering (`mistralai` after `mistralai-user`). No schema change.
+- **FB59 — AI Blind Spots:** `DashboardData::get_blind_spot_posts()` (new) — diffs published posts/pages against logged `request_uri`s via `wp_make_link_relative( get_permalink() )` with trailing-slash normalization; P68 excludes llms.txt-opted-out posts; hourly transient busted on `save_post`/`transition_post_status`. X15 filters: `citewp_aiso/blind_spots/limit`, `citewp_aiso/blind_spots/items`. `LogsPage` renders a card (loads open, 5 rows default, dropdown to 10, WP-style nav arrows beyond 10) between the 2-col chart row and the log table. White card bg, bold subheader with divider gap, rounded outline Edit buttons.
+- **filemtime cache-busting — `includes/Admin/Menu.php` + `includes/Admin/EditorPanel.php`:** both enqueued `citewp-aiso-admin.css` with the static `CITEWP_AISO_VERSION`, so browsers served stale CSS on every edit. Switched to `filemtime()` (matching `EditorAssets.php`). **Root cause of the repeated "CSS change didn't take effect" loop.**
+- **FB65 (simplified) — `DashboardData::get_top_crawled_pages()`** gains `$content_only` param; `LogsPage` Top Crawled Pages card passes `true` → shows only posts/pages + homepage, drops robots.txt/sitemap/llms.txt/feeds/archives. Over-fetches limit+50, filters in PHP, slices. No toggle (Brad chose filter-only); site-file data still in the log table + CSV. Empty-state copy updated.
+- **Top Crawled Pages tooltip removed** (`LogsPage`) — unneeded "?" badge; Bot Visits chart tooltip kept.
+- **Dashboard KPI font** (`admin CSS`) — value 42 → 34px, denom 17 → 15px, scoped to `--dashboard` row.
+- **Top Crawlers avatars removed** (`Menu.php`) — colored initial circles dropped (were placeholders for per-company icons we decided against); row cell vertical padding bumped sp-2 → sp-4 to restore the height the avatars had given.
+- **FB62 — Hide Excluded toggle** (`Menu.php` + `admin CSS`) — pill-link toggle on the Post & Page Cite Scores table. Default shows all (P49); `cs_excl=hide` adds the standard exclude `meta_query` to the table WP_Query. Filter persists across search, chart-range, per-page, and pagination (carried on all 3 forms + page links). Server-side (table is server-paginated).
+
+### Modified
+
+- `includes/Crawler/BotRegistry.php` — +43 bot entries
+- `includes/Admin/DashboardData.php` — `get_blind_spot_posts()` new; `get_top_crawled_pages()` `$content_only` param
+- `includes/Admin/LogsPage.php` — Blind Spots card + pager JS + cache-bust hooks; tooltip removed; content-only call
+- `includes/Admin/Menu.php` — filemtime enqueue; avatar removal; KPI font (CSS); FB62 toggle + query filter
+- `includes/Admin/EditorPanel.php` — filemtime enqueue
+- `admin/css/citewp-aiso-admin.css` — Blind Spots (Section 36), KPI font, crawler row height, FB62 toggle styles
+
+### Decisions made
+
+- **No new DECISIONS.md rows.** All work implemented existing backlog items or was UI polish.
+- **FB65 implemented filter-only** (no "hide site files" toggle) — Brad's call; the card name implies content and raw data stays in the log table/CSV.
+- **FB62 default = show** (P49-consistent); toggle hides.
+- **FB56 closed as already-covered** — Cite Score is already in-editor via `EditorPanel` for Classic/Elementor/Divi/Beaver (P22); Gutenberg gap stays tracked as FB39 (no P24 reversal). **FEATURE-BACKLOG.md flip is a Desktop task.**
+- **FB57 confirmed already shipped** (CSV export was live in `LogsPage`).
+
+### Verified
+
+- Working tree clean; all commits pushed to `origin/main` ✅
+- No JS changed → no `npm run build` required ✅
+- debug.log: no new CiteWP errors (only pre-existing offline-DB + Rank Math notices) ✅
+- BotRegistry count = 86 confirmed via grep ✅
+- Manual browser smoke (Brad): Blind Spots card, KPI font, avatar removal, taller crawler rows all confirmed good ✅
+
+### Carryover into Session 46
+
+**Desktop (Brain) tasks — not doable from Code:**
+1. **FEATURE-BACKLOG.md:** mark FB56 CLOSED (covered by EditorPanel; Gutenberg → FB39), FB58 SHIPPED, FB59 SHIPPED, FB62 SHIPPED, FB65 SHIPPED (filter-only); FB61 (Top Crawler tooltip) — the Crawler-Logs tooltip removed here was the Top Crawled Pages one, confirm vs FB61's Cite Score KPI tooltip.
+2. **00-CITEWP-MASTER.md:** bump "Last updated" to 2026-06-01; add Session 45 under Shipped; update Next Session.
+3. **DECISIONS.md:** no new rows needed (confirm).
+
+**Code tasks (next release):**
+4. **Version bump + readme changelog + WP.org release** — S45 changes are on `main` at v0.7.10 (unreleased). Next release bundles FB58/FB59/FB62/FB65 + the cache-bust fix → 0.7.11.
+5. **`$top_gap_label` source drift** — one-liner in `Menu.php` (still open from S43/S44).
+6. **FB53 A11 gate decision** — scoring rubric expansion (requires explicit approval).
+
+**Brad-manual (still open from S43/S44):**
+7. Upload `ai-search-optimizer.0.7.10.zip` to citewp.com.
+8. Re-insert schema on previously-injected posts; stale wp:html cleanup.
+
+### Next session focus
+
+WP.org 0.7.11 release (version bump + changelog + SVN) bundling this session's work, OR continue feature/polish (FB39 publish panel, FB56 Gutenberg box if reconsidered, website copy per WEBSITE-COPY.md).
+
+---
+
 ## Session 44 — Competitive intelligence, sitemap fix, WP.org listing rewrite ✅
 
 **Date:** 2026-05-31
