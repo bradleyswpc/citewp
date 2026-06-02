@@ -800,7 +800,6 @@ final class Menu {
 		$critical_count = 0;
 		$minor_count    = 0;
 		$cat_sums       = [ 'structure' => 0, 'citability' => 0, 'authority' => 0 ];
-		$signal_fails = [];
 		$sample_cap   = 50;
 
 		foreach ( $scored_ids as $i => $pid ) {
@@ -820,13 +819,6 @@ final class Menu {
 					foreach ( array_keys( $cat_sums ) as $cat_key ) {
 						if ( isset( $data['categories'][ $cat_key ]['score'] ) ) {
 							$cat_sums[ $cat_key ] += (int) $data['categories'][ $cat_key ]['score'];
-						}
-					}
-				}
-				if ( $data && isset( $data['signals'] ) ) {
-					foreach ( $data['signals'] as $sig ) {
-						if ( in_array( $sig['status'], [ 'fail', 'partial' ], true ) ) {
-							$signal_fails[ $sig['id'] ] = ( $signal_fails[ $sig['id'] ] ?? 0 ) + 1;
 						}
 					}
 				}
@@ -878,22 +870,6 @@ final class Menu {
 		}
 
 		// ── Top 3 AI Recommendations — per-(signal × post-type) model ───────
-		// $top_gap_label: first label from the sample-fail list (used in Needs Attention KPI card).
-		arsort( $signal_fails );
-		$top_gap_signal_ids = array_keys( $signal_fails );
-		$top_gap_label      = null;
-		{
-			$_mapper = new RecommendationMapper();
-			foreach ( $top_gap_signal_ids as $_sig_id ) {
-				$_r = $_mapper->get( $_sig_id );
-				if ( $_r && isset( $_r['label'] ) ) {
-					$top_gap_label = $_r['label'];
-					break;
-				}
-			}
-			unset( $_mapper, $_sig_id, $_r );
-		}
-
 		// Canonical signal order for tie-break (rubric order — Engine.php signal sequence).
 		$_signal_rubric_order = [
 			'faq_schema_or_qa'   => 0,
@@ -960,6 +936,11 @@ final class Menu {
 		$top_groups       = array_slice( $_all_groups, 0, 3 );
 		$top_groups_count = count( $top_groups );
 		unset( $_all_groups, $_signal_rubric_order );
+
+		// $top_gap_label (Needs Attention KPI card) is derived from the top recommendation
+		// group — NOT the 50-post sample — so the KPI label and the rec cards can't diverge
+		// on sites with >50 scored posts (S43 drift fix).
+		$top_gap_label = ! empty( $top_groups ) ? ( $top_groups[0]['rec']['label'] ?? null ) : null;
 
 		// ── Score History ────────────────────────────────────────────────
 		$history_range     = absint( $_GET['cs_range'] ?? 30 ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
