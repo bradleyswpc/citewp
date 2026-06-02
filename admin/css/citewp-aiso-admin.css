@@ -3938,9 +3938,9 @@
 	color: var(--citewp-primary);
 	font-size: 14px;
 	font-weight: 600;
-	padding-bottom: var(--sp-3);
+	padding-bottom: var(--sp-4) !important; /* gap between text and divider; !important beats WP admin p rules */
 	border-bottom: 1px solid var(--citewp-border);
-	margin: 0; /* gap comes from list padding-top below — avoids margin-collapse */
+	margin: 0 0 var(--sp-4) !important;     /* gap between divider and the post list */
 }
 
 /* JS pagination hide class — explicit display:none so WP admin CSS can't override */
