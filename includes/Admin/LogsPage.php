@@ -739,9 +739,9 @@ final class LogsPage {
 					</ul>
 					<?php if ( $count > 5 ) : ?>
 						<div class="citewp-aiso-blind-spots__pager">
-							<button type="button" class="citewp-aiso-bsp-prev">&#8592;</button>
+							<button type="button" class="citewp-aiso-filter-pill citewp-aiso-filter-pill--inactive citewp-aiso-bsp-prev">&#8592;</button>
 							<span class="citewp-aiso-bsp-label"></span>
-							<button type="button" class="citewp-aiso-bsp-next">&#8594;</button>
+							<button type="button" class="citewp-aiso-filter-pill citewp-aiso-filter-pill--inactive citewp-aiso-bsp-next">&#8594;</button>
 							<span class="citewp-aiso-bsp-per-page-wrap">
 								<select class="citewp-aiso-bsp-per-page" aria-label="<?php esc_attr_e( 'Rows per page', 'citewp-ai-search-optimizer' ); ?>">
 									<option value="5">5</option>
