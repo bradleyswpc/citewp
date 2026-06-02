@@ -18,8 +18,12 @@ final class LogsPage {
 	private ?LogsTable $table = null;
 
 	public function register(): void {
-		add_action( 'admin_init',                    [ $this, 'maybe_init_table' ] );
+		add_action( 'admin_init',                         [ $this, 'maybe_init_table' ] );
 		add_action( 'admin_post_citewp_aiso_export_logs', [ $this, 'handle_csv_export' ] );
+		// Bust the AI Blind Spots transient when a post is saved or its status changes,
+		// because either event can add a new post to the denominator.
+		add_action( 'save_post',               [ $this, 'bust_blind_spot_cache' ] );
+		add_action( 'transition_post_status',  [ $this, 'bust_blind_spot_cache' ] );
 	}
 
 	/**
@@ -461,6 +465,8 @@ final class LogsPage {
 				</div>
 			<?php endif; ?>
 
+			<?php $this->render_blind_spots_card( $data->get_blind_spot_posts( 20 ) ); ?>
+
 			<div class="citewp-aiso-protip">
 				<div class="citewp-aiso-protip__left">
 					<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'sparkles', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
@@ -634,6 +640,73 @@ final class LogsPage {
 			$arrow,
 			$trend['pct']
 		);
+	}
+
+	/**
+	 * Delete the AI Blind Spots transient.
+	 * Hooked to save_post and transition_post_status.
+	 */
+	public function bust_blind_spot_cache(): void {
+		delete_transient( 'citewp_aiso_blind_spots' );
+	}
+
+	/**
+	 * Render the AI Blind Spots collapsible card (FB59).
+	 *
+	 * @param array<int, array{ID: int, post_title: string, edit_link: string|null}> $posts
+	 */
+	private function render_blind_spots_card( array $posts ): void {
+		$count = count( $posts );
+		?>
+		<details class="citewp-aiso-blind-spots" open>
+			<summary class="citewp-aiso-blind-spots__summary">
+				<span class="citewp-aiso-blind-spots__title">
+					<?php esc_html_e( 'AI Blind Spots', 'citewp-ai-search-optimizer' ); ?>
+				</span>
+				<?php if ( $count > 0 ) : ?>
+					<span class="citewp-aiso-blind-spots__badge"><?php echo esc_html( number_format_i18n( $count ) ); ?></span>
+				<?php endif; ?>
+			</summary>
+			<div class="citewp-aiso-blind-spots__body">
+				<?php if ( 0 === $count ) : ?>
+					<p class="citewp-aiso-blind-spots__empty">
+						<?php esc_html_e( 'All published posts and pages have been visited by at least one AI crawler.', 'citewp-ai-search-optimizer' ); ?>
+					</p>
+				<?php else : ?>
+					<p class="citewp-aiso-blind-spots__intro">
+						<?php
+						echo esc_html(
+							sprintf(
+								/* translators: %d: number of posts/pages never visited by an AI crawler */
+								_n(
+									'%d published post has never been visited by an AI crawler. AI engines may not know this content exists.',
+									'%d published posts have never been visited by any AI crawler. AI engines may not know this content exists.',
+									$count,
+									'citewp-ai-search-optimizer'
+								),
+								$count
+							)
+						);
+						?>
+					</p>
+					<ul class="citewp-aiso-blind-spots__list">
+						<?php foreach ( $posts as $post ) : ?>
+							<li class="citewp-aiso-blind-spots__item">
+								<span class="citewp-aiso-blind-spots__item-title">
+									<?php echo esc_html( $post['post_title'] !== '' ? $post['post_title'] : __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?>
+								</span>
+								<?php if ( $post['edit_link'] ) : ?>
+									<a class="citewp-aiso-blind-spots__edit-link" href="<?php echo esc_url( $post['edit_link'] ); ?>">
+										<?php esc_html_e( 'Edit', 'citewp-ai-search-optimizer' ); ?>
+									</a>
+								<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+			</div>
+		</details>
+		<?php
 	}
 
 }

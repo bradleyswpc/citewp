@@ -3861,3 +3861,119 @@
 #citewp_aiso_editor_panel .citewp-aiso-pc__slider {
 	display: none;
 }
+
+/* ============================================================
+   Section 36 — AI Blind Spots card (FB59)
+   ============================================================ */
+
+.citewp-aiso-blind-spots {
+	background: var(--citewp-paper);
+	border: 1px solid var(--citewp-border);
+	border-radius: 6px;
+	margin-bottom: var(--sp-6);
+}
+
+.citewp-aiso-blind-spots__summary {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-3);
+	padding: var(--sp-4) var(--sp-5);
+	cursor: pointer;
+	list-style: none;
+	user-select: none;
+}
+
+/* Remove default <details> triangle in all browsers */
+.citewp-aiso-blind-spots__summary::-webkit-details-marker { display: none; }
+.citewp-aiso-blind-spots__summary::marker { display: none; }
+
+/* Chevron via CSS — rotates when expanded */
+.citewp-aiso-blind-spots__summary::before {
+	content: '▶';
+	font-size: 10px;
+	color: var(--citewp-secondary);
+	transition: transform 0.15s ease;
+	flex-shrink: 0;
+}
+
+.citewp-aiso-blind-spots[open] > .citewp-aiso-blind-spots__summary::before {
+	transform: rotate(90deg);
+}
+
+.citewp-aiso-blind-spots__title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--citewp-primary);
+	flex: 1;
+}
+
+.citewp-aiso-blind-spots__badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 var(--sp-2);
+	border-radius: 11px;
+	background: var(--citewp-score-red);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.citewp-aiso-blind-spots__body {
+	padding: 0 var(--sp-5) var(--sp-4);
+}
+
+.citewp-aiso-blind-spots__empty {
+	color: var(--citewp-secondary);
+	font-size: 13px;
+	margin: 0;
+}
+
+.citewp-aiso-blind-spots__intro {
+	color: var(--citewp-secondary);
+	font-size: 13px;
+	margin: 0 0 var(--sp-3);
+}
+
+.citewp-aiso-blind-spots__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.citewp-aiso-blind-spots__item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--sp-3);
+	padding: var(--sp-2) 0;
+	border-bottom: 1px solid var(--citewp-border);
+	font-size: 13px;
+}
+
+.citewp-aiso-blind-spots__item:last-child {
+	border-bottom: none;
+}
+
+.citewp-aiso-blind-spots__item-title {
+	color: var(--citewp-primary);
+	flex: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.citewp-aiso-blind-spots__edit-link {
+	color: var(--citewp-secondary);
+	font-size: 12px;
+	text-decoration: none;
+	flex-shrink: 0;
+}
+
+.citewp-aiso-blind-spots__edit-link:hover {
+	color: var(--citewp-primary);
+	text-decoration: underline;
+}

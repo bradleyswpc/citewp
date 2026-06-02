@@ -902,4 +902,113 @@ final class DashboardData {
 		/** FB42: render-time detection will augment $result['confirmed'] via this filter */
 		return apply_filters( 'citewp_aiso/data/schema_coverage', $result );
 	}
+
+	/**
+	 * Published posts/pages that have never been visited by any AI crawler (FB59).
+	 *
+	 * Algorithm:
+	 *   1. Pull every distinct request_uri ever logged.
+	 *   2. For each published post/page get its site-relative permalink via
+	 *      wp_make_link_relative( get_permalink() ) and trailing-slash-normalise.
+	 *   3. Any post whose normalised path is absent from the visited set is a blind spot.
+	 *
+	 * Front-page: get_option('page_on_front') resolves to '/' automatically because
+	 * get_permalink() returns home_url('/') which wp_make_link_relative converts to '/'.
+	 *
+	 * Limitation: sites using plain permalinks (/?p=123) store the query-string form in
+	 * get_permalink() but bots log the rewritten path. These posts always appear as blind
+	 * spots on plain-permalink installs. Do not try to resolve this here.
+	 *
+	 * P68 / P49: posts opted out of llms.txt are excluded — their non-crawling is
+	 * intentional and not a blind spot.
+	 *
+	 * Result cached for 1 hour. Transient is busted by LogsPage on save_post and
+	 * transition_post_status (new publishes change the denominator).
+	 *
+	 * @param int $limit Maximum items returned. Applied after the PHP diff.
+	 * @return array<int, array{ID: int, post_title: string, edit_link: string|null}>
+	 */
+	public function get_blind_spot_posts( int $limit = 20 ): array {
+		/**
+		 * Filter the blind-spots result limit.
+		 *
+		 * @param int $limit Default 20.
+		 */
+		$limit = absint( apply_filters( 'citewp_aiso/blind_spots/limit', $limit ) );
+
+		$cache_key = 'citewp_aiso_blind_spots';
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached && is_array( $cached ) ) {
+			return array_slice( $cached, 0, $limit );
+		}
+
+		global $wpdb;
+		$log_table = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
+
+		// Step 1 — visited URI set. phpcs:ignore covers the interpolated table name
+		// (hardcoded constant, esc_sql'd) and the intentional absence of caching
+		// (we cache the diff result, not this individual query).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+		$raw_uris = $wpdb->get_col( "SELECT DISTINCT request_uri FROM {$log_table}" );
+
+		$visited = [];
+		foreach ( (array) $raw_uris as $uri ) {
+			// Normalise: trailing slash so '/slug' and '/slug/' both match.
+			$visited[ trailingslashit( (string) $uri ) ] = true;
+		}
+
+		// Step 2 — published posts/pages, excluding P68 llms.txt opt-outs.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- result is cached in transient below.
+		$post_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT p.ID
+				FROM {$wpdb->posts} p
+				LEFT JOIN {$wpdb->postmeta} excl
+				       ON excl.post_id = p.ID
+				      AND excl.meta_key = %s
+				WHERE p.post_status = %s
+				  AND p.post_type   IN ( %s, %s )
+				  AND ( excl.meta_value IS NULL OR excl.meta_value != %s )
+				ORDER BY p.post_date DESC",
+				'_citewp_aiso_exclude_from_llms',
+				'publish',
+				'post',
+				'page',
+				'1'
+			)
+		);
+
+		// Step 3 — diff: keep posts whose relative permalink is absent from $visited.
+		$blind_spots = [];
+		foreach ( (array) $post_ids as $raw_id ) {
+			$id = (int) $raw_id;
+
+			$permalink = get_permalink( $id );
+			if ( ! $permalink ) {
+				continue;
+			}
+			$relative = trailingslashit( wp_make_link_relative( $permalink ) );
+
+			if ( isset( $visited[ $relative ] ) ) {
+				continue;
+			}
+
+			$blind_spots[] = [
+				'ID'         => $id,
+				'post_title' => (string) get_the_title( $id ),
+				'edit_link'  => get_edit_post_link( $id ),
+			];
+		}
+
+		/**
+		 * Filter the blind-spots items before caching.
+		 *
+		 * @param array<int, array{ID: int, post_title: string, edit_link: string|null}> $blind_spots
+		 */
+		$blind_spots = (array) apply_filters( 'citewp_aiso/blind_spots/items', $blind_spots );
+
+		set_transient( $cache_key, $blind_spots, HOUR_IN_SECONDS );
+
+		return array_slice( $blind_spots, 0, $limit );
+	}
 }
