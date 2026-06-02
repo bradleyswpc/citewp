@@ -3940,7 +3940,7 @@
 	font-weight: 600;
 	padding-bottom: var(--sp-3);
 	border-bottom: 1px solid var(--citewp-border);
-	margin: 0 0 var(--sp-5); /* gap between divider and the post list */
+	margin: 0; /* gap comes from list padding-top below — avoids margin-collapse */
 }
 
 /* JS pagination hide class — explicit display:none so WP admin CSS can't override */
@@ -3950,7 +3950,7 @@
 
 .citewp-aiso-blind-spots__list {
 	margin: 0;
-	padding: 0;
+	padding: var(--sp-4) 0 0; /* padding-top guarantees gap after intro divider */
 	list-style: none;
 }
 
@@ -3976,26 +3976,26 @@
 	text-overflow: ellipsis;
 }
 
-/* Edit link styled as a mini WP-admin button; padding kept tiny so row height stays flat */
+/* Edit link — rounded rectangle matching .citewp-aiso-btn outline style, no shadow */
 .citewp-aiso-blind-spots__edit-link {
 	display: inline-block;
 	font-size: 11px;
+	font-weight: 500;
 	text-decoration: none;
-	color: #2c3338;
-	background: #f6f7f7;
-	border: 1px solid #8c8f94;
-	border-radius: 3px;
-	padding: 1px 6px;
-	line-height: 1.6;
-	box-shadow: inset 0 -1px 0 #8c8f94;
+	color: var(--citewp-primary);
+	background: transparent;
+	border: 1px solid var(--citewp-border);
+	border-radius: 6px;
+	padding: 2px 8px;
+	line-height: 1.5;
 	white-space: nowrap;
 	flex-shrink: 0;
+	transition: border-color 0.12s, color 0.12s;
 }
 
 .citewp-aiso-blind-spots__edit-link:hover {
-	background: #f0f0f1;
-	border-color: #0a4b78;
-	color: #0a4b78;
+	border-color: var(--citewp-tint-blue);
+	color: var(--citewp-tint-blue);
 	text-decoration: none;
 }
 
