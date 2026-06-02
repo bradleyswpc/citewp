@@ -4,7 +4,7 @@ Tags: ai seo, generative engine optimization, llms.txt, chatgpt seo, ai citation
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.10
+Stable tag: 0.7.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,18 @@ No. Scoring runs in the background on post save and on manual recalculation — 
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.11 =
+* New: Schema scoring now credits authority-entity types — SoftwareApplication, Organization, Person, Product, LocalBusiness, and more — so product, landing, and service pages no longer score 0 for schema just because they aren't Articles.
+* New: "Detected on this page" readout in the Schema Suggestions panel and editor meta box shows the schema types found on each post or page.
+* New: AI crawler detection expanded from 43 to 86 verified bots (DeepSeek, Brave, PetalBot, Semrush, Ahrefs, social link-preview bots, and more).
+* New: AI Blind Spots card on the Crawler Logs page surfaces published content that AI crawlers have not yet visited.
+* New: "Hide excluded" toggle on the Post & Page Cite Scores table.
+* Improvement: Top Crawled Pages now focuses on your posts and pages (site files stay in the full log and CSV export).
+* Fix: Schema scoring message now names what schema was found instead of a misleading "no schema markup detected."
+* Fix: Needs Attention card and AI Recommendation cards always reference the same top gap on large sites.
+* Fix: Admin styles now cache-bust correctly so design updates appear immediately.
+* Fix: Removed a broken tooltip on the Crawler Logs page.
 
 = 0.7.10 =
 * Improvement: AI Recommendations cards now group by signal and post type — Posts and Pages are shown as separate, targeted cards.
