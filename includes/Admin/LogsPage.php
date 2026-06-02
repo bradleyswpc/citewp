@@ -679,7 +679,7 @@ final class LogsPage {
 	private function render_blind_spots_card( array $posts, int $total ): void {
 		$count = count( $posts );
 		?>
-		<details class="citewp-aiso-blind-spots">
+		<details class="citewp-aiso-blind-spots" open>
 			<summary class="citewp-aiso-blind-spots__summary">
 				<span class="citewp-aiso-cs-panel__title citewp-aiso-blind-spots__title">
 					<?php esc_html_e( 'AI Blind Spots', 'citewp-ai-search-optimizer' ); ?>
@@ -739,16 +739,26 @@ final class LogsPage {
 					</ul>
 					<?php if ( $count > 5 ) : ?>
 						<div class="citewp-aiso-blind-spots__pager">
-							<button type="button" class="citewp-aiso-filter-pill citewp-aiso-filter-pill--inactive citewp-aiso-bsp-prev">&#8592;</button>
-							<span class="citewp-aiso-bsp-label"></span>
-							<button type="button" class="citewp-aiso-filter-pill citewp-aiso-filter-pill--inactive citewp-aiso-bsp-next">&#8594;</button>
-							<span class="citewp-aiso-bsp-per-page-wrap">
-								<select class="citewp-aiso-bsp-per-page" aria-label="<?php esc_attr_e( 'Rows per page', 'citewp-ai-search-optimizer' ); ?>">
-									<option value="5">5</option>
-									<option value="10">10</option>
-								</select>
-								<?php esc_html_e( 'per page', 'citewp-ai-search-optimizer' ); ?>
-							</span>
+							<button type="button" class="button citewp-aiso-bsp-show-more">
+								<?php
+								echo esc_html(
+									$count > 10
+										? __( 'Show 10', 'citewp-ai-search-optimizer' )
+										: sprintf(
+											/* translators: %d: total number of blind-spot posts to show */
+											__( 'Show all %d', 'citewp-ai-search-optimizer' ),
+											$count
+										)
+								);
+								?>
+							</button>
+							<?php if ( $count > 10 ) : ?>
+								<span class="citewp-aiso-bsp-nav" hidden>
+									<button type="button" class="button citewp-aiso-bsp-prev" disabled>&#8249;</button>
+									<span class="citewp-aiso-bsp-label"></span>
+									<button type="button" class="button citewp-aiso-bsp-next">&#8250;</button>
+								</span>
+							<?php endif; ?>
 						</div>
 					<?php endif; ?>
 				<?php endif; ?>
@@ -764,32 +774,42 @@ final class LogsPage {
 	 * Default 5/page; select switches to 10/page and resets to page 1.
 	 */
 	private function blind_spots_pager_js(): string {
-		// classList toggling avoids WP admin CSS overriding the [hidden] attribute.
-		// readyState guard handles both head and footer script placement.
+		// Phase 1: show 5. "Show more" button switches to phase 2 (10/page).
+		// Phase 2: show 10; WP-style ‹ › arrows paginate if count > 10.
+		// classList.toggle avoids WP admin CSS overriding [hidden].
 		return <<<'CITEBS'
 (function(){
 function init(){
 var c=document.querySelector('.citewp-aiso-blind-spots');
 if(!c)return;
+var items=Array.from(c.querySelectorAll('.citewp-aiso-blind-spots__item'));
+if(!items.length)return;
 var p=c.querySelector('.citewp-aiso-blind-spots__pager');
 if(!p)return;
-var items=Array.from(c.querySelectorAll('.citewp-aiso-blind-spots__item'));
 var perPage=5,cur=0;
-var prev=p.querySelector('.citewp-aiso-bsp-prev');
-var next=p.querySelector('.citewp-aiso-bsp-next');
-var lbl=p.querySelector('.citewp-aiso-bsp-label');
-var sel=p.querySelector('.citewp-aiso-bsp-per-page');
+var showMore=p.querySelector('.citewp-aiso-bsp-show-more');
+var nav=p.querySelector('.citewp-aiso-bsp-nav');
+var prev=nav&&nav.querySelector('.citewp-aiso-bsp-prev');
+var next=nav&&nav.querySelector('.citewp-aiso-bsp-next');
+var lbl=nav&&nav.querySelector('.citewp-aiso-bsp-label');
 function tp(){return Math.ceil(items.length/perPage);}
 function go(n){
 cur=n;
 items.forEach(function(li,i){li.classList.toggle('citewp-bsp-hidden',Math.floor(i/perPage)!==cur);});
-lbl.textContent='Page '+(cur+1)+' of '+tp();
-prev.disabled=(cur===0);
-next.disabled=(cur>=tp()-1);
+if(lbl)lbl.textContent='Page '+(cur+1)+' of '+tp();
+if(prev)prev.disabled=(cur===0);
+if(next)next.disabled=(cur>=tp()-1);
 }
-prev.addEventListener('click',function(){if(cur>0)go(cur-1);});
-next.addEventListener('click',function(){if(cur<tp()-1)go(cur+1);});
-if(sel){sel.addEventListener('change',function(){perPage=parseInt(sel.value,10);go(0);});}
+if(showMore){
+showMore.addEventListener('click',function(){
+perPage=10;cur=0;
+showMore.hidden=true;
+if(nav)nav.hidden=false;
+go(0);
+});
+}
+if(prev){prev.addEventListener('click',function(){if(cur>0)go(cur-1);});}
+if(next){next.addEventListener('click',function(){if(cur<tp()-1)go(cur+1);});}
 go(0);
 }
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}

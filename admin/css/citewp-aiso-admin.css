@@ -3933,12 +3933,14 @@
 	margin: 0;
 }
 
-/* Bold intro sentence — visually separates the count statement from the post list */
+/* Intro sentence styled as a subheader: bold + rule underneath separates it from the list */
 .citewp-aiso-blind-spots__intro {
 	color: var(--citewp-primary);
 	font-size: 13px;
 	font-weight: 600;
-	margin: 0 0 var(--sp-4); /* extra breathing room before the post list */
+	padding-bottom: var(--sp-3);
+	border-bottom: 1px solid var(--citewp-border);
+	margin: 0 0 var(--sp-3);
 }
 
 /* JS pagination hide class — explicit display:none so WP admin CSS can't override */
@@ -3993,22 +3995,34 @@
 	margin: calc( var(--sp-1) * -1 ) 0 var(--sp-2); /* pull up flush under intro */
 }
 
-/* Pager controls — buttons use .citewp-aiso-filter-pill classes for consistent look */
+/* Pager: "Show more" button + hidden nav arrows */
 .citewp-aiso-blind-spots__pager {
 	display: flex;
 	align-items: center;
-	gap: var(--sp-1);       /* matches .citewp-aiso-filter-pills gap */
+	gap: var(--sp-2);
 	margin-top: var(--sp-3);
 	padding-top: var(--sp-3);
 	border-top: 1px solid var(--citewp-border);
 }
 
-/* Disabled pill — suppress hover, fade out */
+/* Nav span (‹ label ›) — hidden until "Show more" is clicked */
+.citewp-aiso-bsp-nav {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--sp-1);
+}
+
+.citewp-aiso-bsp-label {
+	font-size: 13px;
+	color: var(--citewp-secondary);
+	white-space: nowrap;
+	padding: 0 var(--sp-1);
+}
+
 .citewp-aiso-bsp-prev:disabled,
 .citewp-aiso-bsp-next:disabled {
-	opacity: 0.35;
+	opacity: 0.4;
 	cursor: default;
-	pointer-events: none;
 }
 
 .citewp-aiso-bsp-label {
@@ -4017,22 +4031,3 @@
 	white-space: nowrap;
 }
 
-/* Per-page select — pushed to the right, arrows + label stay centred */
-.citewp-aiso-bsp-per-page-wrap {
-	margin-left: auto;
-	display: flex;
-	align-items: center;
-	gap: var(--sp-2);
-	font-size: 12px;
-	color: var(--citewp-secondary);
-}
-
-.citewp-aiso-bsp-per-page {
-	font-size: 12px;
-	border: 1px solid var(--citewp-border);
-	border-radius: 4px;
-	padding: 1px 4px;
-	color: var(--citewp-primary);
-	background: #fff;
-	cursor: pointer;
-}
