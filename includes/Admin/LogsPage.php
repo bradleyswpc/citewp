@@ -400,7 +400,7 @@ final class LogsPage {
 
 					<!-- Right: Top Crawled Pages panel (T2c) -->
 					<?php
-					$top_pages = $data->get_top_crawled_pages( $range['cutoff'] ?? null, 5 );
+					$top_pages = $data->get_top_crawled_pages( $range['cutoff'] ?? null, 5, true );
 					?>
 					<div class="citewp-aiso-cs-panel citewp-aiso-top-pages-panel">
 						<div class="citewp-aiso-cs-panel__head">
@@ -408,7 +408,7 @@ final class LogsPage {
 						</div>
 						<div class="citewp-aiso-cs-panel__subhead"><?php echo esc_html( $range['label'] ); ?></div>
 						<?php if ( empty( $top_pages ) ) : ?>
-							<p class="citewp-aiso-top-pages-empty"><?php esc_html_e( 'No crawler activity in this period.', 'citewp-ai-search-optimizer' ); ?></p>
+							<p class="citewp-aiso-top-pages-empty"><?php esc_html_e( 'No posts or pages crawled in this period.', 'citewp-ai-search-optimizer' ); ?></p>
 						<?php else : ?>
 							<table class="citewp-aiso-cs-table">
 								<thead>

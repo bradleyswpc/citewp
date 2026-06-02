@@ -49,14 +49,22 @@ final class DashboardData {
 	/**
 	 * Returns the most-crawled URLs in the given window, with title resolution.
 	 *
-	 * @param string|null $cutoff MySQL datetime string (detected_at >= cutoff); null = all-time.
-	 * @param int         $limit  Number of rows to return.
+	 * @param string|null $cutoff       MySQL datetime string (detected_at >= cutoff); null = all-time.
+	 * @param int         $limit        Number of rows to return.
+	 * @param bool        $content_only When true, exclude non-content URIs (robots.txt,
+	 *                                  sitemap.xml, llms.txt, feeds, archives, etc.) — keeping
+	 *                                  only resolved posts/pages and the homepage. A buffer is
+	 *                                  fetched and filtered in PHP since request_uri → post_id
+	 *                                  resolution depends on WP rewrite rules (not SQL-queryable).
 	 * @return array<int, array<string, mixed>>
 	 */
-	public function get_top_crawled_pages( ?string $cutoff = null, int $limit = 5 ): array {
+	public function get_top_crawled_pages( ?string $cutoff = null, int $limit = 5, bool $content_only = false ): array {
 		global $wpdb;
 
 		$table_name = esc_sql( Schema::table( Schema::TABLE_CRAWLER_LOGS ) );
+
+		// Over-fetch when filtering so enough content rows survive the PHP filter.
+		$fetch_limit = $content_only ? $limit + 50 : $limit;
 
 		$sql  = "SELECT request_uri, COUNT(*) AS visits, COUNT(DISTINCT bot_name) AS bot_count
          FROM {$table_name}";
@@ -68,7 +76,7 @@ final class DashboardData {
 		}
 
 		$sql   .= ' GROUP BY request_uri ORDER BY visits DESC LIMIT %d';
-		$args[] = $limit;
+		$args[] = $fetch_limit;
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		// Reason: Custom table not queryable via WP_Query. No-cache acceptable for admin analytics. $table_name is esc_sql() of a hardcoded constant; $sql uses only prepare() placeholders.
@@ -82,7 +90,9 @@ final class DashboardData {
 		// Resolve each URI to a post title in PHP (small N, no SQL join needed).
 		$results = [];
 		foreach ( $rows as $row ) {
-			if ( $row['request_uri'] === '/' ) {
+			$is_home = ( $row['request_uri'] === '/' );
+
+			if ( $is_home ) {
 				$front_page_id = (int) get_option( 'page_on_front' );
 				if ( $front_page_id > 0 ) {
 					$post_id = $front_page_id;
@@ -97,6 +107,12 @@ final class DashboardData {
 				$title   = $post_id > 0 ? get_the_title( $post_id ) : $row['request_uri'];
 			}
 
+			// Content-only: keep resolved posts/pages and the homepage; drop site files,
+			// feeds, archives, and anything url_to_postid() can't resolve to a post.
+			if ( $content_only && $post_id === 0 && ! $is_home ) {
+				continue;
+			}
+
 			$results[] = [
 				'request_uri' => $row['request_uri'],
 				'visits'      => (int) $row['visits'],
@@ -104,6 +120,10 @@ final class DashboardData {
 				'post_id'     => $post_id,
 				'title'       => $title,
 			];
+
+			if ( count( $results ) >= $limit ) {
+				break;
+			}
 		}
 
 		return $results;
