@@ -62,9 +62,7 @@ Two backlog features (FB58 bot expansion, FB59 AI Blind Spots) plus a chain of d
 5. **`$top_gap_label` source drift** — one-liner in `Menu.php` (still open from S43/S44).
 6. **FB53 A11 gate decision** — scoring rubric expansion (requires explicit approval).
 
-**Brad-manual (still open from S43/S44):**
-7. Upload `ai-search-optimizer.0.7.10.zip` to citewp.com.
-8. Re-insert schema on previously-injected posts; stale wp:html cleanup.
+**Brad-manual:** ✅ All previously-open S43/S44 items completed (citewp.com 0.7.10 upload done; schema re-inserted on previously-injected posts; stale wp:html cleanup done). No open Brad-manual carryover.
 
 ### Next session focus
 
