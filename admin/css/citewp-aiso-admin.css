@@ -876,7 +876,7 @@
 }
 
 .citewp-aiso-crawlers__cell {
-  padding: var(--sp-2);
+  padding: var(--sp-4) var(--sp-2); /* taller rows restore the height the avatars used to give */
   border-bottom: 1px solid var(--citewp-paper-border);
   vertical-align: middle;
 }
