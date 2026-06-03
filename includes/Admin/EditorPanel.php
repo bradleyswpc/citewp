@@ -316,8 +316,17 @@ final class EditorPanel {
 						var cat    = row.dataset.cat;
 						var drawer = container.querySelector( '[data-cat-signals="' + cat + '"]' );
 						if ( ! drawer ) { return; }
-						var open = row.classList.toggle( 'is-open' );
-						drawer.style.display = open ? 'block' : 'none';
+						var opening = ! row.classList.contains( 'is-open' );
+						// Close all drawers first (accordion: only one open at a time).
+						container.querySelectorAll( '.citewp-aiso-mb-cat-row--toggle' ).forEach( function( r ) {
+							r.classList.remove( 'is-open' );
+							var d = container.querySelector( '[data-cat-signals="' + r.dataset.cat + '"]' );
+							if ( d ) { d.style.display = 'none'; }
+						} );
+						if ( opening ) {
+							row.classList.add( 'is-open' );
+							drawer.style.display = 'block';
+						}
 					} );
 				} );
 			}
