@@ -6,6 +6,63 @@
 
 ---
 
+## Session 48 — WP.org 0.7.13 release: nested FAQPage detection (FB71) + loopback guard (FB72) + text domain fix ✅
+
+**Date:** 2026-06-03
+
+### Deliverable
+
+WP.org release of **0.7.13** (SVN trunk r3559999, tag `0.7.13` r3560000). Fixes two schema-detection bugs in `includes/Schema/Detector.php` — Rank Math's nested `BlogPosting → subjectOf → FAQPage` pattern going undetected (FB71) and Recalculate degrading the score when the Tier-1 self-request loopback returned a blocked/deficient response (FB72). Also fixes a pre-existing text domain mismatch (`citewp-ai-search-optimizer` → `ai-search-optimizer`) across all 12 admin/rest PHP files and the plugin header, finally clearing the TextDomainMismatch Plugin Check category.
+
+### What shipped
+
+- **FB71 — nested FAQPage detection (`includes/Schema/Detector.php`):** `parse_jsonld_html()` only walked top-level `@graph` nodes, so Rank Math's standard `BlogPosting → subjectOf[] → FAQPage` structure was never reached — FAQ Structure signal capped at 5/8. Added bounded recursion (max depth 3) via new private `check_nested_validity()` method that descends into `subjectOf`, `mainEntity`, and `hasPart` keys. Scope tight: only `faq_valid` / `article_valid` flags are set; nested types are NOT added to `$types[]` (preserves P72 Authority credit). `validate_faq_schema()` / `validate_article_schema()` are unchanged (reach fix, not validation fix).
+- **FB72 — Tier-1 loopback guard (`includes/Schema/Detector.php`):** `fetch_from_permalink()` unconditionally called `store_cache()` with the parse result of whatever `wp_remote_get()` returned — including non-200 responses and sub-1000-byte bodies (CDN challenge pages, security plugin blocks). Result: Recalculate overwrote a good Tier-2 `detected` cache with `not_found`, degrading the score to 0 for schema signals. Fixed by returning `null` (fall through to Tier-2 cache) on any non-200 or body < 1000 bytes. A clean 200 with genuinely no schema still updates the cache (real removals register).
+- **Text domain fix (12 `includes/` files + `ai-search-optimizer.php`):** All 318 occurrences of `citewp-ai-search-optimizer` text domain replaced with `ai-search-optimizer` to match the plugin slug. Fixes 354→5 Plugin Check errors (down to dev-only file noise only). Text Domain header in `ai-search-optimizer.php` corrected too.
+- **Parser unit tests (`tests/DetectorParserTest.php`, `tests/fixtures/detector-parser/`):** Standalone PHP test runner (no PHPUnit) with three fixtures — Fixture A (Rank Math nested subjectOf, FB71), Fixture B (top-level FAQPage regression guard), Fixture C (no FAQ false-positive guard). 9/9 assertions pass. Run: `php tests/DetectorParserTest.php`. Excluded from distribution via `.distignore`.
+- **`.distignore` improvement:** Consolidated four specific `*.png` patterns to a single `*.png` wildcard; prevents session screenshots from leaking into distribution zip.
+
+### Modified
+
+- `includes/Schema/Detector.php` — FB71 (`check_nested_validity()`), FB72 (loopback guard)
+- `includes/Admin/DashboardData.php`, `DashboardWidget.php`, `EditorPanel.php`, `LogsPage.php`, `LogsTable.php`, `Menu.php`, `PostListColumn.php`, `RecommendationFilter.php`, `ScoreDial.php` — text domain fix
+- `includes/Rest/SchemaController.php`, `ScoreController.php` — text domain fix
+- `includes/Settings/Page.php` — text domain fix
+- `ai-search-optimizer.php` — Text Domain header + version 0.7.13
+- `readme.txt` — Stable tag 0.7.13 + changelog
+- `.distignore` — `*.png` wildcard
+- **New:** `tests/DetectorParserTest.php`, `tests/fixtures/detector-parser/fixture-{a,b,c}.html`
+
+### Decisions
+
+- **No new DECISIONS.md rows.** FB71 + FB72 are detection fixes only (no scoring math changed). Text domain fix is housekeeping.
+- **FB71 live verification:** The dev site has no post with Rank Math's `BlogPosting → subjectOf → FAQPage` structure (posts use either CiteWP-injected standalone schemas or Rank Math BlogPosting without nested FAQ). Unit tests (9/9 PASS against exact Rank Math fixture) are the primary FB71 verification. Can re-verify on a real-world Rank Math site post-release.
+- **FB72 loopback investigation:** No evidence found of timeout-caused degradation on this dev site (LocalWP loopback is fast). The guard is purely defensive for CDN/security-plugin environments.
+
+### Verified
+
+- **Parser unit tests:** 9/9 PASS (Fixture A nested subjectOf ✅, Fixture B top-level regression ✅, Fixture C false-positive ✅). PHP lint clean on Detector.php and test file.
+- **FB72 live test:** Recalculate on post 11 ("How AI Search Engines...") held at **73/100** before and after — no score degradation ✅.
+- **Plugin Check (0 real errors):** TextDomainMismatch eliminated (was 354, now 5 errors, all from `.claude/hooks/*.sh` dev-only shell scripts excluded via `.distignore`). `trademarked_term` warning pre-existing.
+- **SVN:** trunk r3559999 (15 files M), tag `0.7.13` r3560000.
+- **debug.log:** `bot_signature` errors visible are pre-existing OPcache residue from before the 0.7.12 fix; `EditorPanel.php` on disk uses the correct `bot_name`/`detected_at`/`request_uri` query.
+
+### Carryover into Session 49
+
+**Brad-manual:**
+1. **Upload `ai-search-optimizer.0.7.13.zip` to citewp.com** — rebuild zip (`package.ps1`) and upload to WP Admin.
+2. **Post-release verify** — confirm `wordpress.org/plugins/citewp-ai-search-optimizer/` shows 0.7.13 once WP.org propagates.
+
+**Desktop (Brain) tasks:**
+3. **00-CITEWP-MASTER.md** — bump "Last updated" to 2026-06-03; add Session 48 + 0.7.13 under Shipped; update Next Session.
+4. **FEATURE-BACKLOG.md** — mark FB71 SHIPPED (S48), FB72 SHIPPED (S48).
+
+**Code (open):**
+5. **FB70** — Bot Visits panel in Gutenberg sidebar (deferred again). Requires new REST endpoint `GET /citewp/aiso/v1/crawler/{post_id}/visits` + React `BotVisitsPanel` component.
+6. **OPcache residue** — `bot_signature` errors in debug.log are from stale OPcache serving pre-0.7.12 EditorPanel. Will clear on LocalWP restart; not a code bug.
+
+---
+
 ## Session 47 — WP.org 0.7.12 release: EditorPanel head injection (FB69) + schema score fix + accordion signals + bot visits fix ✅
 
 **Date:** 2026-06-02
