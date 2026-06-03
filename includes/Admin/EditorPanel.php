@@ -598,17 +598,21 @@ final class EditorPanel {
 
 		$table = esc_sql( Schema::table( 'citewp_aiso_crawler_logs' ) );
 
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table queries; $table is esc_sql() of a hardcoded constant; $post_id is passed via $wpdb->prepare(); real-time admin display, intentionally uncached.
+		// Crawler logs have no post_id — match by URI (same approach as FB59 Blind Spots).
+		$permalink = get_permalink( $post_id );
+		$uri       = $permalink ? trailingslashit( wp_make_link_relative( $permalink ) ) : '/';
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom table queries; $table is esc_sql() of a hardcoded constant; $uri is passed via $wpdb->prepare(); real-time admin display, intentionally uncached.
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT bot_signature, COUNT(*) AS visits, MAX(created_at) AS last_seen
+				"SELECT bot_name AS bot_signature, COUNT(*) AS visits, MAX(detected_at) AS last_seen
 				 FROM {$table}
-				 WHERE post_id = %d
-				   AND created_at > NOW() - INTERVAL 7 DAY
-				 GROUP BY bot_signature
+				 WHERE request_uri = %s
+				   AND detected_at > NOW() - INTERVAL 7 DAY
+				 GROUP BY bot_name
 				 ORDER BY visits DESC
 				 LIMIT 6",
-				$post_id
+				$uri
 			)
 		);
 
@@ -620,11 +624,11 @@ final class EditorPanel {
 		if ( count( $rows ) === 6 ) {
 			$total  = (int) $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT COUNT(DISTINCT bot_signature)
+					"SELECT COUNT(DISTINCT bot_name)
 					 FROM {$table}
-					 WHERE post_id = %d
-					   AND created_at > NOW() - INTERVAL 7 DAY",
-					$post_id
+					 WHERE request_uri = %s
+					   AND detected_at > NOW() - INTERVAL 7 DAY",
+					$uri
 				)
 			);
 			$n_more = max( 0, $total - 5 );
