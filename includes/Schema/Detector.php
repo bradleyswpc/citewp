@@ -25,6 +25,7 @@ final class Detector {
 
 	private const CACHE_TTL            = DAY_IN_SECONDS;
 	private const SELF_REQUEST_TIMEOUT = 3;
+	private const MAX_NESTING_DEPTH    = 3;
 
 	private const ARTICLE_TYPES = [
 		'Article',
@@ -217,8 +218,19 @@ final class Detector {
 		if ( is_wp_error( $response ) ) {
 			return null;
 		}
+		// FB72: non-200 responses (blocked loopback, CDN-served stub, security plugin
+		// returning a challenge page for the CiteWP UA) must NOT be parsed and cached —
+		// they would overwrite a good Tier-2 'detected' result with 'not_found' and
+		// persist that degraded score until the next front-end page load restores it.
+		// Only a clean 200 with a plausible-length body is trustworthy enough to cache.
+		$code = wp_remote_retrieve_response_code( $response );
+		if ( $code !== 200 ) {
+			return null;
+		}
 		$body = wp_remote_retrieve_body( $response );
-		if ( $body === '' ) {
+		// < 1000 bytes = truncated response, empty body, or minimal error page.
+		// Real WordPress pages (even minimal ones) are several KB.
+		if ( strlen( $body ) < 1000 ) {
 			return null;
 		}
 		$result = $this->parse_jsonld_html( $body );
@@ -306,6 +318,21 @@ final class Detector {
 						}
 					}
 				}
+
+				// FB71: descend into known schema-nesting keys to find FAQPage/Article
+				// nodes nested inside container nodes (e.g. Rank Math nests FAQPage as
+				// BlogPosting -> subjectOf -> FAQPage -> mainEntity[Question]).
+				// Only sets the two validity flags; does NOT add nested @types to $types
+				// so P72 Authority credit stays stable.
+				if ( ! $faq_valid || ! $article_valid ) {
+					[ $nested_faq, $nested_article ] = $this->check_nested_validity( $node, 1 );
+					if ( ! $faq_valid ) {
+						$faq_valid = $nested_faq;
+					}
+					if ( ! $article_valid ) {
+						$article_valid = $nested_article;
+					}
+				}
 			}
 		}
 
@@ -319,6 +346,77 @@ final class Detector {
 			'faq_valid'     => $faq_valid,
 			'article_valid' => $article_valid,
 		];
+	}
+
+	/**
+	 * Descends into subjectOf / mainEntity / hasPart nesting keys to find FAQPage or
+	 * Article-type nodes that carry valid schema (FB71).
+	 *
+	 * Rank Math's standard pattern nests FAQPage inside BlogPosting via subjectOf:
+	 *   @graph → BlogPosting → subjectOf[] → FAQPage → mainEntity[]
+	 * The top-level loop only sees BlogPosting; this method finds the FAQPage inside it.
+	 *
+	 * Scope is deliberately tight: only sets faq_valid / article_valid flags; does NOT
+	 * add discovered nested @types to the outer types array (keeps P72 Authority credit
+	 * stable — nested entity types are not counted as authority signals).
+	 *
+	 * @param  array<mixed> $node  Parent node to inspect.
+	 * @param  int          $depth Current recursion depth (caller starts at 1).
+	 * @return bool[]              [ faq_valid, article_valid ]
+	 */
+	private function check_nested_validity( array $node, int $depth ): array {
+		if ( $depth > self::MAX_NESTING_DEPTH ) {
+			return [ false, false ];
+		}
+		$faq_valid     = false;
+		$article_valid = false;
+
+		foreach ( [ 'subjectOf', 'mainEntity', 'hasPart' ] as $key ) {
+			if ( empty( $node[ $key ] ) || ! is_array( $node[ $key ] ) ) {
+				continue;
+			}
+			// Normalize: a single-node object (associative array) must be wrapped in a
+			// list so the foreach below always iterates over individual child nodes.
+			$children = ( isset( $node[ $key ][0] ) && is_array( $node[ $key ][0] ) )
+				? $node[ $key ]
+				: [ $node[ $key ] ];
+
+			foreach ( $children as $child ) {
+				if ( ! is_array( $child ) || ! isset( $child['@type'] ) ) {
+					continue;
+				}
+				$child_types = is_array( $child['@type'] ) ? $child['@type'] : [ $child['@type'] ];
+
+				if ( ! $faq_valid && in_array( 'FAQPage', $child_types, true ) ) {
+					$faq_valid = $this->validate_faq_schema( $child );
+				}
+				if ( ! $article_valid ) {
+					foreach ( $child_types as $t ) {
+						if ( in_array( $t, self::ARTICLE_TYPES, true ) ) {
+							$article_valid = $this->validate_article_schema( $child );
+							break;
+						}
+					}
+				}
+
+				if ( $faq_valid && $article_valid ) {
+					return [ true, true ];
+				}
+
+				// Recurse if still incomplete.
+				if ( ! $faq_valid || ! $article_valid ) {
+					[ $deeper_faq, $deeper_article ] = $this->check_nested_validity( $child, $depth + 1 );
+					$faq_valid     = $faq_valid || $deeper_faq;
+					$article_valid = $article_valid || $deeper_article;
+				}
+
+				if ( $faq_valid && $article_valid ) {
+					return [ true, true ];
+				}
+			}
+		}
+
+		return [ $faq_valid, $article_valid ];
 	}
 
 	/**
