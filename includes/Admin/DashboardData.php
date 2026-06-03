@@ -80,7 +80,7 @@ final class DashboardData {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		// Reason: Custom table not queryable via WP_Query. No-cache acceptable for admin analytics. $table_name is esc_sql() of a hardcoded constant; $sql uses only prepare() placeholders.
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, ...$args ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- variadic args match placeholders exactly.
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, ...$args ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber,PluginCheck.Security.DirectDB.UnescapedDBParameter -- variadic args match placeholders exactly; $sql uses only prepare() placeholders over esc_sql()-sanitised table name.
 		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( ! is_array( $rows ) || empty( $rows ) ) {
