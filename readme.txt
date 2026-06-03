@@ -4,7 +4,7 @@ Tags: ai seo, generative engine optimization, llms.txt, chatgpt seo, ai citation
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.13
+Stable tag: 0.7.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,9 @@ No. Scoring runs in the background on post save and on manual recalculation — 
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.14 =
+* Fix: Restored the correct text domain (citewp-ai-search-optimizer) after a 0.7.13 regression. No functional change.
 
 = 0.7.13 =
 * Fix: FAQ schema nested inside article schema (Rank Math's standard BlogPosting → subjectOf → FAQPage structure) is now correctly detected and credited — affected pages no longer cap at 5/8 for the FAQ Structure signal despite having valid FAQ schema.
