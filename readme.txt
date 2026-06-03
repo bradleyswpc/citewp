@@ -4,7 +4,7 @@ Tags: ai seo, generative engine optimization, llms.txt, chatgpt seo, ai citation
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.12
+Stable tag: 0.7.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,10 @@ No. Scoring runs in the background on post save and on manual recalculation — 
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.13 =
+* Fix: FAQ schema nested inside article schema (Rank Math's standard BlogPosting → subjectOf → FAQPage structure) is now correctly detected and credited — affected pages no longer cap at 5/8 for the FAQ Structure signal despite having valid FAQ schema.
+* Fix: Recalculate no longer downgrades the Cite Score when the self-request loopback returns a non-200 response or an implausibly small body (blocked loopback, CDN challenge page, security plugin filtering the CiteWP UA). The existing cached detection result is preserved in those cases instead of being overwritten.
 
 = 0.7.12 =
 * Improvement: Schema insertion in the Classic Editor and page-builder meta box now injects into the page head — matching the block-editor sidebar — instead of copy-paste into content.
