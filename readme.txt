@@ -133,6 +133,8 @@ No. Scoring runs in the background on post save and on manual recalculation — 
 
 = 0.7.12 =
 * Improvement: Schema insertion in the Classic Editor and page-builder meta box now injects into the page head — matching the block-editor sidebar — instead of copy-paste into content.
+* Fix: Inserting schema via either the meta box or block-editor sidebar now correctly updates the Cite Score on Recalculate, including on sites where the self-request loopback is unavailable.
+* Improvement: Category rows (Structure, Citability, Authority) in the meta box are now expandable — click any row to see individual signal scores and recommendations.
 
 = 0.7.11 =
 * New: Schema scoring now credits authority-entity types — SoftwareApplication, Organization, Person, Product, LocalBusiness, and more — so product, landing, and service pages no longer score 0 for schema just because they aren't Articles.
