@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FAQ Page</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://example.com/faq/#webpage",
+      "url": "https://example.com/faq/",
+      "name": "Frequently Asked Questions"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://example.com/faq/#faqpage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is CiteWP?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CiteWP is a WordPress plugin that helps content get cited by AI search engines like ChatGPT, Perplexity, and Claude."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does CiteWP require an API key?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. CiteWP scores your content locally on your server — no API key, no external calls, no per-post cost."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://example.com/#organization",
+      "name": "Example Corp"
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<h1>FAQ</h1>
+<p>Answers to common questions.</p>
+</body>
+</html>
