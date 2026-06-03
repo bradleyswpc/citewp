@@ -71,7 +71,7 @@ final class ScoreController {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
 			return new \WP_Error(
 				'citewp_aiso_forbidden',
-				__( 'You do not have permission to view scores for this post.', 'ai-search-optimizer' ),
+				__( 'You do not have permission to view scores for this post.', 'citewp-ai-search-optimizer' ),
 				[ 'status' => 403 ]
 			);
 		}

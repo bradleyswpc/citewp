@@ -42,9 +42,9 @@ $GLOBALS['_test_failures'] = 0;
 
 function expect( bool $condition, string $label ): void {
 	if ( $condition ) {
-		echo "  PASS  {$label}\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo "  PASS  {$label}\n";
 	} else {
-		echo "  FAIL  {$label}\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo "  FAIL  {$label}\n";
 		++$GLOBALS['_test_failures'];
 	}
 }
@@ -89,6 +89,6 @@ expect( $c['article_valid'] === false, 'article_valid is false (no Article-type)
 $failures = $GLOBALS['_test_failures'];
 echo "\n" . ( $failures === 0
 	? "All tests passed.\n"
-	: "{$failures} test(s) FAILED.\n" // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	: "{$failures} test(s) FAILED.\n"
 );
 exit( $failures === 0 ? 0 : 1 );

@@ -97,13 +97,13 @@ final class LogsPage {
 			$ts           = $earliest ? strtotime( $earliest ) : false;
 			$days_elapsed = ( $ts !== false ) ? max( 1, (int) ceil( ( time() - $ts ) / DAY_IN_SECONDS ) ) : 1;
 			$avg_freq     = $total > 0 ? round( $total / $days_elapsed, 1 ) : 0.0;
-			$freq_unit    = __( 'per day', 'ai-search-optimizer' );
+			$freq_unit    = __( 'per day', 'citewp-ai-search-optimizer' );
 		} elseif ( $range['days'] === 1 ) {
 			$avg_freq  = $total > 0 ? round( $total / 24, 1 ) : 0.0;
-			$freq_unit = __( 'per hour', 'ai-search-optimizer' );
+			$freq_unit = __( 'per hour', 'citewp-ai-search-optimizer' );
 		} else {
 			$avg_freq  = $total > 0 ? round( $total / $range['days'], 1 ) : 0.0;
-			$freq_unit = __( 'per day', 'ai-search-optimizer' );
+			$freq_unit = __( 'per day', 'citewp-ai-search-optimizer' );
 		}
 
 		// Chart data: use the same $range window; cap all-time to 30 days (chart needs a bounded window).
@@ -220,10 +220,10 @@ final class LogsPage {
 		);
 
 		$range_options = [
-			''    => __( 'All time', 'ai-search-optimizer' ),
-			'24h' => __( 'Last 24h', 'ai-search-optimizer' ),
-			'7d'  => __( '7 days', 'ai-search-optimizer' ),
-			'30d' => __( '30 days', 'ai-search-optimizer' ),
+			''    => __( 'All time', 'citewp-ai-search-optimizer' ),
+			'24h' => __( 'Last 24h', 'citewp-ai-search-optimizer' ),
+			'7d'  => __( '7 days', 'citewp-ai-search-optimizer' ),
+			'30d' => __( '30 days', 'citewp-ai-search-optimizer' ),
 		];
 
 		$export_args = array_filter(
@@ -244,8 +244,8 @@ final class LogsPage {
 		?>
 		<div class="citewp-aiso-page-header">
 			<div class="citewp-aiso-page-header__left">
-				<h1 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Crawler Logs', 'ai-search-optimizer' ); ?></h1>
-				<p class="citewp-aiso-page-header__desc"><?php esc_html_e( 'AI crawler activity on your site.', 'ai-search-optimizer' ); ?></p>
+				<h1 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Crawler Logs', 'citewp-ai-search-optimizer' ); ?></h1>
+				<p class="citewp-aiso-page-header__desc"><?php esc_html_e( 'AI crawler activity on your site.', 'citewp-ai-search-optimizer' ); ?></p>
 			</div>
 			<div class="citewp-aiso-page-header__right">
 				<div class="citewp-aiso-filter-pills">
@@ -264,7 +264,7 @@ final class LogsPage {
 					<?php endforeach; ?>
 				</div>
 				<a href="<?php echo esc_url( $export_url ); ?>" class="citewp-aiso-btn citewp-aiso-btn--secondary">
-					<?php esc_html_e( 'Export CSV', 'ai-search-optimizer' ); ?>
+					<?php esc_html_e( 'Export CSV', 'citewp-ai-search-optimizer' ); ?>
 				</a>
 			</div>
 		</div>
@@ -275,49 +275,49 @@ final class LogsPage {
 				<div class="citewp-aiso-kpi-card">
 					<div class="citewp-aiso-kpi-card__head">
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--blue"><?php echo IconLibrary::icon( 'search', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Total Crawls', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Total Crawls', 'citewp-ai-search-optimizer' ); ?></span>
 					</div>
 					<p class="citewp-aiso-kpi-card__value">
 						<?php echo esc_html( number_format_i18n( $total ) ); ?>
 						<?php echo wp_kses( $this->render_trend_badge( $trend_total ), [ 'span' => [ 'class' => [] ] ] ); ?>
 					</p>
 					<p class="citewp-aiso-kpi-card__caption">
-						<?php echo esc_html( sprintf( /* translators: %s: date range label e.g. "All time", "Last 24h" */ __( '%s AI crawler visits', 'ai-search-optimizer' ), $range['label'] ) ); ?>
+						<?php echo esc_html( sprintf( /* translators: %s: date range label e.g. "All time", "Last 24h" */ __( '%s AI crawler visits', 'citewp-ai-search-optimizer' ), $range['label'] ) ); ?>
 					</p>
 				</div>
 
 				<div class="citewp-aiso-kpi-card">
 					<div class="citewp-aiso-kpi-card__head">
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--purple"><?php echo IconLibrary::icon( 'bot', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Unique Bots', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Unique Bots', 'citewp-ai-search-optimizer' ); ?></span>
 					</div>
 					<p class="citewp-aiso-kpi-card__value">
 						<?php echo esc_html( number_format_i18n( $unique_bots ) ); ?>
 						<?php echo wp_kses( $this->render_trend_badge( $trend_bots ), [ 'span' => [ 'class' => [] ] ] ); ?>
 					</p>
-					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Distinct AI engines detected', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Distinct AI engines detected', 'citewp-ai-search-optimizer' ); ?></p>
 				</div>
 
 				<div class="citewp-aiso-kpi-card">
 					<div class="citewp-aiso-kpi-card__head">
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--teal"><?php echo IconLibrary::icon( 'eye', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Pages Crawled', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Pages Crawled', 'citewp-ai-search-optimizer' ); ?></span>
 					</div>
 					<p class="citewp-aiso-kpi-card__value">
 						<?php echo esc_html( number_format_i18n( $pages_crawled ) ); ?>
 						<?php echo wp_kses( $this->render_trend_badge( $trend_pages ), [ 'span' => [ 'class' => [] ] ] ); ?>
 					</p>
-					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Unique URLs visited', 'ai-search-optimizer' ); ?></p>
+					<p class="citewp-aiso-kpi-card__caption"><?php esc_html_e( 'Unique URLs visited', 'citewp-ai-search-optimizer' ); ?></p>
 				</div>
 
 				<div class="citewp-aiso-kpi-card">
 					<div class="citewp-aiso-kpi-card__head">
 						<div class="citewp-aiso-kpi-card__orb citewp-aiso-kpi-card__orb--citrine"><?php echo IconLibrary::icon( 'calendar', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Avg Frequency', 'ai-search-optimizer' ); ?></span>
+						<span class="citewp-aiso-kpi-card__head-title"><?php esc_html_e( 'Avg Frequency', 'citewp-ai-search-optimizer' ); ?></span>
 					</div>
 					<p class="citewp-aiso-kpi-card__value"><?php echo esc_html( $avg_freq . ' ' . $freq_unit ); ?></p>
 					<p class="citewp-aiso-kpi-card__caption">
-						<?php echo esc_html( sprintf( /* translators: %s: date range label e.g. "All time", "7 days" */ __( '%s average', 'ai-search-optimizer' ), $range['label'] ) ); ?>
+						<?php echo esc_html( sprintf( /* translators: %s: date range label e.g. "All time", "7 days" */ __( '%s average', 'citewp-ai-search-optimizer' ), $range['label'] ) ); ?>
 					</p>
 				</div>
 
@@ -328,11 +328,11 @@ final class LogsPage {
 					<!-- Left: Bot Visits Over Time chart -->
 					<div class="citewp-aiso-cs-panel citewp-aiso-bot-visits-panel">
 						<div class="citewp-aiso-cs-panel__head">
-							<span class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Bot Visits Over Time', 'ai-search-optimizer' ); ?></span>
+							<span class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Bot Visits Over Time', 'citewp-ai-search-optimizer' ); ?></span>
 							<span class="citewp-aiso-kpi-tooltip citewp-aiso-kpi-tooltip--align-left">
 								<?php echo IconLibrary::icon( 'info', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
 								<span class="citewp-aiso-kpi-tooltip__text">
-									<?php esc_html_e( 'AI crawler visits per day, stacked by bot. Responds to the date filter above.', 'ai-search-optimizer' ); ?>
+									<?php esc_html_e( 'AI crawler visits per day, stacked by bot. Responds to the date filter above.', 'citewp-ai-search-optimizer' ); ?>
 								</span>
 							</span>
 						</div>
@@ -342,7 +342,7 @@ final class LogsPage {
 								<svg viewBox="0 0 600 180" style="position:absolute;inset:0;width:100%;height:100%;opacity:.2" preserveAspectRatio="none" aria-hidden="true">
 									<line x1="0" y1="90" x2="600" y2="90" stroke="var(--citewp-border)" stroke-width="1" stroke-dasharray="8 4"/>
 								</svg>
-								<p style="position:relative;z-index:1;"><?php esc_html_e( 'No crawler activity in this period.', 'ai-search-optimizer' ); ?></p>
+								<p style="position:relative;z-index:1;"><?php esc_html_e( 'No crawler activity in this period.', 'citewp-ai-search-optimizer' ); ?></p>
 							</div>
 						<?php else : ?>
 							<div class="citewp-aiso-bvot">
@@ -391,7 +391,7 @@ final class LogsPage {
 								<?php if ( $has_other ) : ?>
 									<span class="citewp-aiso-bvot__legend-item">
 										<span class="citewp-aiso-bvot__legend-swatch" style="background:var(--citewp-bot-other)"></span>
-										<?php esc_html_e( 'Other', 'ai-search-optimizer' ); ?>
+										<?php esc_html_e( 'Other', 'citewp-ai-search-optimizer' ); ?>
 									</span>
 								<?php endif; ?>
 							</div>
@@ -404,18 +404,18 @@ final class LogsPage {
 					?>
 					<div class="citewp-aiso-cs-panel citewp-aiso-top-pages-panel">
 						<div class="citewp-aiso-cs-panel__head">
-							<span class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Top Crawled Pages', 'ai-search-optimizer' ); ?></span>
+							<span class="citewp-aiso-cs-panel__title"><?php esc_html_e( 'Top Crawled Pages', 'citewp-ai-search-optimizer' ); ?></span>
 						</div>
 						<div class="citewp-aiso-cs-panel__subhead"><?php echo esc_html( $range['label'] ); ?></div>
 						<?php if ( empty( $top_pages ) ) : ?>
-							<p class="citewp-aiso-top-pages-empty"><?php esc_html_e( 'No posts or pages crawled in this period.', 'ai-search-optimizer' ); ?></p>
+							<p class="citewp-aiso-top-pages-empty"><?php esc_html_e( 'No posts or pages crawled in this period.', 'citewp-ai-search-optimizer' ); ?></p>
 						<?php else : ?>
 							<table class="citewp-aiso-cs-table">
 								<thead>
 									<tr>
-										<th style="width:50%"><?php esc_html_e( 'Title',  'ai-search-optimizer' ); ?></th>
-										<th style="width:25%;text-align:right"><?php esc_html_e( 'Visits', 'ai-search-optimizer' ); ?></th>
-										<th style="width:25%;text-align:right"><?php esc_html_e( 'Bots',   'ai-search-optimizer' ); ?></th>
+										<th style="width:50%"><?php esc_html_e( 'Title',  'citewp-ai-search-optimizer' ); ?></th>
+										<th style="width:25%;text-align:right"><?php esc_html_e( 'Visits', 'citewp-ai-search-optimizer' ); ?></th>
+										<th style="width:25%;text-align:right"><?php esc_html_e( 'Bots',   'citewp-ai-search-optimizer' ); ?></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -453,12 +453,12 @@ final class LogsPage {
 			<?php if ( $total === 0 && $range_filter === '' ) : ?>
 				<div class="citewp-aiso-empty">
 					<?php echo IconLibrary::icon( 'calendar', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
-					<p><?php esc_html_e( 'No AI crawler activity yet. Once GPTBot, ClaudeBot, PerplexityBot, or another AI crawler visits your site, you\'ll see it here.', 'ai-search-optimizer' ); ?></p>
+					<p><?php esc_html_e( 'No AI crawler activity yet. Once GPTBot, ClaudeBot, PerplexityBot, or another AI crawler visits your site, you\'ll see it here.', 'citewp-ai-search-optimizer' ); ?></p>
 				</div>
 			<?php elseif ( $total === 0 && $range_filter !== '' ) : ?>
 				<div class="citewp-aiso-empty">
 					<?php echo IconLibrary::icon( 'calendar', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?>
-					<p><?php esc_html_e( 'No crawler activity in this period.', 'ai-search-optimizer' ); ?></p>
+					<p><?php esc_html_e( 'No crawler activity in this period.', 'citewp-ai-search-optimizer' ); ?></p>
 				</div>
 			<?php elseif ( $this->table ) : ?>
 				<div class="citewp-aiso-logs-table-card citewp-aiso-table-wrap">
@@ -474,8 +474,8 @@ final class LogsPage {
 				<div class="citewp-aiso-protip__left">
 					<div class="citewp-aiso-protip__orb"><?php echo IconLibrary::icon( 'sparkles', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 					<div class="citewp-aiso-protip__content">
-						<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'ai-search-optimizer' ); ?></p>
-						<p class="citewp-aiso-protip__body"><?php esc_html_e( 'Frequent AI crawler visits signal your content is being actively indexed. Upgrade to CiteWP Pro for 1-year log retention and advanced bot analytics.', 'ai-search-optimizer' ); ?></p>
+						<p class="citewp-aiso-protip__heading"><?php esc_html_e( 'Pro Tip', 'citewp-ai-search-optimizer' ); ?></p>
+						<p class="citewp-aiso-protip__body"><?php esc_html_e( 'Frequent AI crawler visits signal your content is being actively indexed. Upgrade to CiteWP Pro for 1-year log retention and advanced bot analytics.', 'citewp-ai-search-optimizer' ); ?></p>
 					</div>
 				</div>
 			</div>
@@ -486,7 +486,7 @@ final class LogsPage {
 
 	public function handle_csv_export(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Insufficient permissions.', 'ai-search-optimizer' ) );
+			wp_die( esc_html__( 'Insufficient permissions.', 'citewp-ai-search-optimizer' ) );
 		}
 		check_admin_referer( 'citewp_aiso_export_logs' );
 
@@ -588,25 +588,25 @@ final class LogsPage {
 		return match ( $range_filter ) {
 			'24h' => [
 				'where'  => $wpdb->prepare( ' AND detected_at >= %s', gmdate( 'Y-m-d H:i:s', strtotime( '-1 day' ) ) ),
-				'label'  => __( 'Last 24h', 'ai-search-optimizer' ),
+				'label'  => __( 'Last 24h', 'citewp-ai-search-optimizer' ),
 				'days'   => 1,
 				'cutoff' => gmdate( 'Y-m-d H:i:s', strtotime( '-2 days' ) ),
 			],
 			'7d' => [
 				'where'  => $wpdb->prepare( ' AND detected_at >= %s', gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) ) ),
-				'label'  => __( '7 days', 'ai-search-optimizer' ),
+				'label'  => __( '7 days', 'citewp-ai-search-optimizer' ),
 				'days'   => 7,
 				'cutoff' => gmdate( 'Y-m-d H:i:s', strtotime( '-14 days' ) ),
 			],
 			'30d' => [
 				'where'  => $wpdb->prepare( ' AND detected_at >= %s', gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) ) ),
-				'label'  => __( '30 days', 'ai-search-optimizer' ),
+				'label'  => __( '30 days', 'citewp-ai-search-optimizer' ),
 				'days'   => 30,
 				'cutoff' => gmdate( 'Y-m-d H:i:s', strtotime( '-60 days' ) ),
 			],
 			default => [
 				'where'  => '',
-				'label'  => __( 'All time', 'ai-search-optimizer' ),
+				'label'  => __( 'All time', 'citewp-ai-search-optimizer' ),
 				'days'   => null,
 				'cutoff' => null,
 			],
@@ -681,7 +681,7 @@ final class LogsPage {
 		<details class="citewp-aiso-blind-spots" open>
 			<summary class="citewp-aiso-blind-spots__summary">
 				<span class="citewp-aiso-cs-panel__title citewp-aiso-blind-spots__title">
-					<?php esc_html_e( 'AI Blind Spots', 'ai-search-optimizer' ); ?>
+					<?php esc_html_e( 'AI Blind Spots', 'citewp-ai-search-optimizer' ); ?>
 				</span>
 				<?php if ( $total > 0 ) : ?>
 					<span class="citewp-aiso-blind-spots__badge"><?php echo esc_html( number_format_i18n( $total ) ); ?></span>
@@ -690,7 +690,7 @@ final class LogsPage {
 			<div class="citewp-aiso-blind-spots__body">
 				<?php if ( 0 === $total ) : ?>
 					<p class="citewp-aiso-blind-spots__empty">
-						<?php esc_html_e( 'All published posts and pages have been visited by at least one AI crawler.', 'ai-search-optimizer' ); ?>
+						<?php esc_html_e( 'All published posts and pages have been visited by at least one AI crawler.', 'citewp-ai-search-optimizer' ); ?>
 					</p>
 				<?php else : ?>
 					<p class="citewp-aiso-blind-spots__intro">
@@ -702,7 +702,7 @@ final class LogsPage {
 									'%d published post has never been visited by an AI crawler. AI engines may not know this content exists.',
 									'%d published posts have never been visited by any AI crawler. AI engines may not know this content exists.',
 									$total,
-									'ai-search-optimizer'
+									'citewp-ai-search-optimizer'
 								),
 								$total
 							)
@@ -715,7 +715,7 @@ final class LogsPage {
 							echo esc_html(
 								sprintf(
 									/* translators: %d: number of items displayed */
-									__( 'Showing first %d.', 'ai-search-optimizer' ),
+									__( 'Showing first %d.', 'citewp-ai-search-optimizer' ),
 									$count
 								)
 							);
@@ -726,11 +726,11 @@ final class LogsPage {
 						<?php foreach ( $posts as $post ) : ?>
 							<li class="citewp-aiso-blind-spots__item">
 								<span class="citewp-aiso-blind-spots__item-title">
-									<?php echo esc_html( $post['post_title'] !== '' ? $post['post_title'] : __( '(no title)', 'ai-search-optimizer' ) ); ?>
+									<?php echo esc_html( $post['post_title'] !== '' ? $post['post_title'] : __( '(no title)', 'citewp-ai-search-optimizer' ) ); ?>
 								</span>
 								<?php if ( $post['edit_link'] ) : ?>
 									<a class="citewp-aiso-blind-spots__edit-link" href="<?php echo esc_url( $post['edit_link'] ); ?>">
-										<?php esc_html_e( 'Edit', 'ai-search-optimizer' ); ?>
+										<?php esc_html_e( 'Edit', 'citewp-ai-search-optimizer' ); ?>
 									</a>
 								<?php endif; ?>
 							</li>
@@ -738,7 +738,7 @@ final class LogsPage {
 					</ul>
 					<?php if ( $count > 5 ) : ?>
 						<div class="citewp-aiso-blind-spots__pager">
-							<select class="citewp-aiso-bsp-per-page" aria-label="<?php esc_attr_e( 'Posts per page', 'ai-search-optimizer' ); ?>">
+							<select class="citewp-aiso-bsp-per-page" aria-label="<?php esc_attr_e( 'Posts per page', 'citewp-ai-search-optimizer' ); ?>">
 								<option value="5" selected>5</option>
 								<option value="10">10</option>
 							</select>

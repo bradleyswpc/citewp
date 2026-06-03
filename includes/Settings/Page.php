@@ -91,7 +91,7 @@ final class Page {
 
 	public function handle_regenerate(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Insufficient permissions.', 'ai-search-optimizer' ) );
+			wp_die( esc_html__( 'Insufficient permissions.', 'citewp-ai-search-optimizer' ) );
 		}
 		check_admin_referer( 'citewp_aiso_regenerate_llms' );
 
@@ -129,7 +129,7 @@ final class Page {
 		$tabs = apply_filters(
 			'citewp_aiso/settings/tabs',
 			[
-				'general' => __( 'General', 'ai-search-optimizer' ),
+				'general' => __( 'General', 'citewp-ai-search-optimizer' ),
 			]
 		);
 
@@ -137,8 +137,8 @@ final class Page {
 		?>
 		<div class="citewp-aiso-page-header">
 			<div class="citewp-aiso-page-header__left">
-				<h1 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Settings', 'ai-search-optimizer' ); ?></h1>
-				<p class="citewp-aiso-page-header__desc"><?php esc_html_e( 'Configure your AI search optimization preferences.', 'ai-search-optimizer' ); ?></p>
+				<h1 class="citewp-aiso-page-header__title"><?php esc_html_e( 'Settings', 'citewp-ai-search-optimizer' ); ?></h1>
+				<p class="citewp-aiso-page-header__desc"><?php esc_html_e( 'Configure your AI search optimization preferences.', 'citewp-ai-search-optimizer' ); ?></p>
 			</div>
 			<?php if ( count( $tabs ) > 1 ) : ?>
 			<div class="citewp-aiso-page-header__right">
@@ -163,11 +163,11 @@ final class Page {
 		</div>
 
 		<?php if ( sanitize_key( wp_unslash( $_GET['regenerated'] ?? '' ) ) === '1' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
-			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'llms.txt cache cleared. The next request will regenerate from scratch.', 'ai-search-optimizer' ); ?></p></div>
+			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'llms.txt cache cleared. The next request will regenerate from scratch.', 'citewp-ai-search-optimizer' ); ?></p></div>
 		<?php endif; ?>
 
 		<?php if ( sanitize_key( wp_unslash( $_GET['settings-updated'] ?? '' ) ) !== '' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Standard WP options-saved flag; no data modification. ?>
-			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'ai-search-optimizer' ); ?></p></div>
+			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'citewp-ai-search-optimizer' ); ?></p></div>
 		<?php endif; ?>
 
 		<div class="citewp-aiso-page-body" id="citewp-aiso-settings-tabs">
@@ -188,13 +188,13 @@ final class Page {
 						<div class="citewp-aiso-fscard">
 							<div class="citewp-aiso-fscard__header">
 								<div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--orange"><?php echo IconLibrary::icon( 'bot', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-								<?php esc_html_e( 'AI Crawler Detection', 'ai-search-optimizer' ); ?>
+								<?php esc_html_e( 'AI Crawler Detection', 'citewp-ai-search-optimizer' ); ?>
 							</div>
 
 							<div class="citewp-aiso-fscard__row">
 								<div class="citewp-aiso-fscard__left">
-									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable detection', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Log AI crawler visits (GPTBot, ClaudeBot, PerplexityBot, and others).', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable detection', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Log AI crawler visits (GPTBot, ClaudeBot, PerplexityBot, and others).', 'citewp-ai-search-optimizer' ); ?></p>
 								</div>
 								<div class="citewp-aiso-fscard__right">
 									<label class="citewp-aiso-toggle">
@@ -212,8 +212,8 @@ final class Page {
 
 							<div class="citewp-aiso-fscard__row">
 								<div class="citewp-aiso-fscard__left">
-									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Log retention (days)', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Free tier: 7 days. Older logs pruned daily.', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Log retention (days)', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Free tier: 7 days. Older logs pruned daily.', 'citewp-ai-search-optimizer' ); ?></p>
 								</div>
 								<div class="citewp-aiso-fscard__right">
 									<input
@@ -233,13 +233,13 @@ final class Page {
 						<div class="citewp-aiso-fscard">
 							<div class="citewp-aiso-fscard__header">
 								<div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--teal"><?php echo IconLibrary::icon( 'llms-txt', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-								<?php esc_html_e( 'llms.txt Generation', 'ai-search-optimizer' ); ?>
+								<?php esc_html_e( 'llms.txt Generation', 'citewp-ai-search-optimizer' ); ?>
 							</div>
 
 							<div class="citewp-aiso-fscard__row citewp-aiso-fscard__row--info">
 								<div class="citewp-aiso-fscard__left">
 									<p class="citewp-aiso-fscard__field-desc">
-										<?php esc_html_e( 'Your llms.txt:', 'ai-search-optimizer' ); ?>
+										<?php esc_html_e( 'Your llms.txt:', 'citewp-ai-search-optimizer' ); ?>
 										<a href="<?php echo esc_url( $llms_short ); ?>" target="_blank" rel="noopener"><code><?php echo esc_html( $llms_short ); ?></code></a>
 										&nbsp;|&nbsp;
 										<a href="<?php echo esc_url( $llms_full ); ?>" target="_blank" rel="noopener"><code><?php echo esc_html( $llms_full ); ?></code></a>
@@ -249,8 +249,8 @@ final class Page {
 
 							<div class="citewp-aiso-fscard__row">
 								<div class="citewp-aiso-fscard__left">
-									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable llms.txt', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Serve dynamic llms.txt to AI engines.', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Enable llms.txt', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Serve dynamic llms.txt to AI engines.', 'citewp-ai-search-optimizer' ); ?></p>
 								</div>
 								<div class="citewp-aiso-fscard__right">
 									<label class="citewp-aiso-toggle">
@@ -268,8 +268,8 @@ final class Page {
 
 							<div class="citewp-aiso-fscard__row">
 								<div class="citewp-aiso-fscard__left">
-									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Minimum word count', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts shorter than this are skipped. Pages always included.', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Minimum word count', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts shorter than this are skipped. Pages always included.', 'citewp-ai-search-optimizer' ); ?></p>
 								</div>
 								<div class="citewp-aiso-fscard__right">
 									<input
@@ -287,8 +287,8 @@ final class Page {
 
 							<div class="citewp-aiso-fscard__row">
 								<div class="citewp-aiso-fscard__left">
-									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include posts from last (days)', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts published before this window are excluded from llms.txt.', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include posts from last (days)', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Posts published before this window are excluded from llms.txt.', 'citewp-ai-search-optimizer' ); ?></p>
 								</div>
 								<div class="citewp-aiso-fscard__right">
 									<input
@@ -306,8 +306,8 @@ final class Page {
 							<?php if ( ! empty( $public_types ) ) : ?>
 							<div class="citewp-aiso-fscard__row">
 								<div class="citewp-aiso-fscard__left">
-									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include custom post types', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Selected types will appear alongside posts and pages in llms.txt.', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Include custom post types', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Selected types will appear alongside posts and pages in llms.txt.', 'citewp-ai-search-optimizer' ); ?></p>
 								</div>
 								<div class="citewp-aiso-fscard__right">
 									<?php foreach ( $public_types as $type ) : ?>
@@ -331,19 +331,19 @@ final class Page {
 						<div class="citewp-aiso-fscard">
 							<div class="citewp-aiso-fscard__header">
 								<div class="citewp-aiso-fscard__orb citewp-aiso-fscard__orb--gray"><?php echo IconLibrary::icon( 'refresh-cw', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- IconLibrary returns trusted SVG markup. ?></div>
-								<?php esc_html_e( 'Maintenance', 'ai-search-optimizer' ); ?>
+								<?php esc_html_e( 'Maintenance', 'citewp-ai-search-optimizer' ); ?>
 							</div>
 							<div class="citewp-aiso-fscard__row">
 								<div class="citewp-aiso-fscard__left">
-									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Regenerate llms.txt', 'ai-search-optimizer' ); ?></p>
-									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Clears the cache. The next request to /llms.txt rebuilds from scratch.', 'ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Regenerate llms.txt', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc"><?php esc_html_e( 'Clears the cache. The next request to /llms.txt rebuilds from scratch.', 'citewp-ai-search-optimizer' ); ?></p>
 								</div>
 								<div class="citewp-aiso-fscard__right">
 									<button
 										type="submit"
 										form="citewp-aiso-regenerate-form"
 										class="citewp-aiso-fscard__btn"
-									><?php esc_html_e( 'Regenerate now →', 'ai-search-optimizer' ); ?></button>
+									><?php esc_html_e( 'Regenerate now →', 'citewp-ai-search-optimizer' ); ?></button>
 								</div>
 							</div>
 						</div>
@@ -371,7 +371,7 @@ final class Page {
 
 					<div class="citewp-aiso-save-bar">
 						<button type="submit" name="submit" class="citewp-aiso-btn citewp-aiso-btn--primary-paper">
-							<?php esc_html_e( 'Save Changes', 'ai-search-optimizer' ); ?>
+							<?php esc_html_e( 'Save Changes', 'citewp-ai-search-optimizer' ); ?>
 						</button>
 					</div>
 

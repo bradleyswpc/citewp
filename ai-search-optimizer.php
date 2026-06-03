@@ -10,7 +10,7 @@
  * Author URI:        https://citewp.com
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       ai-search-optimizer
+ * Text Domain:       citewp-ai-search-optimizer
  *
  * @package CiteWP\Aiso
  */

@@ -300,18 +300,18 @@ final class RecommendationFilter {
 				'Showing %1$d page flagged for: %2$s.',
 				'Showing %1$d pages flagged for: %2$s.',
 				$count,
-				'ai-search-optimizer'
+				'citewp-ai-search-optimizer'
 			);
-			$clear_label = __( '× All pages', 'ai-search-optimizer' );
+			$clear_label = __( '× All pages', 'citewp-ai-search-optimizer' );
 		} else {
 			/* translators: 1: number of posts, 2: recommendation label */
 			$template = _n(
 				'Showing %1$d post flagged for: %2$s.',
 				'Showing %1$d posts flagged for: %2$s.',
 				$count,
-				'ai-search-optimizer'
+				'citewp-ai-search-optimizer'
 			);
-			$clear_label = __( '× All posts', 'ai-search-optimizer' );
+			$clear_label = __( '× All posts', 'citewp-ai-search-optimizer' );
 		}
 
 		printf(
