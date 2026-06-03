@@ -10,7 +10,10 @@
  * Author URI:        https://citewp.com
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       citewp-ai-search-optimizer  // MUST match the WP.org slug, not the dev folder. Plugin Check's local-folder mismatch is a known false positive — do not "fix" it.
+ * Text Domain:       citewp-ai-search-optimizer
+ *
+ * NOTE: Text Domain MUST be citewp-ai-search-optimizer (WP.org distribution slug), NOT the dev folder
+ * name (ai-search-optimizer). Plugin Check TextDomainMismatch errors here are a known false positive.
  *
  * @package CiteWP\Aiso
  */
