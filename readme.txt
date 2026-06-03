@@ -4,7 +4,7 @@ Tags: ai seo, generative engine optimization, llms.txt, chatgpt seo, ai citation
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 0.7.11
+Stable tag: 0.7.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -130,6 +130,9 @@ No. Scoring runs in the background on post save and on manual recalculation — 
 5. The Cite Score page — site-wide scoring overview with top crawler, optimization coverage, schema coverage, a score health gauge, category breakdown, and AI-powered recommendations.
 
 == Changelog ==
+
+= 0.7.12 =
+* Improvement: Schema insertion in the Classic Editor and page-builder meta box now injects into the page head — matching the block-editor sidebar — instead of copy-paste into content.
 
 = 0.7.11 =
 * New: Schema scoring now credits authority-entity types — SoftwareApplication, Organization, Person, Product, LocalBusiness, and more — so product, landing, and service pages no longer score 0 for schema just because they aren't Articles.

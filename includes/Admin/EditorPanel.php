@@ -6,6 +6,7 @@ namespace CiteWP\Aiso\Admin;
 use CiteWP\Aiso\Scoring\Repository;
 use CiteWP\Aiso\Schema\Generator;
 use CiteWP\Aiso\Schema\Detector;
+use CiteWP\Aiso\Schema\HeadInjector;
 use CiteWP\Aiso\Database\Schema;
 
 defined( 'ABSPATH' ) || exit;
@@ -337,115 +338,178 @@ final class EditorPanel {
 	}
 
 	public function render_schema_tab( \WP_Post $post ): void {
-		// Migrated from SchemaMetaBox::render()
-		$generator    = new Generator();
-		$article      = $generator->generate_article_schema( $post );
-		$faqpage      = $generator->generate_faq_schema( $post );
-		$detected     = $generator->detect_existing_types( $post );
+		$generator = new Generator();
+		$detector  = new Detector();
+		$injector  = new HeadInjector();
 
-		// Full rendered-page detection (head-injected schema from Yoast / Rank Math /
-		// AIOSEO included) for the read-only "Detected on this page" readout. No explicit
-		// recalculate → reads the template_redirect cache / post_content only, never blocks
-		// on an HTTP self-request. The Article/FAQ pill logic below stays on $detected
-		// (post_content) per P67-C — entity types do NOT suppress the copy buttons.
-		$detector     = new Detector();
-		$rendered      = $detector->get_detected_types( $post->ID );
-		$all_detected  = array_values( array_unique( array_merge( $rendered['types'], $detected ) ) );
-		$article_json = wp_json_encode( $article, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		if ( false === $article_json ) {
-			echo '<p class="citewp-aiso-mb-empty-note">' . esc_html__( 'Schema could not be generated (content encoding error).', 'citewp-ai-search-optimizer' ) . '</p>';
-			return;
+		// What CiteWP has already head-injected for this post.
+		$stored        = $injector->get_stored( $post->ID );
+
+		// Rendered-page detection: article_valid / faq_valid drive Insert/Already-detected state.
+		// tier1/tier2 = full rendered page; tier3/cold_start = post_content only (no HTTP self-request).
+		$schema_result = $detector->get_detected_types( $post->ID );
+
+		// Full "Detected on this page" list — merge rendered + post_content. Left exactly as-is.
+		$from_content = $generator->detect_existing_types( $post );
+		$all_detected = array_values( array_unique( array_merge( $schema_result['types'], $from_content ) ) );
+
+		// FAQ pair count — needed for the unavailable-state message.
+		$faq_count = $generator->count_faq_pairs( $post );
+
+		// Article: injected by CiteWP → Remove; valid by another emitter → Already detected; else → Insert.
+		if ( isset( $stored['article'] ) ) {
+			$article_state = 'injected';
+		} elseif ( ! empty( $schema_result['article_valid'] ) ) {
+			$article_state = 'detected';
+		} else {
+			$article_state = 'available';
 		}
-		$faq_encoded  = ! empty( $faqpage )
-			? wp_json_encode( $faqpage, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
-			: null;
-		$faq_json     = ( false !== $faq_encoded ) ? $faq_encoded : null;
-		$article_known = in_array( 'Article', $detected, true );
-		$faq_known     = in_array( 'FAQPage', $detected, true );
-		$box_id        = 'citewp-ep-schema-' . $post->ID;
-		$copy_note     = __( 'Paste into a Custom HTML block (Gutenberg) or a Code/HTML widget in your page builder.', 'citewp-ai-search-optimizer' );
+
+		// FAQ: injected → detected → available (≥ 2 pairs) → unavailable (0 or 1 pair).
+		if ( isset( $stored['faqpage'] ) ) {
+			$faq_state = 'injected';
+		} elseif ( ! empty( $schema_result['faq_valid'] ) ) {
+			$faq_state = 'detected';
+		} elseif ( $faq_count >= 2 ) {
+			$faq_state = 'available';
+		} else {
+			$faq_state = 'unavailable';
+		}
+
+		$box_id     = 'citewp-ep-schema-' . $post->ID;
+		$nonce      = wp_create_nonce( 'wp_rest' );
+		$inject_url = rest_url( 'citewp/aiso/v1/schema/' . $post->ID . '/inject' );
 		?>
 		<div class="citewp-aiso-schema-metabox" id="<?php echo esc_attr( $box_id ); ?>">
-			<div class="citewp-aiso-mb-schema-row">
+
+			<div class="citewp-aiso-mb-schema-row" data-schema-type="article">
 				<span class="citewp-aiso-mb-schema-label"><?php esc_html_e( 'Article Schema', 'citewp-ai-search-optimizer' ); ?></span>
-				<?php if ( $article_known ) : ?>
-					<span class="citewp-aiso-mb-detected"><?php esc_html_e( '✓ Already in content', 'citewp-ai-search-optimizer' ); ?></span>
+				<?php if ( 'injected' === $article_state ) : ?>
+					<button type="button"
+					        class="button button-secondary citewp-aiso-schema-btn"
+					        data-type="article"
+					        data-action="remove">
+						<?php esc_html_e( 'Remove', 'citewp-ai-search-optimizer' ); ?>
+					</button>
+				<?php elseif ( 'detected' === $article_state ) : ?>
+					<span class="citewp-aiso-mb-detected"><?php esc_html_e( 'Already detected', 'citewp-ai-search-optimizer' ); ?></span>
 				<?php else : ?>
 					<button type="button"
-					        class="button button-secondary citewp-aiso-copy-btn"
-					        data-schema="<?php echo esc_attr( '<script type="application/ld+json">' . $article_json . '</script>' ); ?>"
-					        data-label="<?php esc_attr_e( 'Copy Article schema', 'citewp-ai-search-optimizer' ); ?>">
-						<?php esc_html_e( 'Copy Article schema', 'citewp-ai-search-optimizer' ); ?>
+					        class="button button-secondary citewp-aiso-schema-btn"
+					        data-type="article"
+					        data-action="inject">
+						<?php esc_html_e( 'Insert', 'citewp-ai-search-optimizer' ); ?>
 					</button>
-					<span class="citewp-aiso-mb-copy-note"><?php echo esc_html( $copy_note ); ?></span>
 				<?php endif; ?>
 			</div>
-			<div class="citewp-aiso-mb-schema-row">
+
+			<div class="citewp-aiso-mb-schema-row" data-schema-type="faqpage">
 				<span class="citewp-aiso-mb-schema-label"><?php esc_html_e( 'FAQPage Schema', 'citewp-ai-search-optimizer' ); ?></span>
-				<?php if ( $faq_known ) : ?>
-					<span class="citewp-aiso-mb-detected"><?php esc_html_e( '✓ Already in content', 'citewp-ai-search-optimizer' ); ?></span>
-				<?php elseif ( $faq_json ) : ?>
+				<?php if ( 'injected' === $faq_state ) : ?>
 					<button type="button"
-					        class="button button-secondary citewp-aiso-copy-btn"
-					        data-schema="<?php echo esc_attr( '<script type="application/ld+json">' . $faq_json . '</script>' ); ?>"
-					        data-label="<?php esc_attr_e( 'Copy FAQPage schema', 'citewp-ai-search-optimizer' ); ?>">
-						<?php esc_html_e( 'Copy FAQPage schema', 'citewp-ai-search-optimizer' ); ?>
+					        class="button button-secondary citewp-aiso-schema-btn"
+					        data-type="faqpage"
+					        data-action="remove">
+						<?php esc_html_e( 'Remove', 'citewp-ai-search-optimizer' ); ?>
 					</button>
-					<span class="citewp-aiso-mb-copy-note"><?php echo esc_html( $copy_note ); ?></span>
+				<?php elseif ( 'detected' === $faq_state ) : ?>
+					<span class="citewp-aiso-mb-detected"><?php esc_html_e( 'Already detected', 'citewp-ai-search-optimizer' ); ?></span>
+				<?php elseif ( 'available' === $faq_state ) : ?>
+					<button type="button"
+					        class="button button-secondary citewp-aiso-schema-btn"
+					        data-type="faqpage"
+					        data-action="inject">
+						<?php esc_html_e( 'Insert', 'citewp-ai-search-optimizer' ); ?>
+					</button>
 				<?php else : ?>
 					<span class="citewp-aiso-mb-empty-note">
-						<?php esc_html_e( 'No FAQ content detected (need ≥ 2 Q&A pairs)', 'citewp-ai-search-optimizer' ); ?>
+						<?php
+						if ( 0 === $faq_count ) {
+							esc_html_e( 'No FAQ content detected on this page.', 'citewp-ai-search-optimizer' );
+						} else {
+							esc_html_e( 'Only 1 question/answer pair detected. FAQPage schema requires at least 2 pairs.', 'citewp-ai-search-optimizer' );
+						}
+						?>
 					</span>
 				<?php endif; ?>
 			</div>
+
 			<?php if ( ! empty( $all_detected ) ) : ?>
 			<p class="citewp-aiso-mb-other-types">
 				<strong><?php esc_html_e( 'Detected on this page:', 'citewp-ai-search-optimizer' ); ?></strong>
 				<?php echo esc_html( ' ' . implode( ', ', $all_detected ) ); ?>
 			</p>
 			<?php endif; ?>
+
 		</div>
 		<script>
 		(function() {
-			var box = document.getElementById( <?php echo wp_json_encode( $box_id ); ?> );
+			var box   = document.getElementById( <?php echo wp_json_encode( $box_id ); ?> );
+			var nonce = <?php echo wp_json_encode( $nonce ); ?>;
+			var url   = <?php echo wp_json_encode( esc_url_raw( $inject_url ) ); ?>;
 			if ( ! box ) { return; }
-			box.querySelectorAll( '.citewp-aiso-copy-btn' ).forEach( function( btn ) {
-				var fadeTimer, revertTimer;
-				var note = btn.nextElementSibling;
-				btn.addEventListener( 'click', function() {
-					var schema    = btn.dataset.schema;
-					var origLabel = btn.dataset.label;
-					function onSuccess() {
-						btn.textContent = <?php echo wp_json_encode( __( '✓ Copied to clipboard', 'citewp-ai-search-optimizer' ) ); ?>;
-						if ( fadeTimer )   { clearTimeout( fadeTimer ); }
-						if ( revertTimer ) { clearTimeout( revertTimer ); }
-						note.style.transition = '';
-						note.style.opacity    = '1';
-						note.style.display    = 'block';
-						revertTimer = setTimeout( function() { btn.textContent = origLabel; }, 3000 );
-						fadeTimer = setTimeout( function() {
-							note.style.transition = 'opacity 0.6s ease';
-							note.style.opacity    = '0';
-							setTimeout( function() { note.style.display = 'none'; note.style.opacity = '1'; note.style.transition = ''; }, 650 );
-						}, 8000 );
+
+			box.addEventListener( 'click', function( e ) {
+				var btn = e.target.closest( '.citewp-aiso-schema-btn' );
+				if ( ! btn ) { return; }
+
+				var type   = btn.dataset.type;
+				var action = btn.dataset.action;
+				var row    = btn.closest( '[data-schema-type]' );
+				if ( ! type || ! action || ! row ) { return; }
+
+				var origText    = btn.textContent.trim();
+				btn.disabled    = true;
+				btn.textContent = 'inject' === action
+					? <?php echo wp_json_encode( __( 'Inserting…', 'citewp-ai-search-optimizer' ) ); ?>
+					: <?php echo wp_json_encode( __( 'Removing…', 'citewp-ai-search-optimizer' ) ); ?>;
+
+				fetch( url, {
+					method:  'POST',
+					headers: { 'X-WP-Nonce': nonce, 'Content-Type': 'application/json' },
+					body:    JSON.stringify( { type: type, action: action } )
+				} )
+				.then( function( r ) {
+					if ( r.status === 409 ) {
+						// Another emitter already has valid same-@type schema (P67-C conflict guard).
+						replaceAction( row, type, 'already' );
+						return null;
 					}
-					function onFailure() {
-						btn.textContent = <?php echo wp_json_encode( __( 'Copy failed — try again', 'citewp-ai-search-optimizer' ) ); ?>;
-						if ( revertTimer ) { clearTimeout( revertTimer ); }
-						revertTimer = setTimeout( function() { btn.textContent = origLabel; }, 3000 );
-					}
-					if ( navigator.clipboard && navigator.clipboard.writeText ) {
-						navigator.clipboard.writeText( schema ).then( onSuccess ).catch( onFailure );
-					} else {
-						try {
-							var ta = document.createElement( 'textarea' );
-							ta.value = schema; ta.style.position = 'fixed'; ta.style.opacity = '0';
-							document.body.appendChild( ta ); ta.focus(); ta.select();
-							document.execCommand( 'copy' ); document.body.removeChild( ta ); onSuccess();
-						} catch ( e ) { onFailure(); }
-					}
+					return r.ok ? r.json() : Promise.reject( r.status );
+				} )
+				.then( function( data ) {
+					if ( data === null ) { return; }
+					var isInjected = Array.isArray( data.injected ) && data.injected.indexOf( type ) !== -1;
+					replaceAction( row, type, isInjected ? 'remove' : 'insert' );
+				} )
+				.catch( function() {
+					btn.disabled    = false;
+					btn.textContent = origText;
 				} );
 			} );
+
+			function replaceAction( row, type, mode ) {
+				var label = row.querySelector( '.citewp-aiso-mb-schema-label' );
+				row.innerHTML = '';
+				if ( label ) { row.appendChild( label ); }
+
+				if ( 'already' === mode ) {
+					var pill = document.createElement( 'span' );
+					pill.className   = 'citewp-aiso-mb-detected';
+					pill.textContent = <?php echo wp_json_encode( __( 'Already detected', 'citewp-ai-search-optimizer' ) ); ?>;
+					row.appendChild( pill );
+				} else {
+					var btn = document.createElement( 'button' );
+					btn.type      = 'button';
+					btn.className = 'button button-secondary citewp-aiso-schema-btn';
+					btn.dataset.type   = type;
+					btn.dataset.action = 'remove' === mode ? 'remove' : 'inject';
+					btn.textContent    = 'remove' === mode
+						? <?php echo wp_json_encode( __( 'Remove', 'citewp-ai-search-optimizer' ) ); ?>
+						: <?php echo wp_json_encode( __( 'Insert', 'citewp-ai-search-optimizer' ) ); ?>;
+					row.appendChild( btn );
+				}
+			}
 		})();
 		</script>
 		<?php
