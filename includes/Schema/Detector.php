@@ -154,6 +154,35 @@ final class Detector {
 			return $final;
 		}
 
+		// Stored tier: CiteWP-owned head-injected schema.
+		// Consulted when no rendered-page data is available (no tier1/2 cache, nothing
+		// in post_content). Generator guarantees structural validity so article_valid /
+		// faq_valid can be asserted directly from the stored keys.
+		$injector = new HeadInjector();
+		$stored   = $injector->get_stored( $post_id );
+		if ( ! empty( $stored ) ) {
+			$types         = [];
+			$article_valid = false;
+			$faq_valid     = false;
+			if ( isset( $stored['article'] ) ) {
+				$types[]       = 'Article';
+				$article_valid = true;
+			}
+			if ( isset( $stored['faqpage'] ) ) {
+				$types[]   = 'FAQPage';
+				$faq_valid = true;
+			}
+			$final = [
+				'state'         => 'detected',
+				'types'         => $types,
+				'faq_valid'     => $faq_valid,
+				'article_valid' => $article_valid,
+				'source'        => 'stored',
+			];
+			$this->request_cache[ $cache_key ] = $final;
+			return $final;
+		}
+
 		// Cold-start: could not verify, do not credit.
 		$final = [
 			'state'         => 'not_verified',

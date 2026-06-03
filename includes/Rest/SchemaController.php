@@ -188,6 +188,9 @@ final class SchemaController {
 		}
 
 		$this->injector->store( $post_id, $type, $schema );
+		// Clear detection cache so the next Recalculate re-fetches the rendered page
+		// and credits the newly injected schema (mirrors the clear already done on remove).
+		$this->detector->clear_cache( $post_id );
 
 		return new \WP_REST_Response(
 			[ 'injected' => array_keys( $this->injector->get_stored( $post_id ) ) ],
