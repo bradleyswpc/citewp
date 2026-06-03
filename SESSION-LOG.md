@@ -6,6 +6,65 @@
 
 ---
 
+## Session 47 — WP.org 0.7.12 release: EditorPanel head injection (FB69) + schema score fix + accordion signals + bot visits fix ✅
+
+**Date:** 2026-06-02
+
+### Deliverable
+
+WP.org release of **0.7.12** (SVN trunk r3558787, tag `0.7.12` r3558788). Migrates the EditorPanel meta box Schema tab from copy-into-body to head injection (FB69, P67-parity with the Gutenberg sidebar), fixes two bugs discovered during smoke testing (schema score not updating after injection; Bot Visits panel always empty), adds expandable signal-row accordion to the meta box General tab, and pins the right column height to prevent stretching on drawer open.
+
+### What shipped
+
+- **FB69 — EditorPanel head injection (`includes/Admin/EditorPanel.php`):** `render_schema_tab()` now mirrors the Gutenberg sidebar's Insert / Remove / Already-detected states exactly — same `POST /citewp/aiso/v1/schema/<id>/inject` endpoint, same P67-C conflict guard, inline vanilla-JS `fetch()` with `replaceAction()` DOM helper. Copy-to-clipboard path removed per S46 decision (P67(B) mandate: no body-insert fallback).
+- **Bug fix A — schema score stale after injection (`includes/Rest/SchemaController.php`):** `inject_schema()` was not clearing the Detector cache after storing new schema, so the next Recalculate read a stale tier2 result. Added `$this->detector->clear_cache($post_id)` after `$this->injector->store()`, matching the clear already present on remove.
+- **Bug fix B — cold-start not crediting CiteWP-owned schema (`includes/Schema/Detector.php`):** `get_detected_types()` fell through to `not_verified` cold-start when no tier1/2 cache existed and no schema was in post_content — even if CiteWP had stored head-injected schema. Added a "stored tier" before cold-start that reads `HeadInjector::get_stored()` and synthesises `detected` state with `article_valid`/`faq_valid` directly from the stored keys.
+- **Expandable signal rows (`includes/Admin/EditorPanel.php`, `admin/css/citewp-aiso-admin.css`):** Category rows (Structure / Citability / Authority) in the meta box General tab now carry a chevron and expand into a signal drawer on click. Accordion behaviour: only one drawer open at a time. CSS: chevron rotation, drawer fade, signal dot-colours, right column `align-self: start` (prevents column stretching when drawer opens).
+- **Bot Visits query fix (`includes/Admin/EditorPanel.php`):** `query_bot_visits()` was querying `post_id`, `bot_signature`, and `created_at` — none of which exist in `wp_citewp_aiso_crawler_logs`. Rewritten to match via `request_uri` (URI of the current post), alias `bot_name AS bot_signature`, and use `detected_at`. Last-7-days window, top-6 bots, overflow pill.
+- **Plugin Check fixes (`ai-search-optimizer.php`, `includes/Admin/DashboardData.php`):** Plugin Name header synced from "Optimize Content for AI Engines" to "Get Cited by ChatGPT, Perplexity & Claude" (resolves `mismatched_plugin_name` warning — the S46 carryover). Added `PluginCheck.Security.DirectDB.UnescapedDBParameter` to the existing `phpcs:ignore` on `DashboardData.php:83` (false positive; `$sql` uses only `prepare()` placeholders over an `esc_sql()`-sanitised table name).
+- **FB70 backlog entry (`Desktop/CiteWP/Brain/FEATURE-BACKLOG.md`):** Bot Visits panel in the Gutenberg sidebar logged as 0.7.13 candidate. Origin: discovered during 0.7.12 smoke testing.
+
+### Modified
+
+- `includes/Admin/EditorPanel.php` — FB69 schema tab + signal accordion + bot visits query fix
+- `includes/Rest/SchemaController.php` — clear Detector cache on inject (Bug A)
+- `includes/Schema/Detector.php` — stored tier before cold-start (Bug B)
+- `admin/css/citewp-aiso-admin.css` — signal row styles + right column height
+- `ai-search-optimizer.php` — plugin name sync + version 0.7.12
+- `readme.txt` — Stable tag 0.7.12 + changelog
+- `includes/Admin/DashboardData.php` — phpcs:ignore false positive
+
+### Decisions
+
+- **No new DECISIONS.md rows.** FB69 completes P67(B)'s mandate (already logged); no new product decisions. Plugin Check fixes are lint/naming housekeeping.
+
+### Verified
+
+- **Classic Editor test matrix:** Insert Article schema → Recalculate → score updated ✅; Remove → score dropped ✅; Already-detected state fires correctly ✅; signal accordion opens/closes (one at a time) ✅; right column height stable ✅; Bot Visits panel shows data ✅.
+- **Plugin Check (0 real errors after fixes):** `mismatched_plugin_name` resolved; `UnescapedDBParameter` suppressed with documented rationale. Remaining findings: TextDomainMismatch (vanishes in dist), hidden/markdown/app dev files (excluded via `.distignore`), `trademarked_term` "wp" (pre-existing, WP.org-approved). `npm run build` clean ✅.
+- **SVN:** trunk r3558787 (7 files M, 0 added/deleted), tag `0.7.12` r3558788.
+- **Zips:** `citewp-ai-search-optimizer.0.7.12.zip` (WP.org, top-level `citewp-ai-search-optimizer/`) + `ai-search-optimizer.0.7.12.zip` (citewp.com, top-level `ai-search-optimizer/`), both 0.8 MB / 50 files.
+
+### Carryover into Session 48
+
+**Brad-manual:**
+1. **Upload `ai-search-optimizer.0.7.12.zip` to citewp.com** — zip on Desktop (top-level folder `ai-search-optimizer/`), WP Admin → Plugins → Upload → in-place replace.
+2. **Post-release verify** — confirm `wordpress.org/plugins/citewp-ai-search-optimizer/` shows 0.7.12 once WP.org propagates.
+
+**Desktop (Brain) tasks:**
+3. **00-CITEWP-MASTER.md** — bump "Last updated" to 2026-06-02; add Session 47 + 0.7.12 under Shipped; update Next Session.
+4. **FEATURE-BACKLOG.md** — mark FB69 SHIPPED (S47).
+
+**Code (open):**
+5. **FB70** — Bot Visits panel in Gutenberg sidebar (0.7.13 candidate). Requires new REST endpoint `GET /citewp/aiso/v1/crawler/{post_id}/visits` + React `BotVisitsPanel` component.
+6. **FB39** — publish-block Cite Score panel (deferred from S46).
+
+### Next session focus
+
+citewp.com 0.7.12 upload + WP.org propagation verify, then FB70 (sidebar Bot Visits) or FB39 (publish panel).
+
+---
+
 ## Session 46 — WP.org 0.7.11 release: P72 entity-schema scoring + Detected-on-this-page readout ✅
 
 **Date:** 2026-06-02
