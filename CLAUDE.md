@@ -229,7 +229,9 @@ Script handle:
   citewp-aiso-sidebar               → Gutenberg sidebar JS (build/index.js)
 
 Text domain:
-  ai-search-optimizer               → i18n text domain for all translation function calls
+  citewp-ai-search-optimizer        → i18n text domain for all translation function calls
+                                       (equals the WP.org slug — NOT the local dev folder name)
+                                       Plugin Check TextDomainMismatch errors are a known false positive.
 ```
 
 ## Deferred — .claude/ Infrastructure Rebuild

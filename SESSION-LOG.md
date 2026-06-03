@@ -6,6 +6,57 @@
 
 ---
 
+## Session 49 — WP.org 0.7.14 release: revert text-domain regression from 0.7.13 ✅
+
+**Date:** 2026-06-03
+
+### Deliverable
+
+WP.org release of **0.7.14** (SVN trunk r3560015, tag `0.7.14` r3560016). Reverts the text-domain regression introduced in Session 48 / 0.7.13, which incorrectly changed the text domain from `citewp-ai-search-optimizer` to `ai-search-optimizer` across all 12 admin/rest PHP files and the plugin header. `citewp-ai-search-optimizer` IS the correct WP.org distribution slug; `ai-search-optimizer` is only the local dev folder name. The Plugin Check `TextDomainMismatch` errors that triggered the 0.7.13 change are a **known false positive** fired because PC runs against the local folder slug, not the WP.org slug. No functional change in 0.7.14 — FB71 and FB72 (Detector.php) are fully preserved.
+
+### What shipped
+
+- **`git revert f0ae1ef --no-edit` (commit `0373bef`):** Clean reversal of the 0.7.13 text-domain commit — all 318 occurrences of `ai-search-optimizer` text-domain identifiers (2nd arg of i18n functions, `Text Domain:` header, `load_plugin_textdomain()`) restored to `citewp-ai-search-optimizer`. Plugin URI, script/style handles, and other legitimate uses of the string `ai-search-optimizer` were NOT changed (revert only touched the i18n commit).
+- **Guard comment (`ai-search-optimizer.php`):** Separate doc-block comment added below `Text Domain:` explaining that the WP.org slug is `citewp-ai-search-optimizer` and that Plugin Check TextDomainMismatch errors here are a known false positive. Comment placed on its own `*` line (NOT inline on the header value line) to avoid triggering `textdomain_invalid_format`.
+- **Version bump `0.7.13 → 0.7.14`:** `CITEWP_AISO_VERSION` constant and `Stable tag` in readme.txt updated.
+- **`readme.txt` changelog entry:** `= 0.7.14 =` entry added.
+
+### Modified
+
+- `ai-search-optimizer.php` — Text Domain header restored + version 0.7.14 + guard comment
+- `includes/Admin/DashboardData.php`, `DashboardWidget.php`, `EditorPanel.php`, `LogsPage.php`, `LogsTable.php`, `Menu.php`, `PostListColumn.php`, `RecommendationFilter.php`, `ScoreDial.php` — text domain restored to `citewp-ai-search-optimizer`
+- `includes/Rest/SchemaController.php`, `ScoreController.php` — text domain restored
+- `includes/Settings/Page.php` — text domain restored
+- `readme.txt` — Stable tag 0.7.14 + changelog
+
+### Decisions
+
+- **Text domain is `citewp-ai-search-optimizer`, always.** This equals the WP.org distribution slug. The local dev folder (`ai-search-optimizer/`) is different — Plugin Check compares against the folder slug, producing false positives. Guard comment in the plugin header documents this permanently. See also CLAUDE.md Quick Reference.
+- **Do NOT act on `TextDomainMismatch` errors** from Plugin Check when the domain is `citewp-ai-search-optimizer`. They are structural false positives in this project.
+
+### Verified
+
+- **Grep check:** Zero occurrences of `'ai-search-optimizer'` as a text-domain argument in `includes/` after revert.
+- **Plugin Check:** Only `WordPress.WP.I18n.TextDomainMismatch` errors remain (expected false positive, 343 rows all same code). Zero other error codes. Confirmed `textdomain_invalid_format` was eliminated by moving guard comment to a separate line.
+- **SVN:** trunk r3560015 (14 files M), tag `0.7.14` r3560016.
+
+### Carryover into Session 50
+
+**Brad-manual:**
+1. Upload `ai-search-optimizer.0.7.14.zip` (on Desktop) to citewp.com.
+2. Post-release verify — confirm `wordpress.org/plugins/citewp-ai-search-optimizer/` shows 0.7.14 once WP.org propagates.
+
+**Desktop (Brain) tasks:**
+3. **00-CITEWP-MASTER.md** — bump "Last updated"; add Session 49 + 0.7.14 under Shipped; update Next Session.
+4. **FEATURE-BACKLOG.md** — no new backlog items this session.
+5. **DECISIONS.md** — add entry: text domain = `citewp-ai-search-optimizer` (WP.org slug); PC TextDomainMismatch = known false positive; do not act on it.
+
+**Code (open):**
+6. **FB70** — Bot Visits panel in Gutenberg sidebar (deferred). Requires new REST endpoint `GET /citewp/aiso/v1/crawler/{post_id}/visits` + React `BotVisitsPanel` component.
+7. **CLAUDE.md Quick Reference** — `Text domain:` entry says `ai-search-optimizer`; should be corrected to `citewp-ai-search-optimizer`.
+
+---
+
 ## Session 48 — WP.org 0.7.13 release: nested FAQPage detection (FB71) + loopback guard (FB72) + text domain fix ✅
 
 **Date:** 2026-06-03
