@@ -182,8 +182,16 @@ final class EditorPanel {
 		$data       = $repo->get( $post->ID );
 		$total      = isset( $data['total'] ) ? (int) $data['total'] : null;
 		$grade      = isset( $data['grade'] ) && is_string( $data['grade'] ) ? $data['grade'] : 'red';
-		$categories = isset( $data['categories'] ) && is_array( $data['categories'] ) ? $data['categories'] : [];
-		$scored_at  = get_post_meta( $post->ID, Repository::META_KEY_TIME, true );
+		$categories     = isset( $data['categories'] ) && is_array( $data['categories'] ) ? $data['categories'] : [];
+		$scored_at      = get_post_meta( $post->ID, Repository::META_KEY_TIME, true );
+		$signals_by_cat = [];
+		if ( isset( $data['signals'] ) && is_array( $data['signals'] ) ) {
+			foreach ( $data['signals'] as $sig ) {
+				if ( is_array( $sig ) && isset( $sig['category'] ) && $sig['category'] !== '' ) {
+					$signals_by_cat[ $sig['category'] ][] = $sig;
+				}
+			}
+		}
 		$nonce      = wp_create_nonce( 'wp_rest' );
 		$recalc_url = rest_url( 'citewp/aiso/v1/score/' . $post->ID . '/recalculate' );
 		$content_id = 'citewp-ep-general-' . $post->ID;
@@ -202,17 +210,20 @@ final class EditorPanel {
 							</div>
 							<?php if ( ! empty( $categories ) ) : ?>
 								<div class="citewp-aiso-mb-categories">
-									<?php foreach ( $categories as $cat ) : ?>
+									<?php foreach ( $categories as $cat_key => $cat ) : ?>
 										<?php
 										if ( ! is_array( $cat ) ) {
 											continue;
 										}
-										$score = (int) ( $cat['score'] ?? 0 );
-										$max   = (int) ( $cat['max'] ?? 0 );
-										$pct   = $max > 0 ? (int) round( ( $score / $max ) * 100 ) : 0;
-									$grade_cat = $pct >= 80 ? 'green' : ( $pct >= 60 ? 'yellow' : ( $pct >= 40 ? 'orange' : 'red' ) );
+										$score     = (int) ( $cat['score'] ?? 0 );
+										$max       = (int) ( $cat['max'] ?? 0 );
+										$pct       = $max > 0 ? (int) round( ( $score / $max ) * 100 ) : 0;
+										$grade_cat = $pct >= 80 ? 'green' : ( $pct >= 60 ? 'yellow' : ( $pct >= 40 ? 'orange' : 'red' ) );
+										$cat_sigs  = $signals_by_cat[ $cat_key ] ?? [];
 										?>
-										<div class="citewp-aiso-mb-cat-row">
+										<div class="citewp-aiso-mb-cat-row citewp-aiso-mb-cat-row--toggle"
+										     data-cat="<?php echo esc_attr( $cat_key ); ?>">
+											<span class="citewp-aiso-mb-cat-chevron">&#9654;</span>
 											<span class="citewp-aiso-mb-cat-label">
 												<?php echo esc_html( (string) ( $cat['label'] ?? '' ) ); ?>
 											</span>
@@ -224,6 +235,23 @@ final class EditorPanel {
 												<?php echo esc_html( $score . '/' . $max ); ?>
 											</span>
 										</div>
+										<?php if ( ! empty( $cat_sigs ) ) : ?>
+										<div class="citewp-aiso-mb-cat-signals"
+										     data-cat-signals="<?php echo esc_attr( $cat_key ); ?>"
+										     style="display:none;">
+											<?php foreach ( $cat_sigs as $sig ) : ?>
+												<?php if ( ! is_array( $sig ) ) { continue; } ?>
+												<div class="citewp-aiso-mb-signal-row">
+													<span class="citewp-aiso-mb-signal-dot citewp-aiso-mb-signal-dot--<?php echo esc_attr( $sig['status'] ?? 'fail' ); ?>"></span>
+													<span class="citewp-aiso-mb-signal-label"><?php echo esc_html( (string) ( $sig['label'] ?? '' ) ); ?></span>
+													<span class="citewp-aiso-mb-signal-score"><?php echo esc_html( (int) ( $sig['score'] ?? 0 ) . '/' . (int) ( $sig['max'] ?? 0 ) ); ?></span>
+												</div>
+												<?php if ( ! empty( $sig['recommendation'] ) && (int) ( $sig['score'] ?? 0 ) < (int) ( $sig['max'] ?? 0 ) ) : ?>
+												<p class="citewp-aiso-mb-signal-rec"><?php echo esc_html( (string) $sig['recommendation'] ); ?></p>
+												<?php endif; ?>
+											<?php endforeach; ?>
+										</div>
+										<?php endif; ?>
 									<?php endforeach; ?>
 								</div>
 							<?php endif; ?>
@@ -282,6 +310,38 @@ final class EditorPanel {
 			var contEl = wrap.querySelector( '.citewp-aiso-mb-content' );
 			if ( ! btn || ! errEl ) { return; }
 
+			function attachToggles( container ) {
+				container.querySelectorAll( '.citewp-aiso-mb-cat-row--toggle' ).forEach( function( row ) {
+					row.addEventListener( 'click', function() {
+						var cat    = row.dataset.cat;
+						var drawer = container.querySelector( '[data-cat-signals="' + cat + '"]' );
+						if ( ! drawer ) { return; }
+						var open = row.classList.toggle( 'is-open' );
+						drawer.style.display = open ? 'block' : 'none';
+					} );
+				} );
+			}
+
+			function buildSignalRows( signals, catKey ) {
+				var catSigs = signals.filter( function( s ) { return s.category === catKey; } );
+				if ( ! catSigs.length ) { return ''; }
+				var h = '<div class="citewp-aiso-mb-cat-signals" data-cat-signals="' + esc( catKey ) + '" style="display:none;">';
+				catSigs.forEach( function( sig ) {
+					h += '<div class="citewp-aiso-mb-signal-row">'
+					   + '<span class="citewp-aiso-mb-signal-dot citewp-aiso-mb-signal-dot--' + esc( sig.status || 'fail' ) + '"></span>'
+					   + '<span class="citewp-aiso-mb-signal-label">' + esc( sig.label || '' ) + '</span>'
+					   + '<span class="citewp-aiso-mb-signal-score">' + esc( String( sig.score || 0 ) ) + '/' + esc( String( sig.max || 0 ) ) + '</span>'
+					   + '</div>';
+					if ( sig.recommendation && ( sig.score || 0 ) < ( sig.max || 0 ) ) {
+						h += '<p class="citewp-aiso-mb-signal-rec">' + esc( sig.recommendation ) + '</p>';
+					}
+				} );
+				h += '</div>';
+				return h;
+			}
+
+			if ( contEl ) { attachToggles( contEl ); }
+
 			btn.addEventListener( 'click', function() {
 				var origText = btn.textContent;
 				btn.disabled    = true;
@@ -297,6 +357,7 @@ final class EditorPanel {
 					var grade = data.grade || 'red';
 					var total = data.total || 0;
 					var cats  = data.categories || {};
+					var sigs  = data.signals    || [];
 					var html  = '<div class="citewp-aiso-mb-score">'
 					          + '<span class="citewp-aiso-mb-badge citewp-aiso-mb-badge--' + esc(grade) + '">' + esc(String(total)) + '</span>'
 					          + '<span class="citewp-aiso-mb-total-label"> / 100</span>'
@@ -308,18 +369,23 @@ final class EditorPanel {
 								var score = cats[k].score ?? 0;
 								var max   = cats[k].max   ?? 0;
 								var pct   = max ? Math.round( ( score / max ) * 100 ) : 0;
-								var grade_cat = pct >= 80 ? 'green' : pct >= 60 ? 'yellow' : pct >= 40 ? 'orange' : 'red';
-								html += '<div class="citewp-aiso-mb-cat-row">'
+								var gc    = pct >= 80 ? 'green' : pct >= 60 ? 'yellow' : pct >= 40 ? 'orange' : 'red';
+								html += '<div class="citewp-aiso-mb-cat-row citewp-aiso-mb-cat-row--toggle" data-cat="' + esc(k) + '">'
+								      + '<span class="citewp-aiso-mb-cat-chevron">&#9654;</span>'
 								      + '<span class="citewp-aiso-mb-cat-label">' + esc( cats[k].label ?? '' ) + '</span>'
-								      + '<div class="citewp-aiso-mb-cat-bar-wrap"><div class="citewp-aiso-mb-cat-bar-fill citewp-aiso-mb-cat-bar-fill--' + esc(grade_cat) + '" style="width:' + pct + '%"></div></div>'
+								      + '<div class="citewp-aiso-mb-cat-bar-wrap"><div class="citewp-aiso-mb-cat-bar-fill citewp-aiso-mb-cat-bar-fill--' + esc(gc) + '" style="width:' + pct + '%"></div></div>'
 								      + '<span class="citewp-aiso-mb-cat-score">' + esc( String(score) ) + '/' + esc( String(max) ) + '</span>'
-								      + '</div>';
+								      + '</div>'
+								      + buildSignalRows( sigs, k );
 							}
 						} );
 						html += '</div>';
 					}
 					html += '<p class="citewp-aiso-mb-time">' + <?php echo wp_json_encode( __( 'Scored just now', 'citewp-ai-search-optimizer' ) ); ?> + '</p>';
-					if ( contEl ) { contEl.innerHTML = html; }
+					if ( contEl ) {
+						contEl.innerHTML = html;
+						attachToggles( contEl );
+					}
 					btn.disabled    = false;
 					btn.textContent = origText;
 				} )
