@@ -16,8 +16,5 @@ package-lock.json
 package.ps1
 src/
 tests/
-smoke-*.png
-plugin-check-*.png
-cite-score-*.png
-s31-*.png
+*.png
 *.md
