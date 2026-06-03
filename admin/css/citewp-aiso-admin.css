@@ -3524,6 +3524,7 @@
 #citewp_aiso_editor_panel .citewp-aiso-ep-col-right {
 	border-left: 1px solid var(--citewp-border);
 	padding-left: 24px;
+	align-self: start;
 	display: flex;
 	flex-direction: column;
 }
