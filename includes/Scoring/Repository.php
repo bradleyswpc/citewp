@@ -28,11 +28,24 @@ final class Repository {
 
 	private Engine $engine;
 
+	/**
+	 * Post IDs already scored during this request, so save_post and
+	 * transition_post_status don't double-score the same publish.
+	 *
+	 * @var array<int, true>
+	 */
+	private array $processed = [];
+
 	public function __construct( ?Engine $engine = null, ?Detector $detector = null ) {
 		$this->engine = $engine ?? new Engine( $detector ?? new Detector() );
 	}
 
 	public function register(): void {
+		// Score when a post enters 'publish' via any path — including importers and
+		// bulk publishes that never fire save_post. Runs before save_post (priority
+		// 20) inside wp_insert_post, and the $processed guard stops the duplicate.
+		add_action( 'transition_post_status', [ $this, 'on_transition' ], 20, 3 );
+
 		// Recalculate when a post is saved (publish or update).
 		add_action( 'save_post', [ $this, 'on_save_post' ], 20, 3 );
 
@@ -51,6 +64,9 @@ final class Repository {
 		if ( ! $post || ! in_array( $post->post_type, $this->scorable_types(), true ) ) {
 			return null;
 		}
+
+		// Mark handled so the companion hook on this same publish skips it.
+		$this->processed[ $post_id ] = true;
 
 		$result = $this->engine->score( $post, $explicit_recalculate );
 		$this->save( $post_id, $result );
@@ -74,6 +90,9 @@ final class Repository {
 		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
 			return;
 		}
+		if ( isset( $this->processed[ $post_id ] ) ) {
+			return;
+		}
 		if ( ! in_array( $post->post_type, $this->scorable_types(), true ) ) {
 			return;
 		}
@@ -85,9 +104,34 @@ final class Repository {
 	}
 
 	/**
+	 * Score posts that cross into 'publish' through code paths that skip save_post
+	 * (e.g. importers, programmatic wp_insert_post, bulk-edit publish).
+	 *
+	 * @param string   $new_status
+	 * @param string   $old_status
+	 * @param \WP_Post $post
+	 */
+	public function on_transition( string $new_status, string $old_status, \WP_Post $post ): void {
+		if ( $new_status !== 'publish' || $new_status === $old_status ) {
+			return;
+		}
+		if ( isset( $this->processed[ $post->ID ] ) ) {
+			return;
+		}
+		if ( ! in_array( $post->post_type, $this->scorable_types(), true ) ) {
+			return;
+		}
+		if ( wp_is_post_autosave( $post->ID ) || wp_is_post_revision( $post->ID ) ) {
+			return;
+		}
+
+		$this->recalculate( $post->ID );
+	}
+
+	/**
 	 * @return string[]
 	 */
-	private function scorable_types(): array {
+	public function scorable_types(): array {
 		/**
 		 * Filter which post types are scored.
 		 *

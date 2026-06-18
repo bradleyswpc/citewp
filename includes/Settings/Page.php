@@ -12,6 +12,7 @@ namespace CiteWP\Aiso\Settings;
 use CiteWP\Aiso\Admin\IconLibrary;
 use CiteWP\Aiso\Admin\Menu;
 use CiteWP\Aiso\Llms\Cache;
+use CiteWP\Aiso\Scoring\Backfill;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -24,6 +25,7 @@ final class Page {
 	public function register(): void {
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 		add_action( 'admin_post_citewp_aiso_regenerate_llms', [ $this, 'handle_regenerate' ] );
+		add_action( 'admin_post_citewp_aiso_backfill_scores', [ $this, 'handle_backfill' ] );
 	}
 
 	public function register_settings(): void {
@@ -106,6 +108,27 @@ final class Page {
 		exit;
 	}
 
+	public function handle_backfill(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Insufficient permissions.', 'citewp-ai-search-optimizer' ) );
+		}
+		check_admin_referer( 'citewp_aiso_backfill_scores' );
+
+		$queued = ( new Backfill() )->start();
+
+		wp_safe_redirect(
+			add_query_arg(
+				[
+					'page'           => Menu::SLUG_PARENT,
+					'backfilled'     => (string) $queued,
+					'citewp_section' => 'settings',
+				],
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -164,6 +187,30 @@ final class Page {
 
 		<?php if ( sanitize_key( wp_unslash( $_GET['regenerated'] ?? '' ) ) === '1' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification. ?>
 			<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'llms.txt cache cleared. The next request will regenerate from scratch.', 'citewp-ai-search-optimizer' ); ?></p></div>
+		<?php endif; ?>
+
+		<?php if ( isset( $_GET['backfilled'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag set by this plugin after safe redirect; no data modification.
+			$backfilled = absint( wp_unslash( $_GET['backfilled'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+			<div class="notice notice-success is-dismissible"><p>
+				<?php
+				if ( $backfilled > 0 ) {
+					echo esc_html(
+						sprintf(
+							/* translators: %d: number of posts queued for scoring */
+							_n(
+								'Scoring %d unscored post in the background. Counts update as it runs.',
+								'Scoring %d unscored posts in the background. Counts update as it runs.',
+								$backfilled,
+								'citewp-ai-search-optimizer'
+							),
+							$backfilled
+						)
+					);
+				} else {
+					esc_html_e( 'All published posts and pages are already scored.', 'citewp-ai-search-optimizer' );
+				}
+				?>
+			</p></div>
 		<?php endif; ?>
 
 		<?php if ( sanitize_key( wp_unslash( $_GET['settings-updated'] ?? '' ) ) !== '' ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Standard WP options-saved flag; no data modification. ?>
@@ -346,6 +393,40 @@ final class Page {
 									><?php esc_html_e( 'Regenerate now →', 'citewp-ai-search-optimizer' ); ?></button>
 								</div>
 							</div>
+							<?php $unscored = ( new Backfill() )->pending_count(); ?>
+							<div class="citewp-aiso-fscard__row">
+								<div class="citewp-aiso-fscard__left">
+									<p class="citewp-aiso-fscard__field-title"><?php esc_html_e( 'Score all content', 'citewp-ai-search-optimizer' ); ?></p>
+									<p class="citewp-aiso-fscard__field-desc">
+										<?php
+										if ( $unscored > 0 ) {
+											echo esc_html(
+												sprintf(
+													/* translators: %d: number of unscored posts */
+													_n(
+														'%d published post has no Cite Score yet. Score it so it counts on the dashboard.',
+														'%d published posts have no Cite Score yet. Score them so they count on the dashboard.',
+														$unscored,
+														'citewp-ai-search-optimizer'
+													),
+													$unscored
+												)
+											);
+										} else {
+											esc_html_e( 'Every published post and page is already scored.', 'citewp-ai-search-optimizer' );
+										}
+										?>
+									</p>
+								</div>
+								<div class="citewp-aiso-fscard__right">
+									<button
+										type="submit"
+										form="citewp-aiso-backfill-form"
+										class="citewp-aiso-fscard__btn"
+										<?php disabled( 0, $unscored ); ?>
+									><?php esc_html_e( 'Score all now →', 'citewp-ai-search-optimizer' ); ?></button>
+								</div>
+							</div>
 						</div>
 
 						<?php do_action( 'citewp_aiso/settings/panel/general' ); ?>
@@ -381,6 +462,12 @@ final class Page {
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="citewp-aiso-regenerate-form">
 					<input type="hidden" name="action" value="citewp_aiso_regenerate_llms" />
 					<?php wp_nonce_field( 'citewp_aiso_regenerate_llms' ); ?>
+				</form>
+
+				<!-- Backfill form (outside main form to avoid nesting) -->
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" id="citewp-aiso-backfill-form">
+					<input type="hidden" name="action" value="citewp_aiso_backfill_scores" />
+					<?php wp_nonce_field( 'citewp_aiso_backfill_scores' ); ?>
 				</form>
 
 		</div><!-- .citewp-aiso-page-body -->

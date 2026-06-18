@@ -136,7 +136,11 @@ Yes to both. Cite Score and llms.txt work with any post type, including WooComme
 == Changelog ==
 
 = 0.7.15 =
-* Update: Refreshed the listing — clearer Free feature descriptions and a reordered FAQ. No functional change.
+* New: "Score all content" — backfill Cite Scores for published posts and pages that were never scored (content predating the plugin, or bulk-imported content). Run it from Settings → Maintenance, or via WP-CLI with `wp citewp-aiso backfill`. It scores in background batches so large sites don't time out.
+* New: Content is now scored automatically whenever it is published through any path — including importers and bulk publishing — not only when a post is opened and saved in the editor.
+* New: llms.txt include/exclude toggle column on the All Posts and All Pages screens. Defaults to on; flip a post in or out of llms.txt without opening it.
+* Improvement: The dashboard "Indexed Pages" count now reflects all published content once scored, matching what /llms.txt actually contains.
+* Update: Refreshed the listing — clearer Free feature descriptions and a reordered FAQ.
 
 = 0.7.14 =
 * Fix: Restored the correct text domain (citewp-ai-search-optimizer) after a 0.7.13 regression. No functional change.

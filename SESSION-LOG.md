@@ -6,6 +6,63 @@
 
 ---
 
+## Session 50 — WP.org 0.7.15 release: bulk backfill scoring, score-on-publish, llms.txt toggle column ✅
+
+**Date:** 2026-06-18
+
+### Deliverable
+
+WP.org release of **0.7.15** (SVN trunk + tag `0.7.15` r3577689; changelog-fix r3577709). Fixes the root cause reported on hhlnorthwest.com: content only appeared in `/llms.txt` and counted on the dashboard "Indexed Pages" card after a post was opened and saved in the editor. Root cause: scores live in post meta written only on `save_post`, so content predating the plugin (or bulk-imported) was never scored, while `/llms.txt` selects published content directly via `ContentSelector` — two different sources of truth. Adds background backfill scoring, score-on-publish for any publish path, and a per-post llms.txt toggle on the list screens.
+
+### What shipped
+
+- **`includes/Scoring/Backfill.php` (NEW):** Batch-scores published posts/pages missing `_citewp_aiso_geo_score_total`. Chained `wp_schedule_single_event` chunks of 20 (no request timeout). Progress in `citewp_aiso_backfill_state` option. Methods: `unscored_ids`, `pending_count`, `start`, `run_batch`, `cancel`, `state`. Calls existing scorer only — Engine untouched (NO-TOUCH respected).
+- **`includes/CLI/ScoreCommand.php` (NEW):** `wp citewp-aiso backfill` (+`--dry-run`), synchronous with progress bar. Lazy-loaded only under WP-CLI.
+- **Score-on-publish (`includes/Scoring/Repository.php`):** New `transition_post_status` handler scores content entering `publish` via importers/bulk/programmatic paths that skip `save_post`. Per-request `$processed[]` guard dedupes so editor publishes don't double-score. `scorable_types()` made public for Backfill reuse.
+- **llms.txt toggle column (`includes/Admin/PostListColumn.php`):** New "llms.txt" column on All Posts/All Pages with an accessible AJAX on/off switch (default on = absence of `_citewp_aiso_exclude_from_llms`). `wp_ajax_citewp_aiso_toggle_llms` handler: per-post nonce + `edit_post` cap. Flushes llms cache directly (the include path uses `delete_post_meta`, which fires `deleted_post_meta` — not the add/update hooks `Llms\Cache` listens to). Inline vanilla JS in footer (edit screen only) — no React build.
+- **"Score all content" admin button (`includes/Settings/Page.php`):** Maintenance card row with live unscored count, `admin_post_citewp_aiso_backfill_scores` handler (cap + nonce + redirect), success notice.
+- **Plugin wiring (`includes/Plugin.php`):** boot registers Backfill cron + CLI command; activate runs `Backfill::start()`; deactivate runs `Backfill::cancel()`.
+- **Version bump 0.7.14 → 0.7.15** (header + `CITEWP_AISO_VERSION` + readme Stable tag) and `= 0.7.15 =` changelog entry.
+
+### Modified
+
+- `ai-search-optimizer.php` — version 0.7.15
+- `includes/Scoring/Repository.php` — transition_post_status handler + processed-guard + public scorable_types()
+- `includes/Admin/PostListColumn.php` — llms.txt toggle column + AJAX + JS/CSS
+- `includes/Settings/Page.php` — Score-all button + handler + notice
+- `includes/Plugin.php` — Backfill + CLI wiring, activate/deactivate hooks
+- `readme.txt` — Stable tag 0.7.15 + changelog
+
+### Decisions
+
+- **Version-numbering policy (X31):** Never skip a public version number, and never burn one on a no-op. 0.7.15 had been pre-staged as a "listing refresh, no functional change" entry but never shipped to WP.org (live was 0.7.14), so this session's features were folded INTO 0.7.15 rather than bumping to 0.7.16. A throwaway 0.7.16 changelog block was mistakenly committed first (the rejected edit landed) and removed in r3577709.
+- **Two-build distribution reaffirmed (X23/X24):** WP.org build = slug `citewp-ai-search-optimizer` (auto-updating, client sites); citewp.com build = slug `ai-search-optimizer` (manual upload only). Built from one source via `package.ps1` (default slug vs `-Slug`). Client sites pull WP.org updates; the slug difference is by design, not a bug.
+
+### Verified
+
+- **PHP lint:** `php -l` clean on all new/changed files (LocalWP PHP 8.2.30).
+- **debug.log:** no errors/warnings from any new code (only pre-existing SAVEQUERIES dumps + an unrelated Rank Math i18n notice).
+- **Text domain:** all added i18n strings use `citewp-ai-search-optimizer` (12 in PostListColumn, plus Settings additions); only non-domain literal is the CLI command name `citewp-aiso`. No repeat of the 0.7.13 regression.
+- **SVN remote (svn cat):** trunk Stable tag 0.7.15, trunk + tag main-file Version 0.7.15, tag folder present. No JS build needed (toggle is inline JS).
+- **Both zips:** 52 files, clean (no PNG/MD/src/docs), `build/index.js` present, no 0.7.16 changelog dupe.
+
+### Carryover into Session 51
+
+**Brad-manual:**
+1. Upload `ai-search-optimizer.0.7.15.zip` to citewp.com (manual).
+2. Mortgage + medical sites: wp.org `update-check` API was lagging its `info` API after the tag commit — update to 0.7.15 appears on its own in ~1–2h, or upload `citewp-ai-search-optimizer.0.7.15.zip` (Plugins → Add New → Upload → Replace) to push now.
+3. Optional: delete the stale `citewp-ai-search-optimizer/` 0.7.7 folder in `wp-content/plugins/` (dead pre-script artifact).
+
+**Desktop (Brain) tasks:**
+4. DECISIONS.md — add X31 (version-numbering policy) [done this session if committed].
+5. 00-CITEWP-MASTER.md — bump Last updated; Current status → 0.7.15 live; next session.
+
+**Code (open, carried):**
+6. FB70 — Bot Visits panel in Gutenberg sidebar (still deferred).
+7. CLAUDE.md coherence rule (carried from S49) — still undrafted.
+
+---
+
 ## Session 49 — WP.org 0.7.14 release: revert text-domain regression from 0.7.13 ✅
 
 **Date:** 2026-06-03

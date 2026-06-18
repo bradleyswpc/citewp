@@ -63,6 +63,19 @@ final class Plugin {
 		);
 		$this->modules['scoring_repository']->register();
 
+		// Backfill: cron-driven scoring of content that predates activation or was
+		// imported via paths that skip save_post. Cron callback must be registered
+		// on every request so WP-Cron can fire it.
+		$this->modules['scoring_backfill'] = new Scoring\Backfill(
+			$this->modules['scoring_repository']
+		);
+		$this->modules['scoring_backfill']->register();
+
+		// WP-CLI: `wp citewp-aiso backfill`.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			\WP_CLI::add_command( 'citewp-aiso', CLI\ScoreCommand::class );
+		}
+
 		// REST API for score retrieval (Gutenberg sidebar + post list).
 		$this->modules['rest_score_controller'] = new Rest\ScoreController();
 		$this->modules['rest_score_controller']->register();
@@ -161,6 +174,10 @@ final class Plugin {
 		// Register llms.txt rewrite rules and flush so /llms.txt resolves immediately.
 		Llms\Router::flush_rewrite_rules_on_activation();
 		( new Scoring\ScoreHistory() )->schedule();
+
+		// Score any pre-existing published content in the background so dashboard
+		// counts and llms.txt agree from the start.
+		( new Scoring\Backfill() )->start();
 	}
 
 	/**
@@ -169,6 +186,7 @@ final class Plugin {
 	public static function deactivate(): void {
 		flush_rewrite_rules();
 		( new Scoring\ScoreHistory() )->unschedule();
+		( new Scoring\Backfill() )->cancel();
 	}
 
 	public function module( string $key ): ?object {
