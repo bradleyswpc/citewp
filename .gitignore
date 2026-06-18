@@ -41,3 +41,7 @@ wp-cli.local.yml
 
 # Superpowers framework runtime state
 .superpowers/
+
+# Session screenshots dropped at repo root (smoke tests, Plugin Check captures, etc.)
+# Root-anchored: assets/ banners+icons and .playwright-mcp/ are unaffected.
+/*.png
