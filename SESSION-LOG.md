@@ -6,6 +6,65 @@
 
 ---
 
+## Session 51 — WordPress 7.1 compatibility pass (Tested up to 7.1) ✅
+
+**Date:** 2026-09-23
+
+### Deliverable
+
+Verify 0.7.15 against WordPress 7.1 (shipped 2026-08-19; 7.1.1 security release 2026-09-17) and bump the listing's `Tested up to` from 7.0 to 7.1 so 7.1 users stop seeing the "untested with your version" warning. **No plugin code changes were required.**
+
+### What was checked
+
+- **Static audit vs. the 7.1 Field Guide / dev notes:** no jQuery UI usage (jQuery UI bumped to 1.14.2); no `__next40pxDefaultSize` (hard-deprecated); sidebar already imports `PluginSidebar` / `PluginSidebarMoreMenuItem` / `PluginDocumentSettingPanel` from `@wordpress/editor` (built bundle references `wp.editor`, deps list `wp-editor` not `wp-edit-post`); no blocks registered, so Block API v3 / iframed-canvas enforcement doesn't apply; no global `document`/`window` reaches into the editor canvas; Classic meta box is already suppressed on block-editor screens (`get_current_screen()->is_block_editor()`), so the "iframe even with legacy meta boxes" change is moot. Persistent-toolbar change only affects toolbar nodes in the editor (we add none).
+- **LocalWP `citewp-dev` upgraded 7.0 → 7.1.1** via WP-CLI (`wp core update --version=7.1.1`; DB dumped to the session scratchpad first; `update-db` already current at 61833).
+- **Headless admin render as administrator on 7.1.1** (`wp eval-file`, admin modules booted manually because `is_admin()` is false under CLI): `Menu::render_page` (Dashboard + Cite Score), `LogsPage::render`, `Settings\Page::render`, `DashboardWidget::render`, `EditorPanel::render`, `PostListColumn::render_column` (score + llms.txt columns) — all OK, **0 PHP notices/warnings**.
+- **REST:** `POST /citewp/aiso/v1/score/{id}/recalculate` 200, `GET /score/{id}` 200 (internal `rest_do_request` as admin).
+- **Crawler detection:** GPTBot UA hit on `/` → new row in `wp_citewp_aiso_crawler_logs` (`bot_name=GPTBot`).
+- **llms.txt:** `/llms.txt` + `/llms-full.txt` serve 200 (after WP's canonical trailing-slash 301 — see FB74).
+- **`wp citewp-aiso backfill --dry-run`:** OK. **Plugin Check (CLI, 1.9.0):** no new findings (only the known dev-folder items: dotfiles, `.claude/hooks`, `tests/`, TextDomainMismatch false positive per X30).
+- **`debug.log`:** nothing new after the full pass.
+- **Browser (Brad, WP 7.1.1):** block-editor sidebar opens, Recalculate works, Schema Suggestions + AI Visibility panels render; Classic Editor meta box renders. Console: no errors. The `wp.editPost.PluginSidebar/PluginSidebarMoreMenuItem/PluginMoreMenuItem is deprecated since 6.6` warnings are **Rank Math's** (we never use `PluginMoreMenuItem`; our bundle has zero `wp.editPost` references). `rank-math-content-ai-page-css was added to the iframe incorrectly` is likewise Rank Math.
+
+### Modified
+
+- `readme.txt` — `Tested up to: 7.0` → `7.1`. GitHub `43ba196`, pushed to `main`.
+- No version bump (X31: never burn a version on a no-op).
+
+### WP.org SVN — Brad-manual (Code's `svn commit` blocked by the permission classifier)
+
+Working copies are already staged with the one-line change. Run from PowerShell (any directory):
+
+```powershell
+svn commit -m "Tested up to 7.1 (verified 0.7.15 on WordPress 7.1.1, no code changes)" "C:\Users\KingpinBWP\Desktop\citewp-svn-trunk\readme.txt"
+svn checkout --depth files https://plugins.svn.wordpress.org/citewp-ai-search-optimizer/tags/0.7.15 "$env:TEMP\citewp-tag-0.7.15"
+(Get-Content "$env:TEMP\citewp-tag-0.7.15\readme.txt") -replace '^Tested up to: 7\.0$', 'Tested up to: 7.1' | Set-Content "$env:TEMP\citewp-tag-0.7.15\readme.txt"
+svn commit -m "Tested up to 7.1 in 0.7.15 tag readme (verified on WordPress 7.1.1, no code changes)" "$env:TEMP\citewp-tag-0.7.15\readme.txt"
+svn cat https://plugins.svn.wordpress.org/citewp-ai-search-optimizer/tags/0.7.15/readme.txt | Select-String "Tested up to"
+```
+
+Both trunk and the stable tag need it — WP.org reads the header from the stable tag's readme.
+
+### Observations (no action this session)
+
+- **FB74 (new):** `/llms.txt` returns a 301 to `/llms.txt/` before the 200 — WordPress `redirect_canonical` trailing-slash behaviour on our rewrite rule. Pre-existing (citewp.com and hhlnorthwest.com on the WP.org build do the same); not a 7.1 change. AI crawlers pay an extra hop; some may not follow. Fix candidate: filter `redirect_canonical` to skip when our query var is set.
+- Local admin UI verification for future sessions cannot go through the browser from Code (no Chrome extension connection, Playwright rejects the LocalWP self-signed cert, cookie generation via WP-CLI is classifier-blocked). The headless render script pattern used here is the fallback.
+
+### Carryover into Session 52
+
+**Brad-manual:**
+1. Run the SVN commands above (trunk + tag 0.7.15 readme).
+2. Upload `ai-search-optimizer.0.7.15.zip` (on Desktop) to citewp.com (carried from S50).
+3. Optional: delete the stale `citewp-ai-search-optimizer/` 0.7.7 folder in `wp-content/plugins/` on citewp-dev (X6: Brad-manual).
+
+**Code (open, carried):**
+4. FB70 — Bot Visits panel in Gutenberg sidebar.
+5. FB39 — publish-block Cite Score panel.
+6. CLAUDE.md coherence rule (carried since S49) — still undrafted.
+7. FB74 — llms.txt trailing-slash canonical redirect (small; bundle into next release).
+
+---
+
 ## Session 50 — WP.org 0.7.15 release: bulk backfill scoring, score-on-publish, llms.txt toggle column ✅
 
 **Date:** 2026-06-18
