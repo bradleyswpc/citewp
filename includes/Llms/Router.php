@@ -33,6 +33,26 @@ final class Router {
 		add_action( 'init', [ $this, 'add_rewrite_rules' ] );
 		add_filter( 'query_vars', [ $this, 'register_query_var' ] );
 		add_action( 'template_redirect', [ $this, 'maybe_serve' ] );
+		add_filter( 'redirect_canonical', [ $this, 'skip_canonical_redirect' ] );
+	}
+
+	/**
+	 * Prevent WordPress from 301-ing /llms.txt to /llms.txt/ (FB74).
+	 *
+	 * redirect_canonical() runs on template_redirect before maybe_serve() and,
+	 * when the permalink structure ends in a slash, appends one to any rewrite
+	 * match. Crawlers then pay an extra hop (or give up). Return false for our
+	 * query var so the file is served directly at the requested URL.
+	 *
+	 * @param string|false $redirect_url Canonical URL WP intends to redirect to.
+	 * @return string|false
+	 */
+	public function skip_canonical_redirect( $redirect_url ) {
+		$flag = get_query_var( self::QUERY_VAR );
+		if ( $flag === 'short' || $flag === 'full' ) {
+			return false;
+		}
+		return $redirect_url;
 	}
 
 	public function add_rewrite_rules(): void {
