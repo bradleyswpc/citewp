@@ -2,7 +2,7 @@
 Contributors: bradleyswpc
 Tags: ai seo, generative engine optimization, llms.txt, chatgpt seo, ai citations
 Requires at least: 6.5
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.0
 Stable tag: 0.7.15
 License: GPLv2 or later
