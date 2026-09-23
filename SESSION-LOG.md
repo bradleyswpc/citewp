@@ -29,7 +29,8 @@ Verify 0.7.15 against WordPress 7.1 (shipped 2026-08-19; 7.1.1 security release 
 ### Modified
 
 - `readme.txt` — `Tested up to: 7.0` → `7.1`. GitHub `43ba196`, pushed to `main`.
-- No version bump (X31: never burn a version on a no-op).
+- `includes/Llms/Router.php` — **FB74 fix** (Brad: "fix now"). New `skip_canonical_redirect()` on the `redirect_canonical` filter returns `false` when `citewp_aiso_llms` is `short`/`full`, so `/llms.txt` and `/llms-full.txt` serve 200 `text/plain` at the requested URL instead of 301 → trailing slash. Verified: bare + slash forms both 200; `?p=419` still 301s to its permalink (canonical redirect intact elsewhere); `php -l` clean; `debug.log` clean. Committed to `main` at 0.7.15 — **unreleased, ships in 0.7.16** (same pattern as S45 → 0.7.11).
+- No version bump (X31: no no-op releases; FB74 rides the next real release).
 
 ### WP.org SVN ✅
 
@@ -38,7 +39,7 @@ Verify 0.7.15 against WordPress 7.1 (shipped 2026-08-19; 7.1.1 security release 
 
 ### Observations (no action this session)
 
-- **FB74 (new):** `/llms.txt` returns a 301 to `/llms.txt/` before the 200 — WordPress `redirect_canonical` trailing-slash behaviour on our rewrite rule. Pre-existing (citewp.com and hhlnorthwest.com on the WP.org build do the same); not a 7.1 change. AI crawlers pay an extra hop; some may not follow. Fix candidate: filter `redirect_canonical` to skip when our query var is set.
+- **FB74 (found + fixed same session):** `/llms.txt` returned a 301 to `/llms.txt/` before the 200 — WordPress `redirect_canonical` trailing-slash behaviour on our rewrite rule. Pre-existing (citewp.com and hhlnorthwest.com on the WP.org build do the same); not a 7.1 change. Fixed on `main`, see Modified above. Live sites keep the 301 until 0.7.16 ships.
 - Local admin UI verification for future sessions cannot go through the browser from Code (no Chrome extension connection, Playwright rejects the LocalWP self-signed cert, cookie generation via WP-CLI is classifier-blocked). The headless render script pattern used here is the fallback.
 
 ### Carryover into Session 52
@@ -51,7 +52,7 @@ Verify 0.7.15 against WordPress 7.1 (shipped 2026-08-19; 7.1.1 security release 
 3. FB70 — Bot Visits panel in Gutenberg sidebar.
 4. FB39 — publish-block Cite Score panel.
 5. CLAUDE.md coherence rule (carried since S49) — still undrafted.
-6. FB74 — llms.txt trailing-slash canonical redirect (small; bundle into next release).
+6. **0.7.16 release** — FB74 fix is on `main` unreleased; bundle with FB70/FB39 or ship alone when ready (needs version triple + `= 0.7.16 =` changelog per X31, then `package.ps1` + SVN).
 
 ---
 
