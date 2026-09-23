@@ -31,19 +31,10 @@ Verify 0.7.15 against WordPress 7.1 (shipped 2026-08-19; 7.1.1 security release 
 - `readme.txt` — `Tested up to: 7.0` → `7.1`. GitHub `43ba196`, pushed to `main`.
 - No version bump (X31: never burn a version on a no-op).
 
-### WP.org SVN — Brad-manual (Code's `svn commit` blocked by the permission classifier)
+### WP.org SVN ✅
 
-Working copies are already staged with the one-line change. Run from PowerShell (any directory):
-
-```powershell
-svn commit -m "Tested up to 7.1 (verified 0.7.15 on WordPress 7.1.1, no code changes)" "C:\Users\KingpinBWP\Desktop\citewp-svn-trunk\readme.txt"
-svn checkout --depth files https://plugins.svn.wordpress.org/citewp-ai-search-optimizer/tags/0.7.15 "$env:TEMP\citewp-tag-0.7.15"
-(Get-Content "$env:TEMP\citewp-tag-0.7.15\readme.txt") -replace '^Tested up to: 7\.0$', 'Tested up to: 7.1' | Set-Content "$env:TEMP\citewp-tag-0.7.15\readme.txt"
-svn commit -m "Tested up to 7.1 in 0.7.15 tag readme (verified on WordPress 7.1.1, no code changes)" "$env:TEMP\citewp-tag-0.7.15\readme.txt"
-svn cat https://plugins.svn.wordpress.org/citewp-ai-search-optimizer/tags/0.7.15/readme.txt | Select-String "Tested up to"
-```
-
-Both trunk and the stable tag need it — WP.org reads the header from the stable tag's readme.
+- trunk `readme.txt` → **r3710095**; `tags/0.7.15/readme.txt` → **r3710096** (both needed — WP.org reads the header from the stable tag's readme). Verified via `svn cat`: both show `Tested up to: 7.1`, `Stable tag: 0.7.15`.
+- Code's first `svn commit` attempt was blocked by the permission classifier (Production Deploy); Brad explicitly authorized, then Code committed.
 
 ### Observations (no action this session)
 
@@ -53,15 +44,14 @@ Both trunk and the stable tag need it — WP.org reads the header from the stabl
 ### Carryover into Session 52
 
 **Brad-manual:**
-1. Run the SVN commands above (trunk + tag 0.7.15 readme).
-2. Upload `ai-search-optimizer.0.7.15.zip` (on Desktop) to citewp.com (carried from S50).
-3. Optional: delete the stale `citewp-ai-search-optimizer/` 0.7.7 folder in `wp-content/plugins/` on citewp-dev (X6: Brad-manual).
+1. Upload `ai-search-optimizer.0.7.15.zip` (on Desktop) to citewp.com (carried from S50).
+2. Optional: delete the stale `citewp-ai-search-optimizer/` 0.7.7 folder in `wp-content/plugins/` on citewp-dev (X6: Brad-manual).
 
 **Code (open, carried):**
-4. FB70 — Bot Visits panel in Gutenberg sidebar.
-5. FB39 — publish-block Cite Score panel.
-6. CLAUDE.md coherence rule (carried since S49) — still undrafted.
-7. FB74 — llms.txt trailing-slash canonical redirect (small; bundle into next release).
+3. FB70 — Bot Visits panel in Gutenberg sidebar.
+4. FB39 — publish-block Cite Score panel.
+5. CLAUDE.md coherence rule (carried since S49) — still undrafted.
+6. FB74 — llms.txt trailing-slash canonical redirect (small; bundle into next release).
 
 ---
 
